@@ -1,0 +1,200 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="slotDef" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">#{slotDefHome.managed ? 'Edit' : 'Add'} Slot def</f:facet>
+
+
+
+
+            <s:decorate id="nameField" template="layout/edit.xhtml">
+                <ui:define name="label">Name</ui:define>
+                <h:inputTextarea id="name"
+                               cols="80"
+                               rows="3"
+                              value="#{slotDefHome.instance.name}"/>
+            </s:decorate>
+
+
+
+            <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Save"
+                         action="#{slotDefHome.persist}"
+                       disabled="#{!slotDefHome.wired}"
+                       rendered="#{!slotDefHome.managed}"/>
+
+            <h:commandButton id="update"
+                          value="Save"
+                         action="#{slotDefHome.update}"
+                       rendered="#{slotDefHome.managed}"/>
+
+            <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{slotDefHome.remove}"
+                      immediate="true"
+                       rendered="#{slotDefHome.managed}"/>
+
+            <s:button id="cancelEdit"
+                   value="Cancel"
+             propagation="end"
+                    view="/SlotDef.xhtml"
+                rendered="#{slotDefHome.managed}"/>
+
+            <s:button id="cancelAdd"
+                   value="Cancel"
+             propagation="end"
+                    view="/#{empty slotDefFrom ? 'SlotDefList' : slotDefFrom}.xhtml"
+                rendered="#{!slotDefHome.managed}"/>
+
+        </div>
+    </h:form>
+
+<rich:tabPanel switchType="ajax">
+
+    <rich:tab label="Doc def collections">
+        <h:form styleClass="association" id="docDefCollectionsChildren">
+
+            <h:outputText value="There are no docDefCollections associated with this slotDef."
+                       rendered="#{empty slotDefHome.docDefCollections}"/>
+
+            <rich:dataTable value="#{slotDefHome.docDefCollections}"
+                           var="_docDefCollection"
+                      rendered="#{not empty slotDefHome.docDefCollections}"
+                    rowClasses="rvgRowOne,rvgRowTwo"
+                            id="docDefCollectionsTable">
+                <rich:column sortBy="#{_docDefCollection.id}">
+                    <f:facet name="header">Id</f:facet>
+                    <h:outputText value="#{_docDefCollection.id}"/>
+                </rich:column>
+                <rich:column sortBy="#{_docDefCollection.max}">
+                    <f:facet name="header">Max</f:facet>
+                    <h:outputText value="#{_docDefCollection.max}"/>
+                </rich:column>
+                <rich:column sortBy="#{_docDefCollection.min}">
+                    <f:facet name="header">Min</f:facet>
+                    <h:outputText value="#{_docDefCollection.min}"/>
+                </rich:column>
+                <rich:column sortBy="#{_docDefCollection.name}">
+                    <f:facet name="header">Name</f:facet>
+                    <h:outputText value="#{_docDefCollection.name}"/>
+                </rich:column>
+            </rich:dataTable>
+
+        </h:form>
+
+        <f:subview rendered="#{slotDefHome.managed}" id="docDefCollections">
+        <div class="actionButtons">
+            <s:button id="adddocDefCollection"
+                   value="Add docDefCollection"
+                    view="/DocDefCollectionEdit.xhtml"
+             propagation="none">
+                 <f:param name="slotDefId"
+                         value="#{slotDefHome.instance.id}"/>
+                 <f:param name="docDefCollectionFrom" value="SlotDef"/>
+            </s:button>
+        </div>
+        </f:subview>
+    </rich:tab>
+
+    <rich:tab label="Propertyt defs">
+        <h:form styleClass="association" id="propertytDefsChildren">
+
+            <h:outputText value="There are no propertytDefs associated with this slotDef."
+                       rendered="#{empty slotDefHome.propertytDefs}"/>
+
+            <rich:dataTable value="#{slotDefHome.propertytDefs}"
+                           var="_propertytDef"
+                      rendered="#{not empty slotDefHome.propertytDefs}"
+                    rowClasses="rvgRowOne,rvgRowTwo"
+                            id="propertytDefsTable">
+                <rich:column sortBy="#{_propertytDef.id}">
+                    <f:facet name="header">Id</f:facet>
+                    <h:outputText value="#{_propertytDef.id}"/>
+                </rich:column>
+                <rich:column sortBy="#{_propertytDef.name}">
+                    <f:facet name="header">Name</f:facet>
+                    <h:outputText value="#{_propertytDef.name}"/>
+                </rich:column>
+                <rich:column sortBy="#{_propertytDef.type}">
+                    <f:facet name="header">Type</f:facet>
+                    <h:outputText value="#{_propertytDef.type}"/>
+                </rich:column>
+            </rich:dataTable>
+
+        </h:form>
+
+        <f:subview rendered="#{slotDefHome.managed}" id="propertytDefs">
+        <div class="actionButtons">
+            <s:button id="addpropertytDef"
+                   value="Add propertytDef"
+                    view="/PropertytDefEdit.xhtml"
+             propagation="none">
+                 <f:param name="slotDefId"
+                         value="#{slotDefHome.instance.id}"/>
+                 <f:param name="propertytDefFrom" value="SlotDef"/>
+            </s:button>
+        </div>
+        </f:subview>
+    </rich:tab>
+
+    <rich:tab label="Rules">
+        <h:form styleClass="association" id="rulesChildren">
+
+            <h:outputText value="There are no rules associated with this slotDef."
+                       rendered="#{empty slotDefHome.rules}"/>
+
+            <rich:dataTable value="#{slotDefHome.rules}"
+                           var="_rule"
+                      rendered="#{not empty slotDefHome.rules}"
+                    rowClasses="rvgRowOne,rvgRowTwo"
+                            id="rulesTable">
+                <rich:column sortBy="#{_rule.id}">
+                    <f:facet name="header">Id</f:facet>
+                    <h:outputText value="#{_rule.id}"/>
+                </rich:column>
+                <rich:column sortBy="#{_rule.type}">
+                    <f:facet name="header">Type</f:facet>
+                    <h:outputText value="#{_rule.type}"/>
+                </rich:column>
+            </rich:dataTable>
+
+        </h:form>
+
+        <f:subview rendered="#{slotDefHome.managed}" id="rules">
+        <div class="actionButtons">
+            <s:button id="addrule"
+                   value="Add rule"
+                    view="/RuleEdit.xhtml"
+             propagation="none">
+                 <f:param name="slotDefId"
+                         value="#{slotDefHome.instance.id}"/>
+                 <f:param name="ruleFrom" value="SlotDef"/>
+            </s:button>
+        </div>
+        </f:subview>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

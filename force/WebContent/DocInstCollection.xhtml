@@ -1,0 +1,172 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <rich:panel>
+        <f:facet name="header">Doc inst collection Details</f:facet>
+
+
+        <div style="clear:both"/>
+
+    </rich:panel>
+
+    <div class="actionButtons">
+
+        <s:button view="/DocInstCollectionEdit.xhtml"
+                    id="edit"
+                 value="Edit"/>
+
+        <s:button view="/#{empty docInstCollectionFrom ? 'DocInstCollectionList' : docInstCollectionFrom}.xhtml"
+                    id="done"
+                 value="Done"/>
+
+    </div>
+
+    <rich:tabPanel switchType="ajax">
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/manytoone.gif" style="vertical-align: middle; padding-right: 4px;"/>Doc def collection</h:panelGroup>
+        </f:facet>
+    <div class="association" id="docDefCollectionParent">
+
+        <h:outputText value="There is no docDefCollection associated with this docInstCollection."
+                   rendered="#{docInstCollectionHome.instance.docDefCollection == null}"/>
+
+        <rich:dataTable var="_docDefCollection"
+                   value="#{docInstCollectionHome.instance.docDefCollection}"
+                rendered="#{docInstCollectionHome.instance.docDefCollection != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="docDefCollectionTable">
+            <h:column>
+                <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{_docDefCollection.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Doc def id</f:facet>
+                <h:outputText value="#{_docDefCollection.docDef.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Max</f:facet>
+                <h:outputText value="#{_docDefCollection.max}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Min</f:facet>
+                <h:outputText value="#{_docDefCollection.min}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                <h:outputText value="#{_docDefCollection.name}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Slot def id</f:facet>
+                <h:outputText value="#{_docDefCollection.slotDef.id}"/>
+            </h:column>
+            <h:column styleClass="action">
+                <f:facet name="header">Action</f:facet>
+                <s:link id="viewdocDefCollection"
+                     value="View"
+                      view="/DocDefCollection.xhtml">
+                    <f:param name="docDefCollectionId"
+                           value="#{_docDefCollection.id}"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </div>
+    </rich:tab>
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/onetomany.gif" style="vertical-align: middle; padding-right: 4px;"/>Doc insts</h:panelGroup>
+        </f:facet>
+    <h:form styleClass="association" id="docInstsChildren">
+
+        <h:outputText value="There are no docInsts associated with this docInstCollection."
+                   rendered="#{empty docInstCollectionHome.docInsts}"/>
+
+        <rich:dataTable value="#{docInstCollectionHome.docInsts}"
+                       var="_docInst"
+                  rendered="#{not empty docInstCollectionHome.docInsts}"
+                rowClasses="rvgRowOne,rvgRowTwo"
+                        id="docInstsTable">
+            <rich:column sortBy="#{_docInst.id}">
+                <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{_docInst.id}"/>
+            </rich:column>
+            <rich:column sortBy="#{_docInst.nodeRef}">
+                <f:facet name="header">Node ref</f:facet>
+                <h:outputText value="#{_docInst.nodeRef}"/>
+            </rich:column>
+            <h:column>
+                <f:facet name="header">Action</f:facet>
+                <s:link id="selectdocInst"
+                     value="Select"
+                      view="/DocInst.xhtml">
+                    <f:param name="docInstId"
+                            value="#{_docInst.id}"/>
+                    <f:param name="docInstFrom" value="DocInstCollection"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </h:form>
+
+    <div class="actionButtons">
+        <s:button
+               value="Add docInst"
+                view="/DocInstEdit.xhtml">
+            <f:param name="docInstCollectionId"
+                    value="#{docInstCollectionHome.instance.id}"/>
+            <f:param name="docInstFrom" value="DocInstCollection"/>
+        </s:button>
+    </div>
+    </rich:tab>
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/manytoone.gif" style="vertical-align: middle; padding-right: 4px;"/>Slot inst</h:panelGroup>
+        </f:facet>
+    <div class="association" id="slotInstParent">
+
+        <h:outputText value="There is no slotInst associated with this docInstCollection."
+                   rendered="#{docInstCollectionHome.instance.slotInst == null}"/>
+
+        <rich:dataTable var="_slotInst"
+                   value="#{docInstCollectionHome.instance.slotInst}"
+                rendered="#{docInstCollectionHome.instance.slotInst != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="slotInstTable">
+            <h:column>
+                <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{_slotInst.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Slot def id</f:facet>
+                <h:outputText value="#{_slotInst.slotDef.id}"/>
+            </h:column>
+            <h:column styleClass="action">
+                <f:facet name="header">Action</f:facet>
+                <s:link id="viewslotInst"
+                     value="View"
+                      view="/SlotInst.xhtml">
+                    <f:param name="slotInstId"
+                           value="#{_slotInst.id}"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </div>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

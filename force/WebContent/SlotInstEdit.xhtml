@@ -1,0 +1,131 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="slotInst" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">#{slotInstHome.managed ? 'Edit' : 'Add'} Slot inst</f:facet>
+
+
+
+
+            <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Save"
+                         action="#{slotInstHome.persist}"
+                       disabled="#{!slotInstHome.wired}"
+                       rendered="#{!slotInstHome.managed}"/>
+
+            <h:commandButton id="update"
+                          value="Save"
+                         action="#{slotInstHome.update}"
+                       rendered="#{slotInstHome.managed}"/>
+
+            <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{slotInstHome.remove}"
+                      immediate="true"
+                       rendered="#{slotInstHome.managed}"/>
+
+            <s:button id="cancelEdit"
+                   value="Cancel"
+             propagation="end"
+                    view="/SlotInst.xhtml"
+                rendered="#{slotInstHome.managed}"/>
+
+            <s:button id="cancelAdd"
+                   value="Cancel"
+             propagation="end"
+                    view="/#{empty slotInstFrom ? 'SlotInstList' : slotInstFrom}.xhtml"
+                rendered="#{!slotInstHome.managed}"/>
+
+        </div>
+    </h:form>
+
+<rich:tabPanel switchType="ajax">
+
+    <rich:tab label="Doc inst collections">
+        <h:form styleClass="association" id="docInstCollectionsChildren">
+
+            <h:outputText value="There are no docInstCollections associated with this slotInst."
+                       rendered="#{empty slotInstHome.docInstCollections}"/>
+
+            <rich:dataTable value="#{slotInstHome.docInstCollections}"
+                           var="_docInstCollection"
+                      rendered="#{not empty slotInstHome.docInstCollections}"
+                    rowClasses="rvgRowOne,rvgRowTwo"
+                            id="docInstCollectionsTable">
+                <rich:column sortBy="#{_docInstCollection.id}">
+                    <f:facet name="header">Id</f:facet>
+                    <h:outputText value="#{_docInstCollection.id}"/>
+                </rich:column>
+            </rich:dataTable>
+
+        </h:form>
+
+        <f:subview rendered="#{slotInstHome.managed}" id="docInstCollections">
+        <div class="actionButtons">
+            <s:button id="adddocInstCollection"
+                   value="Add docInstCollection"
+                    view="/DocInstCollectionEdit.xhtml"
+             propagation="none">
+                 <f:param name="slotInstId"
+                         value="#{slotInstHome.instance.id}"/>
+                 <f:param name="docInstCollectionFrom" value="SlotInst"/>
+            </s:button>
+        </div>
+        </f:subview>
+    </rich:tab>
+
+    <rich:tab label="Slot def">
+    <div class="association" id="slotDefParent">
+
+        <h:outputText value="There is no slotDef associated with this slotInst."
+                   rendered="#{slotInstHome.instance.slotDef == null}"/>
+
+        <rich:dataTable var="_slotDef"
+                   value="#{slotInstHome.instance.slotDef}"
+                rendered="#{slotInstHome.instance.slotDef != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="slotDefTable">
+            <h:column>
+                <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{_slotDef.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                <h:outputText value="#{_slotDef.name}"/>
+            </h:column>
+        </rich:dataTable>
+
+        <div class="actionButtons">
+            <s:button id="#{slotInstHome.instance.slotDef != null ? 'changeParent' : 'selectParent'}" value="#{slotInstHome.instance.slotDef != null ? 'Change' : 'Select'} slotDef"
+                       view="/SlotDefList.xhtml">
+                <f:param name="from" value="SlotInstEdit"/>
+            </s:button>
+        </div>
+
+    </div>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

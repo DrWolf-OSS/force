@@ -1,5 +1,6 @@
 package it.drwolf.force.entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -8,15 +9,18 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
+@Table(name = "DocDef", uniqueConstraints = { @UniqueConstraint(columnNames = "name") })
 public class DocDef {
 
 	private Long id;
 
 	private String name;
 
-	private Set<PropertytDef> propertyDefs;
+	private Set<PropertytDef> propertyDefs = new HashSet<PropertytDef>();
 
 	@Id
 	@Enumerated
@@ -37,7 +41,7 @@ public class DocDef {
 	}
 
 	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn
+	@JoinColumn(name = "docDef_id")
 	public Set<PropertytDef> getPropertyDefs() {
 		return propertyDefs;
 	}

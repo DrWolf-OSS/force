@@ -60,7 +60,7 @@ public class SlotDef {
 	}
 
 	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn
+	@JoinColumn(name = "slotDef_id")
 	public Set<PropertytDef> getPropertytDefs() {
 		return propertytDefs;
 	}

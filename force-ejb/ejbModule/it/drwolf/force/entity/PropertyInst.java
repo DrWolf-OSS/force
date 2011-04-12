@@ -2,6 +2,12 @@ package it.drwolf.force.entity;
 
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+@Entity
 public class PropertyInst {
 
 	private Long id;
@@ -16,6 +22,17 @@ public class PropertyInst {
 
 	private Date dateValue;
 
+	@Id
+	@GeneratedValue
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@ManyToOne
 	public PropertytDef getPropertytDef() {
 		return propertytDef;
 	}
@@ -54,14 +71,6 @@ public class PropertyInst {
 
 	public void setDateValue(Date dateValue) {
 		this.dateValue = dateValue;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 }

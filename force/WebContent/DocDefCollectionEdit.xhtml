@@ -1,0 +1,156 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="docDefCollection" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">#{docDefCollectionHome.managed ? 'Edit' : 'Add'} Doc def collection</f:facet>
+
+
+
+
+            <s:decorate id="maxField" template="layout/edit.xhtml">
+                <ui:define name="label">Max</ui:define>
+                <h:inputText id="max"
+                          value="#{docDefCollectionHome.instance.max}">
+                    <a:support event="onblur" reRender="maxField" bypassUpdates="true" ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+
+
+            <s:decorate id="minField" template="layout/edit.xhtml">
+                <ui:define name="label">Min</ui:define>
+                <h:inputText id="min"
+                          value="#{docDefCollectionHome.instance.min}">
+                    <a:support event="onblur" reRender="minField" bypassUpdates="true" ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+
+
+            <s:decorate id="nameField" template="layout/edit.xhtml">
+                <ui:define name="label">Name</ui:define>
+                <h:inputTextarea id="name"
+                               cols="80"
+                               rows="3"
+                              value="#{docDefCollectionHome.instance.name}"/>
+            </s:decorate>
+
+
+            <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Save"
+                         action="#{docDefCollectionHome.persist}"
+                       disabled="#{!docDefCollectionHome.wired}"
+                       rendered="#{!docDefCollectionHome.managed}"/>
+
+            <h:commandButton id="update"
+                          value="Save"
+                         action="#{docDefCollectionHome.update}"
+                       rendered="#{docDefCollectionHome.managed}"/>
+
+            <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{docDefCollectionHome.remove}"
+                      immediate="true"
+                       rendered="#{docDefCollectionHome.managed}"/>
+
+            <s:button id="cancelEdit"
+                   value="Cancel"
+             propagation="end"
+                    view="/DocDefCollection.xhtml"
+                rendered="#{docDefCollectionHome.managed}"/>
+
+            <s:button id="cancelAdd"
+                   value="Cancel"
+             propagation="end"
+                    view="/#{empty docDefCollectionFrom ? 'DocDefCollectionList' : docDefCollectionFrom}.xhtml"
+                rendered="#{!docDefCollectionHome.managed}"/>
+
+        </div>
+    </h:form>
+
+<rich:tabPanel switchType="ajax">
+
+    <rich:tab label="Doc def *" labelClass="required">
+    <div class="association" id="docDefParent">
+
+        <h:outputText value="There is no docDef associated with this docDefCollection."
+                   rendered="#{docDefCollectionHome.instance.docDef == null}"/>
+
+        <rich:dataTable var="_docDef"
+                   value="#{docDefCollectionHome.instance.docDef}"
+                rendered="#{docDefCollectionHome.instance.docDef != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="docDefTable">
+            <h:column>
+                <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{_docDef.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                <h:outputText value="#{_docDef.name}"/>
+            </h:column>
+        </rich:dataTable>
+
+        <div class="actionButtons">
+            <s:button id="#{docDefCollectionHome.instance.docDef != null ? 'changeParent' : 'selectParent'}" value="#{docDefCollectionHome.instance.docDef != null ? 'Change' : 'Select'} docDef"
+                       view="/DocDefList.xhtml">
+                <f:param name="from" value="DocDefCollectionEdit"/>
+            </s:button>
+        </div>
+
+    </div>
+    </rich:tab>
+
+    <rich:tab label="Slot def">
+    <div class="association" id="slotDefParent">
+
+        <h:outputText value="There is no slotDef associated with this docDefCollection."
+                   rendered="#{docDefCollectionHome.instance.slotDef == null}"/>
+
+        <rich:dataTable var="_slotDef"
+                   value="#{docDefCollectionHome.instance.slotDef}"
+                rendered="#{docDefCollectionHome.instance.slotDef != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="slotDefTable">
+            <h:column>
+                <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{_slotDef.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                <h:outputText value="#{_slotDef.name}"/>
+            </h:column>
+        </rich:dataTable>
+
+        <div class="actionButtons">
+            <s:button id="#{docDefCollectionHome.instance.slotDef != null ? 'changeParent' : 'selectParent'}" value="#{docDefCollectionHome.instance.slotDef != null ? 'Change' : 'Select'} slotDef"
+                       view="/SlotDefList.xhtml">
+                <f:param name="from" value="DocDefCollectionEdit"/>
+            </s:button>
+        </div>
+
+    </div>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

@@ -12,23 +12,30 @@
     <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none">
         <f:facet name="label">Browse data</f:facet>
 	<rich:menuItem>
-    	<s:link view="/DocSetDefList.xhtml"
-           	value="DocSetDef List"
-           	id="DocSetDefId"
+    	<s:link view="/SlotDefList.xhtml"
+           	value="SlotDef List"
+           	id="SlotDefId"
 			includePageParams="false"
      		propagation="none"/>
      </rich:menuItem>
 	<rich:menuItem>
-    	<s:link view="/DocSetInstList.xhtml"
-           	value="DocSetInst List"
-           	id="DocSetInstId"
+    	<s:link view="/PropertyInstList.xhtml"
+           	value="PropertyInst List"
+           	id="PropertyInstId"
 			includePageParams="false"
      		propagation="none"/>
      </rich:menuItem>
 	<rich:menuItem>
-    	<s:link view="/SetRuleList.xhtml"
-           	value="SetRule List"
-           	id="SetRuleId"
+    	<s:link view="/DocDefCollectionList.xhtml"
+           	value="DocDefCollection List"
+           	id="DocDefCollectionId"
+			includePageParams="false"
+     		propagation="none"/>
+     </rich:menuItem>
+	<rich:menuItem>
+    	<s:link view="/PropertytDefList.xhtml"
+           	value="PropertytDef List"
+           	id="PropertytDefId"
 			includePageParams="false"
      		propagation="none"/>
      </rich:menuItem>
@@ -40,9 +47,16 @@
      		propagation="none"/>
      </rich:menuItem>
 	<rich:menuItem>
-    	<s:link view="/DocRuleList.xhtml"
-           	value="DocRule List"
-           	id="DocRuleId"
+    	<s:link view="/RuleList.xhtml"
+           	value="Rule List"
+           	id="RuleId"
+			includePageParams="false"
+     		propagation="none"/>
+     </rich:menuItem>
+	<rich:menuItem>
+    	<s:link view="/SlotInstList.xhtml"
+           	value="SlotInst List"
+           	id="SlotInstId"
 			includePageParams="false"
      		propagation="none"/>
      </rich:menuItem>
@@ -50,6 +64,13 @@
     	<s:link view="/DocInstList.xhtml"
            	value="DocInst List"
            	id="DocInstId"
+			includePageParams="false"
+     		propagation="none"/>
+     </rich:menuItem>
+	<rich:menuItem>
+    	<s:link view="/DocInstCollectionList.xhtml"
+           	value="DocInstCollection List"
+           	id="DocInstCollectionId"
 			includePageParams="false"
      		propagation="none"/>
      </rich:menuItem>
