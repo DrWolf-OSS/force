@@ -1,8 +1,10 @@
 package it.drwolf.force.session;
 
-import it.drwolf.force.entity.*;
+import it.drwolf.force.entity.DocDef;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityHome;
 
@@ -41,9 +43,9 @@ public class DocDefHome extends EntityHome<DocDef> {
 		return isIdDefined() ? getInstance() : null;
 	}
 
-	public List<PropertytDef> getPropertyDefs() {
-		return getInstance() == null ? null : new ArrayList<PropertytDef>(
-				getInstance().getPropertyDefs());
+	public List<String> getPropertyDefs() {
+		return getInstance() == null ? null : new ArrayList<String>(
+				getInstance().getAspects());
 	}
 
 }

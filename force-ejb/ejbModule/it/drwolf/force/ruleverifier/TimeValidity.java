@@ -1,9 +1,9 @@
 package it.drwolf.force.ruleverifier;
 
+import it.drwolf.force.interfaces.IRuleVerifier;
+
 import java.util.List;
 import java.util.Map;
-
-import it.drwolf.force.interfaces.IRuleVerifier;
 
 public class TimeValidity implements IRuleVerifier {
 
@@ -15,6 +15,8 @@ public class TimeValidity implements IRuleVerifier {
 	public List<String> getInParams() {
 		// TODO Auto-generated method stub
 		return null;
+		// TimeValidityParameter[] values = TimeValidityParameter.values();
+
 	}
 
 }

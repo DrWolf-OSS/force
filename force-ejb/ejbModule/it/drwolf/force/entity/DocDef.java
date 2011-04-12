@@ -3,12 +3,10 @@ package it.drwolf.force.entity;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -20,7 +18,7 @@ public class DocDef {
 
 	private String name;
 
-	private Set<PropertytDef> propertyDefs = new HashSet<PropertytDef>();
+	private Set<String> aspects = new HashSet<String>();
 
 	@Id
 	@Enumerated
@@ -40,14 +38,13 @@ public class DocDef {
 		this.name = name;
 	}
 
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "docDef_id")
-	public Set<PropertytDef> getPropertyDefs() {
-		return propertyDefs;
+	@ElementCollection
+	public Set<String> getAspects() {
+		return aspects;
 	}
 
-	public void setPropertyDefs(Set<PropertytDef> propertyDefs) {
-		this.propertyDefs = propertyDefs;
+	public void setAspects(Set<String> aspects) {
+		this.aspects = aspects;
 	}
 
 }
