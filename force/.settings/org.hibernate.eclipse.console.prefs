@@ -1,0 +1,4 @@
+#Mon Mar 21 10:24:39 CET 2011
+default.configuration=force-ejb
+eclipse.preferences.version=1
+hibernate3.enabled=true

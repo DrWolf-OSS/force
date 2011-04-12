@@ -1,0 +1,17 @@
+#Mon Mar 21 10:24:40 CET 2011
+action.package=it.drwolf.force.session
+action.sources=/force-ejb/ejbModule
+eclipse.preferences.version=1
+model.package=it.drwolf.force.entity
+model.sources=/force-ejb/ejbModule
+seam.ear.project=force-ear
+seam.ejb.project=force-ejb
+seam.project.connection.profile=New MySQL
+seam.project.deployment.type=ear
+seam.project.settings.version=1.1
+seam.project.web.root.folder=/force/WebContent
+seam.runtime.name=jboss-seam-2.2.1.Final
+seam.test.creating=false
+seam.test.project=force-test
+test.package=it.drwolf.force.test
+test.sources=/force-test/test-src
