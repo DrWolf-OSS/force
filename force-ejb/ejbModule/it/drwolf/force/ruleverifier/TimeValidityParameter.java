@@ -4,7 +4,7 @@ import it.drwolf.force.enums.DataType;
 
 public enum TimeValidityParameter {
 	EXPIRATION_DATE("ExpirationDate", DataType.DATE), DATE_TO_VERIFY(
-			"ExpirationDate", DataType.DATE);
+			"DateToVerify", DataType.DATE);
 	private final String paramName;
 	private final DataType paramType;
 

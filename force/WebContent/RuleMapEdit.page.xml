@@ -5,7 +5,7 @@
       no-conversation-view-id="/RuleList.xhtml"
       login-required="true">
 
-   <begin-conversation join="true" />
+   <begin-conversation join="true"/>
 
    <action execute="#{ruleHome.wire}"/>
 
@@ -18,7 +18,7 @@
 
    <navigation from-action="#{ruleHome.persist}">
       <rule if-outcome="persisted">
-         <end-conversation before-redirect="true"/>
+         <end-conversation/>
          <redirect view-id="/RuleMapEdit.xhtml"/>
       </rule>
    </navigation>
