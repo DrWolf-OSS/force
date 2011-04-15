@@ -39,10 +39,20 @@ public abstract class AlfrescoIdentity {
 		parameter.put(SessionParameter.ATOMPUB_URL, url);
 		parameter.put(SessionParameter.BINDING_TYPE,
 				BindingType.ATOMPUB.value());
-
+		//
 		Repository r = f.getRepositories(parameter).get(0);
 
 		parameter.put(SessionParameter.REPOSITORY_ID, r.getId());
+
+		//
+		// CmisBindingFactory factory = CmisBindingFactory.newInstance();
+		// CmisBinding binding = factory.createCmisAtomPubBinding(parameter);
+		//
+		// binding.
+		//
+		// parameter.put(SessionParameter.BINDING_TYPE,
+		// binding.);
+		//
 
 		this.session = new SynchSession(f.createSession(parameter));
 

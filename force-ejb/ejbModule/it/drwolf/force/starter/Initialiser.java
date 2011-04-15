@@ -25,7 +25,6 @@ public class Initialiser {
 
 		while (entityManager == null) {
 			try {
-				// BRUTTERRIMO ma funziona
 				System.out.println("---> Sleep!");
 				Thread.sleep(10000);
 				entityManager = (EntityManager) Component

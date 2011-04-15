@@ -226,4 +226,19 @@ public class SynchSession implements Session {
 		session.setDefaultContext(arg0);
 	}
 
+	// public void cancel() {
+	// // TODO Auto-generated method stub
+	//
+	// }
+	//
+	// public ItemIterable<ChangeEvent> getContentChanges(String arg0) {
+	// // TODO Auto-generated method stub
+	// return null;
+	// }
+	//
+	// public void save() {
+	// // TODO Auto-generated method stub
+	//
+	// }
+
 }

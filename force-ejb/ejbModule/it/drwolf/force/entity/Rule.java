@@ -7,8 +7,6 @@ import it.drwolf.force.interfaces.IRuleVerifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
@@ -16,8 +14,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 @EntityListeners(value = RuleListener.class)
@@ -43,9 +42,9 @@ public class Rule {
 		this.id = id;
 	}
 
-	@ElementCollection
-	@MapKeyColumn(name = "mapKey")
-	@Column(name = "mapValue")
+	@CollectionOfElements
+	// @MapKey(name = "mapKey")
+	// @Column(name = "mapValue")
 	public Map<String, String> getParametersMap() {
 		return parametersMap;
 	}
