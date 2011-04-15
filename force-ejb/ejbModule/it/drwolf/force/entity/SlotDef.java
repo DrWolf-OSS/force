@@ -1,6 +1,8 @@
 package it.drwolf.force.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -9,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 @Entity
 public class SlotDef {
@@ -21,7 +24,7 @@ public class SlotDef {
 
 	private Set<Rule> rules = new HashSet<Rule>();
 
-	private Set<PropertytDef> propertytDefs = new HashSet<PropertytDef>();
+	private Set<PropertyDef> propertyDefs = new HashSet<PropertyDef>();
 
 	@Id
 	@GeneratedValue
@@ -61,12 +64,27 @@ public class SlotDef {
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "slotDef_id")
-	public Set<PropertytDef> getPropertytDefs() {
-		return propertytDefs;
+	public Set<PropertyDef> getPropertyDefs() {
+		return propertyDefs;
 	}
 
-	public void setPropertytDefs(Set<PropertytDef> propertytDefs) {
-		this.propertytDefs = propertytDefs;
+	public void setPropertyDefs(Set<PropertyDef> propertytDefs) {
+		this.propertyDefs = propertytDefs;
+	}
+
+	@Transient
+	public List<PropertyDef> getPropertiesAsList() {
+		return new ArrayList<PropertyDef>(propertyDefs);
+	}
+
+	@Transient
+	public List<DocDefCollection> getDocDefCollectionsAsList() {
+		return new ArrayList<DocDefCollection>(docDefCollections);
+	}
+
+	@Override
+	public String toString() {
+		return name;
 	}
 
 }

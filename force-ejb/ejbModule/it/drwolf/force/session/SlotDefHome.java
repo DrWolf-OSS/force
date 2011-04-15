@@ -46,9 +46,9 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 				getInstance().getDocDefCollections());
 	}
 
-	public List<PropertytDef> getPropertytDefs() {
-		return getInstance() == null ? null : new ArrayList<PropertytDef>(
-				getInstance().getPropertytDefs());
+	public List<PropertyDef> getPropertytDefs() {
+		return getInstance() == null ? null : new ArrayList<PropertyDef>(
+				getInstance().getPropertyDefs());
 	}
 
 	public List<Rule> getRules() {

@@ -4,6 +4,7 @@
     xmlns:s="http://jboss.com/products/seam/taglib"
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:c="http://java.sun.com/jstl/core"
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:a="http://richfaces.org/a4j"
     xmlns:rich="http://richfaces.org/rich"
@@ -16,9 +17,6 @@
         <rich:panel>
             <f:facet name="header">#{slotDefHome.managed ? 'Edit' : 'Add'} Slot def</f:facet>
 
-
-
-
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">Name</ui:define>
                 <h:inputTextarea id="name"
@@ -26,7 +24,32 @@
                                rows="3"
                               value="#{slotDefHome.instance.name}"/>
             </s:decorate>
-
+            
+            <s:div id="properties">
+			<c:forEach var="prop" items="#{slotDefEditBean.properties}">
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="#{prop.name}" />
+					</ui:define>
+	                <h:outputText value="#{prop.type}" />
+	            </s:decorate>			
+			</c:forEach>
+			</s:div>
+			
+			
+			<s:div id="collections">
+			<c:forEach var="coll" items="#{slotDefEditBean.collections}">
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="#{coll.name}" />
+					</ui:define>
+	            </s:decorate>			
+			</c:forEach>
+			</s:div>
+			
+			<div style="clear:both"/>
+			<a:commandButton value="add property" action="#{slotDefEditBean.newPoperty()}" oncomplete="#{rich:component('propPanel')}.show()"/>
+			<a:commandButton value="add collection" action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collPanel')}.show()"/>
 
 
             <div style="clear:both">
@@ -40,13 +63,13 @@
 
             <h:commandButton id="save"
                           value="Save"
-                         action="#{slotDefHome.persist}"
+                         action="#{slotDefEditBean.save()}"
                        disabled="#{!slotDefHome.wired}"
                        rendered="#{!slotDefHome.managed}"/>
 
             <h:commandButton id="update"
                           value="Save"
-                         action="#{slotDefHome.update}"
+                         action="#{slotDefEditBean.save()}"
                        rendered="#{slotDefHome.managed}"/>
 
             <h:commandButton id="delete"
@@ -68,9 +91,67 @@
                 rendered="#{!slotDefHome.managed}"/>
 
         </div>
+        
+       <rich:modalPanel id="propPanel" autosized="true" width="400" 
+			moveable="false" resizeable="false">
+			<f:facet name="header">
+				<h:outputText value="Add Property" />
+			</f:facet>
+			<s:div>
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Property Name" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.name}" />
+	            </s:decorate>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Property Data Type" />
+					</ui:define>
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.type}" >
+                    	<s:selectItems value="#{dataTypes}" 
+						var="type" label="#{type}"/>
+             		</h:selectOneMenu>
+	            </s:decorate>
+	        </s:div>
+	        <div style="clear:both"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" onclick="#{rich:component('propPanel')}.hide()" reRender="properties,propPanel"/>
+			<a:commandButton value="Cancel" onclick="#{rich:component('propPanel')}.hide()"/>
+		</rich:modalPanel>
+		
+		
+		<rich:modalPanel id="collPanel" autosized="true" width="400" 
+			moveable="false" resizeable="false">
+			<f:facet name="header">
+				<h:outputText value="Add Collection" />
+			</f:facet>
+			<s:div>
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Collection Name" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.collection.name}" />
+	            </s:decorate>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Max" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.collection.max}" />
+	            </s:decorate>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Min" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.collection.min}" />
+	            </s:decorate>
+	        </s:div>
+	        <div style="clear:both"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addCollection()}" onclick="#{rich:component('collPanel')}.hide()" reRender="collections,collPanel"/>
+			<a:commandButton value="Cancel" onclick="#{rich:component('collPanel')}.hide()"/>
+		</rich:modalPanel>
     </h:form>
 
-<rich:tabPanel switchType="ajax">
+<rich:tabPanel switchType="client">
 
     <rich:tab label="Doc def collections">
         <h:form styleClass="association" id="docDefCollectionsChildren">
@@ -195,6 +276,9 @@
         </f:subview>
     </rich:tab>
 </rich:tabPanel>
+
+
+		
 </ui:define>
 
 </ui:composition>

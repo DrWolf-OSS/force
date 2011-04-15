@@ -33,7 +33,7 @@ public class PropertyInstHome extends EntityHome<PropertyInst> {
 
 	public void wire() {
 		getInstance();
-		PropertytDef propertytDef = propertytDefHome.getDefinedInstance();
+		PropertyDef propertytDef = propertytDefHome.getDefinedInstance();
 		if (propertytDef != null) {
 			getInstance().setPropertytDef(propertytDef);
 		}

@@ -9,13 +9,22 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-public class PropertytDef {
+public class PropertyDef {
 
 	private Long id;
 
 	private String name;
 
 	private DataType type;
+
+	public PropertyDef(String name, DataType type) {
+		super();
+		this.name = name;
+		this.type = type;
+	}
+
+	public PropertyDef() {
+	}
 
 	@Id
 	@GeneratedValue
@@ -42,6 +51,11 @@ public class PropertytDef {
 
 	public void setType(DataType type) {
 		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		return this.name + ":" + type;
 	}
 
 }

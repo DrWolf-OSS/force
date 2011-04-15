@@ -6,13 +6,13 @@ import org.jboss.seam.framework.EntityQuery;
 import java.util.Arrays;
 
 @Name("propertytDefList")
-public class PropertytDefList extends EntityQuery<PropertytDef> {
+public class PropertytDefList extends EntityQuery<PropertyDef> {
 
 	private static final String EJBQL = "select propertytDef from PropertytDef propertytDef";
 
 	private static final String[] RESTRICTIONS = { "lower(propertytDef.name) like lower(concat(#{propertytDefList.propertytDef.name},'%'))", };
 
-	private PropertytDef propertytDef = new PropertytDef();
+	private PropertyDef propertytDef = new PropertyDef();
 
 	public PropertytDefList() {
 		setEjbql(EJBQL);
@@ -20,7 +20,7 @@ public class PropertytDefList extends EntityQuery<PropertytDef> {
 		setMaxResults(25);
 	}
 
-	public PropertytDef getPropertytDef() {
+	public PropertyDef getPropertytDef() {
 		return propertytDef;
 	}
 }

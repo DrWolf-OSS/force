@@ -9,6 +9,7 @@
     template="layout/template.xhtml">
 
     <ui:define name="body">
+    <h:form>
 
         <h1>Welcome to Seam!</h1>
         <rich:panel>
@@ -32,6 +33,8 @@
                 </s:div>
             </h:panelGrid>
         </rich:panel>
-
+        <h:commandButton action="#{testBean.test()}" value="test" />
+        
+	</h:form>
     </ui:define>
 </ui:composition>

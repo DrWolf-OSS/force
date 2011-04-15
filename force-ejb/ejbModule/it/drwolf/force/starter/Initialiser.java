@@ -25,7 +25,9 @@ public class Initialiser {
 
 		while (entityManager == null) {
 			try {
-				Thread.sleep(1000);
+				// BRUTTERRIMO ma funziona
+				System.out.println("---> Sleep!");
+				Thread.sleep(10000);
 				entityManager = (EntityManager) Component
 						.getInstance("entityManager");
 			} catch (InterruptedException e) {
@@ -34,6 +36,7 @@ public class Initialiser {
 			}
 		}
 		checkParams(entityManager);
+		System.out.println("---> Check");
 	}
 
 	private void checkParams(EntityManager entityManager) {

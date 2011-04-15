@@ -5,7 +5,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityHome;
 
 @Name("propertytDefHome")
-public class PropertytDefHome extends EntityHome<PropertytDef> {
+public class PropertytDefHome extends EntityHome<PropertyDef> {
 
 	public void setPropertytDefId(Long id) {
 		setId(id);
@@ -16,8 +16,8 @@ public class PropertytDefHome extends EntityHome<PropertytDef> {
 	}
 
 	@Override
-	protected PropertytDef createInstance() {
-		PropertytDef propertytDef = new PropertytDef();
+	protected PropertyDef createInstance() {
+		PropertyDef propertytDef = new PropertyDef();
 		return propertytDef;
 	}
 
@@ -35,7 +35,7 @@ public class PropertytDefHome extends EntityHome<PropertytDef> {
 		return true;
 	}
 
-	public PropertytDef getDefinedInstance() {
+	public PropertyDef getDefinedInstance() {
 		return isIdDefined() ? getInstance() : null;
 	}
 

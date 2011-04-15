@@ -23,7 +23,7 @@ public class PreferenceManager {
 		Preference preference = null;
 		List<Preference> resultList = entityManager
 				.createQuery(
-						"from Preferences p where p.keyValue=:preferenceKey")
+						"from Preference p where p.keyValue=:preferenceKey")
 				.setParameter("preferenceKey", preferencekey).getResultList();
 		if (!resultList.isEmpty()) {
 			preference = resultList.get(0);

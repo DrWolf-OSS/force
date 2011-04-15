@@ -12,7 +12,7 @@ public class PropertyInst {
 
 	private Long id;
 
-	private PropertytDef propertytDef;
+	private PropertyDef propertytDef;
 
 	private String stringValue;
 
@@ -33,11 +33,11 @@ public class PropertyInst {
 	}
 
 	@ManyToOne
-	public PropertytDef getPropertytDef() {
+	public PropertyDef getPropertytDef() {
 		return propertytDef;
 	}
 
-	public void setPropertytDef(PropertytDef propertytDef) {
+	public void setPropertytDef(PropertyDef propertytDef) {
 		this.propertytDef = propertytDef;
 	}
 
