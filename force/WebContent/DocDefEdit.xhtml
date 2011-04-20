@@ -16,18 +16,6 @@
         <rich:panel>
             <f:facet name="header">#{docDefHome.managed ? 'Edit' : 'Add'} Doc def</f:facet>
 
-
-            <s:decorate id="idField" template="layout/edit.xhtml">
-                <ui:define name="label">Id</ui:define>
-                <h:inputText id="id"
-                       required="true"
-                       disabled="#{docDefHome.managed}"
-                          value="#{docDefHome.instance.id}">
-                    <a:support event="onblur" reRender="idField" bypassUpdates="true" ajaxSingle="true"/>
-                </h:inputText>
-            </s:decorate>
-
-
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">Name</ui:define>
                 <h:inputTextarea id="name"
@@ -35,6 +23,16 @@
                                rows="3"
                               value="#{docDefHome.instance.name}"/>
             </s:decorate>
+            
+            <s:decorate id="aspects" template="layout/display.xhtml">
+            <ui:define name="label">Aspects</ui:define>
+            <rich:pickList value="#{docDefEditBean.aspects}"
+                				copyAllVisible="false" removeAllVisible="true" sourceListWidth="270" targetListWidth="270">
+                	<s:selectItems value="#{aspects}" 
+                					var="aspect" label="#{aspect}"/>
+                	<s:convertEnum/>
+           </rich:pickList>
+        </s:decorate>
 
 
             <div style="clear:both">
@@ -48,13 +46,13 @@
 
             <h:commandButton id="save"
                           value="Save"
-                         action="#{docDefHome.persist}"
+                         action="#{docDefEditBean.save()}"
                        disabled="#{!docDefHome.wired}"
                        rendered="#{!docDefHome.managed}"/>
 
             <h:commandButton id="update"
                           value="Save"
-                         action="#{docDefHome.update}"
+                         action="#{docDefEditBean.update()}"
                        rendered="#{docDefHome.managed}"/>
 
             <h:commandButton id="delete"
@@ -78,49 +76,6 @@
         </div>
     </h:form>
 
-<rich:tabPanel switchType="ajax">
-
-    <rich:tab label="Property defs">
-        <h:form styleClass="association" id="propertyDefsChildren">
-
-            <h:outputText value="There are no propertyDefs associated with this docDef."
-                       rendered="#{empty docDefHome.propertyDefs}"/>
-
-            <rich:dataTable value="#{docDefHome.propertyDefs}"
-                           var="_propertytDef"
-                      rendered="#{not empty docDefHome.propertyDefs}"
-                    rowClasses="rvgRowOne,rvgRowTwo"
-                            id="propertyDefsTable">
-                <rich:column sortBy="#{_propertytDef.id}">
-                    <f:facet name="header">Id</f:facet>
-                    <h:outputText value="#{_propertytDef.id}"/>
-                </rich:column>
-                <rich:column sortBy="#{_propertytDef.name}">
-                    <f:facet name="header">Name</f:facet>
-                    <h:outputText value="#{_propertytDef.name}"/>
-                </rich:column>
-                <rich:column sortBy="#{_propertytDef.type}">
-                    <f:facet name="header">Type</f:facet>
-                    <h:outputText value="#{_propertytDef.type}"/>
-                </rich:column>
-            </rich:dataTable>
-
-        </h:form>
-
-        <f:subview rendered="#{docDefHome.managed}" id="propertyDefs">
-        <div class="actionButtons">
-            <s:button id="addpropertytDef"
-                   value="Add propertytDef"
-                    view="/PropertytDefEdit.xhtml"
-             propagation="none">
-                 <f:param name="docDefId"
-                         value="#{docDefHome.instance.id}"/>
-                 <f:param name="propertytDefFrom" value="DocDef"/>
-            </s:button>
-        </div>
-        </f:subview>
-    </rich:tab>
-</rich:tabPanel>
 </ui:define>
 
 </ui:composition>

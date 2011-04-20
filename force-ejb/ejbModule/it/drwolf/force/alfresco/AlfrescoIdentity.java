@@ -44,15 +44,9 @@ public abstract class AlfrescoIdentity {
 
 		parameter.put(SessionParameter.REPOSITORY_ID, r.getId());
 
-		//
-		// CmisBindingFactory factory = CmisBindingFactory.newInstance();
-		// CmisBinding binding = factory.createCmisAtomPubBinding(parameter);
-		//
-		// binding.
-		//
-		// parameter.put(SessionParameter.BINDING_TYPE,
-		// binding.);
-		//
+		// Alfresco object factory
+		parameter.put(SessionParameter.OBJECT_FACTORY_CLASS,
+				"org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl");
 
 		this.session = new SynchSession(f.createSession(parameter));
 

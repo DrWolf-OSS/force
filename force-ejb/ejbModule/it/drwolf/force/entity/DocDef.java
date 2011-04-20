@@ -4,9 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.CollectionOfElements;
@@ -22,7 +23,7 @@ public class DocDef {
 	private Set<String> aspects = new HashSet<String>();
 
 	@Id
-	@Enumerated
+	@GeneratedValue
 	public Long getId() {
 		return id;
 	}
@@ -46,6 +47,11 @@ public class DocDef {
 
 	public void setAspects(Set<String> aspects) {
 		this.aspects = aspects;
+	}
+
+	@Transient
+	public void addAspect(String aspectId) {
+		this.aspects.add(aspectId);
 	}
 
 }
