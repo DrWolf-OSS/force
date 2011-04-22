@@ -76,4 +76,9 @@ public class DocDefCollection {
 		this.slotDef = slotDef;
 	}
 
+	@Override
+	public String toString() {
+		return name + ":" + min + "," + max + ";" + docDef;
+	}
+
 }

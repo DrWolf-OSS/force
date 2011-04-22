@@ -96,16 +96,16 @@
         <f:facet name="label">
             <h:panelGroup><h:graphicImage value="/img/onetomany.gif" style="vertical-align: middle; padding-right: 4px;"/>Propertyt defs</h:panelGroup>
         </f:facet>
-    <h:form styleClass="association" id="propertytDefsChildren">
+    <h:form styleClass="association" id="propertyDefsChildren">
 
-        <h:outputText value="There are no propertytDefs associated with this slotDef."
-                   rendered="#{empty slotDefHome.propertytDefs}"/>
+        <h:outputText value="There are no propertyDefs associated with this slotDef."
+                   rendered="#{empty slotDefHome.propertyDefs}"/>
 
-        <rich:dataTable value="#{slotDefHome.propertytDefs}"
+        <rich:dataTable value="#{slotDefHome.propertyDefs}"
                        var="_propertytDef"
-                  rendered="#{not empty slotDefHome.propertytDefs}"
+                  rendered="#{not empty slotDefHome.propertyDefs}"
                 rowClasses="rvgRowOne,rvgRowTwo"
-                        id="propertytDefsTable">
+                        id="propertyDefsTable">
             <rich:column sortBy="#{_propertytDef.id}">
                 <f:facet name="header">Id</f:facet>
                 <h:outputText value="#{_propertytDef.id}"/>

@@ -3,12 +3,16 @@ package it.drwolf.force.pagebeans;
 import it.drwolf.force.entity.DocDefCollection;
 import it.drwolf.force.entity.PropertyDef;
 import it.drwolf.force.enums.DataType;
+import it.drwolf.force.session.DocDefCollectionHome;
+import it.drwolf.force.session.PropertytDefHome;
 import it.drwolf.force.session.SlotDefHome;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -24,17 +28,23 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotDefHome slotDefHome;
 
+	@In(create = true)
+	private PropertytDefHome propertytDefHome;
+
+	@In(create = true)
+	private DocDefCollectionHome docDefCollectionHome;
+
 	private ArrayList<PropertyDef> properties = new ArrayList<PropertyDef>();
 	private ArrayList<DocDefCollection> collections = new ArrayList<DocDefCollection>();
 
-	private String name;
-	private DataType type;
-
 	private DocDefCollection collection = new DocDefCollection();
+	private PropertyDef propertyDef = new PropertyDef();
 
 	@Create
 	public void init() {
 		this.properties.addAll(slotDefHome.getInstance().getPropertyDefs());
+		this.collections.addAll(slotDefHome.getInstance()
+				.getDocDefCollections());
 	}
 
 	public ArrayList<PropertyDef> getProperties() {
@@ -46,12 +56,14 @@ public class SlotDefEditBean {
 	}
 
 	public void newPoperty() {
-		this.name = "";
-		this.type = DataType.STRING;
+		this.propertyDef = new PropertyDef();
 	}
 
 	public void addProperty() {
-		properties.add(new PropertyDef(name, type));
+		if (!properties.contains(this.propertyDef)) {
+			properties.add(this.propertyDef);
+			propertyDef = new PropertyDef();
+		}
 	}
 
 	public void newCollection() {
@@ -59,17 +71,12 @@ public class SlotDefEditBean {
 	}
 
 	public void addCollection() {
-		collections.add(this.collection);
-		collection = new DocDefCollection();
+		if (!this.collections.contains(this.collection)) {
+			collection.setSlotDef(slotDefHome.getInstance());
+			collections.add(this.collection);
+			collection = new DocDefCollection();
+		}
 	}
-
-	// public PropertyDef getPropertyToEdit() {
-	// return propertyToEdit;
-	// }
-	//
-	// public void setPropertyToEdit(PropertyDef propertyToEdit) {
-	// this.propertyToEdit = propertyToEdit;
-	// }
 
 	@Factory("dataTypes")
 	public List<DataType> getPropertyTypes() {
@@ -79,23 +86,67 @@ public class SlotDefEditBean {
 	public void save() {
 		slotDefHome.getInstance().setPropertyDefs(
 				new HashSet<PropertyDef>(properties));
+		slotDefHome.getInstance().setDocDefCollections(
+				new HashSet<DocDefCollection>(collections));
 		slotDefHome.persist();
 	}
 
-	public String getName() {
-		return name;
+	public void update() {
+		Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
+				.getDocDefCollections();
+		Iterator<DocDefCollection> iterator = docDefCollections.iterator();
+		while (iterator.hasNext()) {
+			DocDefCollection docDefCollection = iterator.next();
+			if (!this.collections.contains(docDefCollection)) {
+				iterator.remove();
+				docDefCollectionHome.setInstance(docDefCollection);
+				docDefCollectionHome.remove();
+			}
+		}
+
+		Set<PropertyDef> propertyDefs = slotDefHome.getInstance()
+				.getPropertyDefs();
+		Iterator<PropertyDef> iterator2 = propertyDefs.iterator();
+		while (iterator2.hasNext()) {
+			PropertyDef propertyDef = iterator2.next();
+			if (!this.properties.contains(propertyDef)) {
+				iterator2.remove();
+				propertytDefHome.setInstance(propertyDef);
+				propertytDefHome.remove();
+			}
+		}
+
+		for (PropertyDef propertyDef : properties) {
+			if (!propertyDefs.contains(propertyDef)) {
+				propertyDefs.add(propertyDef);
+			}
+		}
+
+		for (DocDefCollection collection : collections) {
+			if (!docDefCollections.contains(collection)) {
+				docDefCollections.add(collection);
+			}
+		}
+
+		// slotDefHome.getInstance().setDocDefCollections(
+		// new HashSet<DocDefCollection>(collections));
+		slotDefHome.update();
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void removeProp(PropertyDef prop) {
+		this.properties.remove(prop);
 	}
 
-	public DataType getType() {
-		return type;
+	public void editProp(PropertyDef prop) {
+		this.propertyDef = prop;
 	}
 
-	public void setType(DataType type) {
-		this.type = type;
+	public void removeColl(DocDefCollection coll) {
+		this.collections.remove(coll);
+	}
+
+	public void editColl(DocDefCollection coll) {
+		this.collection = coll;
 	}
 
 	public DocDefCollection getCollection() {
@@ -112,6 +163,14 @@ public class SlotDefEditBean {
 
 	public void setCollections(ArrayList<DocDefCollection> collections) {
 		this.collections = collections;
+	}
+
+	public PropertyDef getPropertyDef() {
+		return propertyDef;
+	}
+
+	public void setPropertyDef(PropertyDef propertyDef) {
+		this.propertyDef = propertyDef;
 	}
 
 }

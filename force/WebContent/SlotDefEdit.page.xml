@@ -33,5 +33,12 @@
          <redirect view-id="/SlotDefList.xhtml"/>
       </rule>
    </navigation>
+   
+   <navigation from-action="#{slotDefEditBean.update()}">
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/SlotDefEdit.xhtml">
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         </redirect>
+   </navigation>
 
 </page>

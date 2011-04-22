@@ -1,8 +1,13 @@
 package it.drwolf.force.session;
 
-import it.drwolf.force.entity.*;
+import it.drwolf.force.entity.DocDefCollection;
+import it.drwolf.force.entity.PropertyDef;
+import it.drwolf.force.entity.Rule;
+import it.drwolf.force.entity.SlotDef;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityHome;
 
@@ -46,7 +51,7 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 				getInstance().getDocDefCollections());
 	}
 
-	public List<PropertyDef> getPropertytDefs() {
+	public List<PropertyDef> getPropertyDefs() {
 		return getInstance() == null ? null : new ArrayList<PropertyDef>(
 				getInstance().getPropertyDefs());
 	}

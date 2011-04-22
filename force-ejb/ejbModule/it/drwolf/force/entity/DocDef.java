@@ -54,4 +54,9 @@ public class DocDef {
 		this.aspects.add(aspectId);
 	}
 
+	@Override
+	public String toString() {
+		return this.name;
+	}
+
 }
