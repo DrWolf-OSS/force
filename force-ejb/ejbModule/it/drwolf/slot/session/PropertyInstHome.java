@@ -36,7 +36,7 @@ public class PropertyInstHome extends EntityHome<PropertyInst> {
 		getInstance();
 		PropertyDef propertytDef = propertytDefHome.getDefinedInstance();
 		if (propertytDef != null) {
-			getInstance().setPropertytDef(propertytDef);
+			getInstance().setPropertyDef(propertytDef);
 		}
 	}
 

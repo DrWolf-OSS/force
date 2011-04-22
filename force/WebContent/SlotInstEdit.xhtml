@@ -4,6 +4,7 @@
     xmlns:s="http://jboss.com/products/seam/taglib"
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:c="http://java.sun.com/jstl/core"
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:a="http://richfaces.org/a4j"
     xmlns:rich="http://richfaces.org/rich"
@@ -15,9 +16,19 @@
 
         <rich:panel>
             <f:facet name="header">#{slotInstHome.managed ? 'Edit' : 'Add'} Slot inst</f:facet>
-
-
-
+            
+            <s:div id="properties">
+			<c:forEach var="propInst" items="#{slotInstEditBean.propertyInsts}">
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="#{propInst.propertyDef.name}" />
+					</ui:define>
+					<h:inputText value="#{propInst.stringValue}" rendered="#{propInst.propertyDef.type == 'STRING'}"/>
+					<h:inputText value="#{propInst.integerValue}" rendered="#{propInst.propertyDef.type == 'INTEGER'}"/>
+					<h:selectBooleanCheckbox value="#{propInst.stringValue}" rendered="#{propInst.propertyDef.type == 'BOOLEAN'}"/>
+	            </s:decorate>			
+			</c:forEach>
+			</s:div>
 
             <div style="clear:both">
                 <span class="required">*</span>

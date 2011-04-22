@@ -12,7 +12,7 @@ public class PropertyInst {
 
 	private Long id;
 
-	private PropertyDef propertytDef;
+	private PropertyDef propertyDef;
 
 	private String stringValue;
 
@@ -21,6 +21,17 @@ public class PropertyInst {
 	private Boolean booleanValue;
 
 	private Date dateValue;
+
+	private SlotInst slotInst;
+
+	public PropertyInst() {
+	}
+
+	public PropertyInst(PropertyDef propertytDef, SlotInst slotInst) {
+		super();
+		this.propertyDef = propertytDef;
+		this.slotInst = slotInst;
+	}
 
 	@Id
 	@GeneratedValue
@@ -33,12 +44,12 @@ public class PropertyInst {
 	}
 
 	@ManyToOne
-	public PropertyDef getPropertytDef() {
-		return propertytDef;
+	public PropertyDef getPropertyDef() {
+		return propertyDef;
 	}
 
-	public void setPropertytDef(PropertyDef propertytDef) {
-		this.propertytDef = propertytDef;
+	public void setPropertyDef(PropertyDef propertytDef) {
+		this.propertyDef = propertytDef;
 	}
 
 	public String getStringValue() {
@@ -71,6 +82,15 @@ public class PropertyInst {
 
 	public void setDateValue(Date dateValue) {
 		this.dateValue = dateValue;
+	}
+
+	@ManyToOne
+	public SlotInst getSlotInst() {
+		return slotInst;
+	}
+
+	public void setSlotInst(SlotInst slotInst) {
+		this.slotInst = slotInst;
 	}
 
 }

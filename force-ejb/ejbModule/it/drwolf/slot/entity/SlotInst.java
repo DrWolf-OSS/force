@@ -19,6 +19,8 @@ public class SlotInst {
 
 	private Set<DocInstCollection> docInstCollections = new HashSet<DocInstCollection>();
 
+	private Set<PropertyInst> propertyInsts = new HashSet<PropertyInst>();
+
 	@Id
 	@GeneratedValue
 	public Long getId() {
@@ -45,6 +47,15 @@ public class SlotInst {
 
 	public void setDocInstCollections(Set<DocInstCollection> docInstCollections) {
 		this.docInstCollections = docInstCollections;
+	}
+
+	@OneToMany(mappedBy = "slotInst", cascade = CascadeType.ALL)
+	public Set<PropertyInst> getPropertyInsts() {
+		return propertyInsts;
+	}
+
+	public void setPropertyInsts(Set<PropertyInst> propertyInsts) {
+		this.propertyInsts = propertyInsts;
 	}
 
 }

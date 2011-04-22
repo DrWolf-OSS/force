@@ -137,9 +137,7 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Max" />
 					</ui:define>
-					<h:inputText value="#{slotDefEditBean.collection.max}" >
-						<a:support event="onblur" reRender="typeField" bypassUpdates="true" ajaxSingle="true"/>
-					</h:inputText>
+					<h:inputText value="#{slotDefEditBean.collection.max}" />
 	            </s:decorate>
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
