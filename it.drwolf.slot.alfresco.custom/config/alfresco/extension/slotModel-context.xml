@@ -1,0 +1,16 @@
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+<beans>
+	
+	 <!-- Registration of new models -->	
+    <bean id="arsModel.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+        <property name="models">
+            <list>
+                <value>it/drwolf/slot/alfresco/content/slotModel.xml</value>
+            </list>
+        </property>
+    </bean>
+      
+  
+      
+</beans>

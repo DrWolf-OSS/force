@@ -1,0 +1,46 @@
+<alfresco-config>
+
+	<config evaluator="string-compare" condition="Action Wizards">
+	   	<aspects>
+	   		<aspect name="slot:signed"/>
+	   	</aspects>
+   	</config>
+   
+   	<config evaluator="aspect-name" condition="slot:signed">
+	    <property-sheet>
+	       <show-property name="slot:authorId"/>
+	    </property-sheet>
+   	</config>
+
+   <config>
+      <client>
+         <from-email-address>documenta@drwolf.it</from-email-address>
+      </client>
+   </config>
+
+
+	<!-- Example of adding languages to the list in the login page -->
+
+	<config evaluator="string-compare" condition="Languages">
+		<languages>
+
+			<language locale="it_IT">Italian</language>
+
+		</languages>
+	</config>
+
+	<!-- 
+	<config evaluator="string-compare" condition="Dashboards">
+		<dashboards>
+			<dashlets>
+				<dashlet id="dwcustomsearches" label="Ricerche Centro Documentazione" description="Dashlet Ricerche Centro Documentazione"
+					jsp="/jsp/dashboards/dashlets/dwcustomsearches.jsp" allow-narrow="true" />
+			</dashlets>
+			<default-dashlets>
+           
+            <dashlet id="opensearch" />
+         </default-dashlets>
+		</dashboards>
+	</config>
+	 -->
+</alfresco-config>

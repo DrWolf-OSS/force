@@ -1,0 +1,12 @@
+<div class="dashlet">
+   <div>
+	<iframe name="framericerche" src="/alfresco/service/dw/dwricerche?alf_ticket=${session.getTicket()}" width="30%" height="200" style="border:0; float: left;">
+
+	</iframe>
+<iframe name="framericerche" src="/alfresco/service/dw/dwkeyword?alf_ticket=${session.getTicket()}" width="60%" height="200" style="border:0; float: right;">
+
+	</iframe>
+<table cellspacing='0' cellpadding='0' style='clear: both; border-width: 0px; width: 100%'><tr><td style='width: 7px;'><img src='/alfresco/images/parts/lbgrey_01.gif' width='7' height='7' alt=''/></td><td style='background-image: url(/alfresco/images/parts/lbgrey_02.gif)'><img src='/alfresco/images/parts/lbgrey_02.gif' width='7' height='7' alt=''/></td><td style='width: 7px;'><img src='/alfresco/images/parts/lbgrey_03.gif' width='7' height='7' alt=''/></td></tr><tr><td style='background-image: url(/alfresco/images/parts/lbgrey_04.gif)'><img src='/alfresco/images/parts/lbgrey_04.gif' width='7' height='7' alt=''/></td><td style='background-color:white;'><table border='0' cellspacing='0' cellpadding='0' width='100%'><tr><td><span>Risultati</span></td></tr></table></td><td style='background-image: url(/alfresco/images/parts/lbgrey_06.gif)'><img src='/alfresco/images/parts/lbgrey_06.gif' width='7' height='7' alt=''/></td></tr><tr><td style='width: 7px;'><img src='/alfresco/images/parts/lbgrey_dotted_07.gif' width='7' height='7' alt=''/></td><td style='background-image: url(/alfresco/images/parts/lbgrey_dotted_08.gif)'><img src='/alfresco/images/parts/lbgrey_dotted_08.gif' height='7' alt=''/></td><td style='width:7px;'><img src='/alfresco/images/parts/lbgrey_dotted_09.gif' width='7' height='7' alt=''/></td></tr><tr><td style='background-image: url(/alfresco/images/parts/white_04.gif)'><img src='/alfresco/images/parts/white_04.gif' width='7' height='7' alt=''/></td><td style='background-color:white; padding-top:6px;'><iframe name="framedocumenti" width="100%" style="border:0" >
+
+	</iframe></td><td style='background-image: url(/alfresco/images/parts/white_06.gif)'><img src='/alfresco/images/parts/white_06.gif' width='7' height='7' alt=''/></td></tr><tr><td style='width: 7px;'><img src='/alfresco/images/parts/white_07.gif' width='7' height='7' alt=''/></td><td style='background-image: url(/alfresco/images/parts/white_08.gif)'><img src='/alfresco/images/parts/white_08.gif' width='7' height='7' alt=''/></td><td style='width: 7px;'><img src='/alfresco/images/parts/white_09.gif' width='7' height='7' alt=''/></td></tr></table>
+</div>
