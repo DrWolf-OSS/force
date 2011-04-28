@@ -52,7 +52,6 @@ public class TestBean {
 					+ checkedOutDocs.getTotalNumItems());
 			System.out.println("--> page items: "
 					+ checkedOutDocs.getPageNumItems());
-			// ItemIterable<CmisObject> children = objFolder.getChildren();
 
 			AlfrescoDocument png = (AlfrescoDocument) session
 					.getObject("workspace://SpacesStore/cd548e84-be1e-49f5-9a68-cd566f2d01ae");

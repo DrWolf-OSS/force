@@ -14,6 +14,15 @@ public class DocInst {
 
 	private String nodeRef;
 
+	public DocInst(DocInstCollection docInstCollection, String nodeRef) {
+		super();
+		this.docInstCollection = docInstCollection;
+		this.nodeRef = nodeRef;
+	}
+
+	public DocInst() {
+	}
+
 	@Id
 	@GeneratedValue
 	public Long getId() {

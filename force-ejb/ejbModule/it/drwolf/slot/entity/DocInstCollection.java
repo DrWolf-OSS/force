@@ -22,6 +22,16 @@ public class DocInstCollection {
 
 	private Set<DocInst> docInsts = new HashSet<DocInst>();
 
+	public DocInstCollection() {
+	}
+
+	public DocInstCollection(SlotInst slotInst,
+			DocDefCollection docDefCollection) {
+		super();
+		this.slotInst = slotInst;
+		this.docDefCollection = docDefCollection;
+	}
+
 	@Id
 	@GeneratedValue
 	public Long getId() {

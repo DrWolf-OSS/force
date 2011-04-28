@@ -25,7 +25,28 @@
 					</ui:define>
 					<h:inputText value="#{propInst.stringValue}" rendered="#{propInst.propertyDef.type == 'STRING'}"/>
 					<h:inputText value="#{propInst.integerValue}" rendered="#{propInst.propertyDef.type == 'INTEGER'}"/>
-					<h:selectBooleanCheckbox value="#{propInst.stringValue}" rendered="#{propInst.propertyDef.type == 'BOOLEAN'}"/>
+					<h:selectBooleanCheckbox value="#{propInst.booleanValue}" rendered="#{propInst.propertyDef.type == 'BOOLEAN'}"/>
+					<rich:calendar id="subscriptionDate" mode="client"
+                          value="#{propInst.dateValue}"
+                          datePattern="MM/dd/yyyy"
+                          rendered="#{propInst.propertyDef.type == 'DATE'}"/>
+	            </s:decorate>			
+			</c:forEach>
+			</s:div>
+			
+			<s:div id="collections">
+			<c:forEach var="coll" items="#{slotInstEditBean.docInstCollections}">
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="#{coll.docDefCollection.name}" />
+					</ui:define>
+					<rich:fileUpload maxFilesQuantity="#{coll.docDefCollection.max.intValue()}" 
+									fileUploadListener="#{slotInstEditBean.listener}"
+									immediateUpload="true"
+									acceptedTypes="*"
+									>
+						<f:param name="docDefCollectionId" value="#{coll.docDefCollection.id}"/>
+					</rich:fileUpload>
 	            </s:decorate>			
 			</c:forEach>
 			</s:div>
@@ -41,7 +62,7 @@
 
             <h:commandButton id="save"
                           value="Save"
-                         action="#{slotInstHome.persist}"
+                         action="#{slotInstEditBean.save()}"
                        disabled="#{!slotInstHome.wired}"
                        rendered="#{!slotInstHome.managed}"/>
 

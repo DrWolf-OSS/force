@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.chemistry.opencmis.client.api.ChangeEvent;
 import org.apache.chemistry.opencmis.client.api.ChangeEvents;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
@@ -224,6 +225,21 @@ public class SynchSession implements Session {
 
 	public void setDefaultContext(OperationContext arg0) {
 		session.setDefaultContext(arg0);
+	}
+
+	public void cancel() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public ItemIterable<ChangeEvent> getContentChanges(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void save() {
+		// TODO Auto-generated method stub
+
 	}
 
 	// public void cancel() {
