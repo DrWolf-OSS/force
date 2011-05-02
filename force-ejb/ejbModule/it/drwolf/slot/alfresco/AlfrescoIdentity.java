@@ -3,6 +3,7 @@ package it.drwolf.slot.alfresco;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.cmis.client.AlfrescoFolder;
 import org.apache.chemistry.opencmis.client.api.Repository;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
@@ -67,6 +68,23 @@ public abstract class AlfrescoIdentity {
 
 	public String getUsername() {
 		return this.username;
+	}
+
+	public AlfrescoFolder getUserHomeFolder() {
+		AlfrescoInfo alfrescoInfo = (AlfrescoInfo) org.jboss.seam.Component
+				.getInstance("alfrescoInfo");
+		AlfrescoFolder usersHome = (AlfrescoFolder) this.getSession()
+				.getObject(alfrescoInfo.getUsersHomeRef());
+		return (AlfrescoFolder) this.getSession().getObjectByPath(
+				usersHome.getPath() + "/" + this.username);
+	}
+
+	public String getUserHomePath() {
+		return this.getUserHomeFolder().getPath();
+	}
+
+	public String getUserHomeRef() {
+		return this.getUserHomeFolder().getId();
 	}
 
 }

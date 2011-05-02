@@ -2,6 +2,7 @@ package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.alfresco.AlfrescoAdminIdentity;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
+import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.custom.model.SlotModel;
 
 import java.io.File;
@@ -22,6 +23,7 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.security.Identity;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
@@ -31,6 +33,12 @@ public class TestBean {
 
 	@In(create = true)
 	private AlfrescoAdminIdentity alfrescoAdminIdentity;
+
+	@In
+	private Identity identity;
+
+	@In(create = true)
+	private AlfrescoUserIdentity alfrescoUserIdentity;
 
 	@In(create = true)
 	private AlfrescoInfo alfrescoInfo;
@@ -113,5 +121,17 @@ public class TestBean {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public void test2() {
+
+		Session userSession = alfrescoUserIdentity.getSession();
+		AlfrescoFolder usersHome = (AlfrescoFolder) userSession
+				.getObject("workspace://SpacesStore/065b9204-329b-42bb-b16d-e76811274d25");
+		String path = usersHome.getPath();
+		AlfrescoFolder userHome = (AlfrescoFolder) userSession
+				.getObjectByPath(path + "/"
+						+ identity.getCredentials().getUsername());
+		System.out.println("-->");
 	}
 }

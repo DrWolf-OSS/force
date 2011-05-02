@@ -22,9 +22,9 @@ public class AlfrescoAdminIdentity extends AlfrescoIdentity {
 	public Session getSession() {
 		try {
 			if (super.getSession() == null) {
-				this.authenticate(alfrescoInfo.getAdmin_user(),
-						alfrescoInfo.getAdmin_pwd(),
-						alfrescoInfo.getRepository_uri());
+				this.authenticate(alfrescoInfo.getAdminUser(),
+						alfrescoInfo.getAdminPwd(),
+						alfrescoInfo.getRepositoryUri());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

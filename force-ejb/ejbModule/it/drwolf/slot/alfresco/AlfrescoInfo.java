@@ -1,10 +1,9 @@
 package it.drwolf.slot.alfresco;
 
-import it.drwolf.slot.entity.Preference;
-import it.drwolf.slot.entitymanager.PreferenceManager;
+import it.drwolf.slot.prefs.PreferenceKey;
+import it.drwolf.slot.prefs.Preferences;
 
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
@@ -14,38 +13,25 @@ import org.jboss.seam.annotations.Scope;
 public class AlfrescoInfo {
 
 	@In(create = true)
-	PreferenceManager preferenceManager;
-
-	private Preference repository_uri = null;
-	private Preference admin_user = null;
-	private Preference admin_pwd = null;
+	private Preferences preferences;
 
 	public AlfrescoInfo() {
 	}
 
-	@Create
-	public void init() {
-		try {
-			repository_uri = preferenceManager
-					.getPreference("ALFRESCO_LOCATION");
-			admin_user = preferenceManager.getPreference("ALFRESCO_ADMIN_USER");
-			admin_pwd = preferenceManager.getPreference("ALFRESCO_ADMIN_PWD");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public String getRepositoryUri() {
+		return preferences.getValue(PreferenceKey.ALFRESCO_LOCATION.name());
 	}
 
-	public String getRepository_uri() {
-		return repository_uri.getStringValue();
+	public String getAdminUser() {
+		return preferences.getValue(PreferenceKey.ALFRESCO_ADMIN_USER.name());
 	}
 
-	public String getAdmin_user() {
-		return admin_user.getStringValue();
+	public String getAdminPwd() {
+		return preferences.getValue(PreferenceKey.ALFRESCO_ADMIN_PWD.name());
 	}
 
-	public String getAdmin_pwd() {
-		return admin_pwd.getStringValue();
+	public String getUsersHomeRef() {
+		return preferences.getValue(PreferenceKey.ALFRESCO_USERS_HOME.name());
 	}
 
 }

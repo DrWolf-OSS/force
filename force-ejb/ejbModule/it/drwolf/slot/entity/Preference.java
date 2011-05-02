@@ -24,9 +24,13 @@ public class Preference implements Serializable {
 	private static Preference ALFRESCO_TOMCAT_HOME = new Preference(
 			PreferenceKey.ALFRESCO_TOMCAT_HOME.name(),
 			"/home/drwolf/alfresco-3.4.d/tomcat");
+	private static Preference ALFRESCO_USERS_HOME = new Preference(
+			PreferenceKey.ALFRESCO_USERS_HOME.name(),
+			"workspace://SpacesStore/065b9204-329b-42bb-b16d-e76811274d25");
 
 	public static Preference[] defaults = new Preference[] { ALFRESCO_LOCATION,
-			ALFRESCO_ADMIN_USER, ALFRESCO_ADMIN_PWD, ALFRESCO_TOMCAT_HOME, };
+			ALFRESCO_ADMIN_USER, ALFRESCO_ADMIN_PWD, ALFRESCO_TOMCAT_HOME,
+			ALFRESCO_USERS_HOME };
 
 	private Integer id;
 	private String keyValue;

@@ -44,9 +44,6 @@ public class DocDefEditBean {
 	public void update() {
 		Iterator<String> iDiterator = docDefHome.getInstance().getAspects()
 				.iterator();
-		// List<Aspect> aspectsAsObjects =
-		// customModel.getSlotModel().getAspects();
-		// List<Aspect> aspectsAsObjects = aspects;
 		Iterator<Aspect> objectIterator = aspects.iterator();
 
 		// elimina gli aspects tolti

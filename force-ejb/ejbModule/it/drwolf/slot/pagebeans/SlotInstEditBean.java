@@ -1,6 +1,6 @@
 package it.drwolf.slot.pagebeans;
 
-import it.drwolf.slot.alfresco.AlfrescoAdminIdentity;
+import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
@@ -30,12 +30,14 @@ import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
 
@@ -49,8 +51,8 @@ public class SlotInstEditBean {
 	@In(create = true)
 	private SlotInstHome slotInstHome;
 
-	@In(create = true)
-	private AlfrescoAdminIdentity alfrescoAdminIdentity;
+	@In
+	private AlfrescoUserIdentity alfrescoUserIdentity;
 
 	private List<PropertyInst> propertyInsts;
 
@@ -103,11 +105,18 @@ public class SlotInstEditBean {
 				}
 			}
 			if (found) {
-				List<UploadItem> files = datas.get(key);
-				for (UploadItem file : files) {
-					instCollection.getDocInsts().add(
-							new DocInst(instCollection, storeOnAlfresco(file,
-									instCollection)));
+				try {
+					List<UploadItem> files = datas.get(key);
+					for (UploadItem file : files) {
+						instCollection.getDocInsts().add(
+								new DocInst(instCollection, storeOnAlfresco(
+										file, instCollection)));
+					}
+				} catch (Exception e) {
+					FacesMessages.instance().add(
+							"Errors in storing files on Alfresco");
+					e.printStackTrace();
+					return;
 				}
 			}
 		}
@@ -134,10 +143,25 @@ public class SlotInstEditBean {
 			DocInstCollection instCollection) {
 		String nodeRef = "";
 		try {
+			Session session = alfrescoUserIdentity.getSession();
+			AlfrescoFolder homeFolder = alfrescoUserIdentity
+					.getUserHomeFolder();
 
-			Session session = alfrescoAdminIdentity.getSession();
-			AlfrescoFolder folder = (AlfrescoFolder) session
-					.getObject("workspace://SpacesStore/6411e4ed-1af8-4a5f-9a2a-3a0df3d9c814");
+			// cerco la cartella con il nome dello slot e se non c'è la creo
+			String slotName = slotInstHome.getInstance().getSlotDef().getName();
+			String userHomePath = alfrescoUserIdentity.getUserHomePath();
+			AlfrescoFolder slotFolder;
+			try {
+				slotFolder = (AlfrescoFolder) session
+						.getObjectByPath(userHomePath + "/" + slotName);
+			} catch (CmisObjectNotFoundException e) {
+				HashMap<String, Object> props = new HashMap<String, Object>();
+				props.put(PropertyIds.NAME, slotName);
+				props.put(PropertyIds.OBJECT_TYPE_ID,
+						BaseTypeId.CMIS_FOLDER.value());
+				slotFolder = (AlfrescoFolder) homeFolder.createFolder(props,
+						null, null, null, session.createOperationContext());
+			}
 
 			Set<String> aspects = instCollection.getDocDefCollection()
 					.getDocDef().getAspects();
@@ -149,34 +173,12 @@ public class SlotInstEditBean {
 							+ item.getFile().length()), contentType,
 					new FileInputStream(item.getFile()));
 
-			//
-			// Folder folder = (Folder) session
-			// .getObject("workspace://SpacesStore/6411e4ed-1af8-4a5f-9a2a-3a0df3d9c814");
-			//
-
-			// Folder folder = (Folder) session
-			// .getObject(AlfrescoWrapper
-			// .ref2id("workspace://SpacesStore/d980911d-5906-4e1e-a9f7-efc9c1f4b6df"));
-
-			// String contentType = new
-			// MimetypesFileTypeMap().getContentType(item
-			// .getFileName());
-			// FileInputStream fileInputStream = new FileInputStream(
-			// item.getFile());
-			// byte[] byteArray = IOUtils.toByteArray(fileInputStream);
-			// ContentStreamImpl contentStreamImpl = new ContentStreamImpl(
-			// item.getFileName(), new BigInteger(""
-			// + item.getFile().length()), contentType,
-			// new ByteArrayInputStream(byteArray));
-
 			Map<String, Object> properties = new HashMap<String, Object>();
 			properties.put(PropertyIds.NAME, item.getFileName());
 			properties.put(PropertyIds.OBJECT_TYPE_ID,
 					BaseTypeId.CMIS_DOCUMENT.value());
-			// Document document = folder.createDocument(properties,
-			// contentStreamImpl, VersioningState.NONE, null, null, null,
-			// null);
-			ObjectId objectId = session.createDocument(properties, folder,
+
+			ObjectId objectId = session.createDocument(properties, slotFolder,
 					contentStreamImpl, VersioningState.NONE, null, null, null);
 			System.out.println("ObjectID: " + objectId);
 
@@ -184,7 +186,7 @@ public class SlotInstEditBean {
 					.getObject(objectId);
 
 			for (String aspect : aspects) {
-				document.addAspect(aspect);
+				document.addAspect("P:" + aspect);
 			}
 
 			nodeRef = objectId.toString();

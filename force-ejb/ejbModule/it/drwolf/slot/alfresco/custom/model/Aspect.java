@@ -43,4 +43,8 @@ public class Aspect {
 		this.properties = properties;
 	}
 
+	public String getId() {
+		return "P:" + this.name;
+	}
+
 }
