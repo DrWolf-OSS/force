@@ -24,6 +24,10 @@ public class Preferences {
 
 	@Create
 	public void init() {
+		initPreferences();
+	}
+
+	private void initPreferences() {
 		@SuppressWarnings("unchecked")
 		List<Preference> resultList = entityManager.createQuery(
 				"from Preference").getResultList();

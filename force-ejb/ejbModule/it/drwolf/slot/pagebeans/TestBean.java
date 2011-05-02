@@ -2,7 +2,9 @@ package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.alfresco.AlfrescoAdminIdentity;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
+import it.drwolf.slot.alfresco.custom.model.SlotModel;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +22,8 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
 
 @Name("testBean")
 @Scope(ScopeType.CONVERSATION)
@@ -96,5 +100,18 @@ public class TestBean {
 		// System.out.println("localName: " + objectType.getLocalName());
 		// System.out.println("queryName: " + objectType.getQueryName());
 		// }
+	}
+
+	public void loadModel() {
+		try {
+			Serializer serializer = new Persister();
+			File source = new File(
+					"/home/drwolf/git/force/it.drwolf.slot.alfresco.custom/src/java/it/drwolf/slot/alfresco/content/slotModel.xml");
+			SlotModel model = serializer.read(SlotModel.class, source);
+			System.out.println(model);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

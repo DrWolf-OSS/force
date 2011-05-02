@@ -1,6 +1,7 @@
 package it.drwolf.slot.pagebeans;
 
-import it.drwolf.slot.enums.Aspect;
+import it.drwolf.slot.alfresco.custom.model.Aspect;
+import it.drwolf.slot.application.CustomModel;
 import it.drwolf.slot.session.DocDefHome;
 
 import java.util.ArrayList;
@@ -20,6 +21,9 @@ public class DocDefEditBean {
 	@In(create = true)
 	private DocDefHome docDefHome;
 
+	@In(create = true)
+	private CustomModel customModel;
+
 	private List<Aspect> aspects = new ArrayList<Aspect>();
 
 	public List<Aspect> getAspects() {
@@ -32,33 +36,57 @@ public class DocDefEditBean {
 
 	public void save() {
 		for (Aspect aspect : aspects) {
-			docDefHome.getInstance().addAspect(aspect.value());
+			docDefHome.getInstance().addAspect(aspect.getName());
 		}
 		docDefHome.persist();
 	}
 
 	public void update() {
-		Iterator<String> iterator = docDefHome.getInstance().getAspects()
+		Iterator<String> iDiterator = docDefHome.getInstance().getAspects()
 				.iterator();
+		// List<Aspect> aspectsAsObjects =
+		// customModel.getSlotModel().getAspects();
+		// List<Aspect> aspectsAsObjects = aspects;
+		Iterator<Aspect> objectIterator = aspects.iterator();
 
 		// elimina gli aspects tolti
-		while (iterator.hasNext()) {
-			String aspectId = iterator.next();
-			if (!this.aspects.contains(Aspect.fromValue(aspectId))) {
-				iterator.remove();
+		while (iDiterator.hasNext()) {
+			String aspectId = iDiterator.next();
+			boolean found = false;
+			while (objectIterator.hasNext() && found == false) {
+				Aspect aspect = objectIterator.next();
+				if (aspect.getName().equals(aspectId)) {
+					// aspects.add(aspect);
+					found = true;
+				}
 			}
+			if (found == false) {
+				iDiterator.remove();
+			}
+			// if (!this.aspects.contains(Aspect.fromValue(aspectId))) {
+			// iDiterator.remove();
+			// }
 		}
 
 		for (Aspect aspect : aspects) {
-			docDefHome.getInstance().addAspect(aspect.value());
+			docDefHome.getInstance().addAspect(aspect.getName());
 		}
 		docDefHome.update();
 	}
 
 	@Create
 	public void init() {
+		List<Aspect> aspectsAsObjects = customModel.getSlotModel().getAspects();
+		Iterator<Aspect> iterator = aspectsAsObjects.iterator();
 		for (String aspectId : docDefHome.getInstance().getAspects()) {
-			aspects.add(Aspect.fromValue(aspectId));
+			boolean found = false;
+			while (iterator.hasNext() && found == false) {
+				Aspect aspect = iterator.next();
+				if (aspect.getName().equals(aspectId)) {
+					aspects.add(aspect);
+					found = true;
+				}
+			}
 		}
 	}
 

@@ -1,5 +1,7 @@
 package it.drwolf.slot.entity;
 
+import it.drwolf.slot.prefs.PreferenceKey;
+
 import java.io.Serializable;
 
 import javax.persistence.Entity;
@@ -13,14 +15,18 @@ public class Preference implements Serializable {
 	private static final long serialVersionUID = -8118213420785124186L;
 
 	private static Preference ALFRESCO_LOCATION = new Preference(
-			"ALFRESCO_LOCATION", "http://localhost:9080/alfresco");
+			PreferenceKey.ALFRESCO_LOCATION.name(),
+			"http://localhost:9080/alfresco");
 	private static Preference ALFRESCO_ADMIN_USER = new Preference(
-			"ALFRESCO_ADMIN_USER", "admin");
+			PreferenceKey.ALFRESCO_ADMIN_USER.name(), "admin");
 	private static Preference ALFRESCO_ADMIN_PWD = new Preference(
-			"ALFRESCO_ADMIN_PWD", "uamepumdp");
+			PreferenceKey.ALFRESCO_ADMIN_PWD.name(), "uamepumdp");
+	private static Preference ALFRESCO_TOMCAT_HOME = new Preference(
+			PreferenceKey.ALFRESCO_TOMCAT_HOME.name(),
+			"/home/drwolf/alfresco-3.4.d/tomcat");
 
 	public static Preference[] defaults = new Preference[] { ALFRESCO_LOCATION,
-			ALFRESCO_ADMIN_USER, ALFRESCO_ADMIN_PWD, };
+			ALFRESCO_ADMIN_USER, ALFRESCO_ADMIN_PWD, ALFRESCO_TOMCAT_HOME, };
 
 	private Integer id;
 	private String keyValue;

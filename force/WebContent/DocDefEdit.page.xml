@@ -13,17 +13,33 @@
    <param name="docDefId" value="#{docDefHome.docDefId}"/>
 
 
-   <navigation from-action="#{docDefHome.persist}">
+<!--   <navigation from-action="#{docDefHome.persist}">-->
+<!--      <rule if-outcome="persisted">-->
+<!--         <end-conversation/>-->
+<!--         <redirect view-id="/DocDef.xhtml"/>-->
+<!--      </rule>-->
+<!--   </navigation>-->
+   
+   <navigation from-action="#{docDefEditBean.save()}">
       <rule if-outcome="persisted">
-         <end-conversation/>
-         <redirect view-id="/DocDef.xhtml"/>
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/DocDefList.xhtml"/>
       </rule>
    </navigation>
 
-   <navigation from-action="#{docDefHome.update}">
+<!--   <navigation from-action="#{docDefHome.update}">-->
+<!--      <rule if-outcome="updated">-->
+<!--         <end-conversation/>-->
+<!--         <redirect view-id="/DocDef.xhtml"/>-->
+<!--      </rule>-->
+<!--   </navigation>-->
+   
+   <navigation from-action="#{docDefEditBean.update()}">
       <rule if-outcome="updated">
-         <end-conversation/>
-         <redirect view-id="/DocDef.xhtml"/>
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/DocDefEdit.xhtml">
+         	<param name="DocDefId" value="#{docDefHome.docDefId}"/>
+         </redirect>
       </rule>
    </navigation>
 

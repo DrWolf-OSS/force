@@ -29,7 +29,7 @@ public class Initialiser {
 				Thread.sleep(10000);
 				entityManager = (EntityManager) Component
 						.getInstance("entityManager");
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
