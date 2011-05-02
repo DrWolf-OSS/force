@@ -36,7 +36,7 @@ public class DocDefEditBean {
 
 	public void save() {
 		for (Aspect aspect : aspects) {
-			docDefHome.getInstance().addAspect(aspect.getName());
+			docDefHome.getInstance().addAspect(aspect.getId());
 		}
 		docDefHome.persist();
 	}
@@ -46,13 +46,13 @@ public class DocDefEditBean {
 				.iterator();
 		Iterator<Aspect> objectIterator = aspects.iterator();
 
-		// elimina gli aspects tolti
+		// elimina gli id degli aspects tolti
 		while (iDiterator.hasNext()) {
 			String aspectId = iDiterator.next();
 			boolean found = false;
 			while (objectIterator.hasNext() && found == false) {
 				Aspect aspect = objectIterator.next();
-				if (aspect.getName().equals(aspectId)) {
+				if (aspect.getId().equals(aspectId)) {
 					// aspects.add(aspect);
 					found = true;
 				}
@@ -66,7 +66,7 @@ public class DocDefEditBean {
 		}
 
 		for (Aspect aspect : aspects) {
-			docDefHome.getInstance().addAspect(aspect.getName());
+			docDefHome.getInstance().addAspect(aspect.getId());
 		}
 		docDefHome.update();
 	}
@@ -79,7 +79,7 @@ public class DocDefEditBean {
 			boolean found = false;
 			while (iterator.hasNext() && found == false) {
 				Aspect aspect = iterator.next();
-				if (aspect.getName().equals(aspectId)) {
+				if (aspect.getId().equals(aspectId)) {
 					aspects.add(aspect);
 					found = true;
 				}

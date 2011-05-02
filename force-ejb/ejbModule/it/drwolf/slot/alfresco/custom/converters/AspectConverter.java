@@ -27,7 +27,7 @@ public class AspectConverter implements Converter {
 
 		while (iterator.hasNext()) {
 			Aspect aspect = iterator.next();
-			if (aspect.getName().equals(aspectId)) {
+			if (aspect.getId().equals(aspectId)) {
 				return aspect;
 			}
 		}
@@ -36,7 +36,7 @@ public class AspectConverter implements Converter {
 
 	public String getAsString(FacesContext context, UIComponent component,
 			Object object) {
-		return ((Aspect) object).getName();
+		return ((Aspect) object).getId();
 	}
 
 }

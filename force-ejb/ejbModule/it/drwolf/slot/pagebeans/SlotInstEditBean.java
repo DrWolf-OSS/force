@@ -186,7 +186,7 @@ public class SlotInstEditBean {
 					.getObject(objectId);
 
 			for (String aspect : aspects) {
-				document.addAspect("P:" + aspect);
+				document.addAspect(aspect);
 			}
 
 			nodeRef = objectId.toString();
