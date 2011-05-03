@@ -58,7 +58,7 @@ public class SlotInstEditBean {
 
 	private List<DocInstCollection> docInstCollections;
 
-	private HashMap<String, List<UploadItem>> datas = new HashMap<String, List<UploadItem>>();
+	private HashMap<Long, List<UploadItem>> datas = new HashMap<Long, List<UploadItem>>();
 
 	@Create
 	public void init() {
@@ -91,8 +91,8 @@ public class SlotInstEditBean {
 		slotInstHome.getInstance().setPropertyInsts(
 				new HashSet<PropertyInst>(this.propertyInsts));
 
-		Set<String> keySet = datas.keySet();
-		for (String key : keySet) {
+		Set<Long> keySet = datas.keySet();
+		for (Long key : keySet) {
 			DocInstCollection instCollection = null;
 			// controllo se c'è una collection che corrisponde a quell'id (ed è
 			// la destinataria dei files uploadati)
@@ -101,8 +101,7 @@ public class SlotInstEditBean {
 					.iterator();
 			while (instCollIterator.hasNext() && found == false) {
 				instCollection = instCollIterator.next();
-				if (instCollection.getDocDefCollection().getId().toString()
-						.trim().equalsIgnoreCase(key)) {
+				if (instCollection.getDocDefCollection().getId().equals(key)) {
 					found = true;
 				}
 			}
@@ -131,9 +130,10 @@ public class SlotInstEditBean {
 	public void listener(UploadEvent event) {
 		UploadItem item = event.getUploadItem();
 		String fileName = item.getFileName();
-		String docDefCollectionId = ((HttpServletRequest) javax.faces.context.FacesContext
+		String docDefCollectionIdAsString = ((HttpServletRequest) javax.faces.context.FacesContext
 				.getCurrentInstance().getExternalContext().getRequest())
 				.getParameter("docDefCollectionId");
+		Long docDefCollectionId = new Long(docDefCollectionIdAsString);
 		List<UploadItem> list = datas.get(docDefCollectionId);
 		if (list == null) {
 			list = new ArrayList<UploadItem>();
@@ -141,7 +141,8 @@ public class SlotInstEditBean {
 		}
 		list.add(item);
 		System.out.println("-> " + fileName + " successfully uploaded");
-		System.out.println("-> docDefCollectionId: " + docDefCollectionId);
+		System.out.println("-> docDefCollectionId: "
+				+ docDefCollectionIdAsString);
 	}
 
 	public String storeOnAlfresco(UploadItem item,
@@ -226,11 +227,11 @@ public class SlotInstEditBean {
 		return fileNameSplitted[fileNameSplitted.length - 1];
 	}
 
-	public HashMap<String, List<UploadItem>> getDatas() {
+	public HashMap<Long, List<UploadItem>> getDatas() {
 		return datas;
 	}
 
-	public void setDatas(HashMap<String, List<UploadItem>> datas) {
+	public void setDatas(HashMap<Long, List<UploadItem>> datas) {
 		this.datas = datas;
 	}
 }

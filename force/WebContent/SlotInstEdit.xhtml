@@ -55,13 +55,13 @@
 	            		<f:facet name="header">
 	            			<h:outputText value="Uploaded Files Info" />
 	            		</f:facet>
-	            		<rich:dataGrid columns="1" value="#{slotInstEditBean.datas[coll.docDefCollection.id.toString()]}" var="item" rowKeyVar="row">
-	            		<s:decorate template="/layout/display.xhtml">
-	               			 <ui:define name="label">
-	                			<h:outputText value="File Name" />
-							</ui:define>
-							<h:outputText value="#{item.fileName}"/>
-	            		</s:decorate>
+	            		<rich:dataGrid columns="1" value="#{slotInstEditBean.datas[coll.docDefCollection.id]}" var="item" rowKeyVar="row">
+		            		<s:decorate template="/layout/display.xhtml">
+		               			 <ui:define name="label">
+		                			<h:outputText value="File Name" />
+								</ui:define>
+								<h:outputText value="#{item.fileName}"/>
+		            		</s:decorate>
 	            		</rich:dataGrid>
 	            	</rich:panel>
 			</c:forEach>
@@ -72,16 +72,6 @@
                 <span class="required">*</span>
                 required fields
             </div>
-            
-          			<rich:panel id="infoPanel">
-	            		<f:facet name="header">
-	            			<h:outputText value="Uploaded Files Info" />
-	            		</f:facet>
-	            		<rich:dataGrid columns="1" value="#{slotInstEditBean.datas['1']}" var="item" rowKeyVar="row">
-	            		<h:outputText value="#{item.fileName}" />
-	            		</rich:dataGrid>
-	            	</rich:panel>
-            
 
         </rich:panel>
 
