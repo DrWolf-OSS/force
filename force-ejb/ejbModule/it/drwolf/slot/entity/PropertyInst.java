@@ -1,5 +1,7 @@
 package it.drwolf.slot.entity;
 
+import it.drwolf.slot.enums.DataType;
+
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -31,6 +33,11 @@ public class PropertyInst {
 		super();
 		this.propertyDef = propertytDef;
 		this.slotInst = slotInst;
+		if (propertytDef.getType().equals(DataType.DATE)) {
+			this.setDateValue(new Date());
+		} else if (propertytDef.getType().equals(DataType.BOOLEAN)) {
+			this.setBooleanValue(false);
+		}
 	}
 
 	@Id

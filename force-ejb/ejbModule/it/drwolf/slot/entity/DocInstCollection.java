@@ -69,4 +69,9 @@ public class DocInstCollection {
 		this.docInsts = docInsts;
 	}
 
+	public String toString() {
+		return this.getDocDefCollection().getName() + ":"
+				+ this.docInsts.toString();
+	}
+
 }

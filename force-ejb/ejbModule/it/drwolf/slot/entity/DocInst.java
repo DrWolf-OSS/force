@@ -50,4 +50,8 @@ public class DocInst {
 		this.nodeRef = nodeRef;
 	}
 
+	public String toString() {
+		return nodeRef;
+	}
+
 }

@@ -28,13 +28,16 @@
 					<h:selectBooleanCheckbox value="#{propInst.booleanValue}" rendered="#{propInst.propertyDef.type == 'BOOLEAN'}"/>
 					<rich:calendar id="subscriptionDate" mode="client"
                           value="#{propInst.dateValue}"
-                          datePattern="MM/dd/yyyy"
+                          datePattern="dd/MM/yyyy"
                           rendered="#{propInst.propertyDef.type == 'DATE'}"/>
 	            </s:decorate>			
 			</c:forEach>
 			</s:div>
 			
+			<div style="clear:both"/>
+			
 			<s:div id="collections">
+			<h:panelGrid columns="2">
 			<c:forEach var="coll" items="#{slotInstEditBean.docInstCollections}">
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
@@ -43,18 +46,42 @@
 					<rich:fileUpload maxFilesQuantity="#{coll.docDefCollection.max.intValue()}" 
 									fileUploadListener="#{slotInstEditBean.listener}"
 									immediateUpload="true"
-									acceptedTypes="*"
-									>
+									acceptedTypes="*">
 						<f:param name="docDefCollectionId" value="#{coll.docDefCollection.id}"/>
+						<a:support event="onfileuploadcomplete" reRender="infoPanel_#{coll.docDefCollection.id}" oncomplete="alert('COMPLETE!')"/>
 					</rich:fileUpload>
-	            </s:decorate>			
+	            </s:decorate>
+	            	<rich:panel id="infoPanel_#{coll.docDefCollection.id}">
+	            		<f:facet name="header">
+	            			<h:outputText value="Uploaded Files Info" />
+	            		</f:facet>
+	            		<rich:dataGrid columns="1" value="#{slotInstEditBean.datas[coll.docDefCollection.id.toString()]}" var="item" rowKeyVar="row">
+	            		<s:decorate template="/layout/display.xhtml">
+	               			 <ui:define name="label">
+	                			<h:outputText value="File Name" />
+							</ui:define>
+							<h:outputText value="#{item.fileName}"/>
+	            		</s:decorate>
+	            		</rich:dataGrid>
+	            	</rich:panel>
 			</c:forEach>
+			</h:panelGrid>
 			</s:div>
 
             <div style="clear:both">
                 <span class="required">*</span>
                 required fields
             </div>
+            
+          			<rich:panel id="infoPanel">
+	            		<f:facet name="header">
+	            			<h:outputText value="Uploaded Files Info" />
+	            		</f:facet>
+	            		<rich:dataGrid columns="1" value="#{slotInstEditBean.datas['1']}" var="item" rowKeyVar="row">
+	            		<h:outputText value="#{item.fileName}" />
+	            		</rich:dataGrid>
+	            	</rich:panel>
+            
 
         </rich:panel>
 

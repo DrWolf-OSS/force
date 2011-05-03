@@ -94,6 +94,8 @@ public class SlotInstEditBean {
 		Set<String> keySet = datas.keySet();
 		for (String key : keySet) {
 			DocInstCollection instCollection = null;
+			// controllo se c'è una collection che corrisponde a quell'id (ed è
+			// la destinataria dei files uploadati)
 			boolean found = false;
 			Iterator<DocInstCollection> instCollIterator = docInstCollections
 					.iterator();
@@ -108,9 +110,9 @@ public class SlotInstEditBean {
 				try {
 					List<UploadItem> files = datas.get(key);
 					for (UploadItem file : files) {
-						instCollection.getDocInsts().add(
-								new DocInst(instCollection, storeOnAlfresco(
-										file, instCollection)));
+						String storedRef = storeOnAlfresco(file, instCollection);
+						DocInst docInst = new DocInst(instCollection, storedRef);
+						instCollection.getDocInsts().add(docInst);
 					}
 				} catch (Exception e) {
 					FacesMessages.instance().add(
@@ -120,6 +122,9 @@ public class SlotInstEditBean {
 				}
 			}
 		}
+
+		slotInstHome.getInstance().setDocInstCollections(
+				new HashSet<DocInstCollection>(docInstCollections));
 		slotInstHome.persist();
 	}
 
@@ -219,5 +224,13 @@ public class SlotInstEditBean {
 			return "";
 		}
 		return fileNameSplitted[fileNameSplitted.length - 1];
+	}
+
+	public HashMap<String, List<UploadItem>> getDatas() {
+		return datas;
+	}
+
+	public void setDatas(HashMap<String, List<UploadItem>> datas) {
+		this.datas = datas;
 	}
 }

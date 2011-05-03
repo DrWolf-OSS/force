@@ -22,6 +22,9 @@ public class Property {
 	@Element(required = false)
 	private boolean multiple;
 
+	@Element(required = false, name = "default")
+	private boolean defaultValue;
+
 	public String getName() {
 		return name;
 	}
@@ -60,6 +63,14 @@ public class Property {
 
 	public void setMultiple(boolean multiple) {
 		this.multiple = multiple;
+	}
+
+	public boolean isDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(boolean defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 
 }

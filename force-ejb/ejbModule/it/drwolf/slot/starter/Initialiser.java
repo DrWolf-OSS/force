@@ -25,17 +25,17 @@ public class Initialiser {
 
 		while (entityManager == null) {
 			try {
-				System.out.println("---> Sleep!");
-				Thread.sleep(10000);
 				entityManager = (EntityManager) Component
 						.getInstance("entityManager");
+				System.out.println("---> Sleep!");
+				Thread.sleep(2000);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		checkParams(entityManager);
-		System.out.println("---> Check");
+		System.out.println("---> Checked");
 	}
 
 	private void checkParams(EntityManager entityManager) {
