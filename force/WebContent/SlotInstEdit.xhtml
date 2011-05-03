@@ -48,7 +48,7 @@
 									immediateUpload="true"
 									acceptedTypes="*">
 						<f:param name="docDefCollectionId" value="#{coll.docDefCollection.id}"/>
-						<a:support event="onfileuploadcomplete" reRender="infoPanel_#{coll.docDefCollection.id}" oncomplete="alert('COMPLETE!')"/>
+						<a:support event="onfileuploadcomplete" reRender="infoPanel_#{coll.docDefCollection.id}"/>
 					</rich:fileUpload>
 	            </s:decorate>
 	            	<rich:panel id="infoPanel_#{coll.docDefCollection.id}">
@@ -62,6 +62,22 @@
 								</ui:define>
 								<h:outputText value="#{item.fileName}"/>
 		            		</s:decorate>
+		            		
+		            		<ui:repeat var="propInst" value="#{slotInstEditBean.datasProperties[coll.docDefCollection.id][item.fileName]}">
+			            		<s:decorate template="/layout/edit.xhtml">
+			               			 <ui:define name="label">
+			                			<h:outputText value="#{propInst.propertyDef.name}" />
+									</ui:define>
+									<h:inputText value="#{propInst.stringValue}" rendered="#{propInst.propertyDef.type == 'STRING'}"/>
+									<h:inputText value="#{propInst.integerValue}" rendered="#{propInst.propertyDef.type == 'INTEGER'}"/>
+									<h:selectBooleanCheckbox value="#{propInst.booleanValue}" rendered="#{propInst.propertyDef.type == 'BOOLEAN'}"/>
+									<rich:calendar id="subscriptionDate" mode="client"
+                          						value="#{propInst.dateValue}"
+                          					datePattern="dd/MM/yyyy"
+                         						rendered="#{propInst.propertyDef.type == 'DATE'}"/>
+			            		</s:decorate>
+		            		</ui:repeat>
+
 	            		</rich:dataGrid>
 	            	</rich:panel>
 			</c:forEach>

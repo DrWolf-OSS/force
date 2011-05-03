@@ -1,9 +1,12 @@
 package it.drwolf.slot.application;
 
+import it.drwolf.slot.alfresco.custom.model.Aspect;
+import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.model.SlotModel;
 
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -56,6 +59,39 @@ public class CustomModel {
 
 	public void setSlotModel(SlotModel slotModel) {
 		this.slotModel = slotModel;
+	}
+
+	public Aspect getAspect(String aspectId) {
+		boolean found = false;
+		Iterator<Aspect> aspectIterator = this.slotModel.getAspects()
+				.iterator();
+		while (aspectIterator.hasNext() && found == false) {
+			Aspect aspect = aspectIterator.next();
+			if (aspect.getId().equals(aspectId)) {
+				found = true;
+				return aspect;
+			}
+		}
+		return null;
+	}
+
+	public Property getProperty(String propertyName) {
+		boolean found = false;
+		Iterator<Aspect> aspectIterator = this.slotModel.getAspects()
+				.iterator();
+		while (aspectIterator.hasNext() && found == false) {
+			Aspect aspect = aspectIterator.next();
+			Iterator<Property> propertyIterator = aspect.getProperties()
+					.iterator();
+			while (propertyIterator.hasNext() && found == false) {
+				Property property = propertyIterator.next();
+				if (property.getName().equals(propertyName)) {
+					found = true;
+					return property;
+				}
+			}
+		}
+		return null;
 	}
 
 }

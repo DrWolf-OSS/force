@@ -1,11 +1,15 @@
 package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
+import it.drwolf.slot.alfresco.custom.model.Aspect;
+import it.drwolf.slot.alfresco.custom.model.Property;
+import it.drwolf.slot.application.CustomModel;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
+import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
@@ -21,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
@@ -51,6 +56,12 @@ public class SlotInstEditBean {
 	@In(create = true)
 	private SlotInstHome slotInstHome;
 
+	@In(create = true)
+	private EntityManager entityManager;
+
+	@In(create = true)
+	private CustomModel customModel;
+
 	@In
 	private AlfrescoUserIdentity alfrescoUserIdentity;
 
@@ -59,6 +70,8 @@ public class SlotInstEditBean {
 	private List<DocInstCollection> docInstCollections;
 
 	private HashMap<Long, List<UploadItem>> datas = new HashMap<Long, List<UploadItem>>();
+
+	private HashMap<Long, HashMap<String, List<PropertyInst>>> datasProperties = new HashMap<Long, HashMap<String, List<PropertyInst>>>();
 
 	@Create
 	public void init() {
@@ -134,15 +147,61 @@ public class SlotInstEditBean {
 				.getCurrentInstance().getExternalContext().getRequest())
 				.getParameter("docDefCollectionId");
 		Long docDefCollectionId = new Long(docDefCollectionIdAsString);
+
 		List<UploadItem> list = datas.get(docDefCollectionId);
 		if (list == null) {
 			list = new ArrayList<UploadItem>();
 			datas.put(docDefCollectionId, list);
 		}
 		list.add(item);
+
 		System.out.println("-> " + fileName + " successfully uploaded");
 		System.out.println("-> docDefCollectionId: "
 				+ docDefCollectionIdAsString);
+
+		HashMap<String, List<PropertyInst>> filePropertiesMap = datasProperties
+				.get(docDefCollectionId);
+		if (filePropertiesMap == null) {
+			filePropertiesMap = new HashMap<String, List<PropertyInst>>();
+			datasProperties.put(docDefCollectionId, filePropertiesMap);
+		}
+
+		List<PropertyInst> fileProperties = filePropertiesMap.get(item
+				.getFileName());
+		if (fileProperties == null) {
+			fileProperties = new ArrayList<PropertyInst>();
+			filePropertiesMap.put(item.getFileName(), fileProperties);
+		}
+
+		DocDefCollection docDefCollection = entityManager.find(
+				DocDefCollection.class, docDefCollectionId);
+		Set<String> aspectsIds = docDefCollection.getDocDef().getAspects();
+		for (String aspectId : aspectsIds) {
+			Aspect aspect = customModel.getAspect(aspectId);
+			List<Property> properties = aspect.getProperties();
+			for (Property property : properties) {
+				PropertyDef propertyDef = makePropertyDefFromAspectProperty(property);
+				PropertyInst propertyInst = new PropertyInst(propertyDef);
+				fileProperties.add(propertyInst);
+			}
+		}
+
+	}
+
+	private PropertyDef makePropertyDefFromAspectProperty(
+			Property aspectProperty) {
+		PropertyDef propertyDef = new PropertyDef();
+		propertyDef.setName(aspectProperty.getTitle());
+		if (aspectProperty.getType().equals("d:text")) {
+			propertyDef.setType(DataType.STRING);
+		} else if (aspectProperty.getType().equals("d:date")) {
+			propertyDef.setType(DataType.DATE);
+		} else if (aspectProperty.getType().equals("d:boolean")) {
+			propertyDef.setType(DataType.BOOLEAN);
+		} else if (aspectProperty.getType().equals("d:int")) {
+			propertyDef.setType(DataType.INTEGER);
+		}
+		return propertyDef;
 	}
 
 	public String storeOnAlfresco(UploadItem item,
@@ -233,5 +292,14 @@ public class SlotInstEditBean {
 
 	public void setDatas(HashMap<Long, List<UploadItem>> datas) {
 		this.datas = datas;
+	}
+
+	public HashMap<Long, HashMap<String, List<PropertyInst>>> getDatasProperties() {
+		return datasProperties;
+	}
+
+	public void setDatasProperties(
+			HashMap<Long, HashMap<String, List<PropertyInst>>> datasProperties) {
+		this.datasProperties = datasProperties;
 	}
 }
