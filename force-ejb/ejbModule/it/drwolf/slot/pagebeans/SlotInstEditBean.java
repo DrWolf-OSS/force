@@ -3,13 +3,13 @@ package it.drwolf.slot.pagebeans;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.custom.model.Aspect;
 import it.drwolf.slot.alfresco.custom.model.Property;
+import it.drwolf.slot.alfresco.custom.support.EmbeddedPropertyInst;
 import it.drwolf.slot.application.CustomModel;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
-import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
@@ -71,7 +71,7 @@ public class SlotInstEditBean {
 
 	private HashMap<Long, List<UploadItem>> datas = new HashMap<Long, List<UploadItem>>();
 
-	private HashMap<Long, HashMap<String, List<PropertyInst>>> datasProperties = new HashMap<Long, HashMap<String, List<PropertyInst>>>();
+	private HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>> datasProperties = new HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>>();
 
 	@Create
 	public void init() {
@@ -148,60 +148,95 @@ public class SlotInstEditBean {
 				.getParameter("docDefCollectionId");
 		Long docDefCollectionId = new Long(docDefCollectionIdAsString);
 
-		List<UploadItem> list = datas.get(docDefCollectionId);
-		if (list == null) {
-			list = new ArrayList<UploadItem>();
-			datas.put(docDefCollectionId, list);
-		}
-		list.add(item);
-
-		System.out.println("-> " + fileName + " successfully uploaded");
-		System.out.println("-> docDefCollectionId: "
-				+ docDefCollectionIdAsString);
-
-		HashMap<String, List<PropertyInst>> filePropertiesMap = datasProperties
-				.get(docDefCollectionId);
-		if (filePropertiesMap == null) {
-			filePropertiesMap = new HashMap<String, List<PropertyInst>>();
-			datasProperties.put(docDefCollectionId, filePropertiesMap);
-		}
-
-		List<PropertyInst> fileProperties = filePropertiesMap.get(item
-				.getFileName());
-		if (fileProperties == null) {
-			fileProperties = new ArrayList<PropertyInst>();
-			filePropertiesMap.put(item.getFileName(), fileProperties);
-		}
-
-		DocDefCollection docDefCollection = entityManager.find(
-				DocDefCollection.class, docDefCollectionId);
-		Set<String> aspectsIds = docDefCollection.getDocDef().getAspects();
-		for (String aspectId : aspectsIds) {
-			Aspect aspect = customModel.getAspect(aspectId);
-			List<Property> properties = aspect.getProperties();
-			for (Property property : properties) {
-				PropertyDef propertyDef = makePropertyDefFromAspectProperty(property);
-				PropertyInst propertyInst = new PropertyInst(propertyDef);
-				fileProperties.add(propertyInst);
+		if (!isAlreadyUploaded(fileName, docDefCollectionId)) {
+			List<UploadItem> list = datas.get(docDefCollectionId);
+			if (list == null) {
+				list = new ArrayList<UploadItem>();
+				datas.put(docDefCollectionId, list);
 			}
+
+			list.add(item);
+			System.out.println("-> " + fileName + " successfully uploaded");
+			System.out.println("-> docDefCollectionId: "
+					+ docDefCollectionIdAsString);
+			HashMap<String, List<EmbeddedPropertyInst>> filePropertiesMap = datasProperties
+					.get(docDefCollectionId);
+			if (filePropertiesMap == null) {
+				filePropertiesMap = new HashMap<String, List<EmbeddedPropertyInst>>();
+				datasProperties.put(docDefCollectionId, filePropertiesMap);
+			}
+			List<EmbeddedPropertyInst> fileProperties = filePropertiesMap
+					.get(item.getFileName());
+			if (fileProperties == null) {
+				fileProperties = new ArrayList<EmbeddedPropertyInst>();
+				filePropertiesMap.put(item.getFileName(), fileProperties);
+			}
+			DocDefCollection docDefCollection = entityManager.find(
+					DocDefCollection.class, docDefCollectionId);
+			Set<String> aspectsIds = docDefCollection.getDocDef().getAspects();
+			for (String aspectId : aspectsIds) {
+				Aspect aspect = customModel.getAspect(aspectId);
+				List<Property> properties = aspect.getProperties();
+				for (Property property : properties) {
+					EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(
+							property);
+					if (!fileProperties.contains(embeddedPropertyInst)) {
+						fileProperties.add(embeddedPropertyInst);
+					}
+				}
+			}
+		} else {
+			System.out.println("---> file already uploaded in this collection");
 		}
 
 	}
 
-	private PropertyDef makePropertyDefFromAspectProperty(
-			Property aspectProperty) {
-		PropertyDef propertyDef = new PropertyDef();
-		propertyDef.setName(aspectProperty.getTitle());
-		if (aspectProperty.getType().equals("d:text")) {
-			propertyDef.setType(DataType.STRING);
-		} else if (aspectProperty.getType().equals("d:date")) {
-			propertyDef.setType(DataType.DATE);
-		} else if (aspectProperty.getType().equals("d:boolean")) {
-			propertyDef.setType(DataType.BOOLEAN);
-		} else if (aspectProperty.getType().equals("d:int")) {
-			propertyDef.setType(DataType.INTEGER);
+	public boolean isAlreadyUploaded(String fileName, Long docDefCollectionId) {
+		// HashMap<String, List<EmbeddedPropertyInst>> filePropertiesMap =
+		// datasProperties
+		// .get(docDefCollectionId);
+		// if (filePropertiesMap == null) {
+		// return false;
+		// }
+		// List<EmbeddedPropertyInst> fileProperties = filePropertiesMap
+		// .get(fileName);
+		// if (fileProperties == null) {
+		// return false;
+		// }
+
+		List<UploadItem> itemList = datas.get(docDefCollectionId);
+		if (itemList != null) {
+			Iterator<UploadItem> iterator = itemList.iterator();
+			while (iterator.hasNext()) {
+				if (iterator.next().getFileName().equals(fileName)) {
+					System.out.println("already present");
+					return true;
+				}
+			}
 		}
-		return propertyDef;
+		System.out.println("not present");
+		return false;
+
+	}
+
+	public void removeCleared(Long collectionId, String fileName) {
+		System.out.println("---> removing " + fileName + "...");
+		List<UploadItem> filesList = datas.get(collectionId);
+		if (filesList != null) {
+			Iterator<UploadItem> iterator = filesList.iterator();
+			while (iterator.hasNext()) {
+				UploadItem item = iterator.next();
+				if (item.getFileName().equals(fileName)) {
+					iterator.remove();
+					datasProperties.get(collectionId).get(fileName).clear();
+					return;
+				}
+			}
+		}
+	}
+
+	public void printFileName(String fileName) {
+		System.out.println("---> " + fileName);
 	}
 
 	public String storeOnAlfresco(UploadItem item,
@@ -250,10 +285,21 @@ public class SlotInstEditBean {
 			AlfrescoDocument document = (AlfrescoDocument) session
 					.getObject(objectId);
 
+			// prima si aggiungono gli aspect
 			for (String aspect : aspects) {
 				document.addAspect(aspect);
 			}
 
+			// poi si aggiungono i valori delle relative properties
+			List<EmbeddedPropertyInst> docPropertyValues = datasProperties.get(
+					instCollection.getDocDefCollection().getId()).get(
+					item.getFileName());
+			Map<String, Object> aspectsProperties = new HashMap<String, Object>();
+			for (EmbeddedPropertyInst embeddedPropertyInst : docPropertyValues) {
+				aspectsProperties.put(embeddedPropertyInst.getProperty()
+						.getName(), embeddedPropertyInst.getValue());
+			}
+			document.updateProperties(aspectsProperties);
 			nodeRef = objectId.toString();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -294,12 +340,12 @@ public class SlotInstEditBean {
 		this.datas = datas;
 	}
 
-	public HashMap<Long, HashMap<String, List<PropertyInst>>> getDatasProperties() {
+	public HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>> getDatasProperties() {
 		return datasProperties;
 	}
 
 	public void setDatasProperties(
-			HashMap<Long, HashMap<String, List<PropertyInst>>> datasProperties) {
+			HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>> datasProperties) {
 		this.datasProperties = datasProperties;
 	}
 }

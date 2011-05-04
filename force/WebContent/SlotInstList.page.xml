@@ -9,5 +9,11 @@
    <param name="logic" value="#{slotInstList.restrictionLogicOperator}"/>
 
    <param name="from"/>
+   
+   <navigation from-action="#{slotInstEditBean.removeCleared(coll.docDefCollection.id, item.fileName)}">
+         <redirect view-id="/DocDefList.xhtml">
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         </redirect>
+   </navigation>
 
 </page>

@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
 @Entity
@@ -45,6 +46,7 @@ public class SlotDef {
 	}
 
 	@OneToMany(mappedBy = "slotDef", cascade = CascadeType.ALL)
+	@OrderBy("name")
 	public Set<DocDefCollection> getDocDefCollections() {
 		return docDefCollections;
 	}
@@ -62,6 +64,7 @@ public class SlotDef {
 		this.rules = rules;
 	}
 
+	@OrderBy("name")
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "slotDef_id")
 	public Set<PropertyDef> getPropertyDefs() {

@@ -31,12 +31,6 @@ public class PropertyInst {
 
 	public PropertyInst(PropertyDef propertyDef, SlotInst slotInst) {
 		this(propertyDef);
-		// this.propertyDef = propertyDef;
-		// if (propertyDef.getType().equals(DataType.DATE)) {
-		// this.setDateValue(new Date());
-		// } else if (propertyDef.getType().equals(DataType.BOOLEAN)) {
-		// this.setBooleanValue(false);
-		// }
 		this.slotInst = slotInst;
 	}
 

@@ -12,9 +12,8 @@
 
 <ui:define name="body">
 
-    <h:form id="slotInst" styleClass="edit">
-
-        <rich:panel>
+    <a:form id="slotInst" styleClass="edit">
+			<rich:panel>
             <f:facet name="header">#{slotInstHome.managed ? 'Edit' : 'Add'} Slot inst</f:facet>
             
             <s:div id="properties">
@@ -46,16 +45,21 @@
 					<rich:fileUpload maxFilesQuantity="#{coll.docDefCollection.max.intValue()}" 
 									fileUploadListener="#{slotInstEditBean.listener}"
 									immediateUpload="true"
-									acceptedTypes="*">
+									acceptedTypes="*"
+									noDuplicate="false"
+									autoclear="true"
+									onupload="alert(event.memo.entry.fileName)">
 						<f:param name="docDefCollectionId" value="#{coll.docDefCollection.id}"/>
-						<a:support event="onfileuploadcomplete" reRender="infoPanel_#{coll.docDefCollection.id}"/>
+						<a:support event="onfileuploadcomplete" reRender="infoPanel_#{coll.docDefCollection.id}"/>						
 					</rich:fileUpload>
 	            </s:decorate>
 	            	<rich:panel id="infoPanel_#{coll.docDefCollection.id}">
 	            		<f:facet name="header">
 	            			<h:outputText value="Uploaded Files Info" />
 	            		</f:facet>
-	            		<rich:dataGrid columns="1" value="#{slotInstEditBean.datas[coll.docDefCollection.id]}" var="item" rowKeyVar="row">
+	            		<h:outputText value="No files uploaded" rendered="#{slotInstEditBean.datas[coll.docDefCollection.id] == null or (empty slotInstEditBean.datas[coll.docDefCollection.id])}"/>
+	            	
+	            		<rich:dataGrid id="fileGrid_#{coll.docDefCollection.id}" columns="1" value="#{slotInstEditBean.datas[coll.docDefCollection.id]}" var="item" rowKeyVar="row">
 		            		<s:decorate template="/layout/display.xhtml">
 		               			 <ui:define name="label">
 		                			<h:outputText value="File Name" />
@@ -66,24 +70,26 @@
 		            		<ui:repeat var="propInst" value="#{slotInstEditBean.datasProperties[coll.docDefCollection.id][item.fileName]}">
 			            		<s:decorate template="/layout/edit.xhtml">
 			               			 <ui:define name="label">
-			                			<h:outputText value="#{propInst.propertyDef.name}" />
+			                			<h:outputText value="#{propInst.property.title}" />
 									</ui:define>
-									<h:inputText value="#{propInst.stringValue}" rendered="#{propInst.propertyDef.type == 'STRING'}"/>
-									<h:inputText value="#{propInst.integerValue}" rendered="#{propInst.propertyDef.type == 'INTEGER'}"/>
-									<h:selectBooleanCheckbox value="#{propInst.booleanValue}" rendered="#{propInst.propertyDef.type == 'BOOLEAN'}"/>
+									<h:inputText value="#{propInst.stringValue}" rendered="#{propInst.property.type == 'd:text'}"/>
+									<h:inputText value="#{propInst.integerValue}" rendered="#{propInst.property.type == 'd:int'}"/>
+									<h:selectBooleanCheckbox value="#{propInst.booleanValue}" rendered="#{propInst.property.type == 'd:boolean'}"/>
 									<rich:calendar id="subscriptionDate" mode="client"
                           						value="#{propInst.dateValue}"
                           					datePattern="dd/MM/yyyy"
-                         						rendered="#{propInst.propertyDef.type == 'DATE'}"/>
+                         						rendered="#{propInst.property.type == 'd:date'}"/>
 			            		</s:decorate>
+			            		<div style="clear:both"/>
 		            		</ui:repeat>
-
+				            <h:commandButton value="Remove" action="#{slotInstEditBean.removeCleared(coll.docDefCollection.id, item.fileName)}" reRender="fileGrid_#{coll.docDefCollection.id}"/>
 	            		</rich:dataGrid>
+	            
 	            	</rich:panel>
 			</c:forEach>
 			</h:panelGrid>
 			</s:div>
-
+	
             <div style="clear:both">
                 <span class="required">*</span>
                 required fields
@@ -123,7 +129,7 @@
                 rendered="#{!slotInstHome.managed}"/>
 
         </div>
-    </h:form>
+    </a:form>
 
 <rich:tabPanel switchType="ajax">
 
@@ -143,7 +149,7 @@
                     <h:outputText value="#{_docInstCollection.id}"/>
                 </rich:column>
             </rich:dataTable>
-
+	
         </h:form>
 
         <f:subview rendered="#{slotInstHome.managed}" id="docInstCollections">

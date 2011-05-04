@@ -42,5 +42,11 @@
          <redirect view-id="/SlotInstList.xhtml"/>
       </rule>
    </navigation>
+   
+   <navigation from-action="#{slotInstEditBean.removeCleared(coll.docDefCollection.id, item.fileName)}">
+         <redirect view-id="/SlotInstEdit.xhtml">
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         </redirect>
+   </navigation>
 
 </page>
