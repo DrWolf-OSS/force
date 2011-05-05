@@ -263,15 +263,12 @@ public class SlotInstEditBean {
 			Iterator<UploadItem> iterator = itemList.iterator();
 			while (iterator.hasNext()) {
 				if (iterator.next().getFileName().equals(fileName)) {
-					// System.out.println("already present");
-					// this.message = fileName + " already present!";
 					this.messages.put(docDefCollectionId, fileName
 							+ " already uploaded!");
 					return true;
 				}
 			}
 		}
-		// System.out.println("not present");
 		return false;
 	}
 

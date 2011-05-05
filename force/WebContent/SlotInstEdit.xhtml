@@ -85,8 +85,8 @@
                           					datePattern="dd/MM/yyyy"
                          						rendered="#{propInst.property.type == 'd:date'}"/>
 			            		</s:decorate>
-			            		<div style="clear:both"/>
 		            		</ui:repeat>
+			            	<div style="clear:both"/>
 				            <h:commandButton value="Remove" action="#{slotInstEditBean.removeCleared(coll.docDefCollection.id, item.fileName)}" reRender="fileGrid_#{coll.docDefCollection.id}"/>
 	            		</rich:dataGrid>
 	            
