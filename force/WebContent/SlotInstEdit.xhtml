@@ -53,7 +53,12 @@
 						<a:support event="onfileuploadcomplete" reRender="infoPanel_#{coll.docDefCollection.id}"/>						
 					</rich:fileUpload>
 	            </s:decorate>
-	            	<rich:panel id="infoPanel_#{coll.docDefCollection.id}">
+	            <s:div id="infoPanel_#{coll.docDefCollection.id}">
+	            	<s:span styleClass="message">
+	            	<h:graphicImage value="/img/msgerror.png" rendered="#{slotInstEditBean.messages[coll.docDefCollection.id] != null and not slotInstEditBean.messages[coll.docDefCollection.id].equals('')}" style="margin-right:3px"/>
+	            	<h:outputText value="#{slotInstEditBean.messages[coll.docDefCollection.id]}" style="vertical-align: top"/>
+	            	</s:span>
+	            	<rich:panel >
 	            		<f:facet name="header">
 	            			<h:outputText value="Uploaded Files Info" />
 	            		</f:facet>
@@ -86,6 +91,7 @@
 	            		</rich:dataGrid>
 	            
 	            	</rich:panel>
+	            </s:div>
 			</c:forEach>
 			</h:panelGrid>
 			</s:div>

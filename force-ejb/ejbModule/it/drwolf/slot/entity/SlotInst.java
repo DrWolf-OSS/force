@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 @Entity
 public class SlotInst {
@@ -40,6 +41,7 @@ public class SlotInst {
 		this.slotDef = slotDef;
 	}
 
+	@OrderBy("docDefCollection")
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "slotInst")
 	public Set<DocInstCollection> getDocInstCollections() {
 		return docInstCollections;
@@ -49,6 +51,7 @@ public class SlotInst {
 		this.docInstCollections = docInstCollections;
 	}
 
+	@OrderBy("propertyDef")
 	@OneToMany(mappedBy = "slotInst", cascade = CascadeType.ALL)
 	public Set<PropertyInst> getPropertyInsts() {
 		return propertyInsts;

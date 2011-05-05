@@ -77,4 +77,12 @@ public class EmbeddedPropertyInst {
 		return null;
 	}
 
+	public void setValue(Object value) {
+		// TODO COMPLETARE TRASFORMAZIONI
+		if (value instanceof String)
+			this.stringValue = (String) value;
+		else if (value instanceof Integer)
+			this.integerValue = (Integer) value;
+	}
+
 }

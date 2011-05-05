@@ -73,6 +73,10 @@ public class SlotInstEditBean {
 
 	private HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>> datasProperties = new HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>>();
 
+	private String message;
+
+	private HashMap<Long, String> messages = new HashMap<Long, String>();
+
 	@Create
 	public void init() {
 		if (!slotInstHome.isIdDefined()) {
@@ -91,12 +95,72 @@ public class SlotInstEditBean {
 						slotInstHome.getInstance(), defCollection);
 				docInstCollections.add(instCollection);
 			}
+
 		} else {
 			this.propertyInsts = new ArrayList<PropertyInst>(slotInstHome
 					.getInstance().getPropertyInsts());
 
 			this.docInstCollections = new ArrayList<DocInstCollection>(
 					slotInstHome.getInstance().getDocInstCollections());
+			initDatas();
+		}
+	}
+
+	private void initDatas() {
+		for (DocInstCollection instCollection : this.docInstCollections) {
+			Long defCollectionId = instCollection.getDocDefCollection().getId();
+			Set<DocInst> docInsts = instCollection.getDocInsts();
+			for (DocInst docInst : docInsts) {
+				try {
+					String nodeRef = docInst.getNodeRef();
+					AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
+							.getSession().getObject(nodeRef);
+					String fileName = document.getName();
+					UploadItem uploadItem = new UploadItem(fileName,
+							new Integer(0),
+							document.getContentStreamMimeType(), null);
+					List<UploadItem> filesList = datas.get(defCollectionId);
+					if (filesList == null) {
+						filesList = new ArrayList<UploadItem>();
+						datas.put(defCollectionId, filesList);
+					}
+					filesList.add(uploadItem);
+
+					HashMap<String, List<EmbeddedPropertyInst>> filePropertiesMap = datasProperties
+							.get(defCollectionId);
+					if (filePropertiesMap == null) {
+						filePropertiesMap = new HashMap<String, List<EmbeddedPropertyInst>>();
+						datasProperties.put(defCollectionId, filePropertiesMap);
+					}
+					List<EmbeddedPropertyInst> fileProperties = filePropertiesMap
+							.get(fileName);
+					if (fileProperties == null) {
+						fileProperties = new ArrayList<EmbeddedPropertyInst>();
+						filePropertiesMap.put(fileName, fileProperties);
+					}
+
+					Set<String> aspectIds = instCollection
+							.getDocDefCollection().getDocDef().getAspects();
+					for (String aspectId : aspectIds) {
+						Aspect aspect = customModel.getAspect(aspectId);
+						List<Property> properties = aspect.getProperties();
+						if (properties != null) {
+							for (Property p : properties) {
+								Object propertyValue = document
+										.getPropertyValue(p.getName());
+								EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(
+										p);
+								embeddedPropertyInst.setValue(propertyValue);
+								fileProperties.add(embeddedPropertyInst);
+							}
+						}
+					}
+
+				} catch (CmisObjectNotFoundException e) {
+					FacesMessages.instance().add("Missing files on Alfresco");
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -148,6 +212,8 @@ public class SlotInstEditBean {
 				.getParameter("docDefCollectionId");
 		Long docDefCollectionId = new Long(docDefCollectionIdAsString);
 
+		// messages.put(docDefCollectionId, "");
+
 		if (!isAlreadyUploaded(fileName, docDefCollectionId)) {
 			List<UploadItem> list = datas.get(docDefCollectionId);
 			if (list == null) {
@@ -191,32 +257,22 @@ public class SlotInstEditBean {
 
 	}
 
-	public boolean isAlreadyUploaded(String fileName, Long docDefCollectionId) {
-		// HashMap<String, List<EmbeddedPropertyInst>> filePropertiesMap =
-		// datasProperties
-		// .get(docDefCollectionId);
-		// if (filePropertiesMap == null) {
-		// return false;
-		// }
-		// List<EmbeddedPropertyInst> fileProperties = filePropertiesMap
-		// .get(fileName);
-		// if (fileProperties == null) {
-		// return false;
-		// }
-
+	private boolean isAlreadyUploaded(String fileName, Long docDefCollectionId) {
 		List<UploadItem> itemList = datas.get(docDefCollectionId);
 		if (itemList != null) {
 			Iterator<UploadItem> iterator = itemList.iterator();
 			while (iterator.hasNext()) {
 				if (iterator.next().getFileName().equals(fileName)) {
-					System.out.println("already present");
+					// System.out.println("already present");
+					// this.message = fileName + " already present!";
+					this.messages.put(docDefCollectionId, fileName
+							+ " already uploaded!");
 					return true;
 				}
 			}
 		}
-		System.out.println("not present");
+		// System.out.println("not present");
 		return false;
-
 	}
 
 	public void removeCleared(Long collectionId, String fileName) {
@@ -300,7 +356,7 @@ public class SlotInstEditBean {
 						.getName(), embeddedPropertyInst.getValue());
 			}
 			document.updateProperties(aspectsProperties);
-			nodeRef = objectId.toString();
+			nodeRef = objectId.getId();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -347,5 +403,21 @@ public class SlotInstEditBean {
 	public void setDatasProperties(
 			HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>> datasProperties) {
 		this.datasProperties = datasProperties;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public HashMap<Long, String> getMessages() {
+		return messages;
+	}
+
+	public void setMessages(HashMap<Long, String> messages) {
+		this.messages = messages;
 	}
 }
