@@ -17,9 +17,9 @@ import org.jboss.seam.annotations.Scope;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
-@Name("customModel")
+@Name("customModelController")
 @Scope(ScopeType.APPLICATION)
-public class CustomModel {
+public class CustomModelController {
 
 	private SlotModel slotModel;
 

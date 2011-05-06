@@ -45,7 +45,7 @@ public class DocDefHome extends EntityHome<DocDef> {
 
 	public List<String> getPropertyDefs() {
 		return getInstance() == null ? null : new ArrayList<String>(
-				getInstance().getAspects());
+				getInstance().getAspectIds());
 	}
 
 }

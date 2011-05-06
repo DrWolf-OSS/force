@@ -1,7 +1,7 @@
 package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.alfresco.custom.model.Aspect;
-import it.drwolf.slot.application.CustomModel;
+import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.session.DocDefHome;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class DocDefEditBean {
 	private DocDefHome docDefHome;
 
 	@In(create = true)
-	private CustomModel customModel;
+	private CustomModelController customModelController;
 
 	private List<Aspect> aspects = new ArrayList<Aspect>();
 
@@ -36,13 +36,13 @@ public class DocDefEditBean {
 
 	public void save() {
 		for (Aspect aspect : aspects) {
-			docDefHome.getInstance().addAspect(aspect.getId());
+			docDefHome.getInstance().addAspectId(aspect.getId());
 		}
 		docDefHome.persist();
 	}
 
 	public void update() {
-		Iterator<String> iDiterator = docDefHome.getInstance().getAspects()
+		Iterator<String> iDiterator = docDefHome.getInstance().getAspectIds()
 				.iterator();
 		Iterator<Aspect> objectIterator = aspects.iterator();
 
@@ -66,16 +66,16 @@ public class DocDefEditBean {
 		}
 
 		for (Aspect aspect : aspects) {
-			docDefHome.getInstance().addAspect(aspect.getId());
+			docDefHome.getInstance().addAspectId(aspect.getId());
 		}
 		docDefHome.update();
 	}
 
 	@Create
 	public void init() {
-		List<Aspect> aspectsAsObjects = customModel.getSlotModel().getAspects();
+		List<Aspect> aspectsAsObjects = customModelController.getSlotModel().getAspects();
 		Iterator<Aspect> iterator = aspectsAsObjects.iterator();
-		for (String aspectId : docDefHome.getInstance().getAspects()) {
+		for (String aspectId : docDefHome.getInstance().getAspectIds()) {
 			boolean found = false;
 			while (iterator.hasNext() && found == false) {
 				Aspect aspect = iterator.next();

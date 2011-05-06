@@ -28,7 +28,7 @@
             <ui:define name="label">Aspects</ui:define>
             <rich:pickList value="#{docDefEditBean.aspects}"
                 				copyAllVisible="false" removeAllVisible="true" sourceListWidth="270" targetListWidth="270">
-                	<s:selectItems value="#{customModel.slotModel.aspects}" 
+                	<s:selectItems value="#{customModelController.slotModel.aspects}" 
                 					var="aspect" label="#{aspect.title}"/>
                 	<f:converter converterId="aspectConverter"/>
            </rich:pickList>

@@ -4,7 +4,7 @@ import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.custom.model.Aspect;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.EmbeddedPropertyInst;
-import it.drwolf.slot.application.CustomModel;
+import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
@@ -60,7 +60,7 @@ public class SlotInstEditBean {
 	private EntityManager entityManager;
 
 	@In(create = true)
-	private CustomModel customModel;
+	private CustomModelController customModelController;
 
 	@In
 	private AlfrescoUserIdentity alfrescoUserIdentity;
@@ -138,9 +138,9 @@ public class SlotInstEditBean {
 					}
 
 					Set<String> aspectIds = instCollection
-							.getDocDefCollection().getDocDef().getAspects();
+							.getDocDefCollection().getDocDef().getAspectIds();
 					for (String aspectId : aspectIds) {
-						Aspect aspect = customModel.getAspect(aspectId);
+						Aspect aspect = customModelController.getAspect(aspectId);
 						List<Property> properties = aspect.getProperties();
 						if (properties != null) {
 							for (Property p : properties) {
@@ -327,9 +327,9 @@ public class SlotInstEditBean {
 			}
 			DocDefCollection docDefCollection = entityManager.find(
 					DocDefCollection.class, docDefCollectionId);
-			Set<String> aspectsIds = docDefCollection.getDocDef().getAspects();
+			Set<String> aspectsIds = docDefCollection.getDocDef().getAspectIds();
 			for (String aspectId : aspectsIds) {
-				Aspect aspect = customModel.getAspect(aspectId);
+				Aspect aspect = customModelController.getAspect(aspectId);
 				List<Property> properties = aspect.getProperties();
 				for (Property property : properties) {
 					EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(
@@ -401,7 +401,7 @@ public class SlotInstEditBean {
 			}
 
 			Set<String> aspects = instCollection.getDocDefCollection()
-					.getDocDef().getAspects();
+					.getDocDef().getAspectIds();
 
 			String contentType = new MimetypesFileTypeMap().getContentType(item
 					.getFileName());

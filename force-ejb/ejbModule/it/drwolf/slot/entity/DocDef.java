@@ -20,7 +20,7 @@ public class DocDef {
 
 	private String name;
 
-	private Set<String> aspects = new HashSet<String>();
+	private Set<String> aspectIds = new HashSet<String>();
 
 	@Id
 	@GeneratedValue
@@ -41,17 +41,17 @@ public class DocDef {
 	}
 
 	@CollectionOfElements
-	public Set<String> getAspects() {
-		return aspects;
+	public Set<String> getAspectIds() {
+		return aspectIds;
 	}
 
-	public void setAspects(Set<String> aspects) {
-		this.aspects = aspects;
+	public void setAspectIds(Set<String> aspects) {
+		this.aspectIds = aspects;
 	}
 
 	@Transient
-	public void addAspect(String aspectId) {
-		this.aspects.add(aspectId);
+	public void addAspectId(String aspectId) {
+		this.aspectIds.add(aspectId);
 	}
 
 	@Override

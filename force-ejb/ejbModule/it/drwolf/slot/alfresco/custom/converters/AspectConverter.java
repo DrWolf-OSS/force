@@ -1,7 +1,7 @@
 package it.drwolf.slot.alfresco.custom.converters;
 
 import it.drwolf.slot.alfresco.custom.model.Aspect;
-import it.drwolf.slot.application.CustomModel;
+import it.drwolf.slot.application.CustomModelController;
 
 import java.util.Iterator;
 import java.util.List;
@@ -20,9 +20,10 @@ public class AspectConverter implements Converter {
 
 	public Object getAsObject(FacesContext context, UIComponent component,
 			String aspectId) {
-		CustomModel customModel = (CustomModel) org.jboss.seam.Component
-				.getInstance("customModel");
-		List<Aspect> aspectsAsObjects = customModel.getSlotModel().getAspects();
+		CustomModelController customModelController = (CustomModelController) org.jboss.seam.Component
+				.getInstance("customModelController");
+		List<Aspect> aspectsAsObjects = customModelController.getSlotModel()
+				.getAspects();
 		Iterator<Aspect> iterator = aspectsAsObjects.iterator();
 
 		while (iterator.hasNext()) {
