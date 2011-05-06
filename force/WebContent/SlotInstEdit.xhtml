@@ -14,7 +14,7 @@
 
     <a:form id="slotInst" styleClass="edit">
 			<rich:panel>
-            <f:facet name="header">#{slotInstHome.managed ? 'Edit' : 'Add'} Slot inst</f:facet>
+            <f:facet name="header">#{slotInstHome.managed ? 'Edit' : 'Add'} Slot inst #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
             
             <s:div id="properties">
 			<c:forEach var="propInst" items="#{slotInstEditBean.propertyInsts}">

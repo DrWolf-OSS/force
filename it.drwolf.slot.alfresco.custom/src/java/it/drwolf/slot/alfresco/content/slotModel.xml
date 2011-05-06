@@ -97,20 +97,7 @@
  -->
 
 	<aspects>
-<!-- 
-		<aspect name="slot:researchable">
-			<title>Salvabile in ricerca</title>
-			<properties>
-				<property name="slot:researchId">
-					<title>ID Ricerca</title>
-					<type>d:text</type>
-					<mandatory>false</mandatory>
-					<multiple>true</multiple>
-				</property>
-			</properties>
-		</aspect>
- -->
-		
+
 		<aspect name="slot:signed">
 			<title>Firmato</title>
 			<properties>
@@ -118,6 +105,20 @@
 					<title>ID Autore</title>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
+				</property>
+				<property name="slot:expirationDate">
+					<title>Data Scadenza</title>
+					<type>d:date</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="slot:number">
+					<title>Numero ID</title>
+					<type>d:int</type>
+				</property>
+				<property name="slot:validated">
+					<title>Validato</title>
+					<type>d:boolean</type>
+					<default>false</default>
 				</property>
 			</properties>
 		</aspect>

@@ -73,4 +73,9 @@ public class Property {
 		this.defaultValue = defaultValue;
 	}
 
+	@Override
+	public String toString() {
+		return name + "," + type;
+	}
+
 }

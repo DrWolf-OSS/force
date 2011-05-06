@@ -191,6 +191,8 @@ public class SlotInstEditBean {
 				} catch (Exception e) {
 					FacesMessages.instance().add(
 							"Errors in storing files on Alfresco");
+					// TODO: se il documento è stato creato farsi dare l'id e
+					// toglierlo per avere una garanzia "transazionale"
 					e.printStackTrace();
 					return;
 				}
@@ -442,8 +444,10 @@ public class SlotInstEditBean {
 				item.getFileName());
 		Map<String, Object> aspectsProperties = new HashMap<String, Object>();
 		for (EmbeddedPropertyInst embeddedPropertyInst : docPropertyValues) {
-			aspectsProperties.put(embeddedPropertyInst.getProperty().getName(),
-					embeddedPropertyInst.getValue());
+			if (embeddedPropertyInst.getValue() != null) {
+				aspectsProperties.put(embeddedPropertyInst.getProperty()
+						.getName(), embeddedPropertyInst.getValue());
+			}
 		}
 		document.updateProperties(aspectsProperties);
 	}

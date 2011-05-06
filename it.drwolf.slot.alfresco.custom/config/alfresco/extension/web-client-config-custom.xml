@@ -9,6 +9,9 @@
    	<config evaluator="aspect-name" condition="slot:signed">
 	    <property-sheet>
 	       <show-property name="slot:authorId"/>
+	       <show-property name="slot:expirationDate"/>
+	       <show-property name="slot:number"/>
+	       <show-property name="slot:validated"/>
 	    </property-sheet>
    	</config>
 
