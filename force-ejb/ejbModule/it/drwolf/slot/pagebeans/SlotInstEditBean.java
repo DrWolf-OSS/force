@@ -73,8 +73,6 @@ public class SlotInstEditBean {
 
 	private HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>> datasProperties = new HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>>();
 
-	private String message;
-
 	private HashMap<Long, String> messages = new HashMap<Long, String>();
 
 	@Create
@@ -202,6 +200,94 @@ public class SlotInstEditBean {
 		slotInstHome.getInstance().setDocInstCollections(
 				new HashSet<DocInstCollection>(docInstCollections));
 		slotInstHome.persist();
+		FacesMessages.instance().add(
+				"Slot " + this.slotDefHome.getInstance().getName()
+						+ " successfully created");
+	}
+
+	public void update() {
+		Set<DocInstCollection> persistedDocInstCollections = slotInstHome
+				.getInstance().getDocInstCollections();
+		for (DocInstCollection instCollection : persistedDocInstCollections) {
+			Set<DocInst> docInsts = instCollection.getDocInsts();
+			Iterator<DocInst> iterator = docInsts.iterator();
+			while (iterator.hasNext()) {
+				DocInst docInst = iterator.next();
+				AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
+						.getSession().getObject(docInst.getNodeRef());
+				String fileName = document.getName();
+				Long docDefCollectionId = instCollection.getDocDefCollection()
+						.getId();
+				List<UploadItem> filesList = datas.get(docDefCollectionId);
+				UploadItem itemContained = getItemIfContained(filesList,
+						fileName);
+				if (itemContained == null) {
+					document.deleteAllVersions();
+					iterator.remove();
+					entityManager.remove(docInst);
+				} else {
+					// Gli uploadItem di file precedentemente salvati sono
+					// "fittizi", creati dai documenti già salvati ed hanno il
+					// campo file==null. Questo permette di riconoscere files
+					// nuovi che hanno però lo stesso fileName di uno
+					// precedentemente archiviato nella collection
+					if (itemContained.getFile() == null) {
+						// il file è quello vecchio ma potrebbe necessitare di
+						// un aggiornamento delle properties
+						System.out.println("Doc " + document.getName()
+								+ " da aggiornare");
+						updateProperties(itemContained, instCollection,
+								document);
+					} else {
+						// il file è in realtà un file diverso e va prima
+						// cancellato il vecchio
+						System.out.println("Doc " + document.getName()
+								+ " nuovo ma con stesso nome di uno vecchio");
+						document.deleteAllVersions();
+						iterator.remove();
+						entityManager.remove(docInst);
+						String storedRef = storeOnAlfresco(itemContained,
+								instCollection);
+						DocInst newDocInst = new DocInst(instCollection,
+								storedRef);
+						instCollection.getDocInsts().add(newDocInst);
+					}
+				}
+			}
+
+			// Aggiungo elementi nuovi
+			List<UploadItem> filesList = datas.get(instCollection
+					.getDocDefCollection().getId());
+			if (filesList != null) {
+				for (UploadItem item : filesList) {
+					System.out.println("Doc " + item.getFileName() + " nuovo");
+					String storedRef = storeOnAlfresco(item, instCollection);
+					DocInst docInst = new DocInst(instCollection, storedRef);
+					instCollection.getDocInsts().add(docInst);
+				}
+			}
+		}
+		slotInstHome.update();
+		FacesMessages.instance().add(
+				"Slot " + this.slotDefHome.getInstance().getName()
+						+ " successfully updated");
+	}
+
+	// quando trovo l'element lo tolgo così lascio solo quelli del tutto nuovi
+	// su cui ciclare alla fine ed aggiungerli nell'update
+	private UploadItem getItemIfContained(List<UploadItem> filesList,
+			String fileName) {
+		if (filesList != null) {
+			Iterator<UploadItem> iterator = filesList.iterator();
+			while (iterator.hasNext()) {
+				UploadItem item = iterator.next();
+				if (item.getFileName().equals(fileName)) {
+					iterator.remove();
+					return item;
+				}
+			}
+		}
+		return null;
 	}
 
 	public void listener(UploadEvent event) {
@@ -212,7 +298,7 @@ public class SlotInstEditBean {
 				.getParameter("docDefCollectionId");
 		Long docDefCollectionId = new Long(docDefCollectionIdAsString);
 
-		// messages.put(docDefCollectionId, "");
+		messages.put(docDefCollectionId, "");
 
 		if (!isAlreadyUploaded(fileName, docDefCollectionId)) {
 			List<UploadItem> list = datas.get(docDefCollectionId);
@@ -288,11 +374,7 @@ public class SlotInstEditBean {
 		}
 	}
 
-	public void printFileName(String fileName) {
-		System.out.println("---> " + fileName);
-	}
-
-	public String storeOnAlfresco(UploadItem item,
+	private String storeOnAlfresco(UploadItem item,
 			DocInstCollection instCollection) {
 		String nodeRef = "";
 		try {
@@ -333,7 +415,7 @@ public class SlotInstEditBean {
 
 			ObjectId objectId = session.createDocument(properties, slotFolder,
 					contentStreamImpl, VersioningState.NONE, null, null, null);
-			System.out.println("ObjectID: " + objectId);
+			System.out.println(objectId);
 
 			AlfrescoDocument document = (AlfrescoDocument) session
 					.getObject(objectId);
@@ -344,21 +426,26 @@ public class SlotInstEditBean {
 			}
 
 			// poi si aggiungono i valori delle relative properties
-			List<EmbeddedPropertyInst> docPropertyValues = datasProperties.get(
-					instCollection.getDocDefCollection().getId()).get(
-					item.getFileName());
-			Map<String, Object> aspectsProperties = new HashMap<String, Object>();
-			for (EmbeddedPropertyInst embeddedPropertyInst : docPropertyValues) {
-				aspectsProperties.put(embeddedPropertyInst.getProperty()
-						.getName(), embeddedPropertyInst.getValue());
-			}
-			document.updateProperties(aspectsProperties);
+			updateProperties(item, instCollection, document);
 			nodeRef = objectId.getId();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return nodeRef;
+	}
+
+	private void updateProperties(UploadItem item,
+			DocInstCollection instCollection, AlfrescoDocument document) {
+		List<EmbeddedPropertyInst> docPropertyValues = datasProperties.get(
+				instCollection.getDocDefCollection().getId()).get(
+				item.getFileName());
+		Map<String, Object> aspectsProperties = new HashMap<String, Object>();
+		for (EmbeddedPropertyInst embeddedPropertyInst : docPropertyValues) {
+			aspectsProperties.put(embeddedPropertyInst.getProperty().getName(),
+					embeddedPropertyInst.getValue());
+		}
+		document.updateProperties(aspectsProperties);
 	}
 
 	public List<PropertyInst> getPropertyInsts() {
@@ -377,14 +464,6 @@ public class SlotInstEditBean {
 		this.docInstCollections = docInstCollections;
 	}
 
-	public String getExtension(String fileName) {
-		String[] fileNameSplitted = fileName.split("\\.");
-		if (fileNameSplitted.length < 2) {
-			return "";
-		}
-		return fileNameSplitted[fileNameSplitted.length - 1];
-	}
-
 	public HashMap<Long, List<UploadItem>> getDatas() {
 		return datas;
 	}
@@ -400,14 +479,6 @@ public class SlotInstEditBean {
 	public void setDatasProperties(
 			HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>> datasProperties) {
 		this.datasProperties = datasProperties;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
 	}
 
 	public HashMap<Long, String> getMessages() {
