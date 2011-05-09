@@ -17,9 +17,18 @@
         <rich:panel>
             <f:facet name="header">#{slotDefHome.managed ? 'Edit' : 'Add'} Slot def</f:facet>
 
-            <s:decorate id="nameField" template="layout/edit.xhtml">
+            <s:decorate id="nameField" template="/layout/edit.xhtml">
                 <ui:define name="label">Name</ui:define>
                 <h:inputText id="name" value="#{slotDefHome.instance.name}"/>
+            </s:decorate>
+            
+            <s:decorate id="typeField" template="/layout/edit.xhtml">
+                <ui:define name="label">Type</ui:define>
+                <h:selectOneMenu id="slotDefType" value="#{slotDefHome.instance.type}" >
+                    	<s:selectItems value="#{slotDefEditBean.slotDefTypes}" 
+						var="slotDefType" label="#{slotDefType.value()}"/>
+						<s:convertEnum/>
+             	</h:selectOneMenu>
             </s:decorate>
             
             <s:div id="properties">

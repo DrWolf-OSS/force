@@ -3,6 +3,7 @@ package it.drwolf.slot.pagebeans;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.session.DocDefCollectionHome;
 import it.drwolf.slot.session.PropertytDefHome;
 import it.drwolf.slot.session.SlotDefHome;
@@ -81,6 +82,11 @@ public class SlotDefEditBean {
 	@Factory("dataTypes")
 	public List<DataType> getPropertyTypes() {
 		return Arrays.asList(DataType.values());
+	}
+
+	@Factory("slotDefTypes")
+	public List<SlotDefType> getSlotDefTypes() {
+		return Arrays.asList(SlotDefType.values());
 	}
 
 	public void save() {

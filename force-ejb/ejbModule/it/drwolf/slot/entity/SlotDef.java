@@ -1,5 +1,7 @@
 package it.drwolf.slot.entity;
 
+import it.drwolf.slot.enums.SlotDefType;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -7,6 +9,8 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -20,6 +24,8 @@ public class SlotDef {
 	private Long id;
 
 	private String name;
+
+	private SlotDefType type = SlotDefType.GENERAL;
 
 	private Set<DocDefCollection> docDefCollections = new HashSet<DocDefCollection>();
 
@@ -88,6 +94,15 @@ public class SlotDef {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	@Enumerated(EnumType.STRING)
+	public SlotDefType getType() {
+		return type;
+	}
+
+	public void setType(SlotDefType type) {
+		this.type = type;
 	}
 
 }
