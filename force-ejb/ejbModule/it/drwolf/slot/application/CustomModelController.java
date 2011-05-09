@@ -3,6 +3,8 @@ package it.drwolf.slot.application;
 import it.drwolf.slot.alfresco.custom.model.Aspect;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.model.SlotModel;
+import it.drwolf.slot.prefs.PreferenceKey;
+import it.drwolf.slot.prefs.Preferences;
 
 import java.io.InputStream;
 import java.util.Enumeration;
@@ -12,6 +14,7 @@ import java.util.jar.JarFile;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.simpleframework.xml.Serializer;
@@ -23,6 +26,9 @@ public class CustomModelController {
 
 	private SlotModel slotModel;
 
+	@In(create = true)
+	private Preferences preferences;
+
 	@Create
 	public void init() {
 		loadModel();
@@ -31,17 +37,19 @@ public class CustomModelController {
 	private void loadModel() {
 		if (slotModel == null) {
 			try {
+				String customModelJarPath = preferences
+						.getValue(PreferenceKey.CUSTOM_MODEL_JAR_PATH.name());
+				String customModelXmlName = preferences
+						.getValue(PreferenceKey.CUSTOM_MODEL_XML_PATH.name());
 				JarFile jar;
-				jar = new JarFile(
-						"/home/drwolf/alfresco-3.4.d/tomcat/webapps/alfresco/WEB-INF/lib/it.drwolf.slot.alfresco.custom.jar");
+				jar = new JarFile(customModelJarPath);
 
 				InputStream xmlSource = null;
 				for (Enumeration entries = jar.entries(); entries
 						.hasMoreElements();) {
 					JarEntry jarElement = (JarEntry) entries.nextElement();
 					String zipEntryName = jarElement.getName();
-					if (zipEntryName
-							.equals("it/drwolf/slot/alfresco/content/slotModel.xml")) {
+					if (zipEntryName.equals(customModelXmlName)) {
 						xmlSource = jar.getInputStream(jarElement);
 					}
 				}

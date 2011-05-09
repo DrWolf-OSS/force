@@ -140,7 +140,8 @@ public class SlotInstEditBean {
 					Set<String> aspectIds = instCollection
 							.getDocDefCollection().getDocDef().getAspectIds();
 					for (String aspectId : aspectIds) {
-						Aspect aspect = customModelController.getAspect(aspectId);
+						Aspect aspect = customModelController
+								.getAspect(aspectId);
 						List<Property> properties = aspect.getProperties();
 						if (properties != null) {
 							for (Property p : properties) {
@@ -302,6 +303,27 @@ public class SlotInstEditBean {
 
 		messages.put(docDefCollectionId, "");
 
+		// ///////////////////////////////////////////////
+		// Controllo se è già presente un file con quel nome
+		// AlfrescoFolder slotFolder = null;
+		// Session session = alfrescoUserIdentity.getSession();
+		// String userHomePath = alfrescoUserIdentity.getUserHomePath();
+		// try {
+		// slotFolder = (AlfrescoFolder) session.getObjectByPath(userHomePath
+		// + "/" + this.slotDefHome.getInstance().getName());
+		// session.getObjectByPath(slotFolder.getPath() + "/" + fileName);
+		// DocDefCollection docDefCollection = entityManager.find(
+		// DocDefCollection.class, docDefCollectionId);
+		//
+		// // un file con quel fileName esiste già nella cartella
+		// this.messages.put(docDefCollectionId, slotFolder.getName()
+		// + " already contains a file named " + fileName + "!");
+		// return;
+		// } catch (CmisObjectNotFoundException e) {
+		// // DO NOTHING
+		// }
+		// /////////////////////////////////////////////
+
 		if (!isAlreadyUploaded(fileName, docDefCollectionId)) {
 			List<UploadItem> list = datas.get(docDefCollectionId);
 			if (list == null) {
@@ -327,7 +349,8 @@ public class SlotInstEditBean {
 			}
 			DocDefCollection docDefCollection = entityManager.find(
 					DocDefCollection.class, docDefCollectionId);
-			Set<String> aspectsIds = docDefCollection.getDocDef().getAspectIds();
+			Set<String> aspectsIds = docDefCollection.getDocDef()
+					.getAspectIds();
 			for (String aspectId : aspectsIds) {
 				Aspect aspect = customModelController.getAspect(aspectId);
 				List<Property> properties = aspect.getProperties();
