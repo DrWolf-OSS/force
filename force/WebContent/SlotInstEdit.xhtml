@@ -215,14 +215,18 @@
            	<h:outputText value="Upload dialog" />
            </f:facet>
    		<a:form>
-          	<rich:fileUpload fileUploadListener="#{slotInstEditBean.listener}"
-							immediateUpload="true"
+          	<rich:fileUpload id="fileUpload"
+          					fileUploadListener="#{slotInstEditBean.listener}"
 							acceptedTypes="*"
-							onfileuploadcomplete="#{rich:component('uploadPanel')}.hide()"
+							onupload="checkFileExistence(event.memo.entry.fileName)"
 							noDuplicate="false"
-							autoclear="true">
+							autoclear="false"
+							immediateUpload="true">
 			<a:support event="onfileuploadcomplete" reRender="infoPanel_#{slotInstEditBean.activeCollectionId},uploadPanel"/>				
 			</rich:fileUpload>
+			<a:jsFunction id="checkFileExistence" name="checkFileExistence" action="#{slotInstEditBean.checkFileExistence()}" data="#{slotInstEditBean.activeExists}">
+				 <a:actionparam name="fileName" assignTo="#{slotInstEditBean.activeFileName}"/>
+			</a:jsFunction>
 		</a:form>
 		<div style="clear:both"/>
 		<a:commandButton value="Cancel" onclick="#{rich:component('uploadPanel')}.hide()"/>

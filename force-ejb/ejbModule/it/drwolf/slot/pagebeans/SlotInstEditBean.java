@@ -82,6 +82,8 @@ public class SlotInstEditBean {
 	private HashMap<Long, List<AlfrescoDocument>> primaryDocs = new HashMap<Long, List<AlfrescoDocument>>();
 
 	private Long activeCollectionId;
+	private String activeFileName;
+	private boolean activeExists;
 
 	@Create
 	public void init() {
@@ -138,7 +140,7 @@ public class SlotInstEditBean {
 					String nodeRef = docInst.getNodeRef();
 					AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
 							.getSession().getObject(nodeRef);
-					initProperties(docDefCollection, document, true);
+					initDocAndProperties(docDefCollection, document, true);
 
 				} catch (CmisObjectNotFoundException e) {
 					FacesMessages.instance().add("Missing files on Alfresco");
@@ -148,7 +150,7 @@ public class SlotInstEditBean {
 		}
 	}
 
-	private void initProperties(DocDefCollection docDefCollection,
+	private void initDocAndProperties(DocDefCollection docDefCollection,
 			AlfrescoDocument document, boolean editables) {
 		Long defCollectionId = docDefCollection.getId();
 		String fileName = document.getName();
@@ -262,82 +264,104 @@ public class SlotInstEditBean {
 						+ " successfully created");
 	}
 
-	// public void update() {
-	// Set<DocInstCollection> persistedDocInstCollections = slotInstHome
-	// .getInstance().getDocInstCollections();
-	// for (DocInstCollection instCollection : persistedDocInstCollections) {
-	// Set<DocInst> docInsts = instCollection.getDocInsts();
-	// Iterator<DocInst> iterator = docInsts.iterator();
-	// while (iterator.hasNext()) {
-	// DocInst docInst = iterator.next();
-	// AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
-	// .getSession().getObject(docInst.getNodeRef());
-	// String fileName = document.getName();
-	// Long docDefCollectionId = instCollection.getDocDefCollection()
-	// .getId();
-	// List<FileContainer> filesList = datas.get(docDefCollectionId);
-	// UploadItem itemContained = getItemIfContained(filesList,
-	// fileName);
-	// if (itemContained == null) {
-	// document.deleteAllVersions();
-	// iterator.remove();
-	// entityManager.remove(docInst);
-	// } else {
-	// // Gli uploadItem di file precedentemente salvati sono
-	// // "fittizi", creati dai documenti già salvati ed hanno il
-	// // campo file==null. Questo permette di riconoscere files
-	// // nuovi che hanno però lo stesso fileName di uno
-	// // precedentemente archiviato nella collection
-	// if (itemContained.getFile() == null) {
-	// // il file è quello vecchio ma potrebbe necessitare di
-	// // un aggiornamento delle properties
-	// System.out.println("Doc " + document.getName()
-	// + " da aggiornare");
-	// updateProperties(itemContained, instCollection,
-	// document);
-	// } else {
-	// // il file è in realtà un file diverso e va prima
-	// // cancellato il vecchio
-	// System.out.println("Doc " + document.getName()
-	// + " nuovo ma con stesso nome di uno vecchio");
-	// document.deleteAllVersions();
-	// iterator.remove();
-	// entityManager.remove(docInst);
-	// String storedRef = storeOnAlfresco(itemContained,
-	// instCollection);
-	// DocInst newDocInst = new DocInst(instCollection,
-	// storedRef);
-	// instCollection.getDocInsts().add(newDocInst);
-	// }
-	// }
-	// }
-	//
-	// // Aggiungo elementi nuovi
-	// List<UploadItem> filesList = datas.get(instCollection
-	// .getDocDefCollection().getId());
-	// if (filesList != null) {
-	// for (UploadItem item : filesList) {
-	// System.out.println("Doc " + item.getFileName() + " nuovo");
-	// String storedRef = storeOnAlfresco(item, instCollection);
-	// DocInst docInst = new DocInst(instCollection, storedRef);
-	// instCollection.getDocInsts().add(docInst);
-	// }
-	// }
-	// }
-	// slotInstHome.update();
-	// FacesMessages.instance().add(
-	// "Slot " + this.slotDefHome.getInstance().getName()
-	// + " successfully updated");
-	// }
+	public void update() {
+		Set<DocInstCollection> persistedDocInstCollections = slotInstHome
+				.getInstance().getDocInstCollections();
+		for (DocInstCollection instCollection : persistedDocInstCollections) {
+			Set<DocInst> docInsts = instCollection.getDocInsts();
+			Iterator<DocInst> iterator = docInsts.iterator();
+			while (iterator.hasNext()) {
+				DocInst docInst = iterator.next();
+				AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
+						.getSession().getObject(docInst.getNodeRef());
+				String fileName = document.getName();
+				Long docDefCollectionId = instCollection.getDocDefCollection()
+						.getId();
+				List<FileContainer> filesList = datas.get(docDefCollectionId);
+				FileContainer itemContained = getItemIfContained(filesList,
+						fileName);
+				if (itemContained == null) {
+					document.deleteAllVersions();
+					iterator.remove();
+					entityManager.remove(docInst);
+				} else {
+					if (itemContained.getDocument() != null) {
+						// il file è quello vecchio ma potrebbe necessitare di
+						// un aggiornamento delle properties
+						if (itemContained.getDocument().getId()
+								.equals(docInst.getNodeRef())) {
+							System.out.println("Doc " + document.getName()
+									+ " da aggiornare");
+							updateProperties(itemContained.getFileName(),
+									instCollection, document);
+						} else {
+							System.out
+									.println("Primary Doc "
+											+ document.getName()
+											+ " nuovo ma con stesso nome di uno vecchio");
+							document.deleteAllVersions();
+							iterator.remove();
+							entityManager.remove(docInst);
+							String storedRef = copyDocumentOnAlfresco(
+									itemContained.getDocument(), instCollection);
+							DocInst newDocInst = new DocInst(instCollection,
+									storedRef);
+							instCollection.getDocInsts().add(newDocInst);
+							// docInst.setNodeRef(storedRef);
+						}
+					} else if (itemContained.getUploadItem() != null) {
+						// il file è in realtà un file diverso e va prima
+						// cancellato il vecchio
+						System.out.println("Doc " + document.getName()
+								+ " nuovo ma con stesso nome di uno vecchio");
+						document.deleteAllVersions();
+						iterator.remove();
+						entityManager.remove(docInst);
+						String storedRef = storeOnAlfresco(
+								itemContained.getUploadItem(), instCollection);
+						DocInst newDocInst = new DocInst(instCollection,
+								storedRef);
+						instCollection.getDocInsts().add(newDocInst);
+					}
+				}
+			}
+
+			// Aggiungo elementi nuovi
+			List<FileContainer> filesList = datas.get(instCollection
+					.getDocDefCollection().getId());
+			if (filesList != null) {
+				for (FileContainer item : filesList) {
+					System.out.println("Doc " + item.getFileName() + " nuovo");
+					if (item.getUploadItem() != null) {
+						// elemento nuovo da upload
+						String storedRef = storeOnAlfresco(
+								item.getUploadItem(), instCollection);
+						DocInst docInst = new DocInst(instCollection, storedRef);
+						instCollection.getDocInsts().add(docInst);
+					} else {
+						// elemento nuovo proveniente da primary doc
+						String storedRef = copyDocumentOnAlfresco(
+								item.getDocument(), instCollection);
+						DocInst docInst = new DocInst(instCollection, storedRef);
+						instCollection.getDocInsts().add(docInst);
+					}
+				}
+			}
+		}
+		slotInstHome.update();
+		FacesMessages.instance().add(
+				"Slot " + this.slotDefHome.getInstance().getName()
+						+ " successfully updated");
+	}
 
 	// quando trovo l'element lo tolgo così lascio solo quelli del tutto nuovi
 	// su cui ciclare alla fine ed aggiungerli nell'update
-	private UploadItem getItemIfContained(List<UploadItem> filesList,
+	private FileContainer getItemIfContained(List<FileContainer> filesList,
 			String fileName) {
 		if (filesList != null) {
-			Iterator<UploadItem> iterator = filesList.iterator();
+			Iterator<FileContainer> iterator = filesList.iterator();
 			while (iterator.hasNext()) {
-				UploadItem item = iterator.next();
+				FileContainer item = iterator.next();
 				if (item.getFileName().equals(fileName)) {
 					iterator.remove();
 					return item;
@@ -441,6 +465,13 @@ public class SlotInstEditBean {
 			}
 		}
 		return false;
+	}
+
+	public void checkFileExistence() {
+		System.out
+				.println("---------------------------------------------> current file: "
+						+ this.activeFileName);
+		this.activeExists = true;
 	}
 
 	public void removeCleared(Long collectionId, String fileName) {
@@ -620,7 +651,7 @@ public class SlotInstEditBean {
 		this.activeCollectionId = docDefCollectionId;
 		DocDefCollection docDefCollection = entityManager.find(
 				DocDefCollection.class, docDefCollectionId);
-		initProperties(docDefCollection, document, false);
+		initDocAndProperties(docDefCollection, document, false);
 	}
 
 	public List<PropertyInst> getPropertyInsts() {
@@ -719,6 +750,22 @@ public class SlotInstEditBean {
 			return "";
 		}
 
+	}
+
+	public String getActiveFileName() {
+		return activeFileName;
+	}
+
+	public void setActiveFileName(String activeFileName) {
+		this.activeFileName = activeFileName;
+	}
+
+	public boolean isActiveExists() {
+		return activeExists;
+	}
+
+	public void setActiveExists(boolean activeExists) {
+		this.activeExists = activeExists;
 	}
 
 }
