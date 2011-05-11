@@ -38,21 +38,26 @@
 			<s:div id="collections">
 			<h:panelGrid columns="2">
 			<c:forEach var="coll" items="#{slotInstEditBean.docInstCollections}">
-				<s:decorate template="/layout/edit.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="#{coll.docDefCollection.name}" />
-					</ui:define>
-					<rich:fileUpload maxFilesQuantity="#{coll.docDefCollection.max.intValue()}" 
-									fileUploadListener="#{slotInstEditBean.listener}"
-									immediateUpload="true"
-									acceptedTypes="*"
-									noDuplicate="false"
-									autoclear="true"
-									onupload="alert(event.memo.entry.fileName)">
-						<f:param name="docDefCollectionId" value="#{coll.docDefCollection.id}"/>
-						<a:support event="onfileuploadcomplete" reRender="infoPanel_#{coll.docDefCollection.id}"/>						
-					</rich:fileUpload>
-	            </s:decorate>
+			
+			<s:decorate template="/layout/edit.xhtml">
+                <ui:define name="label">
+                	<h:outputText value="#{coll.docDefCollection.name}" />
+				</ui:define>
+				<rich:panel>
+				<f:facet name="header">
+	            	<h:outputText value="Available files" />
+	            </f:facet>	
+					<rich:dataGrid value="#{slotInstEditBean.primaryDocs[coll.docDefCollection.id]}" var="item">
+						<h:outputText value="#{item.name}" />
+						<a:commandButton value=">>" action="#{slotInstEditBean.addDocFromPrimary(coll.docDefCollection.id,item)}" reRender="infoPanel_#{coll.docDefCollection.id}"/>
+					</rich:dataGrid>
+					<div style="clear:both"/>
+					<a:commandButton value="add new file" action="#{slotInstEditBean.setActiveCollectionId(coll.docDefCollection.id)}" onclick="#{rich:component('uploadPanel')}.show()"/>
+				</rich:panel>
+				
+				
+			</s:decorate>
+      
 	            <s:div id="infoPanel_#{coll.docDefCollection.id}">
 	            	<s:span styleClass="message">
 	            	<h:graphicImage value="/img/msgerror.png" rendered="#{slotInstEditBean.messages[coll.docDefCollection.id] != null and not slotInstEditBean.messages[coll.docDefCollection.id].equals('')}" style="margin-right:3px"/>
@@ -77,13 +82,14 @@
 			               			 <ui:define name="label">
 			                			<h:outputText value="#{propInst.property.title}" />
 									</ui:define>
-									<h:inputText value="#{propInst.stringValue}" rendered="#{propInst.property.type == 'd:text'}"/>
-									<h:inputText value="#{propInst.integerValue}" rendered="#{propInst.property.type == 'd:int'}"/>
-									<h:selectBooleanCheckbox value="#{propInst.booleanValue}" rendered="#{propInst.property.type == 'd:boolean'}"/>
+									<h:inputText value="#{propInst.stringValue}" rendered="#{propInst.property.type == 'd:text'}" disabled="#{not propInst.editable}"/>
+									<h:inputText value="#{propInst.integerValue}" rendered="#{propInst.property.type == 'd:int'}" disabled="#{not propInst.editable}"/>
+									<h:selectBooleanCheckbox value="#{propInst.booleanValue}" rendered="#{propInst.property.type == 'd:boolean'}" disabled="#{not propInst.editable}"/>
 									<rich:calendar id="subscriptionDate" mode="client"
                           						value="#{propInst.dateValue}"
                           					datePattern="dd/MM/yyyy"
-                         						rendered="#{propInst.property.type == 'd:date'}"/>
+                         						rendered="#{propInst.property.type == 'd:date'}"
+                         						disabled="#{not propInst.editable}"/>
 			            		</s:decorate>
 		            		</ui:repeat>
 			            	<div style="clear:both"/>
@@ -203,6 +209,25 @@
     </div>
     </rich:tab>
 </rich:tabPanel>
+
+	<rich:modalPanel id="uploadPanel" autosized="true">
+		<f:facet name="header">
+           	<h:outputText value="Upload dialog" />
+           </f:facet>
+   		<a:form>
+          	<rich:fileUpload fileUploadListener="#{slotInstEditBean.listener}"
+							immediateUpload="true"
+							acceptedTypes="*"
+							onfileuploadcomplete="#{rich:component('uploadPanel')}.hide()"
+							noDuplicate="false"
+							autoclear="true">
+			<a:support event="onfileuploadcomplete" reRender="infoPanel_#{slotInstEditBean.activeCollectionId},uploadPanel"/>				
+			</rich:fileUpload>
+		</a:form>
+		<div style="clear:both"/>
+		<a:commandButton value="Cancel" onclick="#{rich:component('uploadPanel')}.hide()"/>
+	</rich:modalPanel>
+		
 </ui:define>
 
 </ui:composition>

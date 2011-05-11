@@ -22,6 +22,8 @@ public class SlotInst {
 
 	private Set<PropertyInst> propertyInsts = new HashSet<PropertyInst>();
 
+	private String ownerId;
+
 	@Id
 	@GeneratedValue
 	public Long getId() {
@@ -59,6 +61,14 @@ public class SlotInst {
 
 	public void setPropertyInsts(Set<PropertyInst> propertyInsts) {
 		this.propertyInsts = propertyInsts;
+	}
+
+	public String getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(String owner) {
+		this.ownerId = owner;
 	}
 
 }

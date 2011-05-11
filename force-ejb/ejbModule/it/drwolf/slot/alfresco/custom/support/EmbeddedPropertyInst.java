@@ -20,10 +20,12 @@ public class EmbeddedPropertyInst {
 
 	private GregorianCalendar calendarValue;
 
+	private boolean editable = true;
+
 	public EmbeddedPropertyInst(Property property) {
 		super();
 		this.property = property;
-		if (property.getName().equals("d:date")) {
+		if (property.getType().equals("d:date")) {
 			this.setDateValue(new Date());
 		}
 	}
@@ -116,6 +118,14 @@ public class EmbeddedPropertyInst {
 	public void setCalendarValue(GregorianCalendar calendar) {
 		this.calendarValue = calendar;
 		this.dateValue = calendar.getTime();
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setEditable(boolean editable) {
+		this.editable = editable;
 	}
 
 }
