@@ -1,5 +1,6 @@
 package it.drwolf.slot.application;
 
+import it.drwolf.slot.alfresco.AlfrescoAdminIdentity;
 import it.drwolf.slot.alfresco.custom.model.Aspect;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.model.SlotModel;
@@ -12,6 +13,8 @@ import java.util.Iterator;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.alfresco.cmis.client.AlfrescoDocument;
+import org.apache.chemistry.opencmis.client.api.Session;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -29,9 +32,13 @@ public class CustomModelController {
 	@In(create = true)
 	private Preferences preferences;
 
+	@In(create = true)
+	private AlfrescoAdminIdentity alfrescoAdminIdentity;
+
 	@Create
 	public void init() {
-		loadModel();
+		// loadModel();
+		loadModelFromInternalFolder();
 	}
 
 	private void loadModel() {
@@ -40,13 +47,14 @@ public class CustomModelController {
 				String customModelJarPath = preferences
 						.getValue(PreferenceKey.CUSTOM_MODEL_JAR_PATH.name());
 				String customModelXmlName = preferences
-						.getValue(PreferenceKey.CUSTOM_MODEL_XML_PATH.name());
+						.getValue(PreferenceKey.CUSTOM_MODEL_XML_PATH_IN_JAR
+								.name());
 				JarFile jar;
 				jar = new JarFile(customModelJarPath);
 
 				InputStream xmlSource = null;
-				for (Enumeration entries = jar.entries(); entries
-						.hasMoreElements();) {
+				for (@SuppressWarnings("rawtypes")
+				Enumeration entries = jar.entries(); entries.hasMoreElements();) {
 					JarEntry jarElement = (JarEntry) entries.nextElement();
 					String zipEntryName = jarElement.getName();
 					if (zipEntryName.equals(customModelXmlName)) {
@@ -58,6 +66,26 @@ public class CustomModelController {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	private void loadModelFromInternalFolder() {
+		try {
+			Serializer serializer = new Persister();
+			Session session = alfrescoAdminIdentity.getSession();
+			AlfrescoDocument documentModel = (AlfrescoDocument) session
+					.getObjectByPath(preferences
+							.getValue(PreferenceKey.CUSTOM_MODEL_XML_PATH
+									.name())
+							+ "/"
+							+ preferences
+									.getValue(PreferenceKey.CUSTOM_MODEL_XML_NAME
+											.name()));
+			slotModel = serializer.read(SlotModel.class, documentModel
+					.getContentStream().getStream());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

@@ -27,13 +27,19 @@ public class Preference implements Serializable {
 	private static Preference CUSTOM_MODEL_JAR_PATH = new Preference(
 			PreferenceKey.CUSTOM_MODEL_JAR_PATH.name(),
 			"/home/drwolf/alfresco-3.4.d/tomcat/webapps/alfresco/WEB-INF/lib/it.drwolf.slot.alfresco.custom.jar");
+	private static Preference CUSTOM_MODEL_XML_PATH_IN_JAR = new Preference(
+			PreferenceKey.CUSTOM_MODEL_XML_PATH_IN_JAR.name(),
+			"it/drwolf/slot/alfresco/content/slotModel.xml");
 	private static Preference CUSTOM_MODEL_XML_PATH = new Preference(
 			PreferenceKey.CUSTOM_MODEL_XML_PATH.name(),
-			"it/drwolf/slot/alfresco/content/slotModel.xml");
+			"/Dizionario dei dati/Modelli");
+	private static Preference CUSTOM_MODEL_XML_NAME = new Preference(
+			PreferenceKey.CUSTOM_MODEL_XML_NAME.name(), "slotModel.xml");
 
 	public static Preference[] defaults = new Preference[] { ALFRESCO_LOCATION,
 			ALFRESCO_ADMIN_USER, ALFRESCO_ADMIN_PWD, ALFRESCO_USERS_HOME,
-			CUSTOM_MODEL_JAR_PATH, CUSTOM_MODEL_XML_PATH };
+			CUSTOM_MODEL_JAR_PATH, CUSTOM_MODEL_XML_PATH_IN_JAR,
+			CUSTOM_MODEL_XML_PATH, CUSTOM_MODEL_XML_NAME };
 
 	private Integer id;
 	private String keyValue;
