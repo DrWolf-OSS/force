@@ -51,7 +51,7 @@
       </rule>
    </navigation>
    
-   <navigation from-action="#{slotInstEditBean.removeCleared(coll.docDefCollection.id, item.fileName)}">
+   <navigation from-action="#{slotInstEditBean.removeCleared(coll.docDefCollection.id, item.realFileName)}">
          <redirect view-id="/SlotInstEdit.xhtml">
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
          </redirect>

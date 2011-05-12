@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 
 @Entity
 public class DocInstCollection {
@@ -61,6 +62,7 @@ public class DocInstCollection {
 	}
 
 	@OneToMany(mappedBy = "docInstCollection", cascade = CascadeType.ALL)
+	@OrderBy("id")
 	public Set<DocInst> getDocInsts() {
 		return docInsts;
 	}
