@@ -14,7 +14,7 @@
 
     <a:form id="slotInst" styleClass="edit">
 			<rich:panel>
-            <f:facet name="header">#{slotInstHome.managed ? 'Edit' : 'Add'} Slot inst #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
+            <f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Edit' : 'Create'} Slot inst #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
             
             <s:div id="properties">
 			<c:forEach var="propInst" items="#{slotInstEditBean.propertyInsts}">
@@ -39,7 +39,7 @@
 			<h:panelGrid columns="2">
 			<c:forEach var="coll" items="#{slotInstEditBean.docInstCollections}">
 			
-			<s:decorate template="/layout/edit.xhtml">
+			<s:decorate template="/layout/display.xhtml">
                 <ui:define name="label">
                 	<h:outputText value="#{coll.docDefCollection.name}" />
 				</ui:define>
@@ -54,9 +54,7 @@
 					<div style="clear:both"/>
 					<a:commandButton value="add new file" action="#{slotInstEditBean.setActiveCollectionId(coll.docDefCollection.id)}" onclick="#{rich:component('uploadPanel')}.show()"/>
 				</rich:panel>
-				
-				
-			</s:decorate>
+			 </s:decorate>
       
 	            <s:div id="infoPanel_#{coll.docDefCollection.id}">
 	            	<rich:panel >
@@ -91,9 +89,9 @@
 			            	<div style="clear:both"/>
 				            <h:commandButton value="Remove" action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}" reRender="fileGrid_#{coll.docDefCollection.id}"/>
 	            		</rich:dataGrid>
-	            
 	            	</rich:panel>
 	            </s:div>
+	            
 			</c:forEach>
 			</h:panelGrid>
 			</s:div>
