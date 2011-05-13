@@ -75,10 +75,6 @@ public class SlotInstEditBean {
 
 	private HashMap<Long, List<FileContainer>> datas = new HashMap<Long, List<FileContainer>>();
 
-	private HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>> datasProperties = new HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>>();
-
-	private HashMap<Long, String> messages = new HashMap<Long, String>();
-
 	private HashMap<Long, List<FileContainer>> primaryDocs = new HashMap<Long, List<FileContainer>>();
 
 	private Long activeCollectionId;
@@ -107,7 +103,8 @@ public class SlotInstEditBean {
 						.retrievePrimaryDocs(defCollection.getDocDef().getId());
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				for (AlfrescoDocument document : collPrimaryDocs) {
-					FileContainer fileContainer = new FileContainer(document);
+					FileContainer fileContainer = buildContainer(defCollection,
+							document, false);
 					fileContainers.add(fileContainer);
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
@@ -119,17 +116,38 @@ public class SlotInstEditBean {
 
 			this.docInstCollections = new ArrayList<DocInstCollection>(
 					slotInstHome.getInstance().getDocInstCollections());
-			initDatas();
+			for (DocInstCollection instCollection : this.docInstCollections) {
+				DocDefCollection docDefCollection = instCollection
+						.getDocDefCollection();
+				this.datas.put(docDefCollection.getId(),
+						new ArrayList<SlotInstEditBean.FileContainer>());
+				Set<DocInst> docInsts = instCollection.getDocInsts();
+				for (DocInst docInst : docInsts) {
+					try {
+						String nodeRef = docInst.getNodeRef();
+						AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
+								.getSession().getObject(nodeRef);
+						FileContainer container = buildContainer(
+								docDefCollection, document, true);
+						this.datas.get(docDefCollection.getId()).add(container);
+					} catch (CmisObjectNotFoundException e) {
+						FacesMessages.instance().add(
+								"Missing files on Alfresco");
+						e.printStackTrace();
+					}
+				}
+			}
 
 			for (DocDefCollection defCollection : slotDefHome.getInstance()
 					.getDocDefCollections()) {
-
-				//
 				List<AlfrescoDocument> collPrimaryDocs = this
 						.retrievePrimaryDocs(defCollection.getDocDef().getId());
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				for (AlfrescoDocument document : collPrimaryDocs) {
-					FileContainer fileContainer = new FileContainer(document);
+					// FileContainer fileContainer = new
+					// FileContainer(document);
+					FileContainer fileContainer = buildContainer(defCollection,
+							document, false);
 					fileContainers.add(fileContainer);
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
@@ -137,54 +155,10 @@ public class SlotInstEditBean {
 		}
 	}
 
-	private void initDatas() {
-		for (DocInstCollection instCollection : this.docInstCollections) {
-			DocDefCollection docDefCollection = instCollection
-					.getDocDefCollection();
-			// Long defCollectionId = docDefCollection.getId();
-			Set<DocInst> docInsts = instCollection.getDocInsts();
-			for (DocInst docInst : docInsts) {
-				try {
-					String nodeRef = docInst.getNodeRef();
-					AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
-							.getSession().getObject(nodeRef);
-					initDocAndProperties(docDefCollection, document, true);
-
-				} catch (CmisObjectNotFoundException e) {
-					FacesMessages.instance().add("Missing files on Alfresco");
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	private void initDocAndProperties(DocDefCollection docDefCollection,
+	private FileContainer buildContainer(DocDefCollection docDefCollection,
 			AlfrescoDocument document, boolean editables) {
-		Long defCollectionId = docDefCollection.getId();
-		// UploadItem uploadItem = new UploadItem(fileName, new Integer(0),
-		// document.getContentStreamMimeType(), null);
 		FileContainer container = new FileContainer(document);
-		String fileName = document.getName();
-		List<FileContainer> filesList = datas.get(defCollectionId);
-		if (filesList == null) {
-			filesList = new ArrayList<FileContainer>();
-			datas.put(defCollectionId, filesList);
-		}
-		filesList.add(container);
-
-		HashMap<String, List<EmbeddedPropertyInst>> filePropertiesMap = datasProperties
-				.get(defCollectionId);
-		if (filePropertiesMap == null) {
-			filePropertiesMap = new HashMap<String, List<EmbeddedPropertyInst>>();
-			datasProperties.put(defCollectionId, filePropertiesMap);
-		}
-		List<EmbeddedPropertyInst> fileProperties = filePropertiesMap
-				.get(fileName);
-		if (fileProperties == null) {
-			fileProperties = new ArrayList<EmbeddedPropertyInst>();
-			filePropertiesMap.put(fileName, fileProperties);
-		}
-
+		List<EmbeddedPropertyInst> fileProperties = new ArrayList<EmbeddedPropertyInst>();
 		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
 		for (String aspectId : aspectIds) {
 			Aspect aspect = customModelController.getAspect(aspectId);
@@ -201,16 +175,29 @@ public class SlotInstEditBean {
 				}
 			}
 		}
+		container.setEmbeddedProperties(fileProperties);
+		return container;
 	}
 
-	private UploadItem buildUploadItemFromDocInst(DocInst docInst) {
-		String nodeRef = docInst.getNodeRef();
-		AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
-				.getSession().getObject(nodeRef);
-		String fileName = document.getName();
-		UploadItem uploadItem = new UploadItem(fileName, new Integer(0),
-				document.getContentStreamMimeType(), null);
-		return uploadItem;
+	private FileContainer buildContainer(DocDefCollection docDefCollection,
+			UploadItem uploadItem, boolean editables) {
+		FileContainer container = new FileContainer(uploadItem);
+		List<EmbeddedPropertyInst> fileProperties = new ArrayList<EmbeddedPropertyInst>();
+		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
+		for (String aspectId : aspectIds) {
+			Aspect aspect = customModelController.getAspect(aspectId);
+			List<Property> properties = aspect.getProperties();
+			if (properties != null) {
+				for (Property p : properties) {
+					EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(
+							p);
+					embeddedPropertyInst.setEditable(editables);
+					fileProperties.add(embeddedPropertyInst);
+				}
+			}
+		}
+		container.setEmbeddedProperties(fileProperties);
+		return container;
 	}
 
 	public void save() {
@@ -237,7 +224,8 @@ public class SlotInstEditBean {
 					for (FileContainer container : containers) {
 						if (container.getUploadItem() != null) {
 							String storedRef = storeOnAlfresco(
-									container.getUploadItem(), instCollection);
+									container.getUploadItem(), instCollection,
+									container.getEmbeddedProperties());
 							DocInst docInst = new DocInst(instCollection,
 									storedRef);
 							instCollection.getDocInsts().add(docInst);
@@ -245,7 +233,8 @@ public class SlotInstEditBean {
 							System.out.println("si deve copiare "
 									+ container.getDocument().getName());
 							String storedRef = copyDocumentOnAlfresco(
-									container.getDocument(), instCollection);
+									container.getDocument(), instCollection,
+									container.getEmbeddedProperties());
 							DocInst docInst = new DocInst(instCollection,
 									storedRef);
 							instCollection.getDocInsts().add(docInst);
@@ -301,8 +290,8 @@ public class SlotInstEditBean {
 					// un aggiornamento delle properties
 					System.out.println("Doc " + document.getName()
 							+ " da aggiornare");
-					updateProperties(itemContained.getRealFileName(),
-							instCollection, document);
+					updateProperties(document,
+							itemContained.getEmbeddedProperties());
 				}
 			}
 
@@ -316,7 +305,8 @@ public class SlotInstEditBean {
 						System.out.println("Doc " + item.getFileName()
 								+ " nuovo da upload");
 						String storedRef = storeOnAlfresco(
-								item.getUploadItem(), instCollection);
+								item.getUploadItem(), instCollection,
+								item.getEmbeddedProperties());
 						DocInst docInst = new DocInst(instCollection, storedRef);
 						instCollection.getDocInsts().add(docInst);
 					} else {
@@ -324,7 +314,8 @@ public class SlotInstEditBean {
 						System.out.println("Doc " + item.getFileName()
 								+ " nuovo da primary docs");
 						String storedRef = copyDocumentOnAlfresco(
-								item.getDocument(), instCollection);
+								item.getDocument(), instCollection,
+								item.getEmbeddedProperties());
 						DocInst docInst = new DocInst(instCollection, storedRef);
 						instCollection.getDocInsts().add(docInst);
 					}
@@ -358,89 +349,32 @@ public class SlotInstEditBean {
 	public void listener(UploadEvent event) {
 		UploadItem item = event.getUploadItem();
 		addItemToDatas(item);
-
 	}
 
 	private void addItemToDatas(UploadItem item) {
 		String fileName = item.getFileName();
 		Long docDefCollectionId = this.activeCollectionId;
-
-		messages.put(docDefCollectionId, "");
-
-		if (!isAlreadyUploaded(fileName, docDefCollectionId)) {
-			List<FileContainer> list = datas.get(docDefCollectionId);
-			if (list == null) {
-				list = new ArrayList<FileContainer>();
-				datas.put(docDefCollectionId, list);
-			}
-
-			list.add(new FileContainer(item));
-			System.out.println("-> " + fileName + " successfully uploaded");
-			HashMap<String, List<EmbeddedPropertyInst>> filePropertiesMap = datasProperties
-					.get(docDefCollectionId);
-			if (filePropertiesMap == null) {
-				filePropertiesMap = new HashMap<String, List<EmbeddedPropertyInst>>();
-				datasProperties.put(docDefCollectionId, filePropertiesMap);
-			}
-			List<EmbeddedPropertyInst> fileProperties = filePropertiesMap
-					.get(item.getFileName());
-			if (fileProperties == null) {
-				fileProperties = new ArrayList<EmbeddedPropertyInst>();
-				filePropertiesMap.put(item.getFileName(), fileProperties);
-			}
-			DocDefCollection docDefCollection = entityManager.find(
-					DocDefCollection.class, docDefCollectionId);
-			Set<String> aspectsIds = docDefCollection.getDocDef()
-					.getAspectIds();
-			for (String aspectId : aspectsIds) {
-				Aspect aspect = customModelController.getAspect(aspectId);
-				List<Property> properties = aspect.getProperties();
-				for (Property property : properties) {
-					EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(
-							property);
-					if (!fileProperties.contains(embeddedPropertyInst)) {
-						fileProperties.add(embeddedPropertyInst);
-					}
-				}
-			}
-		} else {
-			System.out.println("---> file already uploaded in this collection");
+		List<FileContainer> list = datas.get(docDefCollectionId);
+		if (list == null) {
+			list = new ArrayList<FileContainer>();
+			datas.put(docDefCollectionId, list);
 		}
+		System.out.println("-> " + fileName + " successfully uploaded");
+		DocDefCollection docDefCollection = entityManager.find(
+				DocDefCollection.class, docDefCollectionId);
+		FileContainer container = buildContainer(docDefCollection, item, true);
+		datas.get(docDefCollection.getId()).add(container);
 	}
 
-	private boolean isAlreadyUploaded(String fileName, Long docDefCollectionId) {
-		List<FileContainer> itemList = datas.get(docDefCollectionId);
-		if (itemList != null) {
-			Iterator<FileContainer> iterator = itemList.iterator();
-			while (iterator.hasNext()) {
-				if (iterator.next().getFileName().equals(fileName)) {
-					this.messages.put(docDefCollectionId, fileName
-							+ " already uploaded!");
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public void removeCleared(Long collectionId, String fileName) {
-		System.out.println("---> removing " + fileName + "...");
+	public void remove(Long collectionId, FileContainer container) {
+		System.out.println("---> removing " + container.getFileName() + "...");
 		List<FileContainer> filesList = datas.get(collectionId);
-		if (filesList != null) {
-			Iterator<FileContainer> iterator = filesList.iterator();
-			while (iterator.hasNext()) {
-				FileContainer item = iterator.next();
-				if (item.getRealFileName().equals(fileName)) {
-					iterator.remove();
-					datasProperties.get(collectionId).get(fileName).clear();
-					return;
-				}
-			}
-		}
+		filesList.remove(container);
 	}
 
 	private String storeOnAlfresco(UploadItem item,
-			DocInstCollection instCollection) {
+			DocInstCollection instCollection,
+			List<EmbeddedPropertyInst> embeddedProperties) {
 		String nodeRef = "";
 		try {
 			Session session = alfrescoUserIdentity.getSession();
@@ -474,7 +408,7 @@ public class SlotInstEditBean {
 			}
 
 			// poi si aggiungono i valori delle relative properties
-			updateProperties(item.getFileName(), instCollection, document);
+			updateProperties(document, embeddedProperties);
 			nodeRef = objectId.getId();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -513,14 +447,13 @@ public class SlotInstEditBean {
 	}
 
 	private String copyDocumentOnAlfresco(AlfrescoDocument document,
-			DocInstCollection instCollection) {
+			DocInstCollection instCollection,
+			List<EmbeddedPropertyInst> embeddedProperties) {
 		String nodeRef = "";
 
 		Session session = alfrescoUserIdentity.getSession();
 		AlfrescoFolder slotFolder = findOrCreateSlotFolder(session);
 
-		// String contentType = new MimetypesFileTypeMap().getContentType(item
-		// .getFileName());
 		ContentStream contentStream = document.getContentStream();
 		Set<String> aspects = instCollection.getDocDefCollection().getDocDef()
 				.getAspectIds();
@@ -544,42 +477,22 @@ public class SlotInstEditBean {
 		}
 
 		// poi si aggiungono i valori delle relative properties
-		updateProperties(document.getName(), instCollection, documentCopy);
+		updateProperties(documentCopy, embeddedProperties);
 		nodeRef = objectId.getId();
 
 		return nodeRef;
 	}
 
-	private void updateProperties(String fileName,
-			DocInstCollection instCollection, AlfrescoDocument document) {
-		List<EmbeddedPropertyInst> docPropertyValues = datasProperties.get(
-				instCollection.getDocDefCollection().getId()).get(fileName);
+	private void updateProperties(AlfrescoDocument document,
+			List<EmbeddedPropertyInst> embeddedProperties) {
 		Map<String, Object> aspectsProperties = new HashMap<String, Object>();
-		for (EmbeddedPropertyInst embeddedPropertyInst : docPropertyValues) {
+		for (EmbeddedPropertyInst embeddedPropertyInst : embeddedProperties) {
 			if (embeddedPropertyInst.getValue() != null) {
 				aspectsProperties.put(embeddedPropertyInst.getProperty()
 						.getName(), embeddedPropertyInst.getValue());
 			}
 		}
 		document.updateProperties(aspectsProperties);
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<UploadItem> getPrimaryDatas(Long docDefId) {
-		List<UploadItem> uploadItems = new ArrayList<UploadItem>();
-		List<DocInst> resultList = entityManager
-				.createQuery(
-						"from DocInst d where d.docInstCollection.slotInst.slotDef.type = 'Primary' and d.docInstCollection.slotInst.ownerId=:ownerId and d.docInstCollection.docDefCollection.docDef.id=:docDefId")
-				.setParameter("ownerId",
-						identity.getCredentials().getUsername())
-				.setParameter("docDefId", docDefId).getResultList();
-		if (resultList != null) {
-			for (DocInst docInst : resultList) {
-				UploadItem uploadItem = buildUploadItemFromDocInst(docInst);
-				uploadItems.add(uploadItem);
-			}
-		}
-		return uploadItems;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -605,9 +518,7 @@ public class SlotInstEditBean {
 	public void addDocFromPrimary(Long docDefCollectionId,
 			FileContainer container) {
 		this.activeCollectionId = docDefCollectionId;
-		DocDefCollection docDefCollection = entityManager.find(
-				DocDefCollection.class, docDefCollectionId);
-		initDocAndProperties(docDefCollection, container.getDocument(), false);
+		datas.get(docDefCollectionId).add(container);
 	}
 
 	public List<PropertyInst> getPropertyInsts() {
@@ -634,23 +545,6 @@ public class SlotInstEditBean {
 		this.datas = datas;
 	}
 
-	public HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>> getDatasProperties() {
-		return datasProperties;
-	}
-
-	public void setDatasProperties(
-			HashMap<Long, HashMap<String, List<EmbeddedPropertyInst>>> datasProperties) {
-		this.datasProperties = datasProperties;
-	}
-
-	public HashMap<Long, String> getMessages() {
-		return messages;
-	}
-
-	public void setMessages(HashMap<Long, String> messages) {
-		this.messages = messages;
-	}
-
 	public Long getActiveCollectionId() {
 		return activeCollectionId;
 	}
@@ -670,6 +564,7 @@ public class SlotInstEditBean {
 	public class FileContainer {
 		private UploadItem uploadItem;
 		private AlfrescoDocument document;
+		private List<EmbeddedPropertyInst> embeddedProperties = new ArrayList<EmbeddedPropertyInst>();
 
 		public FileContainer(AlfrescoDocument alfrescoDocument) {
 			super();
@@ -724,6 +619,15 @@ public class SlotInstEditBean {
 				fileName = name;
 			}
 			return fileName.concat(extension);
+		}
+
+		public List<EmbeddedPropertyInst> getEmbeddedProperties() {
+			return embeddedProperties;
+		}
+
+		public void setEmbeddedProperties(
+				List<EmbeddedPropertyInst> embeddedProperties) {
+			this.embeddedProperties = embeddedProperties;
 		}
 
 	}

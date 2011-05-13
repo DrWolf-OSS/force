@@ -59,10 +59,6 @@
 			</s:decorate>
       
 	            <s:div id="infoPanel_#{coll.docDefCollection.id}">
-	            	<s:span styleClass="message">
-	            	<h:graphicImage value="/img/msgerror.png" rendered="#{slotInstEditBean.messages[coll.docDefCollection.id] != null and not slotInstEditBean.messages[coll.docDefCollection.id].equals('')}" style="margin-right:3px"/>
-	            	<h:outputText value="#{slotInstEditBean.messages[coll.docDefCollection.id]}" style="vertical-align: top"/>
-	            	</s:span>
 	            	<rich:panel >
 	            		<f:facet name="header">
 	            			<h:outputText value="Uploaded Files Info" />
@@ -77,7 +73,7 @@
 								<h:outputText value="#{item.fileName}"/>
 		            		</s:decorate>
 		            		
-		            		<ui:repeat var="propInst" value="#{slotInstEditBean.datasProperties[coll.docDefCollection.id][item.realFileName]}">
+		            		<ui:repeat var="propInst" value="#{item.embeddedProperties}">
 			            		<s:decorate template="/layout/edit.xhtml">
 			               			 <ui:define name="label">
 			                			<h:outputText value="#{propInst.property.title}" />
@@ -93,7 +89,7 @@
 			            		</s:decorate>
 		            		</ui:repeat>
 			            	<div style="clear:both"/>
-				            <h:commandButton value="Remove" action="#{slotInstEditBean.removeCleared(coll.docDefCollection.id, item.realFileName)}" reRender="fileGrid_#{coll.docDefCollection.id}"/>
+				            <h:commandButton value="Remove" action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}" reRender="fileGrid_#{coll.docDefCollection.id}"/>
 	            		</rich:dataGrid>
 	            
 	            	</rich:panel>
