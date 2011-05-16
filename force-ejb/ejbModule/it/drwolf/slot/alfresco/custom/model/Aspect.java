@@ -19,6 +19,9 @@ public class Aspect {
 	@ElementList
 	private List<Property> properties;
 
+	@ElementList(name = "mandatory-aspects", required = false)
+	private List<String> mandatoryAspectIds;
+
 	public String getName() {
 		return name;
 	}
@@ -45,6 +48,14 @@ public class Aspect {
 
 	public String getId() {
 		return "P:" + this.name;
+	}
+
+	public List<String> getMandatoryAspectIds() {
+		return mandatoryAspectIds;
+	}
+
+	public void setMandatoryAspectIds(List<String> mandatoryAspects) {
+		this.mandatoryAspectIds = mandatoryAspects;
 	}
 
 }

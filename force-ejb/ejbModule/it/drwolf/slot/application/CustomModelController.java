@@ -7,11 +7,11 @@ import it.drwolf.slot.alfresco.custom.model.SlotModel;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
-import java.io.InputStream;
-import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.List;
+import java.util.Set;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
 import org.apache.chemistry.opencmis.client.api.Session;
@@ -35,39 +35,38 @@ public class CustomModelController {
 	@In(create = true)
 	private AlfrescoAdminIdentity alfrescoAdminIdentity;
 
+	private HashMap<String, Set<Property>> propertiesMap = new HashMap<String, Set<Property>>();
+
 	@Create
 	public void init() {
 		// loadModel();
 		loadModelFromInternalFolder();
 	}
 
-	private void loadModel() {
-		if (slotModel == null) {
-			try {
-				String customModelJarPath = preferences
-						.getValue(PreferenceKey.CUSTOM_MODEL_JAR_PATH.name());
-				String customModelXmlName = preferences
-						.getValue(PreferenceKey.CUSTOM_MODEL_XML_PATH_IN_JAR
-								.name());
-				JarFile jar;
-				jar = new JarFile(customModelJarPath);
-
-				InputStream xmlSource = null;
-				for (@SuppressWarnings("rawtypes")
-				Enumeration entries = jar.entries(); entries.hasMoreElements();) {
-					JarEntry jarElement = (JarEntry) entries.nextElement();
-					String zipEntryName = jarElement.getName();
-					if (zipEntryName.equals(customModelXmlName)) {
-						xmlSource = jar.getInputStream(jarElement);
-					}
-				}
-				Serializer serializer = new Persister();
-				this.slotModel = serializer.read(SlotModel.class, xmlSource);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
+	// private void loadModel() {
+	// try {
+	// String customModelJarPath = preferences
+	// .getValue(PreferenceKey.CUSTOM_MODEL_JAR_PATH.name());
+	// String customModelXmlName = preferences
+	// .getValue(PreferenceKey.CUSTOM_MODEL_XML_PATH_IN_JAR.name());
+	// JarFile jar;
+	// jar = new JarFile(customModelJarPath);
+	//
+	// InputStream xmlSource = null;
+	// for (@SuppressWarnings("rawtypes")
+	// Enumeration entries = jar.entries(); entries.hasMoreElements();) {
+	// JarEntry jarElement = (JarEntry) entries.nextElement();
+	// String zipEntryName = jarElement.getName();
+	// if (zipEntryName.equals(customModelXmlName)) {
+	// xmlSource = jar.getInputStream(jarElement);
+	// }
+	// }
+	// Serializer serializer = new Persister();
+	// this.slotModel = serializer.read(SlotModel.class, xmlSource);
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	// }
 
 	private void loadModelFromInternalFolder() {
 		try {
@@ -83,10 +82,17 @@ public class CustomModelController {
 											.name()));
 			slotModel = serializer.read(SlotModel.class, documentModel
 					.getContentStream().getStream());
+			//
+			initMap();
+			//
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public void reloadModel() {
+		loadModelFromInternalFolder();
 	}
 
 	public SlotModel getSlotModel() {
@@ -128,6 +134,33 @@ public class CustomModelController {
 			}
 		}
 		return null;
+	}
+
+	public Set<Property> getProperties(String aspectId) {
+		return this.propertiesMap.get(aspectId);
+	}
+
+	private void initMap() {
+		List<Aspect> aspects = this.getSlotModel().getAspects();
+		for (Aspect aspect : aspects) {
+			Set<Property> properties = retrieveAllProperties(aspect);
+			propertiesMap.put(aspect.getId(), properties);
+		}
+	}
+
+	private Set<Property> retrieveAllProperties(Aspect aspect) {
+		Set<Property> properties = new HashSet<Property>();
+		// Aspect aspect = this.getAspect(aspectId);
+		if (aspect != null) {
+			properties.addAll(aspect.getProperties());
+			if (aspect.getMandatoryAspectIds() != null) {
+				for (String mandatoryAspectId : aspect.getMandatoryAspectIds()) {
+					properties.addAll(retrieveAllProperties(this.getAspect("P:"
+							+ mandatoryAspectId)));
+				}
+			}
+		}
+		return properties;
 	}
 
 }

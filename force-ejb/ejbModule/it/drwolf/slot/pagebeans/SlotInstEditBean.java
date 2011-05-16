@@ -1,7 +1,6 @@
 package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
-import it.drwolf.slot.alfresco.custom.model.Aspect;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.EmbeddedPropertyInst;
 import it.drwolf.slot.application.CustomModelController;
@@ -156,48 +155,55 @@ public class SlotInstEditBean {
 	}
 
 	private FileContainer buildContainer(DocDefCollection docDefCollection,
-			AlfrescoDocument document, boolean editables) {
-		FileContainer container = new FileContainer(document);
+			Object item, boolean editables) {
 		List<EmbeddedPropertyInst> fileProperties = new ArrayList<EmbeddedPropertyInst>();
 		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
+		Set<Property> properties = new HashSet<Property>();
+		// Recupero tutte le properties.
+		// Essendo un set anche se un aspect è applicato più volte (essendo
+		// settato come mandatory su un altro) le sue properties vengono
+		// aggiunte una volta sola
 		for (String aspectId : aspectIds) {
-			Aspect aspect = customModelController.getAspect(aspectId);
-			List<Property> properties = aspect.getProperties();
-			if (properties != null) {
-				for (Property p : properties) {
-					Object propertyValue = document.getPropertyValue(p
-							.getName());
-					EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(
-							p);
-					embeddedPropertyInst.setValue(propertyValue);
-					embeddedPropertyInst.setEditable(editables);
-					fileProperties.add(embeddedPropertyInst);
-				}
+			// properties.addAll(retrieveAllProperties(aspectId));
+			properties.addAll(customModelController.getProperties(aspectId));
+		}
+		if (properties != null) {
+			for (Property p : properties) {
+				EmbeddedPropertyInst embeddedPropertyInst = buildValorisedEmbeddedPropertyInst(
+						item, editables, p);
+				fileProperties.add(embeddedPropertyInst);
 			}
 		}
+		FileContainer container = new FileContainer(item);
 		container.setEmbeddedProperties(fileProperties);
 		return container;
 	}
 
-	private FileContainer buildContainer(DocDefCollection docDefCollection,
-			UploadItem uploadItem, boolean editables) {
-		FileContainer container = new FileContainer(uploadItem);
-		List<EmbeddedPropertyInst> fileProperties = new ArrayList<EmbeddedPropertyInst>();
-		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
-		for (String aspectId : aspectIds) {
-			Aspect aspect = customModelController.getAspect(aspectId);
-			List<Property> properties = aspect.getProperties();
-			if (properties != null) {
-				for (Property p : properties) {
-					EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(
-							p);
-					embeddedPropertyInst.setEditable(editables);
-					fileProperties.add(embeddedPropertyInst);
-				}
-			}
+	// private Set<Property> retrieveAllProperties(String aspectId) {
+	// Set<Property> properties = new HashSet<Property>();
+	// Aspect aspect = customModelController.getAspect(aspectId);
+	// if (aspect != null) {
+	// properties.addAll(aspect.getProperties());
+	// if (aspect.getMandatoryAspectIds() != null) {
+	// for (String mandatoryAspectId : aspect.getMandatoryAspectIds()) {
+	// properties.addAll(retrieveAllProperties("P:"
+	// + mandatoryAspectId));
+	// }
+	// }
+	// }
+	// return properties;
+	// }
+
+	private EmbeddedPropertyInst buildValorisedEmbeddedPropertyInst(
+			Object item, boolean editables, Property p) {
+		EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(p);
+		if (item instanceof AlfrescoDocument) {
+			AlfrescoDocument document = (AlfrescoDocument) item;
+			Object propertyValue = document.getPropertyValue(p.getName());
+			embeddedPropertyInst.setValue(propertyValue);
 		}
-		container.setEmbeddedProperties(fileProperties);
-		return container;
+		embeddedPropertyInst.setEditable(editables);
+		return embeddedPropertyInst;
 	}
 
 	public void save() {
@@ -574,6 +580,13 @@ public class SlotInstEditBean {
 		public FileContainer(UploadItem uploadItem) {
 			super();
 			this.uploadItem = uploadItem;
+		}
+
+		public FileContainer(Object item) {
+			if (item instanceof AlfrescoDocument)
+				this.document = (AlfrescoDocument) item;
+			else if (item instanceof UploadItem)
+				this.uploadItem = (UploadItem) item;
 		}
 
 		public UploadItem getUploadItem() {

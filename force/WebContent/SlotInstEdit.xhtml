@@ -45,7 +45,7 @@
 				</ui:define>
 				<rich:panel>
 				<f:facet name="header">
-	            	<h:outputText value="Available files" />
+	            	<h:outputText value="Available #{coll.docDefCollection.docDef.name} on primary slot" />
 	            </f:facet>	
 					<rich:dataGrid value="#{slotInstEditBean.primaryDocs[coll.docDefCollection.id]}" var="item">
 						<h:outputText value="#{item.fileName}" />

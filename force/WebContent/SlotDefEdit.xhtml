@@ -32,22 +32,41 @@
             </s:decorate>
             
             <s:div id="properties">
-			<c:forEach var="prop" items="#{slotDefEditBean.properties}">
-				<s:decorate template="/layout/edit.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="#{prop.name}" />
-					</ui:define>
-	                <h:outputText value="#{prop.type}" />
-	                <a:commandButton value="remove" action="#{slotDefEditBean.removeProp(prop)}" reRender="properties"/>
-	                <a:commandButton value="edit" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" reRender="propPanel"/>
-	            </s:decorate>			
-			</c:forEach>
+				<c:forEach var="prop" items="#{slotDefEditBean.properties}">
+					<s:decorate template="/layout/display.xhtml">
+		                <ui:define name="label">
+		                	<h:outputText value="#{prop.name}" />
+						</ui:define>
+		                <h:outputText value="#{prop.type}" />
+		                <a:commandButton value="remove" action="#{slotDefEditBean.removeProp(prop)}" reRender="properties"/>
+		                <a:commandButton value="edit" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" reRender="propPanel"/>
+		            </s:decorate>			
+				</c:forEach>
 			</s:div>
+			
+			<div style="clear:both"/>
+			<rich:dataTable value="#{slotDefEditBean.properties}" var="prop">
+				<f:facet name="header">Properties table</f:facet>
+				<rich:column>
+					<f:facet name="header">Property name</f:facet>
+					<h:outputText value="#{prop.name}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">Property type</f:facet>
+					<h:outputText value="#{prop.type}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">Actions</f:facet>
+					 <a:commandLink value="remove" action="#{slotDefEditBean.removeProp(prop)}" reRender="properties"/>
+					 &#160;|&#160;
+		             <a:commandLink value="edit" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" reRender="propPanel"/>
+				</rich:column>
+			</rich:dataTable>
 			
 			
 			<s:div id="collections">
 			<c:forEach var="coll" items="#{slotDefEditBean.collections}">
-				<s:decorate template="/layout/edit.xhtml">
+				<s:decorate template="/layout/display.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="#{coll.name}" />
 					</ui:define>
