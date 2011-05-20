@@ -44,9 +44,21 @@ select {
 }
 
 .footer {
-	text-align: center;
-	font-size: 11px;
-	margin-bottom: 10px;
+    text-align: center;
+    font-size: 11px;
+    margin-bottom: 10px;
+}
+
+
+
+.footer img {
+    height: 100px;
+    padding-left: 2em;
+    padding-right: 2em;
+}
+
+.footer img#bydrwolf {
+    height: auto;
 }
 
 .rich-table {
