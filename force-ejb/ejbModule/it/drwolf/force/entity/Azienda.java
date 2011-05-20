@@ -52,11 +52,12 @@ public class Azienda implements Serializable {
 	private String cellulare;
 
 	private FormaGiuridica formaGiuridica;
+	private Settore settore;
 
 	// per Alfresco
 	private String alfrescoGroupId;
 
-	private Azienda() {
+	public Azienda() {
 	}
 
 	public String getAlfrescoGroupId() {
@@ -174,6 +175,13 @@ public class Azienda implements Serializable {
 		return this.ragioneSociale;
 	}
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(nullable = false)
+	@NotNull
+	public Settore getSettore() {
+		return this.settore;
+	}
+
 	@Column(nullable = true)
 	public String getTelefono() {
 		return this.telefono;
@@ -257,6 +265,10 @@ public class Azienda implements Serializable {
 
 	public void setRagioneSociale(String ragioneSociale) {
 		this.ragioneSociale = ragioneSociale;
+	}
+
+	public void setSettore(Settore settore) {
+		this.settore = settore;
 	}
 
 	public void setTelefono(String telefono) {

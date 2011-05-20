@@ -1,0 +1,73 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+    
+<ui:define name="body">
+
+    <h:form id="AddAzienda" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">Iscriviti al servizio FORCE</f:facet>
+
+            <s:decorate id="nameField" template="layout/edit.xhtml">
+                <ui:define name="label">Nome dell'azienda</ui:define>
+                <h:inputTextarea id="ragioneSociale"
+                               cols="80"
+                               rows="3"
+                               required="true"
+                              value="#{aziendaHome.instance.ragioneSociale}"/>
+            </s:decorate>
+            <s:decorate id="formaGiuridicaField" template="layout/edit.xhtml">
+                <ui:define name="label">Forma Giuridica</ui:define>
+                <h:selectOneMenu required="true" value="#{aziendaHome.instance.formaGiuridica}"
+                                 defaultLabel="seleziona">
+                    <s:selectItems noSelectionLabel="-- Seleziona"
+                                   value="#{formaGiuridicaList.resultList}" var="r" label="#{r.nome}" />
+                                <s:convertEntity />
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="settoreField" template="layout/edit.xhtml">
+                <ui:define name="label">Settore</ui:define>
+                <h:selectOneMenu required="true" value="#{aziendaHome.instance.settore}"
+                                 defaultLabel="seleziona">
+                    <s:selectItems noSelectionLabel="-- Seleziona"
+                                   value="#{settoreList.resultList}" var="r" label="#{r.nome}" />
+                                <s:convertEntity />
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="indirizzoField" template="layout/edit.xhtml">
+                <ui:define name="label">Indirizzo</ui:define>
+                <h:inputTextarea id="indirizzo"
+                               cols="80"
+                               rows="3"
+                               required="true"
+                              value="#{aziendaHome.instance.indirizzo}"/>
+            </s:decorate>
+            <s:decorate id="localitaField" template="layout/edit.xhtml">
+                <ui:define name="label">Località</ui:define>
+                <h:inputTextarea id="localita"
+                               cols="80"
+                               rows="2"
+                               required="true"
+                              value="#{aziendaHome.instance.localita}"/>
+            </s:decorate>
+            
+             <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>
+            
+        </rich:panel>
+    </h:form>
+    
+</ui:define>
+
+
+</ui:composition>

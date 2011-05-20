@@ -10,35 +10,13 @@ import javax.persistence.Table;
 import org.hibernate.validator.NotNull;
 
 @Entity
-@Table(name = "FormaGiuridica")
-public class FormaGiuridica implements Serializable {
+@Table(name = "Settore")
+public class Settore implements Serializable {
 
 	public static enum Default {
-		II(1, "Impresa individuale"),
+		Edilizia(1, "Edilizia"),
 
-		IF(2, "Impresa familiare"),
-
-		SS(3, "Societˆ semplice - SS"),
-
-		SNC(4, "Societˆ in nome collettivo - SNC"),
-
-		SAS(5, "Societˆ in accomandita semplice - SAS"),
-
-		SRL(6, "Societˆ a responsabilitˆ limitata - SRL"),
-
-		SAPA(7, "Societˆ in accomandita per azioni - SAPA"),
-
-		SPA(8, "Societˆ per azioni - SPA"),
-
-		SCARL(9, "Societˆ cooperativa a responsabilitˆ limitata - SCA.r.l."),
-
-		SCRI(10, "Societˆ cooperativa a responsabilitˆ illimitata"),
-
-		Associazione(11, "Associazione"),
-
-		ProfessionistaStudio(12, "Professionista / Studio"),
-
-		Altro(13, "Altro");
+		Pulizie(2, "Pulizie");
 
 		private Integer id;
 		private String nome;
@@ -53,8 +31,15 @@ public class FormaGiuridica implements Serializable {
 		}
 
 		public String getNome() {
-
 			return this.nome;
+		}
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
+
+		public void setNome(String nome) {
+			this.nome = nome;
 		}
 
 	}
@@ -62,7 +47,7 @@ public class FormaGiuridica implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -482568088570508305L;
+	private static final long serialVersionUID = 369073872190612737L;
 
 	private Integer id;
 	private String nome;
