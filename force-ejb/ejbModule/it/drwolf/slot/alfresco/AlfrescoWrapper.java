@@ -22,6 +22,7 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.security.Identity;
 
 @Name("alfrescoWrapper")
 @Scope(ScopeType.CONVERSATION)
@@ -33,6 +34,12 @@ public class AlfrescoWrapper {
 
 	@In
 	private AlfrescoAdminIdentity alfrescoAdminIdentity;
+
+	@In
+	private AlfrescoInfo alfrescoInfo;
+
+	@In
+	private Identity identity;
 
 	public static ObjectId ref2id(String ref) {
 		if (("" + ref).length() < 10) {
@@ -97,5 +104,44 @@ public class AlfrescoWrapper {
 		adminSession.createDocument(props, folder, contentStreamImpl,
 				VersioningState.NONE, null, null, null);
 	}
+
+	// private JsonElement openJsonWebScript(String url)
+	// throws MalformedURLException, IOException,
+	// UnsupportedEncodingException {
+	// URL peopleServiceUrl = new URL(url);
+	// URLConnection conn = peopleServiceUrl.openConnection();
+	// String auth = "Basic "
+	// + Base64.encodeBase64String((identity.getCredentials()
+	// .getUsername() + ":" + identity.getCredentials()
+	// .getPassword()).getBytes());
+	// conn.setRequestProperty("Authorization", auth);
+	// conn.connect();
+	//
+	// InputStream is = conn.getInputStream();
+	//
+	// JsonElement parsed = new JsonParser().parse(new JsonReader(
+	// new InputStreamReader(is, "UTF-8")));
+	//
+	// return parsed;
+	// }
+	//
+	// public List<Authority> getAlfrescoGroups() {
+	// Gson gson = new Gson();
+	// List<Authority> authGroups = new ArrayList<Authority>();
+	// try {
+	// JsonElement parsed = openJsonWebScript(alfrescoInfo
+	// .getRepositoryUri()
+	// + "/service/api/groups?shortNameFilter=*");
+	// JsonObject groups = parsed.getAsJsonObject();
+	// JsonArray list = groups.getAsJsonArray("data");
+	// for (JsonElement e : list) {
+	// Authority fromJson = gson.fromJson(e, Authority.class);
+	// authGroups.add(fromJson);
+	// }
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	// return authGroups;
+	// }
 
 }

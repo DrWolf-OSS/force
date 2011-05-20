@@ -2,6 +2,10 @@ package it.drwolf.slot.session;
 
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
+import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
+import it.drwolf.slot.alfresco.webscripts.model.Authority;
+
+import java.util.List;
 
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
@@ -23,8 +27,14 @@ public class Authenticator {
 	@In(create = true)
 	AlfrescoUserIdentity alfrescoUserIdentity;
 
+	// @In(create = true)
+	// AlfrescoWrapper alfrescoWrapper;
+
 	@In(create = true)
 	AlfrescoInfo alfrescoInfo;
+
+	@In(create = true)
+	AlfrescoWebScriptClient alfrescoWebScriptClient;
 
 	public boolean authenticate() {
 		log.info("authenticating {0}", credentials.getUsername());
@@ -45,6 +55,11 @@ public class Authenticator {
 		alfrescoUserIdentity.authenticate(identity.getCredentials()
 				.getUsername(), identity.getCredentials().getPassword(),
 				alfrescoInfo.getRepositoryUri());
+
+		// retrieveGroups2();
+		List<Authority> alfrescoGroups = alfrescoWebScriptClient
+				.getAlfrescoGroups();
+		System.out.println(alfrescoGroups);
 
 		return true;
 	}
