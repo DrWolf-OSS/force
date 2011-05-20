@@ -111,4 +111,9 @@ public class Authority {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return authorityType + ":" + shortName;
+	}
+
 }

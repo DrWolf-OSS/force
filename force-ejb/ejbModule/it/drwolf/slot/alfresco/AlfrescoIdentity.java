@@ -1,6 +1,9 @@
 package it.drwolf.slot.alfresco;
 
+import it.drwolf.slot.alfresco.webscripts.model.Authority;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.cmis.client.AlfrescoFolder;
@@ -20,6 +23,10 @@ public abstract class AlfrescoIdentity {
 	private String username;
 
 	private String password;
+
+	private List<Authority> groups;
+
+	private Authority activeGroup;
 
 	public boolean authenticate(String username, String password, String url) {
 
@@ -85,6 +92,22 @@ public abstract class AlfrescoIdentity {
 
 	public String getUserHomeRef() {
 		return this.getUserHomeFolder().getId();
+	}
+
+	public List<Authority> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(List<Authority> groups) {
+		this.groups = groups;
+	}
+
+	public Authority getActiveGroup() {
+		return activeGroup;
+	}
+
+	public void setActiveGroup(Authority activeGroup) {
+		this.activeGroup = activeGroup;
 	}
 
 }

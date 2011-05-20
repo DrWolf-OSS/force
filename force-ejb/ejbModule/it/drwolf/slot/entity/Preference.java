@@ -35,11 +35,13 @@ public class Preference implements Serializable {
 			"/Dizionario dei dati/Modelli");
 	private static Preference CUSTOM_MODEL_XML_NAME = new Preference(
 			PreferenceKey.CUSTOM_MODEL_XML_NAME.name(), "slotModel.xml");
+	private static Preference FORCE_GROUPS_PATH = new Preference(
+			PreferenceKey.FORCE_GROUPS_PATH.name(), "/Force");
 
 	public static Preference[] defaults = new Preference[] { ALFRESCO_LOCATION,
 			ALFRESCO_ADMIN_USER, ALFRESCO_ADMIN_PWD, ALFRESCO_USERS_HOME,
 			CUSTOM_MODEL_JAR_PATH, CUSTOM_MODEL_XML_PATH_IN_JAR,
-			CUSTOM_MODEL_XML_PATH, CUSTOM_MODEL_XML_NAME };
+			CUSTOM_MODEL_XML_PATH, CUSTOM_MODEL_XML_NAME, FORCE_GROUPS_PATH };
 
 	private Integer id;
 	private String keyValue;

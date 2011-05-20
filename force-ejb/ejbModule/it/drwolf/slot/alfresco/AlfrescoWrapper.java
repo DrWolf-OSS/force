@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import javax.activation.MimetypesFileTypeMap;
 
+import org.alfresco.cmis.client.AlfrescoFolder;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
@@ -15,14 +16,15 @@ import org.apache.chemistry.opencmis.client.api.Rendition;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.io.IOUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.security.Identity;
 
 @Name("alfrescoWrapper")
 @Scope(ScopeType.CONVERSATION)
@@ -33,13 +35,8 @@ public class AlfrescoWrapper {
 	// "6880b7a5-ba84-464c-a328-f5428426b450";
 
 	@In
-	private AlfrescoAdminIdentity alfrescoAdminIdentity;
-
-	@In
-	private AlfrescoInfo alfrescoInfo;
-
-	@In
-	private Identity identity;
+	// private AlfrescoAdminIdentity alfrescoAdminIdentity;
+	private AlfrescoUserIdentity alfrescoUserIdentity;
 
 	public static ObjectId ref2id(String ref) {
 		if (("" + ref).length() < 10) {
@@ -53,7 +50,7 @@ public class AlfrescoWrapper {
 		if (("" + ref).length() < 10) {
 			return "NO-ID";
 		}
-		return this.alfrescoAdminIdentity.getSession()
+		return this.alfrescoUserIdentity.getSession()
 				.getObject(AlfrescoWrapper.ref2id(ref))
 				.getProperty(PropertyIds.NAME).getValueAsString();
 	}
@@ -61,7 +58,7 @@ public class AlfrescoWrapper {
 	public Object getThumbnail(String id, String name) {
 		if (id == null || id.length() > 20) {
 			try {
-				Session session = this.alfrescoAdminIdentity.getSession();
+				Session session = this.alfrescoUserIdentity.getSession();
 				OperationContext context = session.createOperationContext();
 
 				context.setRenditionFilterString("*");
@@ -90,7 +87,7 @@ public class AlfrescoWrapper {
 	 * 
 	 */
 	public void storeFile(Folder folder, File file) throws Exception {
-		Session adminSession = this.alfrescoAdminIdentity.getSession();
+		Session adminSession = this.alfrescoUserIdentity.getSession();
 
 		HashMap<String, Object> props = new HashMap<String, Object>();
 		String contentType = new MimetypesFileTypeMap().getContentType(file
@@ -103,6 +100,35 @@ public class AlfrescoWrapper {
 
 		adminSession.createDocument(props, folder, contentStreamImpl,
 				VersioningState.NONE, null, null, null);
+	}
+
+	public AlfrescoFolder retrieveGroupFolder(String path, String shortName) {
+		return (AlfrescoFolder) alfrescoUserIdentity.getSession()
+				.getObjectByPath(path + "/" + shortName);
+	}
+
+	public AlfrescoFolder findOrCreateFolder(Folder father, String folderName) {
+		AlfrescoFolder folder = null;
+		// cerco la cartella con il nome dello slot e se non c'è la creo
+		Session session = alfrescoUserIdentity.getSession();
+		try {
+			folder = (AlfrescoFolder) session.getObjectByPath(father.getPath()
+					+ "/" + folderName);
+		} catch (CmisObjectNotFoundException e) {
+			HashMap<String, Object> props = new HashMap<String, Object>();
+			props.put(PropertyIds.NAME, folderName);
+			props.put(PropertyIds.OBJECT_TYPE_ID,
+					BaseTypeId.CMIS_FOLDER.value());
+			folder = (AlfrescoFolder) father.createFolder(props, null, null,
+					null, session.createOperationContext());
+		}
+		return folder;
+	}
+
+	public AlfrescoFolder findOrCreateFolder(String path, String folderName) {
+		Session session = alfrescoUserIdentity.getSession();
+		AlfrescoFolder father = (AlfrescoFolder) session.getObjectByPath(path);
+		return findOrCreateFolder(father, folderName);
 	}
 
 	// private JsonElement openJsonWebScript(String url)
