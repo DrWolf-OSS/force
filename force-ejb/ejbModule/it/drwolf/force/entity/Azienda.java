@@ -16,7 +16,7 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.validator.NotNull;
 
 @Entity
-@Table(name = "Azienda", uniqueConstraints = { @UniqueConstraint(columnNames = "alfresco_group_id") })
+@Table(name = "Azienda", uniqueConstraints = { @UniqueConstraint(columnNames = "AlfrescoGroupId") })
 public class Azienda implements Serializable {
 
 	/**
