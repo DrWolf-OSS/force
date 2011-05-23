@@ -1,7 +1,7 @@
 package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
-import it.drwolf.slot.alfresco.custom.model.Aspect;
+import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.EmbeddedPropertyInst;
 import it.drwolf.slot.application.CustomModelController;
@@ -10,6 +10,8 @@ import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
+import it.drwolf.slot.prefs.PreferenceKey;
+import it.drwolf.slot.prefs.Preferences;
 import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
@@ -29,6 +31,7 @@ import javax.persistence.EntityManager;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
 import org.alfresco.cmis.client.AlfrescoFolder;
+import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
@@ -63,11 +66,17 @@ public class SlotInstEditBean {
 	@In(create = true)
 	private CustomModelController customModelController;
 
-	@In
+	@In(create = true)
 	private AlfrescoUserIdentity alfrescoUserIdentity;
+
+	@In(create = true)
+	private AlfrescoWrapper alfrescoWrapper;
 
 	@In
 	private Identity identity;
+
+	@In(create = true)
+	private Preferences preferences;
 
 	private List<PropertyInst> propertyInsts;
 
@@ -156,53 +165,62 @@ public class SlotInstEditBean {
 	}
 
 	private FileContainer buildContainer(DocDefCollection docDefCollection,
-			AlfrescoDocument document, boolean editables) {
-		FileContainer container = new FileContainer(document);
+			Object item, boolean editables) {
 		List<EmbeddedPropertyInst> fileProperties = new ArrayList<EmbeddedPropertyInst>();
 		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
+		Set<Property> properties = new HashSet<Property>();
+		// Recupero tutte le properties.
+		// Essendo un set anche se un aspect è applicato più volte (essendo
+		// settato come mandatory su un altro) le sue properties vengono
+		// aggiunte una volta sola
 		for (String aspectId : aspectIds) {
-			Aspect aspect = customModelController.getAspect(aspectId);
-			List<Property> properties = aspect.getProperties();
-			if (properties != null) {
-				for (Property p : properties) {
-					Object propertyValue = document.getPropertyValue(p
-							.getName());
-					EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(
-							p);
-					embeddedPropertyInst.setValue(propertyValue);
-					embeddedPropertyInst.setEditable(editables);
-					fileProperties.add(embeddedPropertyInst);
-				}
+			// properties.addAll(retrieveAllProperties(aspectId));
+			properties.addAll(customModelController.getProperties(aspectId));
+		}
+		if (properties != null) {
+			for (Property p : properties) {
+				EmbeddedPropertyInst embeddedPropertyInst = buildValorisedEmbeddedPropertyInst(
+						item, editables, p);
+				fileProperties.add(embeddedPropertyInst);
 			}
 		}
+		FileContainer container = new FileContainer(item);
 		container.setEmbeddedProperties(fileProperties);
 		return container;
 	}
 
-	private FileContainer buildContainer(DocDefCollection docDefCollection,
-			UploadItem uploadItem, boolean editables) {
-		FileContainer container = new FileContainer(uploadItem);
-		List<EmbeddedPropertyInst> fileProperties = new ArrayList<EmbeddedPropertyInst>();
-		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
-		for (String aspectId : aspectIds) {
-			Aspect aspect = customModelController.getAspect(aspectId);
-			List<Property> properties = aspect.getProperties();
-			if (properties != null) {
-				for (Property p : properties) {
-					EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(
-							p);
-					embeddedPropertyInst.setEditable(editables);
-					fileProperties.add(embeddedPropertyInst);
-				}
-			}
+	// private Set<Property> retrieveAllProperties(String aspectId) {
+	// Set<Property> properties = new HashSet<Property>();
+	// Aspect aspect = customModelController.getAspect(aspectId);
+	// if (aspect != null) {
+	// properties.addAll(aspect.getProperties());
+	// if (aspect.getMandatoryAspectIds() != null) {
+	// for (String mandatoryAspectId : aspect.getMandatoryAspectIds()) {
+	// properties.addAll(retrieveAllProperties("P:"
+	// + mandatoryAspectId));
+	// }
+	// }
+	// }
+	// return properties;
+	// }
+
+	private EmbeddedPropertyInst buildValorisedEmbeddedPropertyInst(
+			Object item, boolean editables, Property p) {
+		EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(p);
+		if (item instanceof AlfrescoDocument) {
+			AlfrescoDocument document = (AlfrescoDocument) item;
+			Object propertyValue = document.getPropertyValue(p.getName());
+			embeddedPropertyInst.setValue(propertyValue);
 		}
-		container.setEmbeddedProperties(fileProperties);
-		return container;
+		embeddedPropertyInst.setEditable(editables);
+		return embeddedPropertyInst;
 	}
 
 	public void save() {
 		slotInstHome.getInstance().setPropertyInsts(
 				new HashSet<PropertyInst>(this.propertyInsts));
+
+		AlfrescoFolder slotFolder = retrieveSlotFolder();
 
 		Set<Long> keySet = datas.keySet();
 		for (Long key : keySet) {
@@ -225,7 +243,8 @@ public class SlotInstEditBean {
 						if (container.getUploadItem() != null) {
 							String storedRef = storeOnAlfresco(
 									container.getUploadItem(), instCollection,
-									container.getEmbeddedProperties());
+									container.getEmbeddedProperties(),
+									slotFolder);
 							DocInst docInst = new DocInst(instCollection,
 									storedRef);
 							instCollection.getDocInsts().add(docInst);
@@ -234,7 +253,8 @@ public class SlotInstEditBean {
 									+ container.getDocument().getName());
 							String storedRef = copyDocumentOnAlfresco(
 									container.getDocument(), instCollection,
-									container.getEmbeddedProperties());
+									container.getEmbeddedProperties(),
+									slotFolder);
 							DocInst docInst = new DocInst(instCollection,
 									storedRef);
 							instCollection.getDocInsts().add(docInst);
@@ -253,17 +273,32 @@ public class SlotInstEditBean {
 
 		slotInstHome.getInstance().setDocInstCollections(
 				new HashSet<DocInstCollection>(docInstCollections));
+		// slotInstHome.getInstance().setOwnerId(
+		// identity.getCredentials().getUsername());
 		slotInstHome.getInstance().setOwnerId(
-				identity.getCredentials().getUsername());
+				alfrescoUserIdentity.getActiveGroup().getShortName());
 		slotInstHome.persist();
 		FacesMessages.instance().add(
 				"Slot " + this.slotDefHome.getInstance().getName()
 						+ " successfully created");
 	}
 
+	private AlfrescoFolder retrieveSlotFolder() {
+		AlfrescoFolder groupFolder = alfrescoWrapper.findOrCreateFolder(
+				preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH.name()),
+				alfrescoUserIdentity.getActiveGroup().getShortName());
+
+		AlfrescoFolder slotFolder = alfrescoWrapper.findOrCreateFolder(
+				groupFolder, slotInstHome.getInstance().getSlotDef().getName());
+		return slotFolder;
+	}
+
 	public void update() {
 		Set<DocInstCollection> persistedDocInstCollections = slotInstHome
 				.getInstance().getDocInstCollections();
+
+		AlfrescoFolder slotFolder = retrieveSlotFolder();
+
 		for (DocInstCollection instCollection : persistedDocInstCollections) {
 			Set<DocInst> docInsts = instCollection.getDocInsts();
 			Iterator<DocInst> iterator = docInsts.iterator();
@@ -306,7 +341,7 @@ public class SlotInstEditBean {
 								+ " nuovo da upload");
 						String storedRef = storeOnAlfresco(
 								item.getUploadItem(), instCollection,
-								item.getEmbeddedProperties());
+								item.getEmbeddedProperties(), slotFolder);
 						DocInst docInst = new DocInst(instCollection, storedRef);
 						instCollection.getDocInsts().add(docInst);
 					} else {
@@ -315,7 +350,7 @@ public class SlotInstEditBean {
 								+ " nuovo da primary docs");
 						String storedRef = copyDocumentOnAlfresco(
 								item.getDocument(), instCollection,
-								item.getEmbeddedProperties());
+								item.getEmbeddedProperties(), slotFolder);
 						DocInst docInst = new DocInst(instCollection, storedRef);
 						instCollection.getDocInsts().add(docInst);
 					}
@@ -374,11 +409,11 @@ public class SlotInstEditBean {
 
 	private String storeOnAlfresco(UploadItem item,
 			DocInstCollection instCollection,
-			List<EmbeddedPropertyInst> embeddedProperties) {
+			List<EmbeddedPropertyInst> embeddedProperties, Folder slotFolder) {
 		String nodeRef = "";
 		try {
 			Session session = alfrescoUserIdentity.getSession();
-			AlfrescoFolder slotFolder = findOrCreateSlotFolder(session);
+			// AlfrescoFolder slotFolder = findOrCreateSlotFolder(session);
 			String contentType = new MimetypesFileTypeMap().getContentType(item
 					.getFileName());
 			ContentStreamImpl contentStreamImpl = new ContentStreamImpl(
@@ -425,34 +460,38 @@ public class SlotInstEditBean {
 		return newName;
 	}
 
-	private AlfrescoFolder findOrCreateSlotFolder(Session session) {
-		AlfrescoFolder homeFolder = alfrescoUserIdentity.getUserHomeFolder();
-
-		// cerco la cartella con il nome dello slot e se non c'è la creo
-		String slotName = slotInstHome.getInstance().getSlotDef().getName();
-		String userHomePath = alfrescoUserIdentity.getUserHomePath();
-		AlfrescoFolder slotFolder;
-		try {
-			slotFolder = (AlfrescoFolder) session.getObjectByPath(userHomePath
-					+ "/" + slotName);
-		} catch (CmisObjectNotFoundException e) {
-			HashMap<String, Object> props = new HashMap<String, Object>();
-			props.put(PropertyIds.NAME, slotName);
-			props.put(PropertyIds.OBJECT_TYPE_ID,
-					BaseTypeId.CMIS_FOLDER.value());
-			slotFolder = (AlfrescoFolder) homeFolder.createFolder(props, null,
-					null, null, session.createOperationContext());
-		}
-		return slotFolder;
-	}
+	// private AlfrescoFolder findOrCreateSlotFolder(Session session) {
+	// // AlfrescoFolder homeFolder = alfrescoUserIdentity.getUserHomeFolder();
+	//
+	// AlfrescoFolder homeFolder = alfrescoWrapper.retrieveGroupFolder(
+	// preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH.name()),
+	// alfrescoUserIdentity.getGroups().get(0).getShortName());
+	//
+	// // cerco la cartella con il nome dello slot e se non c'è la creo
+	// String slotName = slotInstHome.getInstance().getSlotDef().getName();
+	// String userHomePath = alfrescoUserIdentity.getUserHomePath();
+	// AlfrescoFolder slotFolder;
+	// try {
+	// slotFolder = (AlfrescoFolder) session.getObjectByPath(userHomePath
+	// + "/" + slotName);
+	// } catch (CmisObjectNotFoundException e) {
+	// HashMap<String, Object> props = new HashMap<String, Object>();
+	// props.put(PropertyIds.NAME, slotName);
+	// props.put(PropertyIds.OBJECT_TYPE_ID,
+	// BaseTypeId.CMIS_FOLDER.value());
+	// slotFolder = (AlfrescoFolder) homeFolder.createFolder(props, null,
+	// null, null, session.createOperationContext());
+	// }
+	// return slotFolder;
+	// }
 
 	private String copyDocumentOnAlfresco(AlfrescoDocument document,
 			DocInstCollection instCollection,
-			List<EmbeddedPropertyInst> embeddedProperties) {
+			List<EmbeddedPropertyInst> embeddedProperties, Folder slotFolder) {
 		String nodeRef = "";
 
 		Session session = alfrescoUserIdentity.getSession();
-		AlfrescoFolder slotFolder = findOrCreateSlotFolder(session);
+		// AlfrescoFolder slotFolder = findOrCreateSlotFolder(session);
 
 		ContentStream contentStream = document.getContentStream();
 		Set<String> aspects = instCollection.getDocDefCollection().getDocDef()
@@ -574,6 +613,13 @@ public class SlotInstEditBean {
 		public FileContainer(UploadItem uploadItem) {
 			super();
 			this.uploadItem = uploadItem;
+		}
+
+		public FileContainer(Object item) {
+			if (item instanceof AlfrescoDocument)
+				this.document = (AlfrescoDocument) item;
+			else if (item instanceof UploadItem)
+				this.uploadItem = (UploadItem) item;
 		}
 
 		public UploadItem getUploadItem() {

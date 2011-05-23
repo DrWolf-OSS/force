@@ -5,6 +5,7 @@
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
     xmlns:rich="http://richfaces.org/rich"
     template="layout/template.xhtml">
 
@@ -25,6 +26,7 @@
         </rich:panel>
         <h:commandButton action="#{testBean.test2()}" value="test" />
         <h:commandButton action="#{testBean.loadModel()}" value="load model" />
+        <a:commandButton action="#{customModelController.reloadModel()}" value="reload model"/>
         <rich:fileUpload fileUploadListener="#{fileUploadBean.listener}">
         </rich:fileUpload>
         

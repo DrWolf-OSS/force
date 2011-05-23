@@ -2,6 +2,13 @@ package it.drwolf.slot.session;
 
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
+import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
+import it.drwolf.slot.alfresco.webscripts.model.Authority;
+import it.drwolf.slot.alfresco.webscripts.model.AuthorityType;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
@@ -46,7 +53,42 @@ public class Authenticator {
 				.getUsername(), identity.getCredentials().getPassword(),
 				alfrescoInfo.getRepositoryUri());
 
+		assignGroups();
+
 		return true;
+	}
+
+	private void assignGroups() {
+		AlfrescoWebScriptClient alfrescoWebScriptClient = new AlfrescoWebScriptClient(
+				identity.getCredentials().getUsername(), identity
+						.getCredentials().getPassword(),
+				alfrescoInfo.getRepositoryUri());
+
+		List<Authority> userGroups = new ArrayList<Authority>();
+		List<Authority> groups = alfrescoWebScriptClient.getGroupsList("*", "");
+		for (Authority group : groups) {
+			List<Authority> users = alfrescoWebScriptClient
+					.getListOfChildAuthorities(group.getShortName(),
+							AuthorityType.USER.name());
+			Iterator<Authority> iterator = users.iterator();
+			boolean found = false;
+			while (iterator.hasNext() && found == false) {
+				Authority user = iterator.next();
+				if (user.getShortName().equals(
+						identity.getCredentials().getUsername())) {
+					userGroups.add(group);
+					found = true;
+				}
+			}
+		}
+		alfrescoUserIdentity.setGroups(userGroups);
+
+		// SETTO A MERDA il primo della lista come activeGroup
+		alfrescoUserIdentity.setActiveGroup(userGroups.get(0));
+		System.out.println("---> " + identity.getCredentials().getUsername()
+				+ " entered as \""
+				+ alfrescoUserIdentity.getActiveGroup().getShortName()
+				+ "\" member");
 	}
 
 }
