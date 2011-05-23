@@ -1,6 +1,7 @@
 package it.drwolf.force.session.homes;
 
 import it.drwolf.force.entity.Azienda;
+import it.drwolf.force.enums.StatoAzienda;
 
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityHome;
@@ -35,6 +36,12 @@ public class AziendaHome extends EntityHome<Azienda> {
 		if (this.isIdDefined()) {
 			this.wire();
 		}
+	}
+
+	@Override
+	public String persist() {
+		this.getInstance().setStato(StatoAzienda.NUOVA.toString());
+		return super.persist();
 	}
 
 	public void setAziendaId(Long id) {

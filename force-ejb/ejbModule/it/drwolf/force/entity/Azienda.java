@@ -54,6 +54,8 @@ public class Azienda implements Serializable {
 	private FormaGiuridica formaGiuridica;
 	private Settore settore;
 
+	private String stato;
+
 	// per Alfresco
 	private String alfrescoGroupId;
 
@@ -182,6 +184,12 @@ public class Azienda implements Serializable {
 		return this.settore;
 	}
 
+	@Column(nullable = false)
+	@NotNull
+	public String getStato() {
+		return this.stato;
+	}
+
 	@Column(nullable = true)
 	public String getTelefono() {
 		return this.telefono;
@@ -269,6 +277,10 @@ public class Azienda implements Serializable {
 
 	public void setSettore(Settore settore) {
 		this.settore = settore;
+	}
+
+	public void setStato(String stato) {
+		this.stato = stato;
 	}
 
 	public void setTelefono(String telefono) {

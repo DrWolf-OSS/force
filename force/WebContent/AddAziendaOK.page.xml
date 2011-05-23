@@ -5,10 +5,4 @@
       no-conversation-view-id="/home.xhtml">
       
       <begin-conversation join="true"/>
-       <navigation from-action="#{aziendaHome.persist()}">
-	        <rule if-outcome="ko">
-	            <redirect view-id="/AddAzienda.xhtml" />
-	        </rule>
-	       <redirect view-id="/AddAziendaOK.xhtml"/>
-       </navigation>
 </page>

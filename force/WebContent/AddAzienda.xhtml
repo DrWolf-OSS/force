@@ -58,13 +58,140 @@
                                required="true"
                               value="#{aziendaHome.instance.localita}"/>
             </s:decorate>
+            <s:decorate id="comuneField" template="layout/edit.xhtml">
+                <ui:define name="label">Comune</ui:define>
+                <h:inputTextarea id="comune"
+                               cols="80"
+                               rows="2"
+                               required="true"
+                              value="#{aziendaHome.instance.comune}"/>
+            </s:decorate>
+            <s:decorate id="provinciaField" template="layout/edit.xhtml">
+                <ui:define name="label">Provincia</ui:define>
+                <h:inputText id="provincia"
+                               maxlength="2"
+                               size="2"
+                               required="true"
+                              value="#{aziendaHome.instance.provincia}"/>
+            </s:decorate>
+            <s:decorate id="capField" template="layout/edit.xhtml">
+                <ui:define name="label">CAP</ui:define>
+                <h:inputText id="cap"
+                               maxlength="5"
+                               size="5"
+                               required="true"
+                              value="#{aziendaHome.instance.cap}"/>
+            </s:decorate>
             
+            <div style="clear:both"></div>
+            <rich:separator></rich:separator>
+             
+            <s:decorate id="partitaIVAField" template="layout/edit.xhtml">
+                <ui:define name="label">Partita IVA</ui:define>
+                <h:inputText id="partitaIva"
+                               maxlength="11"
+                               size="11"
+                               required="true"
+                              value="#{aziendaHome.instance.partitaIva}"/>
+            </s:decorate>
+
+            <s:decorate id="codiceFiscaleField" template="layout/edit.xhtml">
+                <ui:define name="label">Codice Fiscale</ui:define>
+                <h:inputText id="codiceFiscale"
+                               maxlength="16"
+                               size="16"
+                               required="true"
+                              value="#{aziendaHome.instance.codiceFiscale}"/>
+            </s:decorate>
+ 
+            <s:decorate id="NumeroREAField" template="layout/edit.xhtml">
+                <ui:define name="label">Numero REA</ui:define>
+                <h:inputText id="numeroREA"
+                               size="20"
+                               required="true"
+                              value="#{aziendaHome.instance.numeroREA}"/>
+            </s:decorate>
+            <s:decorate id="annoCostituzioneField" template="layout/edit.xhtml">
+                <ui:define name="label">Anno di Costituzione</ui:define>
+                <h:inputText id="annoCostituzione"
+                               maxlength="4"
+                               size="4"
+                               required="true"
+                              value="#{aziendaHome.instance.annoCostituzione}"/>
+            </s:decorate>
+
+            <s:decorate id="emailField" template="layout/edit.xhtml">
+                <ui:define name="label">Posta Elettronica</ui:define>
+                <h:inputText id="email"
+                               size="20"
+                               required="true"
+                              value="#{aziendaHome.instance.email}"/>
+            </s:decorate>
+            <s:decorate id="emailCertificataField" template="layout/edit.xhtml">
+                <ui:define name="label">Posta Elettronica Certificata</ui:define>
+                <h:inputText id="emailCertificata"
+                               size="20"
+                               value="#{aziendaHome.instance.emailCertificata}"/>
+            </s:decorate>
+ 
+            <div style="clear:both"></div>
+            <rich:separator></rich:separator>
+            <s:decorate id="nomeField" template="layout/edit.xhtml">
+                <ui:define name="label">Nome</ui:define>
+                <h:inputText id="nome"
+                               size="40"
+                                required="true"
+                              value="#{aziendaHome.instance.nome}"/>
+            </s:decorate>
+            <s:decorate id="cognomeField" template="layout/edit.xhtml">
+                <ui:define name="label">Cognome</ui:define>
+                <h:inputText id="cognome"
+                               size="40"
+                                required="true"
+                              value="#{aziendaHome.instance.cognome}"/>
+            </s:decorate>
+            <s:decorate id="emailReferenteField" template="layout/edit.xhtml">
+                <ui:define name="label">Email</ui:define>
+                <h:inputText id="emailReferente"
+                               size="40"
+                               required="true"
+                               value="#{aziendaHome.instance.emailReferente}"/>
+            </s:decorate>
+            <s:decorate id="telefonoField" template="layout/edit.xhtml">
+                <ui:define name="label">Telefono</ui:define>
+                <h:inputText id="telefono"
+                               size="40"
+                               value="#{aziendaHome.instance.telefono}"/>
+            </s:decorate>
+            <s:decorate id="cellulareField" template="layout/edit.xhtml">
+                <ui:define name="label">Cellulare</ui:define>
+                <h:inputText id="cellulare"
+                               size="40"
+                               value="#{aziendaHome.instance.cellulare}"/>
+            </s:decorate>
+ 
              <div style="clear:both">
                 <span class="required">*</span>
                 required fields
             </div>
             
         </rich:panel>
+        
+          <div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Iscriviti"
+                         action="#{aziendaHome.persist()}"
+                       disabled="#{!aziendaHome.wired}"
+                       rendered="#{!aziendaHome.managed}"/>
+
+            <s:button id="cancelAdd"
+                   value="Annulla"
+             propagation="end"
+                    view="/home.xhtml"
+                rendered="#{!aziendaHome.managed}"/>
+
+        </div>
     </h:form>
     
 </ui:define>
