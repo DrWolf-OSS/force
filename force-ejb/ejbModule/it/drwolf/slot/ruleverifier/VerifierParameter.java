@@ -28,4 +28,10 @@ public class VerifierParameter {
 	public void setType(DataType type) {
 		this.type = type;
 	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
 }

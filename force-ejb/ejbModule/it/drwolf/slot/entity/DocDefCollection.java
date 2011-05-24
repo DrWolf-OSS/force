@@ -81,4 +81,47 @@ public class DocDefCollection {
 		return name + ":" + min + "," + max + ";" + docDef;
 	}
 
+	// @Override
+	// public int hashCode() {
+	// final int prime = 31;
+	// int result = 1;
+	// result = prime
+	// * result
+	// + ((this.getDocDef() == null) ? 0 : this.getDocDef().hashCode());
+	// result = prime * result
+	// + ((this.getName() == null) ? 0 : this.getName().hashCode());
+	// result = prime
+	// * result
+	// + ((this.getSlotDef() == null) ? 0 : this.getSlotDef()
+	// .hashCode());
+	// return result;
+	// }
+	//
+	// @Override
+	// public boolean equals(Object obj) {
+	// if (this == obj)
+	// return true;
+	// if (obj == null)
+	// return false;
+	// if (!(obj instanceof DocDefCollection))
+	// return false;
+	// DocDefCollection other = (DocDefCollection) obj;
+	// if (this.getDocDef() == null) {
+	// if (other.getDocDef() != null)
+	// return false;
+	// } else if (!this.getDocDef().equals(other.getDocDef()))
+	// return false;
+	// if (this.getName() == null) {
+	// if (other.getName() != null)
+	// return false;
+	// } else if (!this.getName().equals(other.getName()))
+	// return false;
+	// if (this.getSlotDef() == null) {
+	// if (other.getSlotDef() != null)
+	// return false;
+	// } else if (!this.getSlotDef().equals(other.getSlotDef()))
+	// return false;
+	// return true;
+	// }
+
 }

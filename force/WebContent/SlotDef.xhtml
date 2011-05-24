@@ -32,6 +32,14 @@
         <s:button view="/#{empty slotDefFrom ? 'SlotDefList' : slotDefFrom}.xhtml"
                     id="done"
                  value="Done"/>
+        
+        <s:button view="/RuleEdit.xhtml"
+                    id="rule"
+                 value="Add Rule"
+                 propagation="none">
+          <f:param name="slotDefId" value="#{slotDefHome.id}" />
+          <f:param name="ruleId"/>
+        </s:button>
 
     </div>
 
