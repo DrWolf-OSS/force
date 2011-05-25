@@ -1,8 +1,5 @@
 package it.drwolf.slot.pagebeans;
 
-import it.drwolf.slot.alfresco.custom.model.Property;
-import it.drwolf.slot.application.CustomModelController;
-import it.drwolf.slot.entity.DocDef;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.SlotDef;
@@ -18,7 +15,6 @@ import it.drwolf.slot.session.SlotDefHome;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,42 +36,44 @@ public class RuleEditBean {
 	@In(create = true)
 	private RuleHome ruleHome;
 
-	@In(create = true)
-	private CustomModelController customModelController;
+	// @In(create = true)
+	// private CustomModelController customModelController;
 
 	private RuleListener ruleListener = new RuleListener();
 
-	private DocDefCollection activeCollection;
+	// private DocDefCollection activeCollection;
 
-	private HashMap<Long, List<PropertyContainer>> properties = new HashMap<Long, List<PropertyContainer>>();
+	// private HashMap<Long, List<PropertyContainer>> properties = new
+	// HashMap<Long, List<PropertyContainer>>();
 
 	private HashMap<String, List<PropertiesSourceContainer>> sourcePropertiesSourceMap = new HashMap<String, List<PropertiesSourceContainer>>();
 
 	private HashMap<String, PropertiesSourceContainer> targetPropertiesSourceMap = new HashMap<String, PropertiesSourceContainer>();
 	private HashMap<String, PropertyContainer> targetPropertyMap = new HashMap<String, PropertyContainer>();
 
-	public void init() {
-		SlotDef slotDef = slotDefHome.getInstance();
-		Set<DocDefCollection> docDefCollections = slotDef
-				.getDocDefCollections();
-		for (DocDefCollection collection : docDefCollections) {
-
-			Set<Property> aspectProperties = new HashSet<Property>();
-			DocDef docDef = collection.getDocDef();
-			Set<String> aspectIds = docDef.getAspectIds();
-			for (String aspectId : aspectIds) {
-				aspectProperties.addAll(customModelController
-						.getProperties(aspectId));
-			}
-
-			ArrayList<PropertyContainer> aspectPropertiesAsList = new ArrayList<PropertyContainer>();
-			for (Property property : aspectProperties) {
-				PropertyContainer container = new PropertyContainer(property);
-				aspectPropertiesAsList.add(container);
-			}
-			properties.put(docDef.getId(), aspectPropertiesAsList);
-		}
-	}
+	// public void init() {
+	// SlotDef slotDef = slotDefHome.getInstance();
+	// Set<DocDefCollection> docDefCollections = slotDef
+	// .getDocDefCollections();
+	// for (DocDefCollection collection : docDefCollections) {
+	//
+	// Set<Property> aspectProperties = new HashSet<Property>();
+	// DocDef docDef = collection.getDocDef();
+	// Set<String> aspectIds = docDef.getAspectIds();
+	// for (String aspectId : aspectIds) {
+	// aspectProperties.addAll(customModelController
+	// .getProperties(aspectId));
+	// }
+	//
+	// ArrayList<PropertyContainer> aspectPropertiesAsList = new
+	// ArrayList<PropertyContainer>();
+	// for (Property property : aspectProperties) {
+	// PropertyContainer container = new PropertyContainer(property);
+	// aspectPropertiesAsList.add(container);
+	// }
+	// properties.put(docDef.getId(), aspectPropertiesAsList);
+	// }
+	// }
 
 	@Factory("ruleTypes")
 	public List<RuleType> getRuleTypes() {
@@ -90,9 +88,7 @@ public class RuleEditBean {
 
 		if (verifier != null) {
 			List<VerifierParameter> inParams = verifier.getInParams();
-
 			SlotDef slotDef = slotDefHome.getInstance();
-
 			Set<DocDefCollection> docDefCollections = slotDef
 					.getDocDefCollections();
 
@@ -113,22 +109,22 @@ public class RuleEditBean {
 		}
 	}
 
-	public DocDefCollection getActiveCollection() {
-		return activeCollection;
-	}
+	// public DocDefCollection getActiveCollection() {
+	// return activeCollection;
+	// }
+	//
+	// public void setActiveCollection(DocDefCollection activeCollection) {
+	// this.activeCollection = activeCollection;
+	// }
 
-	public void setActiveCollection(DocDefCollection activeCollection) {
-		this.activeCollection = activeCollection;
-	}
-
-	public List<Property> getProperties(Long docDefCollectionId) {
-		Set<String> aspectIds = activeCollection.getDocDef().getAspectIds();
-		Set<Property> properties = new HashSet<Property>();
-		for (String aspectId : aspectIds) {
-			properties.addAll(customModelController.getProperties(aspectId));
-		}
-		return new ArrayList<Property>(properties);
-	}
+	// public List<Property> getProperties(Long docDefCollectionId) {
+	// Set<String> aspectIds = activeCollection.getDocDef().getAspectIds();
+	// Set<Property> properties = new HashSet<Property>();
+	// for (String aspectId : aspectIds) {
+	// properties.addAll(customModelController.getProperties(aspectId));
+	// }
+	// return new ArrayList<Property>(properties);
+	// }
 
 	// public class PropertyContainer {
 	//
