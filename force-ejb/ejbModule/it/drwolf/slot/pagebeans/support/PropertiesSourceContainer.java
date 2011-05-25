@@ -4,6 +4,7 @@ import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.entity.DocDef;
 import it.drwolf.slot.entity.DocDefCollection;
+import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.SlotDef;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class PropertiesSourceContainer {
 			initPropertiesAsCollection();
 		} else if (object instanceof SlotDef) {
 			this.slotDef = (SlotDef) object;
+			initPropertiesAsSlot();
 		}
 	}
 
@@ -34,6 +36,7 @@ public class PropertiesSourceContainer {
 	public PropertiesSourceContainer(SlotDef slotDef) {
 		super();
 		this.slotDef = slotDef;
+		initPropertiesAsSlot();
 	}
 
 	public SlotDef getSlotDef() {
@@ -87,6 +90,17 @@ public class PropertiesSourceContainer {
 			aspectPropertiesAsList.add(container);
 		}
 		this.setProperties(aspectPropertiesAsList);
+	}
+
+	private void initPropertiesAsSlot() {
+		Set<PropertyDef> propertyDefs = this.slotDef.getPropertyDefs();
+		ArrayList<PropertyContainer> slotPropertiesAsList = new ArrayList<PropertyContainer>();
+		for (PropertyDef propertyDef : propertyDefs) {
+			PropertyContainer propertyContainer = new PropertyContainer(
+					propertyDef);
+			slotPropertiesAsList.add(propertyContainer);
+		}
+		this.setProperties(slotPropertiesAsList);
 	}
 
 	@Override

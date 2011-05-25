@@ -16,6 +16,7 @@ public class RuleListener {
 			break;
 
 		default:
+			rule.setVerifier(null);
 			break;
 		}
 

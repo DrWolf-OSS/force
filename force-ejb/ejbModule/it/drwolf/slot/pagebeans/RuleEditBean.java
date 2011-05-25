@@ -86,12 +86,13 @@ public class RuleEditBean {
 		Rule instance = this.ruleHome.getInstance();
 		ruleListener.setVerifier(instance);
 		IRuleVerifier verifier = instance.getVerifier();
+		sourcePropertiesSourceMap = new HashMap<String, List<PropertiesSourceContainer>>();
 
 		if (verifier != null) {
 			List<VerifierParameter> inParams = verifier.getInParams();
 
 			SlotDef slotDef = slotDefHome.getInstance();
-			sourcePropertiesSourceMap = new HashMap<String, List<PropertiesSourceContainer>>();
+
 			Set<DocDefCollection> docDefCollections = slotDef
 					.getDocDefCollections();
 
@@ -102,18 +103,14 @@ public class RuleEditBean {
 							collection);
 					propertiesSourceContainerList.add(sourceContainer);
 				}
+				propertiesSourceContainerList
+						.add(new PropertiesSourceContainer(slotDef));
 				sourcePropertiesSourceMap.put(verifierParameter.getName(),
 						propertiesSourceContainerList);
 			}
 
 			System.out.println("---> assigned listener " + verifier);
 		}
-	}
-
-	public void collectionListener(ActionEvent event) {
-		Object source = event.getSource();
-
-		System.out.println("--->  ");
 	}
 
 	public DocDefCollection getActiveCollection() {

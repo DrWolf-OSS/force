@@ -26,7 +26,7 @@
             </s:decorate>
             
             <s:div id="inParams">
-            <s:decorate id="params" template="layout/edit.xhtml">
+            <s:decorate id="params" template="layout/display.xhtml">
                 <ui:define name="label">Parameters</ui:define>
                 
                 <h:panelGrid columns="2">
@@ -35,16 +35,18 @@
                 <s:div>
                 	<h:outputText value="#{p.name}"/>
                 	&#160;#{messages.left}#{messages.left}&#160;
-	                <h:selectOneMenu value="#{ruleEditBean.targetPropertiesSourceMap[p.name]}">
+	                <h:selectOneMenu value="#{ruleEditBean.targetPropertiesSourceMap[p.name]}" rendered="#{ruleEditBean.sourcePropertiesSourceMap[p.name] != null}">
 		            	<s:selectItems value="#{ruleEditBean.sourcePropertiesSourceMap[p.name]}"
 		            					var="sourceContainer" label="#{sourceContainer.label}" itemValue="#{sourceContainer}"/>
 		            	<f:converter converterId="propertiesSourceContainerConverter"/>
-		            <a:support event="onchange" actionListener="#{ruleEditBean.collectionListener}" reRender="inParams"/>
+		            <a:support event="onchange" reRender="inParams"/>
 		            </h:selectOneMenu>
 		            &#160; : &#160;
-		            <h:selectOneMenu value="" rendered="#{ruleEditBean.targetPropertiesSourceMap[p.name] != null}">
+		            <h:selectOneMenu value="#{ruleEditBean.targetPropertyMap[p.name]}" rendered="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties != null}">
 		            	<s:selectItems value="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties}"
-		            					var="prop" label="#{prop}" />
+		            					var="prop" label="#{prop.label}" itemValue="#{prop}"/>
+		            	<f:converter converterId="propertyContainerConverter"/>
+		            	<a:support event="onchange" reRender="inParams"/>
 		            </h:selectOneMenu>
 
 		            

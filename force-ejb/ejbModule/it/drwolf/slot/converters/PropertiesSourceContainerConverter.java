@@ -20,9 +20,13 @@ public class PropertiesSourceContainerConverter implements Converter {
 	public Object getAsObject(FacesContext context, UIComponent component,
 			String string) {
 
-		String[] splitted = string.split(":");
-		String clazz = splitted[0];
-		Long id = new Long(splitted[1]);
+		int splitIndex = string.indexOf(":");
+		String clazz = string.substring(0, splitIndex);
+
+		// String[] splitted = string.split(":");
+		// String clazz = splitted[0];
+		// Long id = new Long(splitted[1]);
+		Long id = new Long(string.substring(splitIndex + 1));
 
 		EntityManager entityManager = (EntityManager) org.jboss.seam.Component
 				.getInstance("entityManager");
