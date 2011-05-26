@@ -4,6 +4,7 @@ import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -16,15 +17,32 @@ public class TimeValidity implements IRuleVerifier {
 	final private List<VerifierParameter> params = new ArrayList<VerifierParameter>();
 
 	public TimeValidity() {
-		params.add(new VerifierParameter(this.EXPIRATION_DATE, DataType.DATE));
-		params.add(new VerifierParameter(this.DATE_TO_VERIFY, DataType.DATE));
+		params.add(new VerifierParameter(this.EXPIRATION_DATE,
+				"Expiration Date", DataType.DATE));
+		params.add(new VerifierParameter(this.DATE_TO_VERIFY, "Date To Verify",
+				DataType.DATE));
 	}
 
 	public Boolean verify(Map<String, Object> params) {
-		Date expirationDate = (Date) params.get(this.EXPIRATION_DATE);
-		Date dateToVerify = (Date) params.get(this.DATE_TO_VERIFY);
+		Object expirationDateObj = params.get(this.EXPIRATION_DATE);
+		Date expirationDate = null;
+		if (expirationDateObj instanceof Calendar) {
+			Calendar expirationDateCalendar = (Calendar) expirationDateObj;
+			expirationDate = expirationDateCalendar.getTime();
+		} else if (expirationDateObj instanceof Date) {
+			expirationDate = (Date) expirationDateObj;
+		}
 
-		if (dateToVerify.after(expirationDate))
+		Object dateToVerifyObj = params.get(this.DATE_TO_VERIFY);
+		Date dateToVerify = null;
+		if (dateToVerifyObj instanceof Calendar) {
+			Calendar dateToVerifyCalendar = (Calendar) dateToVerifyObj;
+			dateToVerify = dateToVerifyCalendar.getTime();
+		} else if (expirationDateObj instanceof Date) {
+			dateToVerify = (Date) dateToVerifyObj;
+		}
+
+		if (dateToVerify.before(expirationDate))
 			return false;
 		else
 			return true;

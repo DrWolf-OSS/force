@@ -10,8 +10,12 @@ import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
+import it.drwolf.slot.entity.Rule;
+import it.drwolf.slot.entity.SlotDef;
+import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
+import it.drwolf.slot.ruleverifier.RuleParametersResolver;
 import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
@@ -19,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -77,6 +82,9 @@ public class SlotInstEditBean {
 
 	@In(create = true)
 	private Preferences preferences;
+
+	@In(create = true)
+	private RuleParametersResolver ruleParametersResolver;
 
 	private List<PropertyInst> propertyInsts;
 
@@ -217,6 +225,12 @@ public class SlotInstEditBean {
 	}
 
 	public void save() {
+		boolean passed = verify();
+		if (!passed) {
+			FacesMessages.instance().add("Rules not verified!");
+			return;
+		}
+
 		slotInstHome.getInstance().setPropertyInsts(
 				new HashSet<PropertyInst>(this.propertyInsts));
 
@@ -560,6 +574,188 @@ public class SlotInstEditBean {
 		datas.get(docDefCollectionId).add(container);
 	}
 
+	private boolean verify() {
+		SlotDef slotDef = this.slotDefHome.getInstance();
+		Set<Rule> rules = slotDef.getRules();
+		boolean passed = false;
+		for (Rule rule : rules) {
+			Map<String, String> parametersMap = rule.getParametersMap();
+			IRuleVerifier verifier = rule.getVerifier();
+			List<Map<String, Object>> paramenterValues = retrieveParamenterValues(parametersMap);
+			for (Map<String, Object> map : paramenterValues) {
+				passed = verifier.verify(map);
+			}
+		}
+		return passed;
+	}
+
+	// funziona solo con regole che abbiano almeno un param in una docdefcoll
+	// (filecontainer), non funziona se tutti i param sono dullo slot
+	private List<Map<String, Object>> retrieveParamenterValues(
+			Map<String, String> parametersMap) {
+		Map<FileContainer, Map<String, Object>> fileContainersPropertiesMap = new HashMap<FileContainer, Map<String, Object>>();
+		Map<String, Object> singleMap = new HashMap<String, Object>();
+
+		Map<String, Couple> collectionsParameterDefs = new HashMap<String, SlotInstEditBean.Couple>();
+		Map<String, Couple> slotParameterDefs = new HashMap<String, SlotInstEditBean.Couple>();
+
+		Set<String> keySet = parametersMap.keySet();
+		for (String paramName : keySet) {
+			String encodedParams = parametersMap.get(paramName);
+			String[] splitted = encodedParams.split("\\|");
+			String source = splitted[0];
+			String field = splitted[1];
+			Object sourceDef = ruleParametersResolver.resolveSourceDef(source);
+			Object fieldDef = ruleParametersResolver.resolveFieldDef(field);
+			if (sourceDef instanceof DocDefCollection) {
+				collectionsParameterDefs.put(paramName, new Couple(sourceDef,
+						fieldDef));
+			} else if (sourceDef instanceof SlotDef) {
+				slotParameterDefs.put(paramName,
+						new Couple(sourceDef, fieldDef));
+			}
+		}
+
+		Set<String> collectionsKeys = collectionsParameterDefs.keySet();
+		for (String paramName : collectionsKeys) {
+			Couple couple = collectionsParameterDefs.get(paramName);
+			Object sourceDef = couple.getSourceDef();
+			Object fieldDef = couple.getFieldDef();
+
+			Property property = (Property) fieldDef;
+			DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
+			List<FileContainer> list = datas.get(docDefCollection.getId());
+			for (FileContainer fileContainer : list) {
+				List<EmbeddedPropertyInst> embeddedProperties = fileContainer
+						.getEmbeddedProperties();
+				Iterator<EmbeddedPropertyInst> iterator = embeddedProperties
+						.iterator();
+				boolean found = false;
+				while (iterator.hasNext() && found == false) {
+					EmbeddedPropertyInst embeddedPropertyInst = iterator.next();
+					if (embeddedPropertyInst.getProperty().equals(property)) {
+						Object value = embeddedPropertyInst.getValue();
+						Map<String, Object> valuesMap = fileContainersPropertiesMap
+								.get(fileContainer);
+						if (valuesMap == null) {
+							valuesMap = new HashMap<String, Object>();
+							fileContainersPropertiesMap.put(fileContainer,
+									valuesMap);
+						}
+						valuesMap.put(paramName, value);
+						found = true;
+					}
+				}
+			}
+		}
+
+		Set<String> slotKeys = slotParameterDefs.keySet();
+		for (String paramName : slotKeys) {
+			Couple couple = slotParameterDefs.get(paramName);
+			// Object sourceDef = couple.getSourceDef();
+			Object fieldDef = couple.getFieldDef();
+			PropertyDef propertyDef = (PropertyDef) fieldDef;
+			Iterator<PropertyInst> iterator = this.getPropertyInsts()
+					.iterator();
+			boolean found = false;
+			while (iterator.hasNext() && found == false) {
+				PropertyInst propertyInst = iterator.next();
+				if (propertyInst.getPropertyDef().equals(propertyDef)) {
+					Object value = propertyInst.getValue();
+					Collection<Map<String, Object>> mapValues = fileContainersPropertiesMap
+							.values();
+					if (!mapValues.isEmpty()) {
+						for (Map<String, Object> tmpmap : mapValues) {
+							tmpmap.put(paramName, value);
+						}
+					} else {
+						singleMap.put(paramName, value);
+					}
+					found = true;
+				}
+			}
+		}
+
+		if (!fileContainersPropertiesMap.values().isEmpty()) {
+			return new ArrayList<Map<String, Object>>(
+					fileContainersPropertiesMap.values());
+		} else {
+			ArrayList<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+			resultList.add(singleMap);
+			return resultList;
+		}
+
+	}
+
+	// funziona solo con regole che abbiano almeno un param in una docdefcoll
+	// (filecontainer), non funziona se tutti i param sono dullo slot
+	private List<Map<String, Object>> retrieveParamenterValuesOLD(
+			Map<String, String> parametersMap) {
+		Map<FileContainer, Map<String, Object>> fileContainersPropertiesMap = new HashMap<FileContainer, Map<String, Object>>();
+		Map<String, Object> singleMap = new HashMap<String, Object>();
+		Map<DocDefCollection, Property> docDefCollectionMap = new HashMap<DocDefCollection, Property>();
+
+		Set<String> keySet = parametersMap.keySet();
+		for (String paramName : keySet) {
+			String encodedParams = parametersMap.get(paramName);
+			String[] splitted = encodedParams.split("\\|");
+			String source = splitted[0];
+			String field = splitted[1];
+			Object sourceDef = ruleParametersResolver.resolveSourceDef(source);
+			Object fieldDef = ruleParametersResolver.resolveFieldDef(field);
+
+			if (sourceDef instanceof DocDefCollection) {
+				Property property = (Property) fieldDef;
+				DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
+				List<FileContainer> list = datas.get(docDefCollection.getId());
+				for (FileContainer fileContainer : list) {
+					List<EmbeddedPropertyInst> embeddedProperties = fileContainer
+							.getEmbeddedProperties();
+					Iterator<EmbeddedPropertyInst> iterator = embeddedProperties
+							.iterator();
+					boolean found = false;
+					while (iterator.hasNext() && found == false) {
+						EmbeddedPropertyInst embeddedPropertyInst = iterator
+								.next();
+						if (embeddedPropertyInst.getProperty().equals(property)) {
+							Object value = embeddedPropertyInst.getValue();
+							Map<String, Object> valuesMap = fileContainersPropertiesMap
+									.get(fileContainer);
+							if (valuesMap == null) {
+								valuesMap = new HashMap<String, Object>();
+								fileContainersPropertiesMap.put(fileContainer,
+										valuesMap);
+							}
+							valuesMap.put(paramName, value);
+							found = true;
+						}
+					}
+				}
+			} else if (sourceDef instanceof SlotDef) {
+				PropertyDef propertyDef = (PropertyDef) fieldDef;
+				Iterator<PropertyInst> iterator = this.getPropertyInsts()
+						.iterator();
+				boolean found = false;
+				while (iterator.hasNext() && found == false) {
+					PropertyInst propertyInst = iterator.next();
+					if (propertyInst.getPropertyDef().equals(propertyDef)) {
+						Object value = propertyInst.getValue();
+						Collection<Map<String, Object>> mapValues = fileContainersPropertiesMap
+								.values();
+						for (Map<String, Object> tmpmap : mapValues) {
+							tmpmap.put(paramName, value);
+						}
+						found = true;
+					}
+				}
+			}
+
+		}
+
+		return new ArrayList<Map<String, Object>>(
+				fileContainersPropertiesMap.values());
+	}
+
 	public List<PropertyInst> getPropertyInsts() {
 		return propertyInsts;
 	}
@@ -676,6 +872,33 @@ public class SlotInstEditBean {
 			this.embeddedProperties = embeddedProperties;
 		}
 
+	}
+
+	public class Couple {
+		private Object sourceDef;
+		private Object fieldDef;
+
+		public Couple(Object sourceDef, Object fieldDef) {
+			super();
+			this.sourceDef = sourceDef;
+			this.fieldDef = fieldDef;
+		}
+
+		public Object getSourceDef() {
+			return sourceDef;
+		}
+
+		public void setSourceDef(Object sourceDef) {
+			this.sourceDef = sourceDef;
+		}
+
+		public Object getFieldDef() {
+			return fieldDef;
+		}
+
+		public void setFieldDef(Object fieldDef) {
+			this.fieldDef = fieldDef;
+		}
 	}
 
 }

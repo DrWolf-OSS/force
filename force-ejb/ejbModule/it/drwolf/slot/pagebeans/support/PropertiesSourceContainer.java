@@ -6,9 +6,11 @@ import it.drwolf.slot.entity.DocDef;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.SlotDef;
+import it.drwolf.slot.enums.DataType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -101,6 +103,16 @@ public class PropertiesSourceContainer {
 			slotPropertiesAsList.add(propertyContainer);
 		}
 		this.setProperties(slotPropertiesAsList);
+	}
+
+	public boolean hasPropertiesOfType(DataType type) {
+		Iterator<PropertyContainer> iterator = this.properties.iterator();
+		while (iterator.hasNext()) {
+			PropertyContainer propertyContainer = iterator.next();
+			if (propertyContainer.getType().equals(type))
+				return true;
+		}
+		return false;
 	}
 
 	@Override

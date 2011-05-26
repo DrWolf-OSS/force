@@ -20,7 +20,7 @@
                 <ui:define name="label">Type</ui:define>
                 <h:selectOneMenu id="ruleType" value="#{ruleHome.instance.type}" >
                     	<s:selectItems value="#{ruleTypes}" 
-						var="type" label="#{type.value()}" noSelectionLabel="-- select type --"/>
+						var="type" label="#{type.value()}" noSelectionLabel="-- select rule type --"/>
 					<a:support event="onchange" actionListener="#{ruleEditBean.ruleTypeListener}" reRender="inParams"/>
              	</h:selectOneMenu>
             </s:decorate>
@@ -33,23 +33,22 @@
                 
                 <ui:repeat var="p" value="#{ruleHome.instance.verifier.inParams}">
                 <s:div>
-                	<h:outputText value="#{p.name}"/>
+                	<h:outputText value="#{p.label}"/>
                 	&#160;#{messages.left}#{messages.left}&#160;
 	                <h:selectOneMenu value="#{ruleEditBean.targetPropertiesSourceMap[p.name]}" rendered="#{ruleEditBean.sourcePropertiesSourceMap[p.name] != null}">
 		            	<s:selectItems value="#{ruleEditBean.sourcePropertiesSourceMap[p.name]}"
-		            					var="sourceContainer" label="#{sourceContainer.label}" itemValue="#{sourceContainer}"/>
+		            					var="sourceContainer" label="#{sourceContainer.label}" itemValue="#{sourceContainer}" 
+		            					disabled="#{not sourceContainer.hasPropertiesOfType(p.type)}" noSelectionLabel="-- select a collection or a slot --"/>
 		            	<f:converter converterId="propertiesSourceContainerConverter"/>
 		            <a:support event="onchange" reRender="inParams"/>
 		            </h:selectOneMenu>
 		            &#160; : &#160;
 		            <h:selectOneMenu value="#{ruleEditBean.targetPropertyMap[p.name]}" rendered="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties != null}">
 		            	<s:selectItems value="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties}"
-		            					var="prop" label="#{prop.label}" itemValue="#{prop}"/>
+		            					var="prop" label="#{prop.label}" itemValue="#{prop}" disabled="#{prop.type != p.type}"/>
 		            	<f:converter converterId="propertyContainerConverter"/>
 		            	<a:support event="onchange" reRender="inParams"/>
 		            </h:selectOneMenu>
-
-		            
 	            </s:div>
 	            </ui:repeat>
 	            </h:panelGrid>
@@ -70,7 +69,7 @@
 
             <h:commandButton id="save"
                           value="Save"
-                         action="#{ruleHome.persist}"
+                         action="#{ruleEditBean.save()}"
                        disabled="#{!ruleHome.wired}"
                        rendered="#{!ruleHome.managed}"/>
 

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.faces.event.ActionEvent;
@@ -25,6 +26,7 @@ import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
 
 @Name("ruleEditBean")
 @Scope(ScopeType.CONVERSATION)
@@ -36,44 +38,12 @@ public class RuleEditBean {
 	@In(create = true)
 	private RuleHome ruleHome;
 
-	// @In(create = true)
-	// private CustomModelController customModelController;
-
 	private RuleListener ruleListener = new RuleListener();
-
-	// private DocDefCollection activeCollection;
-
-	// private HashMap<Long, List<PropertyContainer>> properties = new
-	// HashMap<Long, List<PropertyContainer>>();
 
 	private HashMap<String, List<PropertiesSourceContainer>> sourcePropertiesSourceMap = new HashMap<String, List<PropertiesSourceContainer>>();
 
 	private HashMap<String, PropertiesSourceContainer> targetPropertiesSourceMap = new HashMap<String, PropertiesSourceContainer>();
 	private HashMap<String, PropertyContainer> targetPropertyMap = new HashMap<String, PropertyContainer>();
-
-	// public void init() {
-	// SlotDef slotDef = slotDefHome.getInstance();
-	// Set<DocDefCollection> docDefCollections = slotDef
-	// .getDocDefCollections();
-	// for (DocDefCollection collection : docDefCollections) {
-	//
-	// Set<Property> aspectProperties = new HashSet<Property>();
-	// DocDef docDef = collection.getDocDef();
-	// Set<String> aspectIds = docDef.getAspectIds();
-	// for (String aspectId : aspectIds) {
-	// aspectProperties.addAll(customModelController
-	// .getProperties(aspectId));
-	// }
-	//
-	// ArrayList<PropertyContainer> aspectPropertiesAsList = new
-	// ArrayList<PropertyContainer>();
-	// for (Property property : aspectProperties) {
-	// PropertyContainer container = new PropertyContainer(property);
-	// aspectPropertiesAsList.add(container);
-	// }
-	// properties.put(docDef.getId(), aspectPropertiesAsList);
-	// }
-	// }
 
 	@Factory("ruleTypes")
 	public List<RuleType> getRuleTypes() {
@@ -104,167 +74,45 @@ public class RuleEditBean {
 				sourcePropertiesSourceMap.put(verifierParameter.getName(),
 						propertiesSourceContainerList);
 			}
-
-			System.out.println("---> assigned listener " + verifier);
+			// System.out.println("---> assigned listener " + verifier);
 		}
 	}
 
-	// public DocDefCollection getActiveCollection() {
-	// return activeCollection;
-	// }
-	//
-	// public void setActiveCollection(DocDefCollection activeCollection) {
-	// this.activeCollection = activeCollection;
-	// }
+	public void save() {
+		boolean error = false;
+		Rule rule = ruleHome.getInstance();
+		IRuleVerifier verifier = rule.getVerifier();
+		Map<String, String> parametersMap = rule.getParametersMap();
+		if (verifier != null) {
+			for (VerifierParameter parameter : verifier.getInParams()) {
+				if (this.targetPropertiesSourceMap.get(parameter.getName()) != null
+						&& this.targetPropertyMap.get(parameter.getName()) != null) {
+					String encodedRule = "";
+					PropertiesSourceContainer propertiesSourceContainer = this.targetPropertiesSourceMap
+							.get(parameter.getName());
+					encodedRule = encodedRule.concat(propertiesSourceContainer
+							.toString());
+					PropertyContainer propertyContainer = this.targetPropertyMap
+							.get(parameter.getName());
+					encodedRule = encodedRule.concat("|"
+							+ propertyContainer.toString());
+					parametersMap.put(parameter.getName(), encodedRule);
+				} else {
+					error = true;
+					FacesMessages.instance().add(
+							"\"" + parameter.getLabel() + "\" not compiled");
+				}
+			}
+		} else {
+			error = true;
+			FacesMessages.instance().add(
+					"Select a rule type and compile the rule");
+		}
 
-	// public List<Property> getProperties(Long docDefCollectionId) {
-	// Set<String> aspectIds = activeCollection.getDocDef().getAspectIds();
-	// Set<Property> properties = new HashSet<Property>();
-	// for (String aspectId : aspectIds) {
-	// properties.addAll(customModelController.getProperties(aspectId));
-	// }
-	// return new ArrayList<Property>(properties);
-	// }
-
-	// public class PropertyContainer {
-	//
-	// private Property property;
-	// private PropertyDef propertyDef;
-	//
-	// public PropertyContainer(PropertyDef propertyDef) {
-	// super();
-	// this.propertyDef = propertyDef;
-	// }
-	//
-	// public PropertyContainer(Property property) {
-	// super();
-	// this.property = property;
-	// }
-	//
-	// public Property getProperty() {
-	// return property;
-	// }
-	//
-	// public void setProperty(Property property) {
-	// this.property = property;
-	// }
-	//
-	// public PropertyDef getPropertyDef() {
-	// return propertyDef;
-	// }
-	//
-	// public void setPropertyDef(PropertyDef propertyDef) {
-	// this.propertyDef = propertyDef;
-	// }
-	//
-	// public String getLabel() {
-	// if (property != null) {
-	// return property.getTitle();
-	// } else if (propertyDef != null) {
-	// return propertyDef.getName();
-	// }
-	// return "";
-	// }
-	//
-	// @Override
-	// public String toString() {
-	// if (property != null) {
-	// return "Property:" + property.getTitle();
-	// } else if (propertyDef != null) {
-	// return "PropertyDef:" + propertyDef.getName();
-	// }
-	// return "";
-	// }
-	//
-	// }
-
-	// public class PropertiesSourceContainer {
-	// private SlotDef slotDef;
-	// private DocDefCollection docDefCollection;
-	// private List<PropertyContainer> properties;
-	//
-	// public PropertiesSourceContainer(Object object) {
-	// if (object instanceof DocDefCollection) {
-	// this.docDefCollection = (DocDefCollection) object;
-	// initPropertiesAsCollection();
-	// } else if (object instanceof SlotDef) {
-	// this.slotDef = (SlotDef) object;
-	// }
-	// }
-	//
-	// public PropertiesSourceContainer(DocDefCollection docDefCollection) {
-	// super();
-	// this.docDefCollection = docDefCollection;
-	// initPropertiesAsCollection();
-	// }
-	//
-	// public PropertiesSourceContainer(SlotDef slotDef) {
-	// super();
-	// this.slotDef = slotDef;
-	// }
-	//
-	// public SlotDef getSlotDef() {
-	// return slotDef;
-	// }
-	//
-	// public void setSlotDef(SlotDef slotDef) {
-	// this.slotDef = slotDef;
-	// }
-	//
-	// public DocDefCollection getDocDefCollection() {
-	// return docDefCollection;
-	// }
-	//
-	// public void setDocDefCollection(DocDefCollection docDefCollection) {
-	// this.docDefCollection = docDefCollection;
-	// }
-	//
-	// public List<PropertyContainer> getProperties() {
-	// return properties;
-	// }
-	//
-	// public void setProperties(List<PropertyContainer> properties) {
-	// this.properties = properties;
-	// }
-	//
-	// public String getLabel() {
-	// if (slotDef != null) {
-	// return slotDef.getName();
-	// } else if (docDefCollection != null) {
-	// return docDefCollection.getName();
-	// }
-	// return "";
-	// }
-	//
-	// private void initPropertiesAsCollection() {
-	// Set<Property> aspectProperties = new HashSet<Property>();
-	// DocDef docDef = this.docDefCollection.getDocDef();
-	// Set<String> aspectIds = docDef.getAspectIds();
-	// for (String aspectId : aspectIds) {
-	// aspectProperties.addAll(customModelController
-	// .getProperties(aspectId));
-	// }
-	//
-	// ArrayList<PropertyContainer> aspectPropertiesAsList = new
-	// ArrayList<PropertyContainer>();
-	// for (Property property : aspectProperties) {
-	// PropertyContainer container = new PropertyContainer(property);
-	// aspectPropertiesAsList.add(container);
-	// }
-	// this.setProperties(aspectPropertiesAsList);
-	// }
-	//
-	// @Override
-	// public String toString() {
-	// if (slotDef != null) {
-	// return "SlotDef:" + slotDef.getId();
-	// } else if (docDefCollection != null) {
-	// return "DocDefCollection:" + docDefCollection.getId();
-	// }
-	// return "";
-	// }
-	//
-	// }
+		if (!error) {
+			ruleHome.persist();
+		}
+	}
 
 	public HashMap<String, List<PropertiesSourceContainer>> getSourcePropertiesSourceMap() {
 		return sourcePropertiesSourceMap;

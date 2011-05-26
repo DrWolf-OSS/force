@@ -6,10 +6,12 @@ public class VerifierParameter {
 
 	private String name;
 	private DataType type;
+	private String label;
 
-	public VerifierParameter(String name, DataType type) {
+	public VerifierParameter(String name, String label, DataType type) {
 		super();
 		this.name = name;
+		this.label = label;
 		this.type = type;
 	}
 
@@ -29,9 +31,19 @@ public class VerifierParameter {
 		this.type = type;
 	}
 
+	public String getLabel() {
+		if (this.label != null) {
+			return label;
+		}
+		return name;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
 	@Override
 	public String toString() {
 		return name;
 	}
-
 }

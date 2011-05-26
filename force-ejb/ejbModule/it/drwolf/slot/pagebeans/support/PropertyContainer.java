@@ -2,6 +2,7 @@ package it.drwolf.slot.pagebeans.support;
 
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.entity.PropertyDef;
+import it.drwolf.slot.enums.DataType;
 
 public class PropertyContainer {
 
@@ -49,6 +50,23 @@ public class PropertyContainer {
 			return propertyDef.getName();
 		}
 		return "";
+	}
+
+	public DataType getType() {
+		if (propertyDef != null) {
+			return propertyDef.getType();
+		} else if (property != null) {
+			String type = property.getType();
+			if (type.equals("d:text"))
+				return DataType.STRING;
+			else if (type.equals("d:int"))
+				return DataType.INTEGER;
+			else if (type.equals("d:boolean"))
+				return DataType.BOOLEAN;
+			else if (type.equals("d:date"))
+				return DataType.DATE;
+		}
+		return null;
 	}
 
 	@Override
