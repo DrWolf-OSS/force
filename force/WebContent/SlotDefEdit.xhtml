@@ -31,6 +31,24 @@
              	</h:selectOneMenu>
             </s:decorate>
             
+            <s:div id="embeddedProperties">
+			<c:forEach var="embeddedProp" items="#{slotDefEditBean.embeddedProperties}">
+				<s:decorate template="/layout/display.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="#{embeddedProp.name}" />
+					</ui:define>
+					<h:outputText value="#{embeddedProp.stringValue}" rendered="#{embeddedProp.type == 'STRING'}"/>
+					<h:outputText value="#{embeddedProp.integerValue}" rendered="#{embeddedProp.type == 'INTEGER'}"/>
+					<h:outputText value="#{embeddedProp.booleanValue ? 'true' : 'false'}" rendered="#{embeddedProp.type == 'BOOLEAN'}"/>
+					<h:outputText value="#{embeddedProp.dateValue}" rendered="#{embeddedProp.type == 'DATE'}">
+                		<s:convertDateTime type="date" dateStyle="short"/>
+            		</h:outputText>
+            		<a:commandButton value="remove" action="#{slotDefEditBean.removeEmbeddedProp(embeddedProp)}" reRender="embeddedProperties"/>
+		            <a:commandButton value="edit" action="#{slotDefEditBean.editEmbeddedProp(embeddedProp)}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel"/>
+	            </s:decorate>			
+			</c:forEach>
+			</s:div>
+            
             <s:div id="properties">
 				<c:forEach var="prop" items="#{slotDefEditBean.properties}">
 					<s:decorate template="/layout/display.xhtml">
@@ -45,6 +63,7 @@
 			</s:div>
 			
 			<div style="clear:both"/>
+			<ui:remove>
 			<rich:dataTable value="#{slotDefEditBean.properties}" var="prop">
 				<f:facet name="header">Properties table</f:facet>
 				<rich:column>
@@ -62,8 +81,9 @@
 		             <a:commandLink value="edit" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" reRender="propPanel"/>
 				</rich:column>
 			</rich:dataTable>
+			</ui:remove>
 			
-			
+
 			<s:div id="collections">
 			<c:forEach var="coll" items="#{slotDefEditBean.collections}">
 				<s:decorate template="/layout/display.xhtml">
@@ -77,10 +97,12 @@
 			</c:forEach>
 			</s:div>
 			
+			
 			<div style="clear:both"/>
 			<a:commandButton value="add property" action="#{slotDefEditBean.newPoperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="propPanel"/>
 			<a:commandButton value="add collection" action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel"/>
-
+			<a:commandButton value="add embeddedProperty" action="#{slotDefEditBean.newEmbeddedProperty()}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel"/>
+			
             <div style="clear:both">
                 <span class="required">*</span>
                 required fields
@@ -120,74 +142,7 @@
                 rendered="#{!slotDefHome.managed}"/>
 
         </div>
-        
-       <rich:modalPanel id="propPanel" autosized="true" width="400" 
-			moveable="false" resizeable="false">
-			<f:facet name="header">
-				<h:outputText value="Add Property" />
-			</f:facet>
-			<s:div>
-				<s:decorate template="/layout/edit.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="Property Name" />
-					</ui:define>
-					<h:inputText value="#{slotDefEditBean.propertyDef.name}" />
-	            </s:decorate>
-	            <s:decorate template="/layout/edit.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="Property Data Type" />
-					</ui:define>
-					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.propertyDef.type}" >
-                    	<s:selectItems value="#{dataTypes}" 
-						var="type" label="#{type}"/>
-             		</h:selectOneMenu>
-	            </s:decorate>
-	        </s:div>
-	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" onclick="#{rich:component('propPanel')}.hide()" reRender="properties,propPanel"/>
-			<a:commandButton value="Cancel" onclick="#{rich:component('propPanel')}.hide()"/>
-		</rich:modalPanel>
-		
-		
-		<rich:modalPanel id="collPanel" autosized="true" width="400" 
-			moveable="false" resizeable="false">
-			<f:facet name="header">
-				<h:outputText value="Add Collection" />
-			</f:facet>
-			<s:div>
-				<s:decorate template="/layout/edit.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="Collection Name" />
-					</ui:define>
-					<h:inputText value="#{slotDefEditBean.collection.name}" />
-	            </s:decorate>
-	            <s:decorate template="/layout/edit.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="Max" />
-					</ui:define>
-					<h:inputText value="#{slotDefEditBean.collection.max}" />
-	            </s:decorate>
-	            <s:decorate template="/layout/edit.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="Min" />
-					</ui:define>
-					<h:inputText value="#{slotDefEditBean.collection.min}" />
-	            </s:decorate>
-	            <s:decorate template="/layout/edit.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="DocDef Type" />
-					</ui:define>
-					<h:selectOneMenu id="cDocDef" value="#{slotDefEditBean.collection.docDef}" >
-                    	<s:selectItems value="#{docDefList.resultList}" 
-						var="docDef" label="#{docDef.name}"/>
-						<s:convertEntity/>
-             		</h:selectOneMenu>
-	            </s:decorate>
-	        </s:div>
-	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addCollection()}" onclick="#{rich:component('collPanel')}.hide()" reRender="collections,collPanel"/>
-			<a:commandButton value="Cancel" onclick="#{rich:component('collPanel')}.hide()"/>
-		</rich:modalPanel>
+
     </h:form>
 
 <rich:tabPanel switchType="client">
@@ -207,17 +162,17 @@
                     <f:facet name="header">Id</f:facet>
                     <h:outputText value="#{_docDefCollection.id}"/>
                 </rich:column>
-                <rich:column sortBy="#{_docDefCollection.max}">
-                    <f:facet name="header">Max</f:facet>
-                    <h:outputText value="#{_docDefCollection.max}"/>
+                <rich:column sortBy="#{_docDefCollection.name}">
+                    <f:facet name="header">Name</f:facet>
+                    <h:outputText value="#{_docDefCollection.name}"/>
                 </rich:column>
                 <rich:column sortBy="#{_docDefCollection.min}">
                     <f:facet name="header">Min</f:facet>
                     <h:outputText value="#{_docDefCollection.min}"/>
                 </rich:column>
-                <rich:column sortBy="#{_docDefCollection.name}">
-                    <f:facet name="header">Name</f:facet>
-                    <h:outputText value="#{_docDefCollection.name}"/>
+                <rich:column sortBy="#{_docDefCollection.max}">
+                    <f:facet name="header">Max</f:facet>
+                    <h:outputText value="#{_docDefCollection.max}"/>
                 </rich:column>
             </rich:dataTable>
 
@@ -316,6 +271,123 @@
     </rich:tab>
 </rich:tabPanel>
 
+       <rich:modalPanel id="propPanel" autosized="true" width="400" 
+			moveable="false" resizeable="false">
+			<f:facet name="header">
+				<h:outputText value="Add Property" />
+			</f:facet>
+			<a:form>
+			<s:div>
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Property Name" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.propertyDef.name}" />
+	            </s:decorate>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Property Data Type" />
+					</ui:define>
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.propertyDef.type}" >
+                    	<s:selectItems value="#{dataTypes}" 
+						var="type" label="#{type}"/>
+             		</h:selectOneMenu>
+	            </s:decorate>
+	        </s:div>
+	        <div style="clear:both"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" onclick="#{rich:component('propPanel')}.hide()" reRender="properties,propPanel"/>
+			<a:commandButton value="Cancel" onclick="#{rich:component('propPanel')}.hide()"/>
+			</a:form>
+		</rich:modalPanel>
+		
+
+		<rich:modalPanel id="embeddedPropPanel" autosized="true" width="400" 
+			moveable="false" resizeable="false">
+			<f:facet name="header">
+				<h:outputText value="Add Embedded Property" />
+			</f:facet>
+			<a:form id="epForm">
+			<s:div id="embeddedPropValue">
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Property Name" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.embeddedProperty.name}" />
+	            </s:decorate>
+	            <s:decorate template="/layout/display.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Property Data Type" />
+					</ui:define>
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.type}">
+                    	<s:selectItems value="#{dataTypes}" var="type" label="#{type}"
+							noSelectionLabel="-- select a type --"/>
+						<s:convertEnum/>
+					<a:support event="onchange" reRender="epForm"/>
+             		</h:selectOneMenu>
+	            </s:decorate>
+	            <s:div rendered="#{slotDefEditBean.embeddedProperty.type != null}">
+		            <s:decorate template="/layout/edit.xhtml">
+		                <ui:define name="label">
+		                	<h:outputText value="Value" />
+						</ui:define>
+						<h:inputText value="#{slotDefEditBean.embeddedProperty.stringValue}" rendered="#{slotDefEditBean.embeddedProperty.type == 'STRING'}"/>
+						<h:inputText value="#{slotDefEditBean.embeddedProperty.integerValue}" rendered="#{slotDefEditBean.embeddedProperty.type == 'INTEGER'}"/>
+						<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.booleanValue}" rendered="#{slotDefEditBean.embeddedProperty.type == 'BOOLEAN'}"/>
+						<rich:calendar id="subscriptionDate" mode="client"
+	                          value="#{slotDefEditBean.embeddedProperty.dateValue}"
+	                          datePattern="dd/MM/yyyy"
+	                          rendered="#{slotDefEditBean.embeddedProperty.type == 'DATE'}"/>
+		            </s:decorate>
+	            </s:div>
+	        </s:div>
+	        <div style="clear:both"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addEmbeddedProperty()}" onclick="#{rich:component('embeddedPropPanel')}.hide()" reRender="embeddedProperties,propPanel,embeddedPropPanel"/>
+			<a:commandButton value="Cancel" onclick="#{rich:component('embeddedPropPanel')}.hide()"/>
+			</a:form>
+		</rich:modalPanel>
+		
+		
+		<rich:modalPanel id="collPanel" autosized="true" width="400" 
+			moveable="false" resizeable="false">
+			<f:facet name="header">
+				<h:outputText value="Add Collection" />
+			</f:facet>
+			<a:form>
+			<s:div>
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Collection Name" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.collection.name}" />
+	            </s:decorate>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Min" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.collection.min}" />
+	            </s:decorate>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Max" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.collection.max}" />
+	            </s:decorate>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="DocDef Type" />
+					</ui:define>
+					<h:selectOneMenu id="cDocDef" value="#{slotDefEditBean.collection.docDef}" >
+                    	<s:selectItems value="#{docDefList.resultList}" 
+						var="docDef" label="#{docDef.name}"/>
+						<s:convertEntity/>
+             		</h:selectOneMenu>
+	            </s:decorate>
+	        </s:div>
+	        <div style="clear:both"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addCollection()}" onclick="#{rich:component('collPanel')}.hide()" reRender="collections,collPanel"/>
+			<a:commandButton value="Cancel" onclick="#{rich:component('collPanel')}.hide()"/>
+			</a:form>
+		</rich:modalPanel>
 
 		
 </ui:define>

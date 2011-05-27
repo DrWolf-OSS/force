@@ -589,19 +589,17 @@ public class SlotInstEditBean {
 		return passed;
 	}
 
-	// funziona solo con regole che abbiano almeno un param in una docdefcoll
-	// (filecontainer), non funziona se tutti i param sono dullo slot
 	private List<Map<String, Object>> retrieveParamenterValues(
-			Map<String, String> parametersMap) {
+			Map<String, String> encodedParametersMap) {
 		Map<FileContainer, Map<String, Object>> fileContainersPropertiesMap = new HashMap<FileContainer, Map<String, Object>>();
 		Map<String, Object> singleMap = new HashMap<String, Object>();
 
 		Map<String, Couple> collectionsParameterDefs = new HashMap<String, SlotInstEditBean.Couple>();
 		Map<String, Couple> slotParameterDefs = new HashMap<String, SlotInstEditBean.Couple>();
 
-		Set<String> keySet = parametersMap.keySet();
+		Set<String> keySet = encodedParametersMap.keySet();
 		for (String paramName : keySet) {
-			String encodedParams = parametersMap.get(paramName);
+			String encodedParams = encodedParametersMap.get(paramName);
 			String[] splitted = encodedParams.split("\\|");
 			String source = splitted[0];
 			String field = splitted[1];
@@ -616,6 +614,10 @@ public class SlotInstEditBean {
 			}
 		}
 
+		// Assumo che se un parametro riferisce una collection allora ci sarà
+		// una lista di mappe (una mappa per file contenuto nella collection).
+		// Se invece i parametri riferiscono solo lo slot l'output sarà una sola
+		// mappa
 		Set<String> collectionsKeys = collectionsParameterDefs.keySet();
 		for (String paramName : collectionsKeys) {
 			Couple couple = collectionsParameterDefs.get(paramName);

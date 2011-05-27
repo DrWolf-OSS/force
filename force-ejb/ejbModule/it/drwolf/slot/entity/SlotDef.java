@@ -33,6 +33,8 @@ public class SlotDef {
 
 	private Set<PropertyDef> propertyDefs = new HashSet<PropertyDef>();
 
+	private Set<SlotDefEmbeddedProperty> embeddedProperties = new HashSet<SlotDefEmbeddedProperty>();
+
 	@Id
 	@GeneratedValue
 	public Long getId() {
@@ -103,6 +105,17 @@ public class SlotDef {
 
 	public void setType(SlotDefType type) {
 		this.type = type;
+	}
+
+	@OrderBy("name")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "slotDef")
+	public Set<SlotDefEmbeddedProperty> getEmbeddedProperties() {
+		return embeddedProperties;
+	}
+
+	public void setEmbeddedProperties(
+			Set<SlotDefEmbeddedProperty> embeddedProperties) {
+		this.embeddedProperties = embeddedProperties;
 	}
 
 	// @Override
