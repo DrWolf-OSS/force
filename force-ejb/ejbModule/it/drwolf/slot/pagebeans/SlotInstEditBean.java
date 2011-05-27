@@ -3,7 +3,7 @@ package it.drwolf.slot.pagebeans;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
-import it.drwolf.slot.alfresco.custom.support.EmbeddedPropertyInst;
+import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
 import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInst;
@@ -174,7 +174,7 @@ public class SlotInstEditBean {
 
 	private FileContainer buildContainer(DocDefCollection docDefCollection,
 			Object item, boolean editables) {
-		List<EmbeddedPropertyInst> fileProperties = new ArrayList<EmbeddedPropertyInst>();
+		List<DocumentPropertyInst> fileProperties = new ArrayList<DocumentPropertyInst>();
 		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
 		Set<Property> properties = new HashSet<Property>();
 		// Recupero tutte le properties.
@@ -187,9 +187,9 @@ public class SlotInstEditBean {
 		}
 		if (properties != null) {
 			for (Property p : properties) {
-				EmbeddedPropertyInst embeddedPropertyInst = buildValorisedEmbeddedPropertyInst(
+				DocumentPropertyInst documentPropertyInst = buildValorisedDocumentPropertyInst(
 						item, editables, p);
-				fileProperties.add(embeddedPropertyInst);
+				fileProperties.add(documentPropertyInst);
 			}
 		}
 		FileContainer container = new FileContainer(item);
@@ -212,9 +212,9 @@ public class SlotInstEditBean {
 	// return properties;
 	// }
 
-	private EmbeddedPropertyInst buildValorisedEmbeddedPropertyInst(
+	private DocumentPropertyInst buildValorisedDocumentPropertyInst(
 			Object item, boolean editables, Property p) {
-		EmbeddedPropertyInst embeddedPropertyInst = new EmbeddedPropertyInst(p);
+		DocumentPropertyInst embeddedPropertyInst = new DocumentPropertyInst(p);
 		if (item instanceof AlfrescoDocument) {
 			AlfrescoDocument document = (AlfrescoDocument) item;
 			Object propertyValue = document.getPropertyValue(p.getName());
@@ -423,7 +423,7 @@ public class SlotInstEditBean {
 
 	private String storeOnAlfresco(UploadItem item,
 			DocInstCollection instCollection,
-			List<EmbeddedPropertyInst> embeddedProperties, Folder slotFolder) {
+			List<DocumentPropertyInst> embeddedProperties, Folder slotFolder) {
 		String nodeRef = "";
 		try {
 			Session session = alfrescoUserIdentity.getSession();
@@ -501,7 +501,7 @@ public class SlotInstEditBean {
 
 	private String copyDocumentOnAlfresco(AlfrescoDocument document,
 			DocInstCollection instCollection,
-			List<EmbeddedPropertyInst> embeddedProperties, Folder slotFolder) {
+			List<DocumentPropertyInst> embeddedProperties, Folder slotFolder) {
 		String nodeRef = "";
 
 		Session session = alfrescoUserIdentity.getSession();
@@ -537,9 +537,9 @@ public class SlotInstEditBean {
 	}
 
 	private void updateProperties(AlfrescoDocument document,
-			List<EmbeddedPropertyInst> embeddedProperties) {
+			List<DocumentPropertyInst> embeddedProperties) {
 		Map<String, Object> aspectsProperties = new HashMap<String, Object>();
-		for (EmbeddedPropertyInst embeddedPropertyInst : embeddedProperties) {
+		for (DocumentPropertyInst embeddedPropertyInst : embeddedProperties) {
 			if (embeddedPropertyInst.getValue() != null) {
 				aspectsProperties.put(embeddedPropertyInst.getProperty()
 						.getName(), embeddedPropertyInst.getValue());
@@ -626,13 +626,13 @@ public class SlotInstEditBean {
 			DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
 			List<FileContainer> list = datas.get(docDefCollection.getId());
 			for (FileContainer fileContainer : list) {
-				List<EmbeddedPropertyInst> embeddedProperties = fileContainer
+				List<DocumentPropertyInst> embeddedProperties = fileContainer
 						.getEmbeddedProperties();
-				Iterator<EmbeddedPropertyInst> iterator = embeddedProperties
+				Iterator<DocumentPropertyInst> iterator = embeddedProperties
 						.iterator();
 				boolean found = false;
 				while (iterator.hasNext() && found == false) {
-					EmbeddedPropertyInst embeddedPropertyInst = iterator.next();
+					DocumentPropertyInst embeddedPropertyInst = iterator.next();
 					if (embeddedPropertyInst.getProperty().equals(property)) {
 						Object value = embeddedPropertyInst.getValue();
 						Map<String, Object> valuesMap = fileContainersPropertiesMap
@@ -709,13 +709,13 @@ public class SlotInstEditBean {
 				DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
 				List<FileContainer> list = datas.get(docDefCollection.getId());
 				for (FileContainer fileContainer : list) {
-					List<EmbeddedPropertyInst> embeddedProperties = fileContainer
+					List<DocumentPropertyInst> embeddedProperties = fileContainer
 							.getEmbeddedProperties();
-					Iterator<EmbeddedPropertyInst> iterator = embeddedProperties
+					Iterator<DocumentPropertyInst> iterator = embeddedProperties
 							.iterator();
 					boolean found = false;
 					while (iterator.hasNext() && found == false) {
-						EmbeddedPropertyInst embeddedPropertyInst = iterator
+						DocumentPropertyInst embeddedPropertyInst = iterator
 								.next();
 						if (embeddedPropertyInst.getProperty().equals(property)) {
 							Object value = embeddedPropertyInst.getValue();
@@ -799,7 +799,7 @@ public class SlotInstEditBean {
 	public class FileContainer {
 		private UploadItem uploadItem;
 		private AlfrescoDocument document;
-		private List<EmbeddedPropertyInst> embeddedProperties = new ArrayList<EmbeddedPropertyInst>();
+		private List<DocumentPropertyInst> embeddedProperties = new ArrayList<DocumentPropertyInst>();
 
 		public FileContainer(AlfrescoDocument alfrescoDocument) {
 			super();
@@ -863,12 +863,12 @@ public class SlotInstEditBean {
 			return fileName.concat(extension);
 		}
 
-		public List<EmbeddedPropertyInst> getEmbeddedProperties() {
+		public List<DocumentPropertyInst> getEmbeddedProperties() {
 			return embeddedProperties;
 		}
 
 		public void setEmbeddedProperties(
-				List<EmbeddedPropertyInst> embeddedProperties) {
+				List<DocumentPropertyInst> embeddedProperties) {
 			this.embeddedProperties = embeddedProperties;
 		}
 
