@@ -2,18 +2,22 @@ package it.drwolf.slot.pagebeans.support;
 
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.entity.PropertyDef;
+import it.drwolf.slot.entity.SlotDefEmbeddedProperty;
 import it.drwolf.slot.enums.DataType;
 
 public class PropertyContainer {
 
 	private Property property;
 	private PropertyDef propertyDef;
+	private SlotDefEmbeddedProperty embeddedProperty;
 
 	public PropertyContainer(Object object) {
 		if (object instanceof Property) {
 			this.property = (Property) object;
 		} else if (object instanceof PropertyDef) {
 			this.propertyDef = (PropertyDef) object;
+		} else if (object instanceof SlotDefEmbeddedProperty) {
+			this.embeddedProperty = (SlotDefEmbeddedProperty) object;
 		}
 	}
 
@@ -25,6 +29,11 @@ public class PropertyContainer {
 	public PropertyContainer(Property property) {
 		super();
 		this.property = property;
+	}
+
+	public PropertyContainer(SlotDefEmbeddedProperty embeddedProperty) {
+		super();
+		this.embeddedProperty = embeddedProperty;
 	}
 
 	public Property getProperty() {
@@ -48,6 +57,8 @@ public class PropertyContainer {
 			return property.getTitle();
 		} else if (propertyDef != null) {
 			return propertyDef.getName();
+		} else if (embeddedProperty != null) {
+			return embeddedProperty.getName();
 		}
 		return "";
 	}
@@ -65,6 +76,8 @@ public class PropertyContainer {
 				return DataType.BOOLEAN;
 			else if (type.equals("d:date"))
 				return DataType.DATE;
+		} else if (embeddedProperty != null) {
+			return embeddedProperty.getType();
 		}
 		return null;
 	}
@@ -75,6 +88,8 @@ public class PropertyContainer {
 			return "Property:" + property.getName();
 		} else if (propertyDef != null) {
 			return "PropertyDef:" + propertyDef.getId();
+		} else if (embeddedProperty != null) {
+			return "SlotDefEmbeddedProperty:" + embeddedProperty.getId();
 		}
 		return "";
 	}
@@ -87,6 +102,9 @@ public class PropertyContainer {
 				+ ((property == null) ? 0 : property.hashCode());
 		result = prime * result
 				+ ((propertyDef == null) ? 0 : propertyDef.hashCode());
+		result = prime
+				* result
+				+ ((embeddedProperty == null) ? 0 : embeddedProperty.hashCode());
 		return result;
 	}
 
@@ -109,7 +127,20 @@ public class PropertyContainer {
 				return false;
 		} else if (!propertyDef.equals(other.propertyDef))
 			return false;
+		if (embeddedProperty == null) {
+			if (other.embeddedProperty != null)
+				return false;
+		} else if (!embeddedProperty.equals(other.embeddedProperty))
+			return false;
 		return true;
+	}
+
+	public SlotDefEmbeddedProperty getEmbeddedProperty() {
+		return embeddedProperty;
+	}
+
+	public void setEmbeddedProperty(SlotDefEmbeddedProperty embeddedProperty) {
+		this.embeddedProperty = embeddedProperty;
 	}
 
 }

@@ -12,6 +12,7 @@ import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.SlotDef;
+import it.drwolf.slot.entity.SlotDefEmbeddedProperty;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
@@ -656,24 +657,38 @@ public class SlotInstEditBean {
 			Couple couple = slotParameterDefs.get(paramName);
 			// Object sourceDef = couple.getSourceDef();
 			Object fieldDef = couple.getFieldDef();
-			PropertyDef propertyDef = (PropertyDef) fieldDef;
-			Iterator<PropertyInst> iterator = this.getPropertyInsts()
-					.iterator();
-			boolean found = false;
-			while (iterator.hasNext() && found == false) {
-				PropertyInst propertyInst = iterator.next();
-				if (propertyInst.getPropertyDef().equals(propertyDef)) {
-					Object value = propertyInst.getValue();
-					Collection<Map<String, Object>> mapValues = fileContainersPropertiesMap
-							.values();
-					if (!mapValues.isEmpty()) {
-						for (Map<String, Object> tmpmap : mapValues) {
-							tmpmap.put(paramName, value);
+			if (fieldDef instanceof PropertyDef) {
+				PropertyDef propertyDef = (PropertyDef) fieldDef;
+				Iterator<PropertyInst> iterator = this.getPropertyInsts()
+						.iterator();
+				boolean found = false;
+				while (iterator.hasNext() && found == false) {
+					PropertyInst propertyInst = iterator.next();
+					if (propertyInst.getPropertyDef().equals(propertyDef)) {
+						Object value = propertyInst.getValue();
+						Collection<Map<String, Object>> mapValues = fileContainersPropertiesMap
+								.values();
+						if (!mapValues.isEmpty()) {
+							for (Map<String, Object> tmpmap : mapValues) {
+								tmpmap.put(paramName, value);
+							}
+						} else {
+							singleMap.put(paramName, value);
 						}
-					} else {
-						singleMap.put(paramName, value);
+						found = true;
 					}
-					found = true;
+				}
+			} else if (fieldDef instanceof SlotDefEmbeddedProperty) {
+				SlotDefEmbeddedProperty embeddedProperty = (SlotDefEmbeddedProperty) fieldDef;
+				Object value = embeddedProperty.getValue();
+				Collection<Map<String, Object>> mapValues = fileContainersPropertiesMap
+						.values();
+				if (!mapValues.isEmpty()) {
+					for (Map<String, Object> tmpmap : mapValues) {
+						tmpmap.put(paramName, value);
+					}
+				} else {
+					singleMap.put(paramName, value);
 				}
 			}
 		}
@@ -796,6 +811,11 @@ public class SlotInstEditBean {
 
 	public void setPrimaryDocs(HashMap<Long, List<FileContainer>> primaryDocs) {
 		this.primaryDocs = primaryDocs;
+	}
+
+	public List<SlotDefEmbeddedProperty> getEmbeddedProperties() {
+		return new ArrayList<SlotDefEmbeddedProperty>(this.slotDefHome
+				.getInstance().getEmbeddedProperties());
 	}
 
 	public class FileContainer {

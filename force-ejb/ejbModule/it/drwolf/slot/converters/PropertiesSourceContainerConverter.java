@@ -1,13 +1,11 @@
 package it.drwolf.slot.converters;
 
 import it.drwolf.slot.pagebeans.support.PropertiesSourceContainer;
-
-import java.util.List;
+import it.drwolf.slot.ruleverifier.RuleParametersResolver;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
-import javax.persistence.EntityManager;
 
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.intercept.BypassInterceptors;
@@ -20,26 +18,15 @@ public class PropertiesSourceContainerConverter implements Converter {
 	public Object getAsObject(FacesContext context, UIComponent component,
 			String string) {
 
-		int splitIndex = string.indexOf(":");
-		String clazz = string.substring(0, splitIndex);
+		RuleParametersResolver ruleParametersResolver = (RuleParametersResolver) org.jboss.seam.Component
+				.getInstance("ruleParametersResolver");
+		Object resolvedSourceDef = ruleParametersResolver
+				.resolveSourceDef(string);
 
-		// String[] splitted = string.split(":");
-		// String clazz = splitted[0];
-		// Long id = new Long(splitted[1]);
-		Long id = new Long(string.substring(splitIndex + 1));
+		PropertiesSourceContainer propertiesSourceContainer = new PropertiesSourceContainer(
+				resolvedSourceDef);
+		return propertiesSourceContainer;
 
-		EntityManager entityManager = (EntityManager) org.jboss.seam.Component
-				.getInstance("entityManager");
-		List resultList = entityManager
-				.createQuery("from " + clazz + " as c where c.id=:id")
-				.setParameter("id", id).getResultList();
-		if (resultList != null && !resultList.isEmpty()) {
-			Object object = resultList.get(0);
-			PropertiesSourceContainer propertiesSourceContainer = new PropertiesSourceContainer(
-					object);
-			return propertiesSourceContainer;
-		}
-		return null;
 	}
 
 	public String getAsString(FacesContext context, UIComponent component,

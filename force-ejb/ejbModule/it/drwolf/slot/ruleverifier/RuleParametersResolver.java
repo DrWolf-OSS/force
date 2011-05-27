@@ -35,7 +35,12 @@ public class RuleParametersResolver {
 		int splitIndex = field.indexOf(":");
 		String clazz = field.substring(0, splitIndex);
 
-		if (clazz.equals("PropertyDef")) {
+		if (clazz.equals("Property")) {
+			CustomModelController customModelController = (CustomModelController) org.jboss.seam.Component
+					.getInstance("customModelController");
+			String name = field.substring(splitIndex + 1);
+			return customModelController.getProperty(name);
+		} else {
 			String sid = field.substring(splitIndex + 1);
 			Long id = new Long(sid);
 
@@ -47,12 +52,28 @@ public class RuleParametersResolver {
 			if (resultList != null && !resultList.isEmpty()) {
 				return resultList.get(0);
 			}
-		} else if (clazz.equals("Property")) {
-			CustomModelController customModelController = (CustomModelController) org.jboss.seam.Component
-					.getInstance("customModelController");
-			String name = field.substring(splitIndex + 1);
-			return customModelController.getProperty(name);
 		}
+
+		// if (clazz.equals("PropertyDef")) {
+		// String sid = field.substring(splitIndex + 1);
+		// Long id = new Long(sid);
+		//
+		// EntityManager entityManager = (EntityManager)
+		// org.jboss.seam.Component
+		// .getInstance("entityManager");
+		// List resultList = entityManager
+		// .createQuery("from " + clazz + " as c where c.id=:id")
+		// .setParameter("id", id).getResultList();
+		// if (resultList != null && !resultList.isEmpty()) {
+		// return resultList.get(0);
+		// }
+		// } else if (clazz.equals("Property")) {
+		// CustomModelController customModelController = (CustomModelController)
+		// org.jboss.seam.Component
+		// .getInstance("customModelController");
+		// String name = field.substring(splitIndex + 1);
+		// return customModelController.getProperty(name);
+		// }
 		return null;
 	}
 

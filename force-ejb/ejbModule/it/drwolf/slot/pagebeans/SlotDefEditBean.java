@@ -72,7 +72,6 @@ public class SlotDefEditBean {
 	public void addProperty() {
 		if (!properties.contains(this.propertyDef)) {
 			properties.add(this.propertyDef);
-			// propertyDef = new PropertyDef();
 		}
 	}
 
@@ -84,7 +83,6 @@ public class SlotDefEditBean {
 		if (!this.collections.contains(this.collection)) {
 			collection.setSlotDef(slotDefHome.getInstance());
 			collections.add(this.collection);
-			// collection = new DocDefCollection();
 		}
 	}
 
