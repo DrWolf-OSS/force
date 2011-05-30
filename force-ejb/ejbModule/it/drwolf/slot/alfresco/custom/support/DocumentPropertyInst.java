@@ -25,9 +25,9 @@ public class DocumentPropertyInst {
 	public DocumentPropertyInst(Property property) {
 		super();
 		this.property = property;
-		if (property.getType().equals("d:date")) {
-			this.setDateValue(new Date());
-		}
+		// if (property.getType().equals("d:date")) {
+		// this.setDateValue(new Date());
+		// }
 	}
 
 	public String getStringValue() {

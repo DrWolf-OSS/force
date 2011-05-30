@@ -38,9 +38,10 @@ public class PropertyInst {
 	public PropertyInst(PropertyDef propertyDef) {
 		super();
 		this.propertyDef = propertyDef;
-		if (propertyDef.getType().equals(DataType.DATE)) {
-			this.setDateValue(new Date());
-		} else if (propertyDef.getType().equals(DataType.BOOLEAN)) {
+		// if (propertyDef.getType().equals(DataType.DATE)) {
+		// this.setDateValue(new Date());
+		// } else
+		if (propertyDef.getType().equals(DataType.BOOLEAN)) {
 			this.setBooleanValue(false);
 		}
 	}
