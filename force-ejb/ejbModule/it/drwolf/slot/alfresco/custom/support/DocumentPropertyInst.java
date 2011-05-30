@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class EmbeddedPropertyInst {
+public class DocumentPropertyInst {
 
 	private Property property;
 
@@ -22,7 +22,7 @@ public class EmbeddedPropertyInst {
 
 	private boolean editable = true;
 
-	public EmbeddedPropertyInst(Property property) {
+	public DocumentPropertyInst(Property property) {
 		super();
 		this.property = property;
 		if (property.getType().equals("d:date")) {

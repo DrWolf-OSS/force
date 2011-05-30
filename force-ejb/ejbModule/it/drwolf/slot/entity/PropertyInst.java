@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 @Entity
 public class PropertyInst {
@@ -102,6 +103,20 @@ public class PropertyInst {
 
 	public void setSlotInst(SlotInst slotInst) {
 		this.slotInst = slotInst;
+	}
+
+	@Transient
+	public Object getValue() {
+		if (this.getPropertyDef().getType().equals(DataType.STRING))
+			return this.getStringValue();
+		else if (this.getPropertyDef().getType().equals(DataType.INTEGER))
+			return this.getIntegerValue();
+		else if (this.getPropertyDef().getType().equals(DataType.DATE))
+			return this.getDateValue();
+		else if (this.getPropertyDef().getType().equals(DataType.BOOLEAN))
+			return this.getBooleanValue();
+		else
+			return null;
 	}
 
 }

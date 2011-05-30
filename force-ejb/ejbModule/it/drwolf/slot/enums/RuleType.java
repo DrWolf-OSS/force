@@ -2,7 +2,7 @@ package it.drwolf.slot.enums;
 
 public enum RuleType {
 
-	TIME_VALIDITY("TimeValidity");
+	TIME_VALIDITY("TimeValidity"), SIGNATURE_REQUIREMENT("SignatureRequirement");
 	private final String value;
 
 	RuleType(String value) {

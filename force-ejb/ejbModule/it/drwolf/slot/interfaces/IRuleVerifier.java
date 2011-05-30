@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface IRuleVerifier {
 
-	public Object verify(Map<String, Object> params);
+	public Boolean verify(Map<String, Object> params);
 
 	public List<VerifierParameter> getInParams();
 

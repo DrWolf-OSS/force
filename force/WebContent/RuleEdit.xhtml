@@ -11,18 +11,52 @@
 
 <ui:define name="body">
 
-    <h:form id="rule" styleClass="edit">
+    <a:form id="rule" styleClass="edit">
 
         <rich:panel>
             <f:facet name="header">#{ruleHome.managed ? 'Edit' : 'Add'} Rule</f:facet>
-
+ 
             <s:decorate id="typeField" template="layout/edit.xhtml">
                 <ui:define name="label">Type</ui:define>
-                <h:inputText id="type"
-                          value="#{ruleHome.instance.type}">
-                    <a:support event="onblur" reRender="typeField" bypassUpdates="true" ajaxSingle="true"/>
-                </h:inputText>
+                <h:selectOneMenu id="ruleType" value="#{ruleHome.instance.type}" >
+                    	<s:selectItems value="#{ruleTypes}" 
+						var="type" label="#{type.value()}" noSelectionLabel="-- select rule type --"/>
+					<a:support event="onchange" actionListener="#{ruleEditBean.ruleTypeListener}" reRender="inParams"/>
+             	</h:selectOneMenu>
             </s:decorate>
+            
+            <s:div id="inParams">
+            <s:decorate id="params" template="layout/display.xhtml">
+                <ui:define name="label">Parameters</ui:define>
+                
+                <h:panelGrid columns="2">
+                
+                <ui:repeat var="p" value="#{ruleHome.instance.verifier.inParams}">
+                <s:div>
+                	<h:outputText value="#{p.label}"/>
+                	&#160;#{messages.left}#{messages.left}&#160;
+	                <h:selectOneMenu value="#{ruleEditBean.targetPropertiesSourceMap[p.name]}" rendered="#{ruleEditBean.sourcePropertiesSourceMap[p.name] != null}">
+		            	<s:selectItems value="#{ruleEditBean.sourcePropertiesSourceMap[p.name]}"
+		            					var="sourceContainer" label="#{sourceContainer.label}" itemValue="#{sourceContainer}" 
+		            					disabled="#{not sourceContainer.hasPropertiesOfType(p.type)}" noSelectionLabel="-- select a collection or a slot --"/>
+		            	<f:converter converterId="propertiesSourceContainerConverter"/>
+		            <a:support event="onchange" reRender="inParams"/>
+		            </h:selectOneMenu>
+		            &#160; : &#160;
+		            <h:selectOneMenu value="#{ruleEditBean.targetPropertyMap[p.name]}" rendered="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties != null}">
+		            	<s:selectItems value="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties}"
+		            					var="prop" label="#{prop.label}" itemValue="#{prop}" disabled="#{prop.type != p.type}"/>
+		            	<f:converter converterId="propertyContainerConverter"/>
+		            	<a:support event="onchange" reRender="inParams"/>
+		            </h:selectOneMenu>
+	            </s:div>
+	            </ui:repeat>
+	            </h:panelGrid>
+              
+            </s:decorate>
+            </s:div>
+
+
 
             <div style="clear:both">
                 <span class="required">*</span>
@@ -35,7 +69,7 @@
 
             <h:commandButton id="save"
                           value="Save"
-                         action="#{ruleHome.persist}"
+                         action="#{ruleEditBean.save()}"
                        disabled="#{!ruleHome.wired}"
                        rendered="#{!ruleHome.managed}"/>
 
@@ -63,7 +97,7 @@
                 rendered="#{!ruleHome.managed}"/>
 
         </div>
-    </h:form>
+    </a:form>
 
 <rich:tabPanel switchType="ajax">
 

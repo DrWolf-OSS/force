@@ -33,6 +33,8 @@ public class SlotDef {
 
 	private Set<PropertyDef> propertyDefs = new HashSet<PropertyDef>();
 
+	private Set<SlotDefEmbeddedProperty> embeddedProperties = new HashSet<SlotDefEmbeddedProperty>();
+
 	@Id
 	@GeneratedValue
 	public Long getId() {
@@ -104,5 +106,63 @@ public class SlotDef {
 	public void setType(SlotDefType type) {
 		this.type = type;
 	}
+
+	@OrderBy("name")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "slotDef")
+	public Set<SlotDefEmbeddedProperty> getEmbeddedProperties() {
+		return embeddedProperties;
+	}
+
+	public void setEmbeddedProperties(
+			Set<SlotDefEmbeddedProperty> embeddedProperties) {
+		this.embeddedProperties = embeddedProperties;
+	}
+
+	// @Override
+	// public int hashCode() {
+	// final int prime = 31;
+	// int result = 1;
+	// result = prime
+	// * result
+	// + ((this.getDocDefCollections() == null) ? 0 : this
+	// .getDocDefCollections().hashCode());
+	// result = prime * result
+	// + ((this.getId() == null) ? 0 : this.getId().hashCode());
+	// result = prime * result
+	// + ((this.getName() == null) ? 0 : this.getName().hashCode());
+	// result = prime * result
+	// + ((this.getType() == null) ? 0 : this.getType().hashCode());
+	// return result;
+	// }
+	//
+	// @Override
+	// public boolean equals(Object obj) {
+	// if (this == obj)
+	// return true;
+	// if (obj == null)
+	// return false;
+	// if (!(obj instanceof SlotDef))
+	// return false;
+	// SlotDef other = (SlotDef) obj;
+	// if (this.getDocDefCollections() == null) {
+	// if (other.getDocDefCollections() != null)
+	// return false;
+	// } else if (!this.getDocDefCollections().equals(
+	// other.getDocDefCollections()))
+	// return false;
+	// if (this.getId() == null) {
+	// if (other.getId() != null)
+	// return false;
+	// } else if (!this.getId().equals(other.getId()))
+	// return false;
+	// if (this.getName() == null) {
+	// if (other.getName() != null)
+	// return false;
+	// } else if (!this.getName().equals(other.getName()))
+	// return false;
+	// if (this.getType() != other.getType())
+	// return false;
+	// return true;
+	// }
 
 }

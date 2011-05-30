@@ -16,6 +16,22 @@
 			<rich:panel>
             <f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Edit' : 'Create'} Slot inst #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
             
+            <s:div id="embeddedProperties">
+			<c:forEach var="embeddedProp" items="#{slotInstEditBean.embeddedProperties}">
+				<s:decorate template="/layout/display.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="#{embeddedProp.name}" />
+					</ui:define>
+					<h:outputText value="#{embeddedProp.stringValue}" rendered="#{embeddedProp.type == 'STRING'}"/>
+					<h:outputText value="#{embeddedProp.integerValue}" rendered="#{embeddedProp.type == 'INTEGER'}"/>
+					<h:outputText value="#{embeddedProp.booleanValue ? 'true' : 'false'}" rendered="#{embeddedProp.type == 'BOOLEAN'}"/>
+					<h:outputText value="#{embeddedProp.dateValue}" rendered="#{embeddedProp.type == 'DATE'}">
+                		<s:convertDateTime type="date" dateStyle="short"/>
+            		</h:outputText>
+	            </s:decorate>			
+			</c:forEach>
+			</s:div>
+            
             <s:div id="properties">
 			<c:forEach var="propInst" items="#{slotInstEditBean.propertyInsts}">
 				<s:decorate template="/layout/edit.xhtml">
