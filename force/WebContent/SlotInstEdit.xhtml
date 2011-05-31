@@ -70,7 +70,7 @@
 						<a:commandButton value=">>" action="#{slotInstEditBean.addDocFromPrimary(coll.docDefCollection.id,item)}" reRender="infoPanel_#{coll.docDefCollection.id}"/>
 					</rich:dataGrid>
 					<div style="clear:both"/>
-					<a:commandButton value="add new file" action="#{slotInstEditBean.setActiveCollectionId(coll.docDefCollection.id)}" onclick="#{rich:component('uploadPanel')}.show()"/>
+					<a:commandButton value="add new file" action="#{slotInstEditBean.setActiveCollectionId(coll.docDefCollection.id)}" onclick="#{rich:component('uploadPanel')}.show()" reRender="infoPanel_#{slotInstEditBean.activeCollectionId}"/>
 				</rich:panel>
 			 </s:decorate>
 			 </a:region>
@@ -95,7 +95,7 @@
 			               			 <ui:define name="label">
 			                			<h:outputText value="#{propInst.property.title}" />
 									</ui:define>
-									<h:inputText value="#{propInst.stringValue}" rendered="#{propInst.property.type == 'd:text'}" disabled="#{not propInst.editable}" required="#{propInst.property.mandatory}"/>
+									<h:inputText id="propT" value="#{propInst.stringValue}" rendered="#{propInst.property.type == 'd:text'}" disabled="#{not propInst.editable}" required="#{propInst.property.mandatory}"/>
 									<h:inputText value="#{propInst.integerValue}" rendered="#{propInst.property.type == 'd:int'}" disabled="#{not propInst.editable}" required="#{propInst.property.mandatory}"/>
 									<h:selectBooleanCheckbox value="#{propInst.booleanValue}" rendered="#{propInst.property.type == 'd:boolean'}" disabled="#{not propInst.editable}" required="#{propInst.property.mandatory}"/>
 									<rich:calendar id="subscriptionDate" mode="client"
@@ -107,8 +107,8 @@
 			            		</s:decorate>
 		            		</ui:repeat>
 			            	<div style="clear:both"/>
-			            	<a:region>
-				            <a:commandButton value="Remove" action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}" reRender="fileGrid_#{coll.docDefCollection.id}"/>
+							<a:region>
+				            <a:commandButton value="Remove" action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}" reRender="infoPanel_#{slotInstEditBean.activeCollectionId}"/>
 				            </a:region>
 	            		</rich:dataGrid>
 	            	</rich:panel>
