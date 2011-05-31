@@ -579,13 +579,17 @@ public class SlotInstEditBean {
 		SlotDef slotDef = this.slotDefHome.getInstance();
 		Set<Rule> rules = slotDef.getRules();
 		boolean passed = false;
-		for (Rule rule : rules) {
-			Map<String, String> parametersMap = rule.getParametersMap();
-			IRuleVerifier verifier = rule.getVerifier();
-			List<Map<String, Object>> paramenterValues = retrieveParamenterValues(parametersMap);
-			for (Map<String, Object> map : paramenterValues) {
-				passed = verifier.verify(map);
+		if (rules != null && !rules.isEmpty()) {
+			for (Rule rule : rules) {
+				Map<String, String> parametersMap = rule.getParametersMap();
+				IRuleVerifier verifier = rule.getVerifier();
+				List<Map<String, Object>> paramenterValues = retrieveParamenterValues(parametersMap);
+				for (Map<String, Object> map : paramenterValues) {
+					passed = verifier.verify(map);
+				}
 			}
+		} else {
+			passed = true;
 		}
 		return passed;
 	}

@@ -17,6 +17,8 @@ public class PropertyDef {
 
 	private DataType type;
 
+	private boolean required = false;
+
 	public PropertyDef(String name, DataType type) {
 		super();
 		this.name = name;
@@ -93,6 +95,14 @@ public class PropertyDef {
 		if (this.getType() != other.getType())
 			return false;
 		return true;
+	}
+
+	public boolean isRequired() {
+		return required;
+	}
+
+	public void setRequired(boolean required) {
+		this.required = required;
 	}
 
 }

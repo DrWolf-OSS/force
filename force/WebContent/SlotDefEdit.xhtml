@@ -293,6 +293,12 @@
 						var="type" label="#{type}"/>
              		</h:selectOneMenu>
 	            </s:decorate>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Required" />
+					</ui:define>
+					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.required}" />
+	            </s:decorate>
 	        </s:div>
 	        <div style="clear:both"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" onclick="#{rich:component('propPanel')}.hide()" reRender="properties,propPanel"/>

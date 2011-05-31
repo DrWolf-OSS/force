@@ -2,7 +2,6 @@ package it.drwolf.slot.alfresco.webscripts.model;
 
 public class Authority {
 
-	// private String authorityType;
 	private AuthorityType authorityType;
 
 	private String shortName;
@@ -16,14 +15,6 @@ public class Authority {
 	private boolean isAdminGroup;
 
 	private String url;
-
-	// public String getAuthorityType() {
-	// return authorityType;
-	// }
-	//
-	// public void setAuthorityType(String authorityType) {
-	// this.authorityType = authorityType;
-	// }
 
 	public String getShortName() {
 		return shortName;
