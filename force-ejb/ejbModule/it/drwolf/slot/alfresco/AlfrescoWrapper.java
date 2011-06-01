@@ -1,5 +1,8 @@
 package it.drwolf.slot.alfresco;
 
+import it.drwolf.slot.prefs.PreferenceKey;
+import it.drwolf.slot.prefs.Preferences;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigInteger;
@@ -31,12 +34,9 @@ import org.jboss.seam.annotations.Scope;
 public class AlfrescoWrapper {
 
 	public static final String NODEREF_PREFIX = "workspace://SpacesStore/";
+
 	// public static final String DRAWINGS_FOLDER_REF =
 	// "6880b7a5-ba84-464c-a328-f5428426b450";
-
-	@In
-	// private AlfrescoAdminIdentity alfrescoAdminIdentity;
-	private AlfrescoUserIdentity alfrescoUserIdentity;
 
 	public static ObjectId ref2id(String ref) {
 		if (("" + ref).length() < 10) {
@@ -44,6 +44,61 @@ public class AlfrescoWrapper {
 		}
 		return ref.startsWith(AlfrescoWrapper.NODEREF_PREFIX) ? new ObjectIdImpl(
 				ref) : new ObjectIdImpl(AlfrescoWrapper.NODEREF_PREFIX + ref);
+	}
+
+	@In
+	private AlfrescoAdminIdentity alfrescoAdminIdentity;
+
+	@In
+	private AlfrescoUserIdentity alfrescoUserIdentity;
+
+	@In(create = true)
+	Preferences preferences;
+
+	@In(create = true)
+	AlfrescoInfo alfrescoInfo;
+
+	public AlfrescoFolder findOrCreateFolder(Folder father, String folderName) {
+		AlfrescoFolder folder = null;
+		// cerco la cartella con il nome dello slot e se non c'è la creo
+		Session session = this.alfrescoUserIdentity.getSession();
+		// faccio un workaround per recuperare la session senza stravolgere....
+		// si deve fare refactor e far passare la session come parametro
+		if (session == null) {
+			session = this.alfrescoAdminIdentity.getSession();
+		}
+		try {
+			folder = (AlfrescoFolder) session.getObjectByPath(father.getPath()
+					+ "/" + folderName);
+		} catch (CmisObjectNotFoundException e) {
+			HashMap<String, Object> props = new HashMap<String, Object>();
+			props.put(PropertyIds.NAME, folderName);
+			props.put(PropertyIds.OBJECT_TYPE_ID,
+					BaseTypeId.CMIS_FOLDER.value());
+			folder = (AlfrescoFolder) father.createFolder(props, null, null,
+					null, session.createOperationContext());
+		}
+		return folder;
+	}
+
+	public AlfrescoFolder findOrCreateFolder(String path, String folderName) {
+		Session session = this.alfrescoUserIdentity.getSession();
+		AlfrescoFolder father = (AlfrescoFolder) session.getObjectByPath(path);
+		return this.findOrCreateFolder(father, folderName);
+	}
+
+	public Folder getMainProjectFolder() {
+		String value = this.preferences
+				.getValue(PreferenceKey.FORCE_GROUPS_PATH.name());
+		// faccio un workaround per recuperare la session senza stravolgere....
+		// si deve fare refactor e far passare la session come parametro
+
+		Session session = this.alfrescoUserIdentity.getSession();
+		if (session == null) {
+			session = this.alfrescoAdminIdentity.getSession();
+		}
+		Folder mainFolder = (Folder) session.getObjectByPath(value);
+		return mainFolder;
 	}
 
 	public String getNodeName(String ref) {
@@ -56,7 +111,7 @@ public class AlfrescoWrapper {
 	}
 
 	public Object getThumbnail(String id, String name) {
-		if (id == null || id.length() > 20) {
+		if ((id == null) || (id.length() > 20)) {
 			try {
 				Session session = this.alfrescoUserIdentity.getSession();
 				OperationContext context = session.createOperationContext();
@@ -82,6 +137,11 @@ public class AlfrescoWrapper {
 		return AlfrescoWrapper.class.getResourceAsStream("image-missing.png");
 	}
 
+	public AlfrescoFolder retrieveGroupFolder(String path, String shortName) {
+		return (AlfrescoFolder) this.alfrescoUserIdentity.getSession()
+				.getObjectByPath(path + "/" + shortName);
+	}
+
 	/**
 	 * DA TESTARE
 	 * 
@@ -100,35 +160,6 @@ public class AlfrescoWrapper {
 
 		adminSession.createDocument(props, folder, contentStreamImpl,
 				VersioningState.NONE, null, null, null);
-	}
-
-	public AlfrescoFolder retrieveGroupFolder(String path, String shortName) {
-		return (AlfrescoFolder) alfrescoUserIdentity.getSession()
-				.getObjectByPath(path + "/" + shortName);
-	}
-
-	public AlfrescoFolder findOrCreateFolder(Folder father, String folderName) {
-		AlfrescoFolder folder = null;
-		// cerco la cartella con il nome dello slot e se non c'è la creo
-		Session session = alfrescoUserIdentity.getSession();
-		try {
-			folder = (AlfrescoFolder) session.getObjectByPath(father.getPath()
-					+ "/" + folderName);
-		} catch (CmisObjectNotFoundException e) {
-			HashMap<String, Object> props = new HashMap<String, Object>();
-			props.put(PropertyIds.NAME, folderName);
-			props.put(PropertyIds.OBJECT_TYPE_ID,
-					BaseTypeId.CMIS_FOLDER.value());
-			folder = (AlfrescoFolder) father.createFolder(props, null, null,
-					null, session.createOperationContext());
-		}
-		return folder;
-	}
-
-	public AlfrescoFolder findOrCreateFolder(String path, String folderName) {
-		Session session = alfrescoUserIdentity.getSession();
-		AlfrescoFolder father = (AlfrescoFolder) session.getObjectByPath(path);
-		return findOrCreateFolder(father, folderName);
 	}
 
 	// private JsonElement openJsonWebScript(String url)

@@ -27,12 +27,6 @@ public class Azienda implements Serializable {
 	private Integer id;
 
 	private String ragioneSociale;
-	private String codiceFiscale;
-	private String partitaIva;
-
-	private Integer annoCostituzione;
-	private String numeroREA;
-
 	// Sede legale
 	private String indirizzo;
 	private String localita;
@@ -68,12 +62,6 @@ public class Azienda implements Serializable {
 
 	@Column(nullable = false)
 	@NotNull
-	public Integer getAnnoCostituzione() {
-		return this.annoCostituzione;
-	}
-
-	@Column(nullable = false)
-	@NotNull
 	public String getCap() {
 		return this.cap;
 	}
@@ -81,12 +69,6 @@ public class Azienda implements Serializable {
 	@Column(nullable = true)
 	public String getCellulare() {
 		return this.cellulare;
-	}
-
-	@Column(nullable = false)
-	@NotNull
-	public String getCodiceFiscale() {
-		return this.codiceFiscale;
 	}
 
 	@Column(nullable = false)
@@ -155,18 +137,6 @@ public class Azienda implements Serializable {
 
 	@Column(nullable = false)
 	@NotNull
-	public String getNumeroREA() {
-		return this.numeroREA;
-	}
-
-	@Column(nullable = false)
-	@NotNull
-	public String getPartitaIva() {
-		return this.partitaIva;
-	}
-
-	@Column(nullable = false)
-	@NotNull
 	public String getProvincia() {
 		return this.provincia;
 	}
@@ -199,20 +169,12 @@ public class Azienda implements Serializable {
 		this.alfrescoGroupId = alfrescoGroupId;
 	}
 
-	public void setAnnoCostituzione(Integer annoCostituzione) {
-		this.annoCostituzione = annoCostituzione;
-	}
-
 	public void setCap(String cap) {
 		this.cap = cap;
 	}
 
 	public void setCellulare(String cellulare) {
 		this.cellulare = cellulare;
-	}
-
-	public void setCodiceFiscale(String codiceFiscale) {
-		this.codiceFiscale = codiceFiscale;
 	}
 
 	public void setCognome(String cognome) {
@@ -257,14 +219,6 @@ public class Azienda implements Serializable {
 
 	public void setNome(String nome) {
 		this.nome = nome;
-	}
-
-	public void setNumeroREA(String numeroREA) {
-		this.numeroREA = numeroREA;
-	}
-
-	public void setPartitaIva(String partitaIva) {
-		this.partitaIva = partitaIva;
 	}
 
 	public void setProvincia(String provincia) {
