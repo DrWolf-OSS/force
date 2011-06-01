@@ -183,7 +183,6 @@ public class SlotInstEditBean {
 		// settato come mandatory su un altro) le sue properties vengono
 		// aggiunte una volta sola
 		for (String aspectId : aspectIds) {
-			// properties.addAll(retrieveAllProperties(aspectId));
 			properties.addAll(customModelController.getProperties(aspectId));
 		}
 		if (properties != null) {
@@ -197,21 +196,6 @@ public class SlotInstEditBean {
 		container.setEmbeddedProperties(fileProperties);
 		return container;
 	}
-
-	// private Set<Property> retrieveAllProperties(String aspectId) {
-	// Set<Property> properties = new HashSet<Property>();
-	// Aspect aspect = customModelController.getAspect(aspectId);
-	// if (aspect != null) {
-	// properties.addAll(aspect.getProperties());
-	// if (aspect.getMandatoryAspectIds() != null) {
-	// for (String mandatoryAspectId : aspect.getMandatoryAspectIds()) {
-	// properties.addAll(retrieveAllProperties("P:"
-	// + mandatoryAspectId));
-	// }
-	// }
-	// }
-	// return properties;
-	// }
 
 	private DocumentPropertyInst buildValorisedDocumentPropertyInst(
 			Object item, boolean editables, Property p) {

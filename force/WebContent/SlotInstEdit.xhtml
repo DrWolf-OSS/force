@@ -26,7 +26,7 @@
 					<h:outputText value="#{embeddedProp.integerValue}" rendered="#{embeddedProp.type == 'INTEGER'}"/>
 					<h:outputText value="#{embeddedProp.booleanValue ? 'true' : 'false'}" rendered="#{embeddedProp.type == 'BOOLEAN'}"/>
 					<h:outputText value="#{embeddedProp.dateValue}" rendered="#{embeddedProp.type == 'DATE'}">
-                		<s:convertDateTime type="date" dateStyle="short"/>
+                		<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy"/>
             		</h:outputText>
 	            </s:decorate>			
 			</c:forEach>

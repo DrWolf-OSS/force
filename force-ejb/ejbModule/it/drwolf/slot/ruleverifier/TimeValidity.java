@@ -11,38 +11,38 @@ import java.util.Map;
 
 public class TimeValidity implements IRuleVerifier {
 
-	private final String EXPIRATION_DATE = "ExpirationDate";
-	private final String DATE_TO_VERIFY = "DateToVerify";
+	private final String EARLIER_DATE = "EarlierDate";
+	private final String FOLLOWING_DATE = "FollowingDate";
 
 	final private List<VerifierParameter> params = new ArrayList<VerifierParameter>();
 
 	public TimeValidity() {
-		params.add(new VerifierParameter(this.EXPIRATION_DATE,
-				"Expiration Date", DataType.DATE));
-		params.add(new VerifierParameter(this.DATE_TO_VERIFY, "Date To Verify",
+		params.add(new VerifierParameter(this.EARLIER_DATE, "Earlier Date",
+				DataType.DATE));
+		params.add(new VerifierParameter(this.FOLLOWING_DATE, "Following date",
 				DataType.DATE));
 	}
 
 	public Boolean verify(Map<String, Object> params) {
-		Object expirationDateObj = params.get(this.EXPIRATION_DATE);
-		Date expirationDate = null;
-		if (expirationDateObj instanceof Calendar) {
-			Calendar expirationDateCalendar = (Calendar) expirationDateObj;
-			expirationDate = expirationDateCalendar.getTime();
-		} else if (expirationDateObj instanceof Date) {
-			expirationDate = (Date) expirationDateObj;
+		Object earlierDateObj = params.get(this.EARLIER_DATE);
+		Date earlierDate = null;
+		if (earlierDateObj instanceof Calendar) {
+			Calendar earlierDateCalendar = (Calendar) earlierDateObj;
+			earlierDate = earlierDateCalendar.getTime();
+		} else if (earlierDateObj instanceof Date) {
+			earlierDate = (Date) earlierDateObj;
 		}
 
-		Object dateToVerifyObj = params.get(this.DATE_TO_VERIFY);
-		Date dateToVerify = null;
-		if (dateToVerifyObj instanceof Calendar) {
-			Calendar dateToVerifyCalendar = (Calendar) dateToVerifyObj;
-			dateToVerify = dateToVerifyCalendar.getTime();
-		} else if (expirationDateObj instanceof Date) {
-			dateToVerify = (Date) dateToVerifyObj;
+		Object followingDateObj = params.get(this.FOLLOWING_DATE);
+		Date followingDate = null;
+		if (followingDateObj instanceof Calendar) {
+			Calendar followingDateCalendar = (Calendar) followingDateObj;
+			followingDate = followingDateCalendar.getTime();
+		} else if (followingDateObj instanceof Date) {
+			followingDate = (Date) followingDateObj;
 		}
 
-		if (dateToVerify.before(expirationDate))
+		if (followingDate.before(earlierDate))
 			return false;
 		else
 			return true;
