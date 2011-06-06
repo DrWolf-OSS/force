@@ -14,17 +14,19 @@ public class TimeValidity implements IRuleVerifier {
 	private final String EARLIER_DATE = "EarlierDate";
 	private final String FOLLOWING_DATE = "FollowingDate";
 
-	final private List<VerifierParameter> params = new ArrayList<VerifierParameter>();
+	final private List<VerifierParameterDef> params = new ArrayList<VerifierParameterDef>();
 
 	public TimeValidity() {
-		params.add(new VerifierParameter(this.EARLIER_DATE, "Earlier Date",
+		params.add(new VerifierParameterDef(this.EARLIER_DATE, "Earlier Date",
 				DataType.DATE));
-		params.add(new VerifierParameter(this.FOLLOWING_DATE, "Following date",
-				DataType.DATE));
+		params.add(new VerifierParameterDef(this.FOLLOWING_DATE,
+				"Following date", DataType.DATE));
 	}
 
-	public Boolean verify(Map<String, Object> params) {
-		Object earlierDateObj = params.get(this.EARLIER_DATE);
+	public VerifierReport verify(Map<String, VerifierParameterInst> params) {
+		VerifierParameterInst earlierParameterInst = params
+				.get(this.EARLIER_DATE);
+		Object earlierDateObj = earlierParameterInst.getValue();
 		Date earlierDate = null;
 		if (earlierDateObj instanceof Calendar) {
 			Calendar earlierDateCalendar = (Calendar) earlierDateObj;
@@ -33,7 +35,9 @@ public class TimeValidity implements IRuleVerifier {
 			earlierDate = (Date) earlierDateObj;
 		}
 
-		Object followingDateObj = params.get(this.FOLLOWING_DATE);
+		VerifierParameterInst followingParameterInst = params
+				.get(this.FOLLOWING_DATE);
+		Object followingDateObj = followingParameterInst.getValue();
 		Date followingDate = null;
 		if (followingDateObj instanceof Calendar) {
 			Calendar followingDateCalendar = (Calendar) followingDateObj;
@@ -42,13 +46,20 @@ public class TimeValidity implements IRuleVerifier {
 			followingDate = (Date) followingDateObj;
 		}
 
-		if (followingDate.before(earlierDate))
-			return false;
-		else
-			return true;
+		VerifierReport report = new VerifierReport();
+		if (followingDate.before(earlierDate)) {
+			report.setPassed(false);
+			VerifierMessage message = new VerifierMessage(
+					followingParameterInst.getLable() + " is not valid!",
+					VerifierMessageType.ERROR);
+			report.setMessage(message);
+		} else {
+			report.setPassed(true);
+		}
+		return report;
 	}
 
-	public List<VerifierParameter> getInParams() {
+	public List<VerifierParameterDef> getInParams() {
 		return params;
 	}
 

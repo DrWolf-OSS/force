@@ -8,7 +8,7 @@ import it.drwolf.slot.enums.RuleType;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.PropertiesSourceContainer;
 import it.drwolf.slot.pagebeans.support.PropertyContainer;
-import it.drwolf.slot.ruleverifier.VerifierParameter;
+import it.drwolf.slot.ruleverifier.VerifierParameterDef;
 import it.drwolf.slot.session.RuleHome;
 import it.drwolf.slot.session.SlotDefHome;
 
@@ -57,12 +57,12 @@ public class RuleEditBean {
 		sourcePropertiesSourceMap = new HashMap<String, List<PropertiesSourceContainer>>();
 
 		if (verifier != null) {
-			List<VerifierParameter> inParams = verifier.getInParams();
+			List<VerifierParameterDef> inParams = verifier.getInParams();
 			SlotDef slotDef = slotDefHome.getInstance();
 			Set<DocDefCollection> docDefCollections = slotDef
 					.getDocDefCollections();
 
-			for (VerifierParameter verifierParameter : inParams) {
+			for (VerifierParameterDef verifierParameter : inParams) {
 				ArrayList<PropertiesSourceContainer> propertiesSourceContainerList = new ArrayList<PropertiesSourceContainer>();
 				for (DocDefCollection collection : docDefCollections) {
 					PropertiesSourceContainer sourceContainer = new PropertiesSourceContainer(
@@ -84,7 +84,7 @@ public class RuleEditBean {
 		IRuleVerifier verifier = rule.getVerifier();
 		Map<String, String> parametersMap = rule.getParametersMap();
 		if (verifier != null) {
-			for (VerifierParameter parameter : verifier.getInParams()) {
+			for (VerifierParameterDef parameter : verifier.getInParams()) {
 				if (this.targetPropertiesSourceMap.get(parameter.getName()) != null
 						&& this.targetPropertyMap.get(parameter.getName()) != null) {
 					String encodedRule = "";

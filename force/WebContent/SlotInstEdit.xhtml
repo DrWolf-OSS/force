@@ -16,6 +16,13 @@
 			<rich:panel>
             <f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Edit' : 'Create'} Slot inst #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
             
+            <ui:repeat var="message" value="#{slotInstEditBean.slotMessages}">
+    				<h:graphicImage value="/img/msgerror.png" rendered="#{message.type == 'ERROR'}"/>
+    				<h:graphicImage value="/img/msgwarn.png" rendered="#{message.type == 'WARNING'}"/>
+    				<h:outputText value="#{message.text}" />
+    				<br />
+    			</ui:repeat>
+    			
             <s:div id="embeddedProperties">
 			<c:forEach var="embeddedProp" items="#{slotInstEditBean.embeddedProperties}">
 				<s:decorate template="/layout/display.xhtml">
@@ -32,7 +39,7 @@
 			</c:forEach>
 			</s:div>
             
-            <s:div id="properties">
+            <s:div id="properties">	
 			<c:forEach var="propInst" items="#{slotInstEditBean.propertyInsts}">
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
@@ -81,8 +88,15 @@
 	            			<h:outputText value="Uploaded Files Info" />
 	            		</f:facet>
 	            		<h:outputText value="No files uploaded" rendered="#{slotInstEditBean.datas[coll.docDefCollection.id] == null or (empty slotInstEditBean.datas[coll.docDefCollection.id])}"/>
-	            	
+
 	            		<rich:dataGrid id="fileGrid_#{coll.docDefCollection.id}" columns="1" value="#{slotInstEditBean.datas[coll.docDefCollection.id]}" var="item" rowKeyVar="row">
+	            			
+	            			<ui:repeat var="message" value="#{slotInstEditBean.filesMessages[item.id]}">
+	            				<h:graphicImage value="/img/msgerror.png" rendered="#{message.type == 'ERROR'}"/>
+	            				<h:graphicImage value="/img/msgwarn.png" rendered="#{message.type == 'WARNING'}"/>
+	            				<h:outputText value="#{message.text}" /><br />
+	            			</ui:repeat>
+
 		            		<s:decorate template="/layout/display.xhtml">
 		               			 <ui:define name="label">
 		                			<h:outputText value="File Name" />

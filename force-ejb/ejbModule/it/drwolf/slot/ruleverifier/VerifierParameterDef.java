@@ -2,13 +2,13 @@ package it.drwolf.slot.ruleverifier;
 
 import it.drwolf.slot.enums.DataType;
 
-public class VerifierParameter {
+public class VerifierParameterDef {
 
 	private String name;
 	private DataType type;
 	private String label;
 
-	public VerifierParameter(String name, String label, DataType type) {
+	public VerifierParameterDef(String name, String label, DataType type) {
 		super();
 		this.name = name;
 		this.label = label;
