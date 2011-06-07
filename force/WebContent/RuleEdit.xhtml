@@ -16,6 +16,7 @@
         <rich:panel>
             <f:facet name="header">#{ruleHome.managed ? 'Edit' : 'Add'} Rule</f:facet>
  
+ <a:region>
             <s:decorate id="typeField" template="layout/edit.xhtml">
                 <ui:define name="label">Type</ui:define>
                 <h:selectOneMenu id="ruleType" value="#{ruleHome.instance.type}" >
@@ -55,6 +56,19 @@
               
             </s:decorate>
             </s:div>
+            
+            </a:region>
+            
+            <s:decorate id="errorMsg" template="layout/edit.xhtml">
+            	<ui:define name="label">Error Message</ui:define>
+            	<h:inputTextarea value="#{ruleEditBean.errorMessage.text}" cols="50"/>
+            </s:decorate>
+            
+            <s:decorate id="warningMsg" template="layout/edit.xhtml">
+            	<ui:define name="label">Warning Message</ui:define>
+            	<h:inputTextarea value="#{ruleEditBean.warningMessage.text}"  cols="50"/>
+            </s:decorate>
+            
 
 
 

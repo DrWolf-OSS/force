@@ -16,6 +16,9 @@ public class TimeValidity implements IRuleVerifier {
 
 	final private List<VerifierParameterDef> params = new ArrayList<VerifierParameterDef>();
 
+	private VerifierParameterInst earlierParameterInst;
+	private VerifierParameterInst followingParameterInst;
+
 	public TimeValidity() {
 		params.add(new VerifierParameterDef(this.EARLIER_DATE, "Earlier Date",
 				DataType.DATE));
@@ -24,8 +27,7 @@ public class TimeValidity implements IRuleVerifier {
 	}
 
 	public VerifierReport verify(Map<String, VerifierParameterInst> params) {
-		VerifierParameterInst earlierParameterInst = params
-				.get(this.EARLIER_DATE);
+		earlierParameterInst = params.get(this.EARLIER_DATE);
 		Object earlierDateObj = earlierParameterInst.getValue();
 		Date earlierDate = null;
 		if (earlierDateObj instanceof Calendar) {
@@ -35,8 +37,7 @@ public class TimeValidity implements IRuleVerifier {
 			earlierDate = (Date) earlierDateObj;
 		}
 
-		VerifierParameterInst followingParameterInst = params
-				.get(this.FOLLOWING_DATE);
+		followingParameterInst = params.get(this.FOLLOWING_DATE);
 		Object followingDateObj = followingParameterInst.getValue();
 		Date followingDate = null;
 		if (followingDateObj instanceof Calendar) {
@@ -48,13 +49,14 @@ public class TimeValidity implements IRuleVerifier {
 
 		VerifierReport report = new VerifierReport();
 		if (followingDate.before(earlierDate)) {
-			report.setPassed(false);
-			VerifierMessage message = new VerifierMessage(
-					followingParameterInst.getLable() + " is not valid!",
-					VerifierMessageType.ERROR);
-			report.setMessage(message);
+			report.setResult(VerifierResult.ERROR);
+			// VerifierMessage message = new VerifierMessage("\""
+			// + followingParameterInst.getLable() + "\" must follow \""
+			// + earlierParameterInst.getLable() + "\"!",
+			// VerifierMessageType.ERROR);
+			// report.setMessage(message);
 		} else {
-			report.setPassed(true);
+			report.setResult(VerifierResult.PASSED);
 		}
 		return report;
 	}
@@ -66,6 +68,18 @@ public class TimeValidity implements IRuleVerifier {
 	@Override
 	public String toString() {
 		return "TimeValidity";
+	}
+
+	public VerifierMessage getDefaultErrorMessage() {
+		return new VerifierMessage(
+				"\"" + followingParameterInst.getLable() + "\" must follow \""
+						+ earlierParameterInst.getLable() + "\"!",
+				VerifierMessageType.ERROR);
+	}
+
+	public VerifierMessage getDefaultWarningMessage() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

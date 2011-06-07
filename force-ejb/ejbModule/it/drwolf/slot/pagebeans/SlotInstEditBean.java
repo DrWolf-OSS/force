@@ -21,6 +21,7 @@ import it.drwolf.slot.ruleverifier.RuleParametersResolver;
 import it.drwolf.slot.ruleverifier.VerifierMessage;
 import it.drwolf.slot.ruleverifier.VerifierParameterInst;
 import it.drwolf.slot.ruleverifier.VerifierReport;
+import it.drwolf.slot.ruleverifier.VerifierResult;
 import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
@@ -574,9 +575,9 @@ public class SlotInstEditBean {
 		boolean passed = false;
 		if (rules != null && !rules.isEmpty()) {
 			for (Rule rule : rules) {
-				Map<String, String> parametersMap = rule.getParametersMap();
-				IRuleVerifier verifier = rule.getVerifier();
-				boolean rulePassed = verifyRule(parametersMap, verifier);
+				// Map<String, String> parametersMap = rule.getParametersMap();
+				// IRuleVerifier verifier = rule.getVerifier();
+				boolean rulePassed = verifyRule(rule);
 				// List<Map<String, Object>> paramenterValues =
 				// retrieveParamenterValues(parametersMap);
 				// for (Map<String, Object> map : paramenterValues) {
@@ -592,8 +593,10 @@ public class SlotInstEditBean {
 		return passed;
 	}
 
-	private boolean verifyRule(Map<String, String> encodedParametersMap,
-			IRuleVerifier verifier) {
+	private boolean verifyRule(Rule rule) {
+		Map<String, String> encodedParametersMap = rule.getParametersMap();
+		IRuleVerifier verifier = rule.getVerifier();
+
 		Map<FileContainer, Map<String, VerifierParameterInst>> fileContainersPropertiesMap = new HashMap<FileContainer, Map<String, VerifierParameterInst>>();
 		Map<String, VerifierParameterInst> singleMap = new HashMap<String, VerifierParameterInst>();
 
@@ -720,11 +723,12 @@ public class SlotInstEditBean {
 				Map<String, VerifierParameterInst> mapParameters = fileContainersPropertiesMap
 						.get(fileContainer);
 				VerifierReport report = verifier.verify(mapParameters);
-				if (report.isPassed() == false) {
+				if (report.getResult().equals(VerifierResult.PASSED)) {
 					passed = false;
-				}
-				VerifierMessage message = report.getMessage();
-				if (message != null) {
+					VerifierMessage message = rule.getErrorMessage();
+					if (message == null || message.getText().equals("")) {
+						message = verifier.getDefaultErrorMessage();
+					}
 					ArrayList<VerifierMessage> messages = filesMessages
 							.get(fileContainer.getId());
 					if (messages == null) {
@@ -732,19 +736,34 @@ public class SlotInstEditBean {
 						filesMessages.put(fileContainer.getId(), messages);
 					}
 					messages.add(message);
-					System.out.println("MESSAGE: " + message.getText());
 				}
+				// VerifierMessage message = report.getMessage();
+				// if (message != null) {
+				// ArrayList<VerifierMessage> messages = filesMessages
+				// .get(fileContainer.getId());
+				// if (messages == null) {
+				// messages = new ArrayList<VerifierMessage>();
+				// filesMessages.put(fileContainer.getId(), messages);
+				// }
+				// messages.add(message);
+				// System.out.println("MESSAGE: " + message.getText());
+				// }
 			}
 		} else {
 			VerifierReport report = verifier.verify(singleMap);
-			if (report.isPassed() == false) {
+			if (report.getResult().equals(VerifierResult.ERROR)) {
 				passed = false;
-			}
-			VerifierMessage message = report.getMessage();
-			if (message != null) {
+				VerifierMessage message = rule.getErrorMessage();
+				if (message == null || message.getText().equals("")) {
+					message = verifier.getDefaultErrorMessage();
+				}
 				slotMessages.add(message);
-				System.out.println("MESSAGE: " + message.getText());
 			}
+			// VerifierMessage message = report.getMessage();
+			// if (message != null) {
+			// slotMessages.add(message);
+			// System.out.println("MESSAGE: " + message.getText());
+			// }
 		}
 
 		return passed;

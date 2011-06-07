@@ -63,6 +63,7 @@
 			<h:panelGrid columns="2">
 			<c:forEach var="coll" items="#{slotInstEditBean.docInstCollections}">
 			
+			<s:div id="primaryRegion_#{coll.docDefCollection.id}">
 			<a:region>
 			<s:decorate template="/layout/display.xhtml">
                 <ui:define name="label">
@@ -74,13 +75,19 @@
 	            </f:facet>	
 					<rich:dataGrid value="#{slotInstEditBean.primaryDocs[coll.docDefCollection.id]}" var="item">
 						<h:outputText value="#{item.fileName}" />
-						<a:commandButton value=">>" action="#{slotInstEditBean.addDocFromPrimary(coll.docDefCollection.id,item)}" reRender="infoPanel_#{coll.docDefCollection.id}"/>
+						<a:commandButton id="addPrimaryDoc_#{coll.docDefCollection.id}" value=">>" action="#{slotInstEditBean.addDocFromPrimary(coll.docDefCollection.id,item)}" 
+									reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}"
+									disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}"/>
 					</rich:dataGrid>
 					<div style="clear:both"/>
-					<a:commandButton value="add new file" action="#{slotInstEditBean.setActiveCollectionId(coll.docDefCollection.id)}" onclick="#{rich:component('uploadPanel')}.show()" reRender="infoPanel_#{slotInstEditBean.activeCollectionId}"/>
+					<a:commandButton id="addNewFile_#{coll.docDefCollection.id}" value="add new file" action="#{slotInstEditBean.setActiveCollectionId(coll.docDefCollection.id)}" 
+								onclick="#{rich:component('uploadPanel')}.show()" 
+								reRender="infoPanel_#{slotInstEditBean.activeCollectionId},primaryRegion_#{coll.docDefCollection.id}"
+								disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}"/>
 				</rich:panel>
 			 </s:decorate>
 			 </a:region>
+			 </s:div>
       
 	            <s:div id="infoPanel_#{coll.docDefCollection.id}">
 	            	<rich:panel >
@@ -122,7 +129,8 @@
 		            		</ui:repeat>
 			            	<div style="clear:both"/>
 							<a:region>
-				            <a:commandButton value="Remove" action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}" reRender="infoPanel_#{slotInstEditBean.activeCollectionId}"/>
+				            <a:commandButton value="Remove" action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}" 
+				            				reRender="infoPanel_#{slotInstEditBean.activeCollectionId},primaryRegion_#{coll.docDefCollection.id}"/>
 				            </a:region>
 	            		</rich:dataGrid>
 	            	</rich:panel>
@@ -251,7 +259,7 @@
 							noDuplicate="false"
 							autoclear="false"
 							immediateUpload="true">
-			<a:support event="onfileuploadcomplete" reRender="infoPanel_#{slotInstEditBean.activeCollectionId},uploadPanel"/>				
+			<a:support event="onfileuploadcomplete" reRender="infoPanel_#{slotInstEditBean.activeCollectionId},uploadPanel, primaryRegion_#{slotInstEditBean.activeCollectionId}"/>				
 			</rich:fileUpload>
 		</a:form>
 		<div style="clear:both"/>

@@ -2,24 +2,34 @@ package it.drwolf.slot.ruleverifier;
 
 public class VerifierReport {
 
-	private boolean passed;
+	private VerifierResult result;
 
-	private VerifierMessage message;
-
-	public boolean isPassed() {
-		return passed;
+	public VerifierResult getResult() {
+		return result;
 	}
 
-	public void setPassed(boolean result) {
-		this.passed = result;
+	public void setResult(VerifierResult result) {
+		this.result = result;
 	}
 
-	public VerifierMessage getMessage() {
-		return message;
-	}
+	// private boolean passed;
 
-	public void setMessage(VerifierMessage message) {
-		this.message = message;
-	}
+	// private VerifierMessage message;
+
+	// public boolean isPassed() {
+	// return passed;
+	// }
+	//
+	// public void setPassed(boolean result) {
+	// this.passed = result;
+	// }
+
+	// public VerifierMessage getMessage() {
+	// return message;
+	// }
+	//
+	// public void setMessage(VerifierMessage message) {
+	// this.message = message;
+	// }
 
 }
