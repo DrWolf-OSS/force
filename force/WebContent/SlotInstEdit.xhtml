@@ -19,7 +19,7 @@
             <ui:repeat var="message" value="#{slotInstEditBean.slotMessages}">
     				<h:graphicImage value="/img/msgerror.png" rendered="#{message.type == 'ERROR'}"/>
     				<h:graphicImage value="/img/msgwarn.png" rendered="#{message.type == 'WARNING'}"/>
-    				<h:outputText value="#{message.text}" />
+    				<h:outputText value="#{message.text}"/>
     				<br />
     			</ui:repeat>
     			
@@ -90,6 +90,11 @@
 			 </s:div>
       
 	            <s:div id="infoPanel_#{coll.docDefCollection.id}">
+	            			<ui:repeat var="message" value="#{slotInstEditBean.collectionsMessages[coll.docDefCollection.id]}">
+	            				<h:graphicImage value="/img/msgerror.png" rendered="#{message.type == 'ERROR'}"/>
+	            				<h:graphicImage value="/img/msgwarn.png" rendered="#{message.type == 'WARNING'}"/>
+	            				<h:outputText value="#{message.text}" /><br />
+	            			</ui:repeat>
 	            	<rich:panel >
 	            		<f:facet name="header">
 	            			<h:outputText value="Uploaded Files Info" />

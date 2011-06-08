@@ -16,8 +16,8 @@ public class TimeValidity implements IRuleVerifier {
 
 	final private List<VerifierParameterDef> params = new ArrayList<VerifierParameterDef>();
 
-	private VerifierParameterInst earlierParameterInst;
-	private VerifierParameterInst followingParameterInst;
+	// private VerifierParameterInst earlierParameterInst;
+	// private VerifierParameterInst followingParameterInst;
 
 	public TimeValidity() {
 		params.add(new VerifierParameterDef(this.EARLIER_DATE, "Earlier Date",
@@ -26,9 +26,9 @@ public class TimeValidity implements IRuleVerifier {
 				"Following date", DataType.DATE));
 	}
 
-	public VerifierReport verify(Map<String, VerifierParameterInst> params) {
-		earlierParameterInst = params.get(this.EARLIER_DATE);
-		Object earlierDateObj = earlierParameterInst.getValue();
+	public VerifierReport verify(Map<String, Object> params) {
+		// earlierParameterInst = params.get(this.EARLIER_DATE);
+		Object earlierDateObj = params.get(this.EARLIER_DATE);
 		Date earlierDate = null;
 		if (earlierDateObj instanceof Calendar) {
 			Calendar earlierDateCalendar = (Calendar) earlierDateObj;
@@ -37,8 +37,8 @@ public class TimeValidity implements IRuleVerifier {
 			earlierDate = (Date) earlierDateObj;
 		}
 
-		followingParameterInst = params.get(this.FOLLOWING_DATE);
-		Object followingDateObj = followingParameterInst.getValue();
+		// followingParameterInst = params.get(this.FOLLOWING_DATE);
+		Object followingDateObj = params.get(this.FOLLOWING_DATE);
 		Date followingDate = null;
 		if (followingDateObj instanceof Calendar) {
 			Calendar followingDateCalendar = (Calendar) followingDateObj;
@@ -71,9 +71,11 @@ public class TimeValidity implements IRuleVerifier {
 	}
 
 	public VerifierMessage getDefaultErrorMessage() {
-		return new VerifierMessage(
-				"\"" + followingParameterInst.getLable() + "\" must follow \""
-						+ earlierParameterInst.getLable() + "\"!",
+		// return new VerifierMessage(
+		// "\"" + followingParameterInst.getLable() + "\" must follow \""
+		// + earlierParameterInst.getLable() + "\"!",
+		// VerifierMessageType.ERROR);
+		return new VerifierMessage("Time validity rule not verified!",
 				VerifierMessageType.ERROR);
 	}
 

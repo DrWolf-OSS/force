@@ -19,7 +19,7 @@ import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 import it.drwolf.slot.ruleverifier.RuleParametersResolver;
 import it.drwolf.slot.ruleverifier.VerifierMessage;
-import it.drwolf.slot.ruleverifier.VerifierParameterInst;
+import it.drwolf.slot.ruleverifier.VerifierMessageType;
 import it.drwolf.slot.ruleverifier.VerifierReport;
 import it.drwolf.slot.ruleverifier.VerifierResult;
 import it.drwolf.slot.session.SlotDefHome;
@@ -100,10 +100,15 @@ public class SlotInstEditBean {
 
 	private HashMap<Long, List<FileContainer>> primaryDocs = new HashMap<Long, List<FileContainer>>();
 
+	// main messages
 	private ArrayList<VerifierMessage> slotMessages = new ArrayList<VerifierMessage>();
 
 	// FileContainer.id, messages
 	private HashMap<String, ArrayList<VerifierMessage>> filesMessages = new HashMap<String, ArrayList<VerifierMessage>>();
+
+	// DocDefCollection.id, messages
+	private HashMap<Long, ArrayList<VerifierMessage>> collectionsMessages = new HashMap<Long, ArrayList<VerifierMessage>>();
+
 	private Long activeCollectionId;
 
 	@Create
@@ -130,8 +135,8 @@ public class SlotInstEditBean {
 						.retrievePrimaryDocs(defCollection.getDocDef().getId());
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				for (AlfrescoDocument document : collPrimaryDocs) {
-					FileContainer fileContainer = buildContainer(defCollection,
-							document, false);
+					FileContainer fileContainer = buildFileContainer(
+							defCollection, document, false);
 					fileContainers.add(fileContainer);
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
@@ -154,7 +159,7 @@ public class SlotInstEditBean {
 						String nodeRef = docInst.getNodeRef();
 						AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
 								.getSession().getObject(nodeRef);
-						FileContainer container = buildContainer(
+						FileContainer container = buildFileContainer(
 								docDefCollection, document, true);
 						this.datas.get(docDefCollection.getId()).add(container);
 					} catch (CmisObjectNotFoundException e) {
@@ -173,8 +178,8 @@ public class SlotInstEditBean {
 				for (AlfrescoDocument document : collPrimaryDocs) {
 					// FileContainer fileContainer = new
 					// FileContainer(document);
-					FileContainer fileContainer = buildContainer(defCollection,
-							document, false);
+					FileContainer fileContainer = buildFileContainer(
+							defCollection, document, false);
 					fileContainers.add(fileContainer);
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
@@ -182,7 +187,7 @@ public class SlotInstEditBean {
 		}
 	}
 
-	private FileContainer buildContainer(DocDefCollection docDefCollection,
+	private FileContainer buildFileContainer(DocDefCollection docDefCollection,
 			Object item, boolean editables) {
 		List<DocumentPropertyInst> fileProperties = new ArrayList<DocumentPropertyInst>();
 		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
@@ -218,7 +223,38 @@ public class SlotInstEditBean {
 		return embeddedPropertyInst;
 	}
 
+	private void cleanMessages() {
+		Set<String> filesKeys = filesMessages.keySet();
+		for (String key : filesKeys) {
+			ArrayList<VerifierMessage> messages = filesMessages.get(key);
+			if (messages != null) {
+				messages.clear();
+			}
+		}
+
+		Set<Long> collectionsKeys = collectionsMessages.keySet();
+		for (Long key : collectionsKeys) {
+			ArrayList<VerifierMessage> messages = collectionsMessages.get(key);
+			if (messages != null) {
+				messages.clear();
+			}
+		}
+
+		if (this.slotMessages != null) {
+			slotMessages.clear();
+		}
+	}
+
 	public String save() {
+		cleanMessages();
+		boolean sizeCollectionPassed = checkCollectionsSize();
+		if (!sizeCollectionPassed) {
+			FacesMessages
+					.instance()
+					.add("Le dimensioni di alcune collection non rispettano le specifiche");
+			return "failed";
+		}
+
 		boolean passed = verify();
 		if (!passed) {
 			FacesMessages.instance().add("Rules not verified!");
@@ -290,6 +326,36 @@ public class SlotInstEditBean {
 				"Slot " + this.slotDefHome.getInstance().getName()
 						+ " successfully created");
 		return "saved";
+	}
+
+	private boolean checkCollectionsSize() {
+		boolean passed = true;
+
+		for (DocDefCollection defCollection : slotDefHome.getInstance()
+				.getDocDefCollections()) {
+			List<FileContainer> list = datas.get(defCollection.getId());
+			int size = list.size();
+			if (defCollection.getMin() != null && size < defCollection.getMin()) {
+				passed = false;
+				this.addCollectionMessage(defCollection.getId(),
+						new VerifierMessage(
+								"La quantità minima di documenti in questa collection è di "
+										+ defCollection.getMin()
+										+ " documento/i",
+								VerifierMessageType.ERROR));
+			}
+
+			if (defCollection.getMax() != null && size > defCollection.getMax()) {
+				passed = false;
+				this.addCollectionMessage(defCollection.getId(),
+						new VerifierMessage(
+								"La quantità massima di documenti in questa collection è di "
+										+ defCollection.getMax()
+										+ " documento/i",
+								VerifierMessageType.ERROR));
+			}
+		}
+		return passed;
 	}
 
 	private AlfrescoFolder retrieveSlotFolder() {
@@ -406,7 +472,8 @@ public class SlotInstEditBean {
 		System.out.println("-> " + fileName + " successfully uploaded");
 		DocDefCollection docDefCollection = entityManager.find(
 				DocDefCollection.class, docDefCollectionId);
-		FileContainer container = buildContainer(docDefCollection, item, true);
+		FileContainer container = buildFileContainer(docDefCollection, item,
+				true);
 		datas.get(docDefCollection.getId()).add(container);
 	}
 
@@ -414,6 +481,11 @@ public class SlotInstEditBean {
 		System.out.println("---> removing " + container.getFileName() + "...");
 		List<FileContainer> filesList = datas.get(collectionId);
 		filesList.remove(container);
+		ArrayList<VerifierMessage> messages = filesMessages.get(container
+				.getId());
+		if (messages != null) {
+			messages.clear();
+		}
 	}
 
 	private String storeOnAlfresco(UploadItem item,
@@ -597,8 +669,8 @@ public class SlotInstEditBean {
 		Map<String, String> encodedParametersMap = rule.getParametersMap();
 		IRuleVerifier verifier = rule.getVerifier();
 
-		Map<FileContainer, Map<String, VerifierParameterInst>> fileContainersPropertiesMap = new HashMap<FileContainer, Map<String, VerifierParameterInst>>();
-		Map<String, VerifierParameterInst> singleMap = new HashMap<String, VerifierParameterInst>();
+		Map<FileContainer, Map<String, Object>> fileContainersPropertiesMap = new HashMap<FileContainer, Map<String, Object>>();
+		Map<String, Object> singleMap = new HashMap<String, Object>();
 
 		Map<String, Couple> collectionsParameterDefs = new HashMap<String, SlotInstEditBean.Couple>();
 		Map<String, Couple> slotParameterDefs = new HashMap<String, SlotInstEditBean.Couple>();
@@ -620,10 +692,13 @@ public class SlotInstEditBean {
 			}
 		}
 
+		boolean verifiable = true;
 		// Assumo che se un parametro riferisce una collection allora ci sarà
 		// una lista di mappe (una mappa per file contenuto nella collection).
 		// Se invece i parametri riferiscono solo lo slot l'output sarà una sola
 		// mappa
+
+		// Parametri da recuperare nelle collection
 		Set<String> collectionsKeys = collectionsParameterDefs.keySet();
 		for (String paramName : collectionsKeys) {
 			Couple couple = collectionsParameterDefs.get(paramName);
@@ -633,36 +708,67 @@ public class SlotInstEditBean {
 			Property property = (Property) fieldDef;
 			DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
 			List<FileContainer> list = datas.get(docDefCollection.getId());
-			for (FileContainer fileContainer : list) {
-				List<DocumentPropertyInst> embeddedProperties = fileContainer
-						.getEmbeddedProperties();
-				Iterator<DocumentPropertyInst> iterator = embeddedProperties
-						.iterator();
-				boolean found = false;
-				while (iterator.hasNext() && found == false) {
-					DocumentPropertyInst documentPropertyInst = iterator.next();
-					if (documentPropertyInst.getProperty().equals(property)) {
-						Object value = documentPropertyInst.getValue();
-						//
-						VerifierParameterInst parameterInst = new VerifierParameterInst();
-						parameterInst.setLable(documentPropertyInst
-								.getProperty().getTitle());
-						parameterInst.setValue(value);
-						//
-						Map<String, VerifierParameterInst> valuesMap = fileContainersPropertiesMap
-								.get(fileContainer);
-						if (valuesMap == null) {
-							valuesMap = new HashMap<String, VerifierParameterInst>();
-							fileContainersPropertiesMap.put(fileContainer,
-									valuesMap);
+			if (list != null && !list.isEmpty()) {
+				for (FileContainer fileContainer : list) {
+					List<DocumentPropertyInst> embeddedProperties = fileContainer
+							.getEmbeddedProperties();
+					Iterator<DocumentPropertyInst> iterator = embeddedProperties
+							.iterator();
+					boolean found = false;
+					while (iterator.hasNext() && found == false) {
+						DocumentPropertyInst documentPropertyInst = iterator
+								.next();
+						if (documentPropertyInst.getProperty().equals(property)) {
+							Object value = documentPropertyInst.getValue();
+							//
+							// VerifierParameterInst parameterInst = new
+							// VerifierParameterInst();
+							// parameterInst.setLable(documentPropertyInst
+							// .getProperty().getTitle());
+							// parameterInst.setValue(value);
+							//
+							found = true;
+							if (value != null) {
+								Map<String, Object> valuesMap = fileContainersPropertiesMap
+										.get(fileContainer);
+								if (valuesMap == null) {
+									valuesMap = new HashMap<String, Object>();
+									fileContainersPropertiesMap.put(
+											fileContainer, valuesMap);
+								}
+								valuesMap.put(paramName, value);
+							} else {
+								verifiable = false;
+								this.addFileMessage(
+										fileContainer.getId(),
+										new VerifierMessage(
+												documentPropertyInst
+														.getProperty()
+														.getTitle()
+														+ " non può essere nulla per verificare una regola di tipo "
+														+ rule.getType()
+																.value(),
+												VerifierMessageType.ERROR));
+							}
 						}
-						valuesMap.put(paramName, parameterInst);
-						found = true;
 					}
 				}
+			} else {
+				verifiable = false;
+				addCollectionMessage(
+						docDefCollection.getId(),
+						new VerifierMessage(
+								docDefCollection.getName()
+										+ " non può essere vuota per verificare una regola di tipo "
+										+ rule.getType().value()
+										+ " sulla proprietà "
+										+ property.getTitle()
+										+ " dei files che contiene",
+								VerifierMessageType.ERROR));
 			}
 		}
 
+		// Parametri da recuperare tra le properties dello slot
 		Set<String> slotKeys = slotParameterDefs.keySet();
 		for (String paramName : slotKeys) {
 			Couple couple = slotParameterDefs.get(paramName);
@@ -677,96 +783,128 @@ public class SlotInstEditBean {
 					PropertyInst propertyInst = iterator.next();
 					if (propertyInst.getPropertyDef().equals(propertyDef)) {
 						Object value = propertyInst.getValue();
-						Collection<Map<String, VerifierParameterInst>> mapValues = fileContainersPropertiesMap
-								.values();
-						//
-						VerifierParameterInst parameterInst = new VerifierParameterInst();
-						parameterInst.setLable(propertyDef.getName());
-						parameterInst.setValue(value);
-						//
-						if (!mapValues.isEmpty()) {
-							for (Map<String, VerifierParameterInst> tmpmap : mapValues) {
-								tmpmap.put(paramName, parameterInst);
+						if (value != null) {
+							Collection<Map<String, Object>> mapValues = fileContainersPropertiesMap
+									.values();
+							//
+							// VerifierParameterInst parameterInst = new
+							// VerifierParameterInst();
+							// parameterInst.setLable(propertyDef.getName());
+							// parameterInst.setValue(value);
+							//
+							if (!mapValues.isEmpty()) {
+								for (Map<String, Object> tmpmap : mapValues) {
+									tmpmap.put(paramName, value);
+								}
+							} else {
+								singleMap.put(paramName, value);
 							}
+							found = true;
 						} else {
-							singleMap.put(paramName, parameterInst);
+							verifiable = false;
+							this.addMainMessage(new VerifierMessage(
+									propertyDef.getName()
+											+ " non può essere nulla per verificare una regola di tipo "
+											+ rule.getType().value(),
+									VerifierMessageType.ERROR));
 						}
-						found = true;
 					}
 				}
 			} else if (fieldDef instanceof SlotDefEmbeddedProperty) {
 				SlotDefEmbeddedProperty embeddedProperty = (SlotDefEmbeddedProperty) fieldDef;
 				Object value = embeddedProperty.getValue();
-				Collection<Map<String, VerifierParameterInst>> mapValues = fileContainersPropertiesMap
+				Collection<Map<String, Object>> mapValues = fileContainersPropertiesMap
 						.values();
 				//
-				VerifierParameterInst parameterInst = new VerifierParameterInst();
-				parameterInst.setLable(embeddedProperty.getName());
-				parameterInst.setValue(value);
+				// VerifierParameterInst parameterInst = new
+				// VerifierParameterInst();
+				// parameterInst.setLable(embeddedProperty.getName());
+				// parameterInst.setValue(value);
 				//
 				if (!mapValues.isEmpty()) {
-					for (Map<String, VerifierParameterInst> tmpmap : mapValues) {
-						tmpmap.put(paramName, parameterInst);
+					for (Map<String, Object> tmpmap : mapValues) {
+						tmpmap.put(paramName, value);
 					}
 				} else {
-					singleMap.put(paramName, parameterInst);
+					singleMap.put(paramName, value);
 				}
 			}
 		}
 
-		boolean passed = true;
+		boolean passed = false;
+		if (verifiable) {
+			passed = true;
+			if (!fileContainersPropertiesMap.values().isEmpty()) {
+				Set<FileContainer> fileContainerKeySet = fileContainersPropertiesMap
+						.keySet();
+				for (FileContainer fileContainer : fileContainerKeySet) {
+					Map<String, Object> mapParameters = fileContainersPropertiesMap
+							.get(fileContainer);
+					VerifierReport report = verifier.verify(mapParameters);
+					VerifierMessage message = null;
+					if (report.getResult().equals(VerifierResult.ERROR)) {
+						passed = false;
+						message = rule.getErrorMessage();
+						if (message == null || message.getText().equals("")) {
+							message = verifier.getDefaultErrorMessage();
+						}
+					} else if (report.getResult()
+							.equals(VerifierResult.WARNING)) {
+						message = rule.getWarningMessage();
+						if (message == null || message.getText().equals("")) {
+							message = verifier.getDefaultWarningMessage();
+						}
+					}
 
-		if (!fileContainersPropertiesMap.values().isEmpty()) {
-			Set<FileContainer> fileContainerKeySet = fileContainersPropertiesMap
-					.keySet();
-			for (FileContainer fileContainer : fileContainerKeySet) {
-				Map<String, VerifierParameterInst> mapParameters = fileContainersPropertiesMap
-						.get(fileContainer);
-				VerifierReport report = verifier.verify(mapParameters);
-				if (report.getResult().equals(VerifierResult.PASSED)) {
+					if (message != null) {
+						this.addFileMessage(fileContainer.getId(), message);
+					}
+				}
+			} else {
+				VerifierReport report = verifier.verify(singleMap);
+				VerifierMessage message = null;
+				if (report.getResult().equals(VerifierResult.ERROR)) {
 					passed = false;
-					VerifierMessage message = rule.getErrorMessage();
+					message = rule.getErrorMessage();
 					if (message == null || message.getText().equals("")) {
 						message = verifier.getDefaultErrorMessage();
 					}
-					ArrayList<VerifierMessage> messages = filesMessages
-							.get(fileContainer.getId());
-					if (messages == null) {
-						messages = new ArrayList<VerifierMessage>();
-						filesMessages.put(fileContainer.getId(), messages);
+				} else if (report.getResult().equals(VerifierResult.WARNING)) {
+					message = rule.getWarningMessage();
+					if (message == null || message.getText().equals("")) {
+						message = verifier.getDefaultWarningMessage();
 					}
-					messages.add(message);
 				}
-				// VerifierMessage message = report.getMessage();
-				// if (message != null) {
-				// ArrayList<VerifierMessage> messages = filesMessages
-				// .get(fileContainer.getId());
-				// if (messages == null) {
-				// messages = new ArrayList<VerifierMessage>();
-				// filesMessages.put(fileContainer.getId(), messages);
-				// }
-				// messages.add(message);
-				// System.out.println("MESSAGE: " + message.getText());
-				// }
-			}
-		} else {
-			VerifierReport report = verifier.verify(singleMap);
-			if (report.getResult().equals(VerifierResult.ERROR)) {
-				passed = false;
-				VerifierMessage message = rule.getErrorMessage();
-				if (message == null || message.getText().equals("")) {
-					message = verifier.getDefaultErrorMessage();
+				if (message != null) {
+					this.addMainMessage(message);
 				}
-				slotMessages.add(message);
 			}
-			// VerifierMessage message = report.getMessage();
-			// if (message != null) {
-			// slotMessages.add(message);
-			// System.out.println("MESSAGE: " + message.getText());
-			// }
 		}
-
 		return passed;
+	}
+
+	private void addCollectionMessage(Long collectionId, VerifierMessage message) {
+		ArrayList<VerifierMessage> messages = collectionsMessages
+				.get(collectionId);
+		if (messages == null) {
+			messages = new ArrayList<VerifierMessage>();
+			collectionsMessages.put(collectionId, messages);
+		}
+		messages.add(message);
+	}
+
+	private void addFileMessage(String fileContainerId, VerifierMessage message) {
+		ArrayList<VerifierMessage> messages = filesMessages
+				.get(fileContainerId);
+		if (messages == null) {
+			messages = new ArrayList<VerifierMessage>();
+			filesMessages.put(fileContainerId, messages);
+		}
+		messages.add(message);
+	}
+
+	private void addMainMessage(VerifierMessage message) {
+		slotMessages.add(message);
 	}
 
 	public List<PropertyInst> getPropertyInsts() {
@@ -856,6 +994,15 @@ public class SlotInstEditBean {
 	public void setFilesMessages(
 			HashMap<String, ArrayList<VerifierMessage>> filesMessages) {
 		this.filesMessages = filesMessages;
+	}
+
+	public HashMap<Long, ArrayList<VerifierMessage>> getCollectionsMessages() {
+		return collectionsMessages;
+	}
+
+	public void setCollectionsMessages(
+			HashMap<Long, ArrayList<VerifierMessage>> collectionsMessages) {
+		this.collectionsMessages = collectionsMessages;
 	}
 
 }
