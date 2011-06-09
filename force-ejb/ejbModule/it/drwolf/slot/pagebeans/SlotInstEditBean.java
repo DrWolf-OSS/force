@@ -210,6 +210,7 @@ public class SlotInstEditBean {
 			}
 		}
 		FileContainer container = new FileContainer(item);
+		container.setEditable(editables);
 		container.setEmbeddedProperties(fileProperties);
 		return container;
 	}
@@ -643,8 +644,16 @@ public class SlotInstEditBean {
 
 	public void addDocFromPrimary(Long docDefCollectionId,
 			FileContainer container) {
+		//
+		container.setEditable(false);
+		//
 		this.activeCollectionId = docDefCollectionId;
 		datas.get(docDefCollectionId).add(container);
+	}
+
+	public void editItem(Long docDefCollectionId, FileContainer container) {
+		this.activeCollectionId = docDefCollectionId;
+		this.activeFileContainer = container;
 	}
 
 	private boolean verify() {

@@ -146,27 +146,21 @@
 										</s:decorate>
 
 										<ui:repeat var="propInst" value="#{item.embeddedProperties}">
-											<s:decorate template="/layout/edit.xhtml">
+											<s:decorate template="/layout/display.xhtml">
 												<ui:define name="label">
 													<h:outputText value="#{propInst.property.title}" />
 												</ui:define>
-												<h:inputText id="propT" value="#{propInst.stringValue}"
-													rendered="#{propInst.property.type == 'd:text'}"
-													disabled="#{not propInst.editable}"
-													required="#{propInst.property.mandatory}" />
-												<h:inputText value="#{propInst.integerValue}"
-													rendered="#{propInst.property.type == 'd:int'}"
-													disabled="#{not propInst.editable}"
-													required="#{propInst.property.mandatory}" />
-												<h:selectBooleanCheckbox value="#{propInst.booleanValue}"
-													rendered="#{propInst.property.type == 'd:boolean'}"
-													disabled="#{not propInst.editable}"
-													required="#{propInst.property.mandatory}" />
-												<rich:calendar id="subscriptionDate" mode="client"
-													value="#{propInst.dateValue}" datePattern="dd/MM/yyyy"
-													rendered="#{propInst.property.type == 'd:date'}"
-													disabled="#{not propInst.editable}"
-													required="#{propInst.property.mandatory}" />
+												<h:outputText id="propT" value="#{propInst.stringValue}"
+													rendered="#{propInst.property.type == 'd:text'}"/>
+												<h:outputText value="#{propInst.integerValue}"
+													rendered="#{propInst.property.type == 'd:int'}" />
+												<h:outputText value="#{propInst.booleanValue ? 'true' : 'false'}"
+													rendered="#{propInst.property.type == 'd:boolean'}" />
+												<h:outputText value="#{propInst.dateValue}"
+													rendered="#{propInst.property.type == 'd:date'}">
+													<s:convertDateTime type="date" dateStyle="short"
+														pattern="dd/MM/yyyy" />
+												</h:outputText>
 											</s:decorate>
 										</ui:repeat>
 										<div style="clear: both" />
@@ -174,6 +168,11 @@
 											<a:commandButton value="Remove"
 												action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}"
 												reRender="infoPanel_#{slotInstEditBean.activeCollectionId},primaryRegion_#{coll.docDefCollection.id}" />
+											<a:commandButton value="Edit"
+												action="#{slotInstEditBean.editItem(coll.docDefCollection.id, item)}" 
+												reRender="editPanel" 
+												oncomplete="#{rich:component('editPanel')}.show()"
+												disabled="#{not item.editable}"/>
 										</a:region>
 									</rich:dataGrid>
 									<div style="clear: both" />

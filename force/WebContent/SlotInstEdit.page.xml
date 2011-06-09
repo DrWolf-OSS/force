@@ -59,10 +59,10 @@
       </rule>
    </navigation>
    
-   <navigation from-action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}">
-         <redirect view-id="/SlotInstEdit.xhtml">
-         	<param name="slotDefId" value="#{slotDefHome.id}"/>
-         </redirect>
-   </navigation>
+<!--   <navigation from-action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}">-->
+<!--         <redirect view-id="/SlotInstEdit.xhtml">-->
+<!--         	<param name="slotDefId" value="#{slotDefHome.id}"/>-->
+<!--         </redirect>-->
+<!--   </navigation>-->
 
 </page>

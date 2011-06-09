@@ -13,6 +13,7 @@ public class FileContainer {
 	private UploadItem uploadItem;
 	private AlfrescoDocument document;
 	private List<DocumentPropertyInst> embeddedProperties = new ArrayList<DocumentPropertyInst>();
+	private boolean editable = true;
 	private String id = UUID.randomUUID().toString();
 
 	public FileContainer(AlfrescoDocument alfrescoDocument) {
@@ -113,6 +114,14 @@ public class FileContainer {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setEditable(boolean editable) {
+		this.editable = editable;
 	}
 
 }
