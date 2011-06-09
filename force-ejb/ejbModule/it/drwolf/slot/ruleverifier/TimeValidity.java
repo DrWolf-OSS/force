@@ -13,6 +13,7 @@ public class TimeValidity implements IRuleVerifier {
 
 	private final String EARLIER_DATE = "EarlierDate";
 	private final String FOLLOWING_DATE = "FollowingDate";
+	private final String WARNING_THRESHOLD = "WarningThreshold";
 
 	final private List<VerifierParameterDef> params = new ArrayList<VerifierParameterDef>();
 
@@ -21,9 +22,11 @@ public class TimeValidity implements IRuleVerifier {
 
 	public TimeValidity() {
 		params.add(new VerifierParameterDef(this.EARLIER_DATE, "Earlier Date",
-				DataType.DATE));
+				DataType.DATE, false));
 		params.add(new VerifierParameterDef(this.FOLLOWING_DATE,
-				"Following date", DataType.DATE));
+				"Following date", DataType.DATE, false));
+		params.add(new VerifierParameterDef(this.WARNING_THRESHOLD,
+				"Warning Theshold", DataType.INTEGER, true));
 	}
 
 	public VerifierReport verify(Map<String, Object> params) {

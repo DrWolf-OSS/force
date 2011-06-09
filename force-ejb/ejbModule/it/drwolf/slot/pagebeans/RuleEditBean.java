@@ -111,9 +111,12 @@ public class RuleEditBean {
 						rule.setWarningMessage(this.warningMessage);
 					}
 				} else {
-					error = true;
-					FacesMessages.instance().add(
-							"\"" + parameter.getLabel() + "\" not compiled");
+					if (!parameter.isOptional()) {
+						error = true;
+						FacesMessages.instance()
+								.add("\"" + parameter.getLabel()
+										+ "\" not compiled");
+					}
 				}
 			}
 		} else {

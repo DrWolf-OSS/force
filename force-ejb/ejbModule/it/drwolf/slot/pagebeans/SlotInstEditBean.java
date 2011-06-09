@@ -20,6 +20,7 @@ import it.drwolf.slot.prefs.Preferences;
 import it.drwolf.slot.ruleverifier.RuleParametersResolver;
 import it.drwolf.slot.ruleverifier.VerifierMessage;
 import it.drwolf.slot.ruleverifier.VerifierMessageType;
+import it.drwolf.slot.ruleverifier.VerifierParameterDef;
 import it.drwolf.slot.ruleverifier.VerifierReport;
 import it.drwolf.slot.ruleverifier.VerifierResult;
 import it.drwolf.slot.session.SlotDefHome;
@@ -110,6 +111,8 @@ public class SlotInstEditBean {
 	private HashMap<Long, ArrayList<VerifierMessage>> collectionsMessages = new HashMap<Long, ArrayList<VerifierMessage>>();
 
 	private Long activeCollectionId;
+
+	private FileContainer activeFileContainer;
 
 	@Create
 	public void init() {
@@ -458,10 +461,7 @@ public class SlotInstEditBean {
 
 	public void listener(UploadEvent event) {
 		UploadItem item = event.getUploadItem();
-		addItemToDatas(item);
-	}
 
-	private void addItemToDatas(UploadItem item) {
 		String fileName = item.getFileName();
 		Long docDefCollectionId = this.activeCollectionId;
 		List<FileContainer> list = datas.get(docDefCollectionId);
@@ -474,7 +474,13 @@ public class SlotInstEditBean {
 				DocDefCollection.class, docDefCollectionId);
 		FileContainer container = buildFileContainer(docDefCollection, item,
 				true);
-		datas.get(docDefCollection.getId()).add(container);
+		//
+		this.activeFileContainer = container;
+		//
+	}
+
+	public void addActiveItemToDatas() {
+		datas.get(this.activeCollectionId).add(this.activeFileContainer);
 	}
 
 	public void remove(Long collectionId, FileContainer container) {
@@ -668,6 +674,7 @@ public class SlotInstEditBean {
 	private boolean verifyRule(Rule rule) {
 		Map<String, String> encodedParametersMap = rule.getParametersMap();
 		IRuleVerifier verifier = rule.getVerifier();
+		List<VerifierParameterDef> inParams = verifier.getInParams();
 
 		Map<FileContainer, Map<String, Object>> fileContainersPropertiesMap = new HashMap<FileContainer, Map<String, Object>>();
 		Map<String, Object> singleMap = new HashMap<String, Object>();
@@ -675,6 +682,8 @@ public class SlotInstEditBean {
 		Map<String, Couple> collectionsParameterDefs = new HashMap<String, SlotInstEditBean.Couple>();
 		Map<String, Couple> slotParameterDefs = new HashMap<String, SlotInstEditBean.Couple>();
 
+		// Separo le sorgenti in base al fatto se afferiscono o meno a delle
+		// collection
 		Set<String> keySet = encodedParametersMap.keySet();
 		for (String paramName : keySet) {
 			String encodedParams = encodedParametersMap.get(paramName);
@@ -693,11 +702,11 @@ public class SlotInstEditBean {
 		}
 
 		boolean verifiable = true;
+
 		// Assumo che se un parametro riferisce una collection allora ci sarà
 		// una lista di mappe (una mappa per file contenuto nella collection).
 		// Se invece i parametri riferiscono solo lo slot l'output sarà una sola
-		// mappa
-
+		// mappa.
 		// Parametri da recuperare nelle collection
 		Set<String> collectionsKeys = collectionsParameterDefs.keySet();
 		for (String paramName : collectionsKeys) {
@@ -1003,6 +1012,14 @@ public class SlotInstEditBean {
 	public void setCollectionsMessages(
 			HashMap<Long, ArrayList<VerifierMessage>> collectionsMessages) {
 		this.collectionsMessages = collectionsMessages;
+	}
+
+	public FileContainer getActiveFileContainer() {
+		return activeFileContainer;
+	}
+
+	public void setActiveFileContainer(FileContainer activeFileContainer) {
+		this.activeFileContainer = activeFileContainer;
 	}
 
 }

@@ -1,276 +1,357 @@
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:s="http://jboss.com/products/seam/taglib"
-    xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:f="http://java.sun.com/jsf/core"
-    xmlns:c="http://java.sun.com/jstl/core"
-    xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:a="http://richfaces.org/a4j"
-    xmlns:rich="http://richfaces.org/rich"
-    template="layout/template.xhtml">
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich" template="layout/template.xhtml">
 
-<ui:define name="body">
+	<ui:define name="body">
 
-    <a:form id="slotInst" styleClass="edit">
+		<a:form id="slotInst" styleClass="edit">
 			<rich:panel>
-            <f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Edit' : 'Create'} Slot inst #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
-            
-            <ui:repeat var="message" value="#{slotInstEditBean.slotMessages}">
-    				<h:graphicImage value="/img/msgerror.png" rendered="#{message.type == 'ERROR'}"/>
-    				<h:graphicImage value="/img/msgwarn.png" rendered="#{message.type == 'WARNING'}"/>
-    				<h:outputText value="#{message.text}"/>
-    				<br />
-    			</ui:repeat>
-    			
-            <s:div id="embeddedProperties">
-			<c:forEach var="embeddedProp" items="#{slotInstEditBean.embeddedProperties}">
-				<s:decorate template="/layout/display.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="#{embeddedProp.name}" />
-					</ui:define>
-					<h:outputText value="#{embeddedProp.stringValue}" rendered="#{embeddedProp.type == 'STRING'}"/>
-					<h:outputText value="#{embeddedProp.integerValue}" rendered="#{embeddedProp.type == 'INTEGER'}"/>
-					<h:outputText value="#{embeddedProp.booleanValue ? 'true' : 'false'}" rendered="#{embeddedProp.type == 'BOOLEAN'}"/>
-					<h:outputText value="#{embeddedProp.dateValue}" rendered="#{embeddedProp.type == 'DATE'}">
-                		<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy"/>
-            		</h:outputText>
-	            </s:decorate>			
-			</c:forEach>
-			</s:div>
-            
-            <s:div id="properties">	
-			<c:forEach var="propInst" items="#{slotInstEditBean.propertyInsts}">
-				<s:decorate template="/layout/edit.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="#{propInst.propertyDef.name}" />
-					</ui:define>
-					<h:inputText value="#{propInst.stringValue}" rendered="#{propInst.propertyDef.type == 'STRING'}" required="#{propInst.propertyDef.required}"/>
-					<h:inputText value="#{propInst.integerValue}" rendered="#{propInst.propertyDef.type == 'INTEGER'}" required="#{propInst.propertyDef.required}"/>
-					<h:selectBooleanCheckbox value="#{propInst.booleanValue}" rendered="#{propInst.propertyDef.type == 'BOOLEAN'}" required="#{propInst.propertyDef.required}"/>
-					<rich:calendar id="subscriptionDate" mode="client"
-                          value="#{propInst.dateValue}"
-                          datePattern="dd/MM/yyyy"
-                          rendered="#{propInst.propertyDef.type == 'DATE'}"
-                          required="#{propInst.propertyDef.required}"/>
-	            </s:decorate>			
-			</c:forEach>
-			</s:div>
-			
-			<div style="clear:both"/>
-			
-			<s:div id="collections">
-			<h:panelGrid columns="2">
-			<c:forEach var="coll" items="#{slotInstEditBean.docInstCollections}">
-			
-			<s:div id="primaryRegion_#{coll.docDefCollection.id}">
-			<a:region>
-			<s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">
-                	<h:outputText value="#{coll.docDefCollection.name}" />
-				</ui:define>
-				<rich:panel>
-				<f:facet name="header">
-	            	<h:outputText value="Available #{coll.docDefCollection.docDef.name} on primary slot" />
-	            </f:facet>	
-					<rich:dataGrid value="#{slotInstEditBean.primaryDocs[coll.docDefCollection.id]}" var="item">
-						<h:outputText value="#{item.fileName}" />
-						<a:commandButton id="addPrimaryDoc_#{coll.docDefCollection.id}" value=">>" action="#{slotInstEditBean.addDocFromPrimary(coll.docDefCollection.id,item)}" 
-									reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}"
-									disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}"/>
-					</rich:dataGrid>
-					<div style="clear:both"/>
-					<a:commandButton id="addNewFile_#{coll.docDefCollection.id}" value="add new file" action="#{slotInstEditBean.setActiveCollectionId(coll.docDefCollection.id)}" 
-								onclick="#{rich:component('uploadPanel')}.show()" 
-								reRender="infoPanel_#{slotInstEditBean.activeCollectionId},primaryRegion_#{coll.docDefCollection.id}"
-								disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}"/>
-				</rich:panel>
-			 </s:decorate>
-			 </a:region>
-			 </s:div>
-      
-	            <s:div id="infoPanel_#{coll.docDefCollection.id}">
-	            			<ui:repeat var="message" value="#{slotInstEditBean.collectionsMessages[coll.docDefCollection.id]}">
-	            				<h:graphicImage value="/img/msgerror.png" rendered="#{message.type == 'ERROR'}"/>
-	            				<h:graphicImage value="/img/msgwarn.png" rendered="#{message.type == 'WARNING'}"/>
-	            				<h:outputText value="#{message.text}" /><br />
-	            			</ui:repeat>
-	            	<rich:panel >
-	            		<f:facet name="header">
-	            			<h:outputText value="Uploaded Files Info" />
-	            		</f:facet>
-	            		<h:outputText value="No files uploaded" rendered="#{slotInstEditBean.datas[coll.docDefCollection.id] == null or (empty slotInstEditBean.datas[coll.docDefCollection.id])}"/>
+				<f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Edit' : 'Create'} Slot inst #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
 
-	            		<rich:dataGrid id="fileGrid_#{coll.docDefCollection.id}" columns="1" value="#{slotInstEditBean.datas[coll.docDefCollection.id]}" var="item" rowKeyVar="row">
-	            			
-	            			<ui:repeat var="message" value="#{slotInstEditBean.filesMessages[item.id]}">
-	            				<h:graphicImage value="/img/msgerror.png" rendered="#{message.type == 'ERROR'}"/>
-	            				<h:graphicImage value="/img/msgwarn.png" rendered="#{message.type == 'WARNING'}"/>
-	            				<h:outputText value="#{message.text}" /><br />
-	            			</ui:repeat>
+				<ui:repeat var="message" value="#{slotInstEditBean.slotMessages}">
+					<h:graphicImage value="/img/msgerror.png"
+						rendered="#{message.type == 'ERROR'}" />
+					<h:graphicImage value="/img/msgwarn.png"
+						rendered="#{message.type == 'WARNING'}" />
+					<h:outputText value="#{message.text}" />
+					<br />
+				</ui:repeat>
 
-		            		<s:decorate template="/layout/display.xhtml">
-		               			 <ui:define name="label">
-		                			<h:outputText value="File Name" />
-								</ui:define>
-								<h:outputText value="#{item.fileName}"/>
-		            		</s:decorate>
-		            		
-		            		<ui:repeat var="propInst" value="#{item.embeddedProperties}">
-			            		<s:decorate template="/layout/edit.xhtml">
-			               			 <ui:define name="label">
-			                			<h:outputText value="#{propInst.property.title}" />
+				<s:div id="embeddedProperties">
+					<c:forEach var="embeddedProp"
+						items="#{slotInstEditBean.embeddedProperties}">
+						<s:decorate template="/layout/display.xhtml">
+							<ui:define name="label">
+								<h:outputText value="#{embeddedProp.name}" />
+							</ui:define>
+							<h:outputText value="#{embeddedProp.stringValue}"
+								rendered="#{embeddedProp.type == 'STRING'}" />
+							<h:outputText value="#{embeddedProp.integerValue}"
+								rendered="#{embeddedProp.type == 'INTEGER'}" />
+							<h:outputText
+								value="#{embeddedProp.booleanValue ? 'true' : 'false'}"
+								rendered="#{embeddedProp.type == 'BOOLEAN'}" />
+							<h:outputText value="#{embeddedProp.dateValue}"
+								rendered="#{embeddedProp.type == 'DATE'}">
+								<s:convertDateTime type="date" dateStyle="short"
+									pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</s:decorate>
+					</c:forEach>
+				</s:div>
+
+				<s:div id="properties">
+					<c:forEach var="propInst" items="#{slotInstEditBean.propertyInsts}">
+						<s:decorate template="/layout/edit.xhtml">
+							<ui:define name="label">
+								<h:outputText value="#{propInst.propertyDef.name}" />
+							</ui:define>
+							<h:inputText value="#{propInst.stringValue}"
+								rendered="#{propInst.propertyDef.type == 'STRING'}"
+								required="#{propInst.propertyDef.required}" />
+							<h:inputText value="#{propInst.integerValue}"
+								rendered="#{propInst.propertyDef.type == 'INTEGER'}"
+								required="#{propInst.propertyDef.required}" />
+							<h:selectBooleanCheckbox value="#{propInst.booleanValue}"
+								rendered="#{propInst.propertyDef.type == 'BOOLEAN'}"
+								required="#{propInst.propertyDef.required}" />
+							<rich:calendar id="subscriptionDate" mode="client"
+								value="#{propInst.dateValue}" datePattern="dd/MM/yyyy"
+								rendered="#{propInst.propertyDef.type == 'DATE'}"
+								required="#{propInst.propertyDef.required}" />
+						</s:decorate>
+					</c:forEach>
+				</s:div>
+
+				<div style="clear: both" />
+
+				<s:div id="collections">
+					<h:panelGrid columns="2">
+						<c:forEach var="coll"
+							items="#{slotInstEditBean.docInstCollections}">
+
+							<s:div id="primaryRegion_#{coll.docDefCollection.id}">
+
+								<s:decorate template="/layout/display.xhtml">
+									<ui:define name="label">
+										<h:outputText value="#{coll.docDefCollection.name}" />
 									</ui:define>
-									<h:inputText id="propT" value="#{propInst.stringValue}" rendered="#{propInst.property.type == 'd:text'}" disabled="#{not propInst.editable}" required="#{propInst.property.mandatory}"/>
-									<h:inputText value="#{propInst.integerValue}" rendered="#{propInst.property.type == 'd:int'}" disabled="#{not propInst.editable}" required="#{propInst.property.mandatory}"/>
-									<h:selectBooleanCheckbox value="#{propInst.booleanValue}" rendered="#{propInst.property.type == 'd:boolean'}" disabled="#{not propInst.editable}" required="#{propInst.property.mandatory}"/>
-									<rich:calendar id="subscriptionDate" mode="client"
-                          						value="#{propInst.dateValue}"
-                          					datePattern="dd/MM/yyyy"
-                         						rendered="#{propInst.property.type == 'd:date'}"
-                         						disabled="#{not propInst.editable}"
-                         						required="#{propInst.property.mandatory}"/>
-			            		</s:decorate>
-		            		</ui:repeat>
-			            	<div style="clear:both"/>
-							<a:region>
-				            <a:commandButton value="Remove" action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}" 
-				            				reRender="infoPanel_#{slotInstEditBean.activeCollectionId},primaryRegion_#{coll.docDefCollection.id}"/>
-				            </a:region>
-	            		</rich:dataGrid>
-	            	</rich:panel>
-	            </s:div>
-	            
-			</c:forEach>
-			</h:panelGrid>
-			</s:div>
-	
-            <div style="clear:both">
-                <span class="required">*</span>
-                required fields
-            </div>
+									<rich:panel>
+										<f:facet name="header">
+											<h:outputText
+												value="Available #{coll.docDefCollection.docDef.name} on primary slot" />
+										</f:facet>
+										<rich:dataGrid
+											value="#{slotInstEditBean.primaryDocs[coll.docDefCollection.id]}"
+											var="item">
+											<h:outputText value="#{item.fileName}" />
+											<a:region>
+												<a:commandButton value=">>"
+													id="addPrimaryDoc_#{coll.docDefCollection.id}"
+													action="#{slotInstEditBean.addDocFromPrimary(coll.docDefCollection.id,item)}"
+													reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}"
+													disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}" />
+											</a:region>
+										</rich:dataGrid>
 
-        </rich:panel>
+									</rich:panel>
+								</s:decorate>
 
-        <div class="actionButtons">
+							</s:div>
 
-            <h:commandButton id="save"
-                          value="Save"
-                         action="#{slotInstEditBean.save()}"
-                       disabled="#{!slotInstHome.wired}"
-                       rendered="#{!slotInstHome.managed}"/>
+							<s:div id="infoPanel_#{coll.docDefCollection.id}">
+								<ui:repeat var="message"
+									value="#{slotInstEditBean.collectionsMessages[coll.docDefCollection.id]}">
+									<h:graphicImage value="/img/msgerror.png"
+										rendered="#{message.type == 'ERROR'}" />
+									<h:graphicImage value="/img/msgwarn.png"
+										rendered="#{message.type == 'WARNING'}" />
+									<h:outputText value="#{message.text}" />
+									<br />
+								</ui:repeat>
+								<rich:panel>
+									<f:facet name="header">
+										<h:outputText value="Uploaded Files Info" />
+									</f:facet>
+									<h:outputText value="No files uploaded"
+										rendered="#{slotInstEditBean.datas[coll.docDefCollection.id] == null or (empty slotInstEditBean.datas[coll.docDefCollection.id])}" />
 
-            <h:commandButton id="update"
-                          value="Save"
-                         action="#{slotInstEditBean.update()}"
-                       rendered="#{slotInstHome.managed}"/>
+									<rich:dataGrid id="fileGrid_#{coll.docDefCollection.id}"
+										columns="1"
+										value="#{slotInstEditBean.datas[coll.docDefCollection.id]}"
+										var="item" rowKeyVar="row">
 
-            <h:commandButton id="delete"
-                          value="Delete"
-                         action="#{slotInstHome.remove}"
-                      immediate="true"
-                       rendered="#{slotInstHome.managed}"/>
+										<ui:repeat var="message"
+											value="#{slotInstEditBean.filesMessages[item.id]}">
+											<h:graphicImage value="/img/msgerror.png"
+												rendered="#{message.type == 'ERROR'}" />
+											<h:graphicImage value="/img/msgwarn.png"
+												rendered="#{message.type == 'WARNING'}" />
+											<h:outputText value="#{message.text}" />
+											<br />
+										</ui:repeat>
 
-            <s:button id="cancelEdit"
-                   value="Cancel"
-             propagation="end"
-                    view="/SlotInst.xhtml"
-                rendered="#{slotInstHome.managed}"/>
+										<s:decorate template="/layout/display.xhtml">
+											<ui:define name="label">
+												<h:outputText value="File Name" />
+											</ui:define>
+											<h:outputText value="#{item.fileName}" />
+										</s:decorate>
 
-            <s:button id="cancelAdd"
-                   value="Cancel"
-             propagation="end"
-                    view="/#{empty slotInstFrom ? 'SlotInstList' : slotInstFrom}.xhtml"
-                rendered="#{!slotInstHome.managed}"/>
+										<ui:repeat var="propInst" value="#{item.embeddedProperties}">
+											<s:decorate template="/layout/edit.xhtml">
+												<ui:define name="label">
+													<h:outputText value="#{propInst.property.title}" />
+												</ui:define>
+												<h:inputText id="propT" value="#{propInst.stringValue}"
+													rendered="#{propInst.property.type == 'd:text'}"
+													disabled="#{not propInst.editable}"
+													required="#{propInst.property.mandatory}" />
+												<h:inputText value="#{propInst.integerValue}"
+													rendered="#{propInst.property.type == 'd:int'}"
+													disabled="#{not propInst.editable}"
+													required="#{propInst.property.mandatory}" />
+												<h:selectBooleanCheckbox value="#{propInst.booleanValue}"
+													rendered="#{propInst.property.type == 'd:boolean'}"
+													disabled="#{not propInst.editable}"
+													required="#{propInst.property.mandatory}" />
+												<rich:calendar id="subscriptionDate" mode="client"
+													value="#{propInst.dateValue}" datePattern="dd/MM/yyyy"
+													rendered="#{propInst.property.type == 'd:date'}"
+													disabled="#{not propInst.editable}"
+													required="#{propInst.property.mandatory}" />
+											</s:decorate>
+										</ui:repeat>
+										<div style="clear: both" />
+										<a:region>
+											<a:commandButton value="Remove"
+												action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}"
+												reRender="infoPanel_#{slotInstEditBean.activeCollectionId},primaryRegion_#{coll.docDefCollection.id}" />
+										</a:region>
+									</rich:dataGrid>
+									<div style="clear: both" />
 
-        </div>
-    </a:form>
+									<a:region>
+										<a:commandButton id="addNewFile_#{coll.docDefCollection.id}"
+											value="add new file"
+											action="#{slotInstEditBean.setActiveCollectionId(coll.docDefCollection.id)}"
+											onclick="#{rich:component('uploadPanel')}.show()"
+											reRender="primaryRegion_#{coll.docDefCollection.id}"
+											disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}" />
+									</a:region>
+								</rich:panel>
+							</s:div>
 
-<rich:tabPanel switchType="ajax">
+						</c:forEach>
+					</h:panelGrid>
+				</s:div>
 
-    <rich:tab label="Doc inst collections">
-        <h:form styleClass="association" id="docInstCollectionsChildren">
+				<div style="clear: both"><span class="required">*</span>
+				required fields</div>
 
-            <h:outputText value="There are no docInstCollections associated with this slotInst."
-                       rendered="#{empty slotInstHome.docInstCollections}"/>
+			</rich:panel>
 
-            <rich:dataTable value="#{slotInstHome.docInstCollections}"
-                           var="_docInstCollection"
-                      rendered="#{not empty slotInstHome.docInstCollections}"
-                    rowClasses="rvgRowOne,rvgRowTwo"
-                            id="docInstCollectionsTable">
-                <rich:column sortBy="#{_docInstCollection.id}">
-                    <f:facet name="header">Id</f:facet>
-                    <h:outputText value="#{_docInstCollection.id}"/>
-                </rich:column>
-            </rich:dataTable>
-	
-        </h:form>
-
-        <f:subview rendered="#{slotInstHome.managed}" id="docInstCollections">
-        <div class="actionButtons">
-            <s:button id="adddocInstCollection"
-                   value="Add docInstCollection"
-                    view="/DocInstCollectionEdit.xhtml"
-             propagation="none">
-                 <f:param name="slotInstId"
-                         value="#{slotInstHome.instance.id}"/>
-                 <f:param name="docInstCollectionFrom" value="SlotInst"/>
-            </s:button>
-        </div>
-        </f:subview>
-    </rich:tab>
-
-    <rich:tab label="Slot def">
-    <div class="association" id="slotDefParent">
-
-        <h:outputText value="There is no slotDef associated with this slotInst."
-                   rendered="#{slotInstHome.instance.slotDef == null}"/>
-
-        <rich:dataTable var="_slotDef"
-                   value="#{slotInstHome.instance.slotDef}"
-                rendered="#{slotInstHome.instance.slotDef != null}"
-              rowClasses="rvgRowOne,rvgRowTwo"
-                      id="slotDefTable">
-            <h:column>
-                <f:facet name="header">Id</f:facet>
-                <h:outputText value="#{_slotDef.id}"/>
-            </h:column>
-            <h:column>
-                <f:facet name="header">Name</f:facet>
-                <h:outputText value="#{_slotDef.name}"/>
-            </h:column>
-        </rich:dataTable>
-
-        <div class="actionButtons">
-            <s:button id="#{slotInstHome.instance.slotDef != null ? 'changeParent' : 'selectParent'}" value="#{slotInstHome.instance.slotDef != null ? 'Change' : 'Select'} slotDef"
-                       view="/SlotDefList.xhtml">
-                <f:param name="from" value="SlotInstEdit"/>
-            </s:button>
-        </div>
-
-    </div>
-    </rich:tab>
-</rich:tabPanel>
-
-	<rich:modalPanel id="uploadPanel" autosized="true">
-		<f:facet name="header">
-           	<h:outputText value="Upload dialog" />
-           </f:facet>
-   		<a:form>
-          	<rich:fileUpload id="fileUpload"
-          					fileUploadListener="#{slotInstEditBean.listener}"
-							acceptedTypes="*"
-							noDuplicate="false"
-							autoclear="false"
-							immediateUpload="true">
-			<a:support event="onfileuploadcomplete" reRender="infoPanel_#{slotInstEditBean.activeCollectionId},uploadPanel, primaryRegion_#{slotInstEditBean.activeCollectionId}"/>				
-			</rich:fileUpload>
+			<div class="actionButtons">
+			<h:commandButton id="save"
+				value="Save" action="#{slotInstEditBean.save()}"
+				disabled="#{!slotInstHome.wired}"
+				rendered="#{!slotInstHome.managed}" />
+			<h:commandButton id="update"
+				value="Save" action="#{slotInstEditBean.update()}"
+				rendered="#{slotInstHome.managed}" />
+			<h:commandButton id="delete"
+				value="Delete" action="#{slotInstHome.remove}" immediate="true"
+				rendered="#{slotInstHome.managed}" />
+			<s:button id="cancelEdit"
+				value="Cancel" propagation="end" view="/SlotInst.xhtml"
+				rendered="#{slotInstHome.managed}" />
+			<s:button id="cancelAdd"
+				value="Cancel" propagation="end"
+				view="/#{empty slotInstFrom ? 'SlotInstList' : slotInstFrom}.xhtml"
+				rendered="#{!slotInstHome.managed}" /></div>
 		</a:form>
-		<div style="clear:both"/>
-		<a:commandButton value="Cancel" onclick="#{rich:component('uploadPanel')}.hide()"/>
-	</rich:modalPanel>
-		
-</ui:define>
+
+		<rich:tabPanel switchType="ajax">
+
+			<rich:tab label="Doc inst collections">
+				<h:form styleClass="association" id="docInstCollectionsChildren">
+
+					<h:outputText
+						value="There are no docInstCollections associated with this slotInst."
+						rendered="#{empty slotInstHome.docInstCollections}" />
+
+					<rich:dataTable value="#{slotInstHome.docInstCollections}"
+						var="_docInstCollection"
+						rendered="#{not empty slotInstHome.docInstCollections}"
+						rowClasses="rvgRowOne,rvgRowTwo" id="docInstCollectionsTable">
+						<rich:column sortBy="#{_docInstCollection.id}">
+							<f:facet name="header">Id</f:facet>
+							<h:outputText value="#{_docInstCollection.id}" />
+						</rich:column>
+					</rich:dataTable>
+
+				</h:form>
+
+				<f:subview rendered="#{slotInstHome.managed}"
+					id="docInstCollections">
+					<div class="actionButtons">
+					<s:button value="Add docInstCollection"
+						id="adddocInstCollection" 
+						view="/DocInstCollectionEdit.xhtml" propagation="none">
+						<f:param name="slotInstId" value="#{slotInstHome.instance.id}" />
+						<f:param name="docInstCollectionFrom" value="SlotInst" />
+					</s:button></div>
+				</f:subview>
+			</rich:tab>
+
+			<rich:tab label="Slot def">
+				<div class="association" id="slotDefParent"><h:outputText
+					value="There is no slotDef associated with this slotInst."
+					rendered="#{slotInstHome.instance.slotDef == null}" /> <rich:dataTable
+					var="_slotDef" value="#{slotInstHome.instance.slotDef}"
+					rendered="#{slotInstHome.instance.slotDef != null}"
+					rowClasses="rvgRowOne,rvgRowTwo" id="slotDefTable">
+					<h:column>
+						<f:facet name="header">Id</f:facet>
+						<h:outputText value="#{_slotDef.id}" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">Name</f:facet>
+						<h:outputText value="#{_slotDef.name}" />
+					</h:column>
+				</rich:dataTable>
+
+				<div class="actionButtons"><s:button
+					id="#{slotInstHome.instance.slotDef != null ? 'changeParent' : 'selectParent'}"
+					value="#{slotInstHome.instance.slotDef != null ? 'Change' : 'Select'} slotDef"
+					view="/SlotDefList.xhtml">
+					<f:param name="from" value="SlotInstEdit" />
+				</s:button></div>
+
+				</div>
+			</rich:tab>
+		</rich:tabPanel>
+
+		<rich:modalPanel id="uploadPanel" autosized="true">
+			<f:facet name="header">
+				<h:outputText value="Upload dialog" />
+			</f:facet>
+			<a:form>
+				<rich:fileUpload id="fileUpload"
+					fileUploadListener="#{slotInstEditBean.listener}" acceptedTypes="*"
+					noDuplicate="false" autoclear="false" immediateUpload="true"
+					onuploadcomplete="#{rich:component('uploadPanel')}.hide()">
+					<a:support event="onfileuploadcomplete"
+						reRender="editPanel,uploadPanel"
+						oncomplete="#{rich:component('editPanel')}.show()" />
+				</rich:fileUpload>
+			</a:form>
+			<div style="clear: both" />
+			<a:commandButton value="Cancel"
+				onclick="#{rich:component('uploadPanel')}.hide()" />
+		</rich:modalPanel>
+
+		<rich:modalPanel id="editPanel" autosized="true" minWidth="450">
+			<f:facet name="header">
+				<h:outputText value="Edit dialog" />
+			</f:facet>
+			<a:form id="editPanelForm">
+
+					<script type="text/javascript">
+					var epfinvalid = false;
+					</script>
+
+				<s:decorate template="/layout/display.xhtml">
+					<ui:define name="label">
+						<h:outputText value="File Name" />
+					</ui:define>
+					<h:outputText
+						value="#{slotInstEditBean.activeFileContainer.fileName}" />
+				</s:decorate>
+
+				<ui:repeat var="propInst"
+					value="#{slotInstEditBean.activeFileContainer.embeddedProperties}">
+					<s:decorate template="/layout/edit.xhtml" >
+					<ui:param name="prefix" value="epf" />
+						<ui:define name="label">
+							<h:outputText value="#{propInst.property.title}" />
+						</ui:define>
+						<h:inputText id="propT" value="#{propInst.stringValue}"
+							rendered="#{propInst.property.type == 'd:text'}"
+							disabled="#{not propInst.editable}"
+							required="#{propInst.property.mandatory}" />
+						<h:inputText value="#{propInst.integerValue}"
+							rendered="#{propInst.property.type == 'd:int'}"
+							disabled="#{not propInst.editable}"
+							required="#{propInst.property.mandatory}" />
+						<h:selectBooleanCheckbox value="#{propInst.booleanValue}"
+							rendered="#{propInst.property.type == 'd:boolean'}"
+							disabled="#{not propInst.editable}"
+							required="#{propInst.property.mandatory}" />
+						<rich:calendar id="subscriptionDate" mode="client"
+							value="#{propInst.dateValue}" datePattern="dd/MM/yyyy"
+							rendered="#{propInst.property.type == 'd:date'}"
+							disabled="#{not propInst.editable}"
+							required="#{propInst.property.mandatory}" />
+					</s:decorate>
+				</ui:repeat>
+				<div style="clear: both" />
+				<a:commandButton value="Confirm"
+					action="#{slotInstEditBean.addActiveItemToDatas}"
+					reRender="editPanelForm, infoPanel_#{slotInstEditBean.activeCollectionId}" 
+					oncomplete="if(!epfinvalid){#{rich:component('editPanel')}.hide();};"/>
+				<a:commandButton value="Cancel"
+					onclick="#{rich:component('editPanel')}.hide()"/>
+			</a:form>
+		</rich:modalPanel>
+
+	</ui:define>
 
 </ui:composition>

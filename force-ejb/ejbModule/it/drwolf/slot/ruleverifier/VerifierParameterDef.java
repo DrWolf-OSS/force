@@ -7,12 +7,15 @@ public class VerifierParameterDef {
 	private String name;
 	private DataType type;
 	private String label;
+	private boolean optional;
 
-	public VerifierParameterDef(String name, String label, DataType type) {
+	public VerifierParameterDef(String name, String label, DataType type,
+			boolean optional) {
 		super();
 		this.name = name;
 		this.label = label;
 		this.type = type;
+		this.optional = optional;
 	}
 
 	public String getName() {
@@ -45,5 +48,13 @@ public class VerifierParameterDef {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	public boolean isOptional() {
+		return optional;
+	}
+
+	public void setOptional(boolean optional) {
+		this.optional = optional;
 	}
 }
