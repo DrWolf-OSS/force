@@ -481,7 +481,10 @@ public class SlotInstEditBean {
 	}
 
 	public void addActiveItemToDatas() {
-		datas.get(this.activeCollectionId).add(this.activeFileContainer);
+		if (!datas.get(this.activeCollectionId).contains(
+				this.activeFileContainer)) {
+			datas.get(this.activeCollectionId).add(this.activeFileContainer);
+		}
 	}
 
 	public void remove(Long collectionId, FileContainer container) {
@@ -659,23 +662,14 @@ public class SlotInstEditBean {
 	private boolean verify() {
 		SlotDef slotDef = this.slotDefHome.getInstance();
 		Set<Rule> rules = slotDef.getRules();
-		boolean passed = false;
+		boolean passed = true;
 		if (rules != null && !rules.isEmpty()) {
 			for (Rule rule : rules) {
-				// Map<String, String> parametersMap = rule.getParametersMap();
-				// IRuleVerifier verifier = rule.getVerifier();
 				boolean rulePassed = verifyRule(rule);
-				// List<Map<String, Object>> paramenterValues =
-				// retrieveParamenterValues(parametersMap);
-				// for (Map<String, Object> map : paramenterValues) {
-				// boolean tmpPassed = verifier.verify(map);
-				// }
 				if (!rulePassed) {
 					passed = false;
 				}
 			}
-		} else {
-			passed = true;
 		}
 		return passed;
 	}
