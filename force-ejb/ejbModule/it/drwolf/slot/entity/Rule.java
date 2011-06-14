@@ -33,6 +33,8 @@ public class Rule {
 
 	private RuleType type;
 
+	private boolean mandatory = false;
+
 	private IRuleVerifier verifier;
 
 	private VerifierMessage errorMessage;
@@ -103,6 +105,14 @@ public class Rule {
 
 	public void setWarningMessage(VerifierMessage warningMessage) {
 		this.warningMessage = warningMessage;
+	}
+
+	public boolean isMandatory() {
+		return mandatory;
+	}
+
+	public void setMandatory(boolean mandatory) {
+		this.mandatory = mandatory;
 	}
 
 }
