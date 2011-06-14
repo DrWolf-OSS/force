@@ -17,8 +17,7 @@ public class TimeValidity implements IRuleVerifier {
 
 	final private List<VerifierParameterDef> params = new ArrayList<VerifierParameterDef>();
 
-	// private VerifierParameterInst earlierParameterInst;
-	// private VerifierParameterInst followingParameterInst;
+	private VerifierReport verifierReport = new VerifierReport();
 
 	public TimeValidity() {
 		params.add(new VerifierParameterDef(this.EARLIER_DATE, "Earlier Date",
@@ -29,39 +28,128 @@ public class TimeValidity implements IRuleVerifier {
 				"Warning Theshold", DataType.INTEGER, true));
 	}
 
-	public VerifierReport verify(Map<String, Object> params) {
-		// earlierParameterInst = params.get(this.EARLIER_DATE);
-		Object earlierDateObj = params.get(this.EARLIER_DATE);
-		Date earlierDate = null;
-		if (earlierDateObj instanceof Calendar) {
-			Calendar earlierDateCalendar = (Calendar) earlierDateObj;
-			earlierDate = earlierDateCalendar.getTime();
-		} else if (earlierDateObj instanceof Date) {
-			earlierDate = (Date) earlierDateObj;
-		}
+	public VerifierReport verify(Map<String, List<VerifierParameterInst>> params) {
+		List<VerifierParameterInst> earlierParametersInst = params
+				.get(this.EARLIER_DATE);
+		List<VerifierParameterInst> followingParametersInst = params
+				.get(this.FOLLOWING_DATE);
 
-		// followingParameterInst = params.get(this.FOLLOWING_DATE);
-		Object followingDateObj = params.get(this.FOLLOWING_DATE);
-		Date followingDate = null;
-		if (followingDateObj instanceof Calendar) {
-			Calendar followingDateCalendar = (Calendar) followingDateObj;
-			followingDate = followingDateCalendar.getTime();
-		} else if (followingDateObj instanceof Date) {
-			followingDate = (Date) followingDateObj;
-		}
+		this.verifierReport.setResult(VerifierResult.PASSED);
 
-		VerifierReport report = new VerifierReport();
-		if (followingDate.before(earlierDate)) {
-			report.setResult(VerifierResult.ERROR);
-			// VerifierMessage message = new VerifierMessage("\""
-			// + followingParameterInst.getLable() + "\" must follow \""
-			// + earlierParameterInst.getLable() + "\"!",
-			// VerifierMessageType.ERROR);
-			// report.setMessage(message);
+		if (!earlierParametersInst.get(0).isFallible()) {
+			fromEarliers(earlierParametersInst, followingParametersInst);
+		} else if (!followingParametersInst.get(0).isFallible()) {
+			fromFollowers(earlierParametersInst, followingParametersInst);
+		} else if (earlierParametersInst.size() == 1) {
+			fromEarliers(earlierParametersInst, followingParametersInst);
 		} else {
-			report.setResult(VerifierResult.PASSED);
+			fromFollowers(earlierParametersInst, followingParametersInst);
 		}
-		return report;
+		// Object earlierDateObj = params.get(this.EARLIER_DATE);
+		// Date earlierDate = null;
+		// if (earlierDateObj instanceof Calendar) {
+		// Calendar earlierDateCalendar = (Calendar) earlierDateObj;
+		// earlierDate = earlierDateCalendar.getTime();
+		// } else if (earlierDateObj instanceof Date) {
+		// earlierDate = (Date) earlierDateObj;
+		// }
+		//
+		// Object followingDateObj = params.get(this.FOLLOWING_DATE);
+		// Date followingDate = null;
+		// if (followingDateObj instanceof Calendar) {
+		// Calendar followingDateCalendar = (Calendar) followingDateObj;
+		// followingDate = followingDateCalendar.getTime();
+		// } else if (followingDateObj instanceof Date) {
+		// followingDate = (Date) followingDateObj;
+		// }
+		//
+		// VerifierReport report = new VerifierReport();
+		// if (followingDate.before(earlierDate)) {
+		// report.setResult(VerifierResult.ERROR);
+		// } else {
+		// report.setResult(VerifierResult.PASSED);
+		// }
+		// return report;
+		return this.verifierReport;
+	}
+
+	private void fromEarliers(
+			List<VerifierParameterInst> earlierParametersInst,
+			List<VerifierParameterInst> followingParametersInst) {
+
+		// List<VerifierParameterInst> failedParams = new
+		// ArrayList<VerifierParameterInst>();
+
+		// trovo la soglia maggiore che deve essere rispettata
+		Date earlierThreshold = null;
+		for (VerifierParameterInst parameterInst : earlierParametersInst) {
+			Object value = parameterInst.getValue();
+			Date eDate = null;
+			if (value instanceof Calendar) {
+				Calendar earlierDateCalendar = (Calendar) value;
+				eDate = earlierDateCalendar.getTime();
+			} else if (value instanceof Date) {
+				eDate = (Date) value;
+			}
+
+			if (earlierThreshold == null || eDate.after(earlierThreshold)) {
+				earlierThreshold = eDate;
+			}
+		}
+
+		for (VerifierParameterInst parameterInst : followingParametersInst) {
+			Object value = parameterInst.getValue();
+			Date fDate = null;
+			if (value instanceof Calendar) {
+				Calendar earlierDateCalendar = (Calendar) value;
+				fDate = earlierDateCalendar.getTime();
+			} else if (value instanceof Date) {
+				fDate = (Date) value;
+			}
+
+			if (fDate.before(earlierThreshold)) {
+				this.verifierReport.setResult(VerifierResult.ERROR);
+				this.verifierReport.getFailedParams().add(parameterInst);
+			}
+		}
+	}
+
+	private void fromFollowers(
+			List<VerifierParameterInst> earlierParametersInst,
+			List<VerifierParameterInst> followingParametersInst) {
+
+		// trovo la soglia minore che deve essere rispettata
+		Date followerThreshold = null;
+		for (VerifierParameterInst parameterInst : followingParametersInst) {
+			Object value = parameterInst.getValue();
+			Date fDate = null;
+			if (value instanceof Calendar) {
+				Calendar earlierDateCalendar = (Calendar) value;
+				fDate = earlierDateCalendar.getTime();
+			} else if (value instanceof Date) {
+				fDate = (Date) value;
+			}
+
+			if (followerThreshold == null || fDate.before(followerThreshold)) {
+				followerThreshold = fDate;
+			}
+		}
+
+		for (VerifierParameterInst parameterInst : earlierParametersInst) {
+			Object value = parameterInst.getValue();
+			Date eDate = null;
+			if (value instanceof Calendar) {
+				Calendar earlierDateCalendar = (Calendar) value;
+				eDate = earlierDateCalendar.getTime();
+			} else if (value instanceof Date) {
+				eDate = (Date) value;
+			}
+
+			if (eDate.after(followerThreshold)) {
+				this.verifierReport.setResult(VerifierResult.ERROR);
+				this.verifierReport.getFailedParams().add(parameterInst);
+			}
+		}
 	}
 
 	public List<VerifierParameterDef> getInParams() {
@@ -70,14 +158,10 @@ public class TimeValidity implements IRuleVerifier {
 
 	@Override
 	public String toString() {
-		return "TimeValidity";
+		return this.getClass().getName();
 	}
 
 	public VerifierMessage getDefaultErrorMessage() {
-		// return new VerifierMessage(
-		// "\"" + followingParameterInst.getLable() + "\" must follow \""
-		// + earlierParameterInst.getLable() + "\"!",
-		// VerifierMessageType.ERROR);
 		return new VerifierMessage("Time validity rule not verified!",
 				VerifierMessageType.ERROR);
 	}

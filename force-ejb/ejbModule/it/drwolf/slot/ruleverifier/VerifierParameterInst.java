@@ -6,7 +6,22 @@ public class VerifierParameterInst {
 
 	private Object value;
 
-	private String lable;
+	private boolean fallible = true;
+
+	public VerifierParameterInst(VerifierParameterDef verifierParameterDef,
+			Object value) {
+		super();
+		this.verifierParameterDef = verifierParameterDef;
+		this.value = value;
+	}
+
+	public VerifierParameterInst(VerifierParameterDef verifierParameterDef,
+			Object value, boolean fallible) {
+		super();
+		this.verifierParameterDef = verifierParameterDef;
+		this.value = value;
+		this.fallible = fallible;
+	}
 
 	public VerifierParameterDef getVerifierParameterDef() {
 		return verifierParameterDef;
@@ -25,12 +40,12 @@ public class VerifierParameterInst {
 		this.value = value;
 	}
 
-	public String getLable() {
-		return lable;
+	public boolean isFallible() {
+		return fallible;
 	}
 
-	public void setLable(String lable) {
-		this.lable = lable;
+	public void setFallible(boolean fallible) {
+		this.fallible = fallible;
 	}
 
 }

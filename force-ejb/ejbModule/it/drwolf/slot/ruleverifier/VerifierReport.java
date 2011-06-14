@@ -1,8 +1,13 @@
 package it.drwolf.slot.ruleverifier;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class VerifierReport {
 
 	private VerifierResult result;
+
+	private List<VerifierParameterInst> failedParams = new ArrayList<VerifierParameterInst>();
 
 	public VerifierResult getResult() {
 		return result;
@@ -10,6 +15,14 @@ public class VerifierReport {
 
 	public void setResult(VerifierResult result) {
 		this.result = result;
+	}
+
+	public List<VerifierParameterInst> getFailedParams() {
+		return failedParams;
+	}
+
+	public void setFailedParams(List<VerifierParameterInst> failedParams) {
+		this.failedParams = failedParams;
 	}
 
 	// private boolean passed;
