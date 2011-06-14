@@ -2,22 +2,22 @@ package it.drwolf.slot.pagebeans.support;
 
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.entity.PropertyDef;
-import it.drwolf.slot.entity.SlotDefEmbeddedProperty;
+import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.enums.DataType;
 
 public class PropertyContainer {
 
 	private Property property;
 	private PropertyDef propertyDef;
-	private SlotDefEmbeddedProperty embeddedProperty;
+	private EmbeddedProperty embeddedProperty;
 
 	public PropertyContainer(Object object) {
 		if (object instanceof Property) {
 			this.property = (Property) object;
 		} else if (object instanceof PropertyDef) {
 			this.propertyDef = (PropertyDef) object;
-		} else if (object instanceof SlotDefEmbeddedProperty) {
-			this.embeddedProperty = (SlotDefEmbeddedProperty) object;
+		} else if (object instanceof EmbeddedProperty) {
+			this.embeddedProperty = (EmbeddedProperty) object;
 		}
 	}
 
@@ -31,7 +31,7 @@ public class PropertyContainer {
 		this.property = property;
 	}
 
-	public PropertyContainer(SlotDefEmbeddedProperty embeddedProperty) {
+	public PropertyContainer(EmbeddedProperty embeddedProperty) {
 		super();
 		this.embeddedProperty = embeddedProperty;
 	}
@@ -89,7 +89,7 @@ public class PropertyContainer {
 		} else if (propertyDef != null) {
 			return "PropertyDef:" + propertyDef.getId();
 		} else if (embeddedProperty != null) {
-			return "SlotDefEmbeddedProperty:" + embeddedProperty.getId();
+			return "EmbeddedProperty:" + embeddedProperty.getId();
 		}
 		return "";
 	}
@@ -135,11 +135,11 @@ public class PropertyContainer {
 		return true;
 	}
 
-	public SlotDefEmbeddedProperty getEmbeddedProperty() {
+	public EmbeddedProperty getEmbeddedProperty() {
 		return embeddedProperty;
 	}
 
-	public void setEmbeddedProperty(SlotDefEmbeddedProperty embeddedProperty) {
+	public void setEmbeddedProperty(EmbeddedProperty embeddedProperty) {
 		this.embeddedProperty = embeddedProperty;
 	}
 

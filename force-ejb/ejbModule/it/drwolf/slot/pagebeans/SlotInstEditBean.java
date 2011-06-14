@@ -12,7 +12,7 @@ import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.SlotDef;
-import it.drwolf.slot.entity.SlotDefEmbeddedProperty;
+import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.FileContainer;
 import it.drwolf.slot.prefs.PreferenceKey;
@@ -807,8 +807,8 @@ public class SlotInstEditBean {
 								}
 							}
 						}
-					} else if (fieldDef instanceof SlotDefEmbeddedProperty) {
-						SlotDefEmbeddedProperty embeddedProperty = (SlotDefEmbeddedProperty) fieldDef;
+					} else if (fieldDef instanceof EmbeddedProperty) {
+						EmbeddedProperty embeddedProperty = (EmbeddedProperty) fieldDef;
 						Object value = embeddedProperty.getValue();
 						if (value != null) {
 							VerifierParameterInst parameterInst = new VerifierParameterInst(
@@ -945,8 +945,8 @@ public class SlotInstEditBean {
 		this.primaryDocs = primaryDocs;
 	}
 
-	public List<SlotDefEmbeddedProperty> getEmbeddedProperties() {
-		return new ArrayList<SlotDefEmbeddedProperty>(this.slotDefHome
+	public List<EmbeddedProperty> getEmbeddedProperties() {
+		return new ArrayList<EmbeddedProperty>(this.slotDefHome
 				.getInstance().getEmbeddedProperties());
 	}
 

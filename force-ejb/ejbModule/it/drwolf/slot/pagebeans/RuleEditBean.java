@@ -82,6 +82,9 @@ public class RuleEditBean {
 						propertiesSourceContainerList);
 			}
 			// System.out.println("---> assigned listener " + verifier);
+		} else {
+			targetPropertiesSourceMap.clear();
+			targetPropertyMap.clear();
 		}
 	}
 

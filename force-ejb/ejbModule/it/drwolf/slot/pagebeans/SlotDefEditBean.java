@@ -1,8 +1,8 @@
 package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.entity.DocDefCollection;
+import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
-import it.drwolf.slot.entity.SlotDefEmbeddedProperty;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.session.DocDefCollectionHome;
@@ -42,11 +42,11 @@ public class SlotDefEditBean {
 
 	private ArrayList<PropertyDef> properties = new ArrayList<PropertyDef>();
 	private ArrayList<DocDefCollection> collections = new ArrayList<DocDefCollection>();
-	private ArrayList<SlotDefEmbeddedProperty> embeddedProperties = new ArrayList<SlotDefEmbeddedProperty>();
+	private ArrayList<EmbeddedProperty> embeddedProperties = new ArrayList<EmbeddedProperty>();
 
 	private DocDefCollection collection = new DocDefCollection();
 	private PropertyDef propertyDef = new PropertyDef();
-	private SlotDefEmbeddedProperty embeddedProperty = new SlotDefEmbeddedProperty();
+	private EmbeddedProperty embeddedProperty = new EmbeddedProperty();
 
 	@Create
 	public void init() {
@@ -87,12 +87,12 @@ public class SlotDefEditBean {
 	}
 
 	public void newEmbeddedProperty() {
-		this.embeddedProperty = new SlotDefEmbeddedProperty();
+		this.embeddedProperty = new EmbeddedProperty();
 	}
 
 	public void addEmbeddedProperty() {
 		if (!this.embeddedProperties.contains(this.embeddedProperty)) {
-			embeddedProperty.setSlotDef(slotDefHome.getInstance());
+			// embeddedProperty.setSlotDef(slotDefHome.getInstance());
 			embeddedProperties.add(this.embeddedProperty);
 		}
 	}
@@ -113,7 +113,7 @@ public class SlotDefEditBean {
 		slotDefHome.getInstance().setDocDefCollections(
 				new HashSet<DocDefCollection>(collections));
 		slotDefHome.getInstance().setEmbeddedProperties(
-				new HashSet<SlotDefEmbeddedProperty>(embeddedProperties));
+				new HashSet<EmbeddedProperty>(embeddedProperties));
 		slotDefHome.persist();
 	}
 
@@ -142,12 +142,12 @@ public class SlotDefEditBean {
 			}
 		}
 
-		Set<SlotDefEmbeddedProperty> slotDefEmbeddedProperties = slotDefHome
+		Set<EmbeddedProperty> slotDefEmbeddedProperties = slotDefHome
 				.getInstance().getEmbeddedProperties();
-		Iterator<SlotDefEmbeddedProperty> iterator3 = slotDefEmbeddedProperties
+		Iterator<EmbeddedProperty> iterator3 = slotDefEmbeddedProperties
 				.iterator();
 		while (iterator3.hasNext()) {
-			SlotDefEmbeddedProperty embeddedProperty = iterator3.next();
+			EmbeddedProperty embeddedProperty = iterator3.next();
 			if (!this.embeddedProperties.contains(embeddedProperty)) {
 				iterator3.remove();
 				slotDefEmbeddedPropertyHome.setInstance(embeddedProperty);
@@ -167,7 +167,7 @@ public class SlotDefEditBean {
 			}
 		}
 
-		for (SlotDefEmbeddedProperty embeddedProperty : embeddedProperties) {
+		for (EmbeddedProperty embeddedProperty : embeddedProperties) {
 			if (!slotDefEmbeddedProperties.contains(embeddedProperty)) {
 				slotDefEmbeddedProperties.add(embeddedProperty);
 			}
@@ -176,11 +176,11 @@ public class SlotDefEditBean {
 		slotDefHome.update();
 	}
 
-	public void removeEmbeddedProp(SlotDefEmbeddedProperty embeddedProp) {
+	public void removeEmbeddedProp(EmbeddedProperty embeddedProp) {
 		this.embeddedProperties.remove(embeddedProp);
 	}
 
-	public void editEmbeddedProp(SlotDefEmbeddedProperty embeddedProp) {
+	public void editEmbeddedProp(EmbeddedProperty embeddedProp) {
 		this.embeddedProperty = embeddedProp;
 	}
 
@@ -224,20 +224,20 @@ public class SlotDefEditBean {
 		this.propertyDef = propertyDef;
 	}
 
-	public ArrayList<SlotDefEmbeddedProperty> getEmbeddedProperties() {
+	public ArrayList<EmbeddedProperty> getEmbeddedProperties() {
 		return embeddedProperties;
 	}
 
 	public void setEmbeddedProperties(
-			ArrayList<SlotDefEmbeddedProperty> embeddedProperties) {
+			ArrayList<EmbeddedProperty> embeddedProperties) {
 		this.embeddedProperties = embeddedProperties;
 	}
 
-	public SlotDefEmbeddedProperty getEmbeddedProperty() {
+	public EmbeddedProperty getEmbeddedProperty() {
 		return embeddedProperty;
 	}
 
-	public void setEmbeddedProperty(SlotDefEmbeddedProperty embeddedProperty) {
+	public void setEmbeddedProperty(EmbeddedProperty embeddedProperty) {
 		this.embeddedProperty = embeddedProperty;
 	}
 
