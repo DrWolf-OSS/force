@@ -33,7 +33,7 @@ public class SlotDef {
 
 	private Set<PropertyDef> propertyDefs = new HashSet<PropertyDef>();
 
-	private Set<SlotDefEmbeddedProperty> embeddedProperties = new HashSet<SlotDefEmbeddedProperty>();
+	private Set<EmbeddedProperty> embeddedProperties = new HashSet<EmbeddedProperty>();
 
 	@Id
 	@GeneratedValue
@@ -108,13 +108,14 @@ public class SlotDef {
 	}
 
 	@OrderBy("name")
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "slotDef")
-	public Set<SlotDefEmbeddedProperty> getEmbeddedProperties() {
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "slotDef_id")
+	public Set<EmbeddedProperty> getEmbeddedProperties() {
 		return embeddedProperties;
 	}
 
 	public void setEmbeddedProperties(
-			Set<SlotDefEmbeddedProperty> embeddedProperties) {
+			Set<EmbeddedProperty> embeddedProperties) {
 		this.embeddedProperties = embeddedProperties;
 	}
 

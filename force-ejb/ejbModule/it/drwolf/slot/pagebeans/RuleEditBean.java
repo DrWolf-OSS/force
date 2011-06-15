@@ -8,7 +8,9 @@ import it.drwolf.slot.enums.RuleType;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.PropertiesSourceContainer;
 import it.drwolf.slot.pagebeans.support.PropertyContainer;
-import it.drwolf.slot.ruleverifier.VerifierParameter;
+import it.drwolf.slot.ruleverifier.VerifierMessage;
+import it.drwolf.slot.ruleverifier.VerifierMessageType;
+import it.drwolf.slot.ruleverifier.VerifierParameterDef;
 import it.drwolf.slot.session.RuleHome;
 import it.drwolf.slot.session.SlotDefHome;
 
@@ -45,9 +47,21 @@ public class RuleEditBean {
 	private HashMap<String, PropertiesSourceContainer> targetPropertiesSourceMap = new HashMap<String, PropertiesSourceContainer>();
 	private HashMap<String, PropertyContainer> targetPropertyMap = new HashMap<String, PropertyContainer>();
 
+	private VerifierMessage errorMessage = new VerifierMessage("",
+			VerifierMessageType.ERROR);
+	private VerifierMessage warningMessage = new VerifierMessage("",
+			VerifierMessageType.WARNING);
+
+	private List<VerifierParameterDef> normalParameters = new ArrayList<VerifierParameterDef>();
+	private List<VerifierParameterDef> embeddedParameters = new ArrayList<VerifierParameterDef>();
+
 	@Factory("ruleTypes")
 	public List<RuleType> getRuleTypes() {
 		return Arrays.asList(RuleType.values());
+	}
+
+	public void init() {
+
 	}
 
 	public void ruleTypeListener(ActionEvent event) {
@@ -57,12 +71,23 @@ public class RuleEditBean {
 		sourcePropertiesSourceMap = new HashMap<String, List<PropertiesSourceContainer>>();
 
 		if (verifier != null) {
-			List<VerifierParameter> inParams = verifier.getInParams();
+			List<VerifierParameterDef> inParams = verifier.getInParams();
+			//
+			this.embeddedParameters.clear();
+			this.normalParameters.clear();
+			for (VerifierParameterDef verifierParameter : inParams) {
+				if (verifierParameter.isRuleEmbedded()) {
+					this.embeddedParameters.add(verifierParameter);
+				} else {
+					this.normalParameters.add(verifierParameter);
+				}
+			}
+			//
 			SlotDef slotDef = slotDefHome.getInstance();
 			Set<DocDefCollection> docDefCollections = slotDef
 					.getDocDefCollections();
 
-			for (VerifierParameter verifierParameter : inParams) {
+			for (VerifierParameterDef verifierParameter : normalParameters) {
 				ArrayList<PropertiesSourceContainer> propertiesSourceContainerList = new ArrayList<PropertiesSourceContainer>();
 				for (DocDefCollection collection : docDefCollections) {
 					PropertiesSourceContainer sourceContainer = new PropertiesSourceContainer(
@@ -75,6 +100,9 @@ public class RuleEditBean {
 						propertiesSourceContainerList);
 			}
 			// System.out.println("---> assigned listener " + verifier);
+		} else {
+			targetPropertiesSourceMap.clear();
+			targetPropertyMap.clear();
 		}
 	}
 
@@ -84,7 +112,7 @@ public class RuleEditBean {
 		IRuleVerifier verifier = rule.getVerifier();
 		Map<String, String> parametersMap = rule.getParametersMap();
 		if (verifier != null) {
-			for (VerifierParameter parameter : verifier.getInParams()) {
+			for (VerifierParameterDef parameter : verifier.getInParams()) {
 				if (this.targetPropertiesSourceMap.get(parameter.getName()) != null
 						&& this.targetPropertyMap.get(parameter.getName()) != null) {
 					String encodedRule = "";
@@ -97,10 +125,19 @@ public class RuleEditBean {
 					encodedRule = encodedRule.concat("|"
 							+ propertyContainer.toString());
 					parametersMap.put(parameter.getName(), encodedRule);
+					if (!this.errorMessage.getText().equals("")) {
+						rule.setErrorMessage(this.errorMessage);
+					}
+					if (!this.warningMessage.getText().equals("")) {
+						rule.setWarningMessage(this.warningMessage);
+					}
 				} else {
-					error = true;
-					FacesMessages.instance().add(
-							"\"" + parameter.getLabel() + "\" not compiled");
+					if (!parameter.isOptional()) {
+						error = true;
+						FacesMessages.instance()
+								.add("\"" + parameter.getLabel()
+										+ "\" not compiled");
+					}
 				}
 			}
 		} else {
@@ -139,6 +176,39 @@ public class RuleEditBean {
 	public void setTargetPropertyMap(
 			HashMap<String, PropertyContainer> targetPropertyMap) {
 		this.targetPropertyMap = targetPropertyMap;
+	}
+
+	public VerifierMessage getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(VerifierMessage errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
+	public VerifierMessage getWarningMessage() {
+		return warningMessage;
+	}
+
+	public void setWarningMessage(VerifierMessage warningMessage) {
+		this.warningMessage = warningMessage;
+	}
+
+	public List<VerifierParameterDef> getNormalParameters() {
+		return normalParameters;
+	}
+
+	public void setNormalParameters(List<VerifierParameterDef> normalParameters) {
+		this.normalParameters = normalParameters;
+	}
+
+	public List<VerifierParameterDef> getEmbeddedParameters() {
+		return embeddedParameters;
+	}
+
+	public void setEmbeddedParameters(
+			List<VerifierParameterDef> embeddedParameters) {
+		this.embeddedParameters = embeddedParameters;
 	}
 
 }

@@ -2,17 +2,22 @@ package it.drwolf.slot.ruleverifier;
 
 import it.drwolf.slot.enums.DataType;
 
-public class VerifierParameter {
+public class VerifierParameterDef {
 
 	private String name;
 	private DataType type;
 	private String label;
+	private boolean optional;
+	private boolean ruleEmbedded;
 
-	public VerifierParameter(String name, String label, DataType type) {
+	public VerifierParameterDef(String name, String label, DataType type,
+			boolean optional, boolean ruleEmbedded) {
 		super();
 		this.name = name;
 		this.label = label;
 		this.type = type;
+		this.optional = optional;
+		this.ruleEmbedded = ruleEmbedded;
 	}
 
 	public String getName() {
@@ -45,5 +50,21 @@ public class VerifierParameter {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	public boolean isOptional() {
+		return optional;
+	}
+
+	public void setOptional(boolean optional) {
+		this.optional = optional;
+	}
+
+	public boolean isRuleEmbedded() {
+		return ruleEmbedded;
+	}
+
+	public void setRuleEmbedded(boolean ruleEmbedded) {
+		this.ruleEmbedded = ruleEmbedded;
 	}
 }

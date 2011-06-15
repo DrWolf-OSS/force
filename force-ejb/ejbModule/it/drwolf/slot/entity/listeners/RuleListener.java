@@ -9,17 +9,20 @@ public class RuleListener {
 
 	@PostLoad
 	public void setVerifier(Rule rule) {
-		// switch su RuleType e assegnazione del verifier giusto
-		switch (rule.getType()) {
-		case TIME_VALIDITY:
-			rule.setVerifier(new TimeValidity());
-			break;
+		if (rule.getType() != null) {
+			// switch su RuleType e assegnazione del verifier giusto
+			switch (rule.getType()) {
+			case TIME_VALIDITY:
+				rule.setVerifier(new TimeValidity());
+				break;
 
-		default:
+			default:
+				rule.setVerifier(null);
+				break;
+			}
+		} else {
 			rule.setVerifier(null);
-			break;
 		}
-
 	}
 
 }

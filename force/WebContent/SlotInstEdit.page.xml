@@ -15,11 +15,19 @@
 
 	
 	<navigation from-action="#{slotInstEditBean.save()}">
+	  <rule if-outcome="saved">
          <end-conversation/>
          <redirect view-id="/SlotInst.xhtml">
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
+      </rule>
+      <rule if-outcome="failed">
+         <redirect>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         </redirect>
+      </rule>
    </navigation>
    
    <navigation from-action="#{slotInstEditBean.update()}">

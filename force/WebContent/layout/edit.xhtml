@@ -21,7 +21,12 @@
             <h:graphicImage value="/img/error.gif" rendered="#{invalid}" styleClass="errors"/>
             <s:message styleClass="errors"/>
         </span>
-
+      
+<s:fragment rendered="#{invalid}">
+<script type="text/javascript">
+#{prefix}invalid=true;
+</script>
+</s:fragment>
     </div>
 
 </ui:composition>

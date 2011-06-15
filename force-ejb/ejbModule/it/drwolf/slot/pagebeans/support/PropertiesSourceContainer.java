@@ -6,7 +6,7 @@ import it.drwolf.slot.entity.DocDef;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.SlotDef;
-import it.drwolf.slot.entity.SlotDefEmbeddedProperty;
+import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.enums.DataType;
 
 import java.util.ArrayList;
@@ -104,7 +104,7 @@ public class PropertiesSourceContainer {
 			slotPropertiesAsList.add(propertyContainer);
 		}
 
-		for (SlotDefEmbeddedProperty embeddedProperty : this.slotDef
+		for (EmbeddedProperty embeddedProperty : this.slotDef
 				.getEmbeddedProperties()) {
 			PropertyContainer propertyContainer = new PropertyContainer(
 					embeddedProperty);

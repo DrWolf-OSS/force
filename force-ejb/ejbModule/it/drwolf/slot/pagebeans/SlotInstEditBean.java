@@ -12,11 +12,18 @@ import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.SlotDef;
-import it.drwolf.slot.entity.SlotDefEmbeddedProperty;
+import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.interfaces.IRuleVerifier;
+import it.drwolf.slot.pagebeans.support.FileContainer;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 import it.drwolf.slot.ruleverifier.RuleParametersResolver;
+import it.drwolf.slot.ruleverifier.VerifierMessage;
+import it.drwolf.slot.ruleverifier.VerifierMessageType;
+import it.drwolf.slot.ruleverifier.VerifierParameterDef;
+import it.drwolf.slot.ruleverifier.VerifierParameterInst;
+import it.drwolf.slot.ruleverifier.VerifierReport;
+import it.drwolf.slot.ruleverifier.VerifierResult;
 import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
@@ -24,7 +31,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -95,7 +101,18 @@ public class SlotInstEditBean {
 
 	private HashMap<Long, List<FileContainer>> primaryDocs = new HashMap<Long, List<FileContainer>>();
 
+	// main messages
+	private ArrayList<VerifierMessage> slotMessages = new ArrayList<VerifierMessage>();
+
+	// FileContainer.id, messages
+	private HashMap<String, ArrayList<VerifierMessage>> filesMessages = new HashMap<String, ArrayList<VerifierMessage>>();
+
+	// DocDefCollection.id, messages
+	private HashMap<Long, ArrayList<VerifierMessage>> collectionsMessages = new HashMap<Long, ArrayList<VerifierMessage>>();
+
 	private Long activeCollectionId;
+
+	private FileContainer activeFileContainer;
 
 	@Create
 	public void init() {
@@ -121,8 +138,8 @@ public class SlotInstEditBean {
 						.retrievePrimaryDocs(defCollection.getDocDef().getId());
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				for (AlfrescoDocument document : collPrimaryDocs) {
-					FileContainer fileContainer = buildContainer(defCollection,
-							document, false);
+					FileContainer fileContainer = buildFileContainer(
+							defCollection, document, false);
 					fileContainers.add(fileContainer);
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
@@ -138,14 +155,14 @@ public class SlotInstEditBean {
 				DocDefCollection docDefCollection = instCollection
 						.getDocDefCollection();
 				this.datas.put(docDefCollection.getId(),
-						new ArrayList<SlotInstEditBean.FileContainer>());
+						new ArrayList<FileContainer>());
 				Set<DocInst> docInsts = instCollection.getDocInsts();
 				for (DocInst docInst : docInsts) {
 					try {
 						String nodeRef = docInst.getNodeRef();
 						AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
 								.getSession().getObject(nodeRef);
-						FileContainer container = buildContainer(
+						FileContainer container = buildFileContainer(
 								docDefCollection, document, true);
 						this.datas.get(docDefCollection.getId()).add(container);
 					} catch (CmisObjectNotFoundException e) {
@@ -164,8 +181,8 @@ public class SlotInstEditBean {
 				for (AlfrescoDocument document : collPrimaryDocs) {
 					// FileContainer fileContainer = new
 					// FileContainer(document);
-					FileContainer fileContainer = buildContainer(defCollection,
-							document, false);
+					FileContainer fileContainer = buildFileContainer(
+							defCollection, document, false);
 					fileContainers.add(fileContainer);
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
@@ -173,7 +190,7 @@ public class SlotInstEditBean {
 		}
 	}
 
-	private FileContainer buildContainer(DocDefCollection docDefCollection,
+	private FileContainer buildFileContainer(DocDefCollection docDefCollection,
 			Object item, boolean editables) {
 		List<DocumentPropertyInst> fileProperties = new ArrayList<DocumentPropertyInst>();
 		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
@@ -183,7 +200,6 @@ public class SlotInstEditBean {
 		// settato come mandatory su un altro) le sue properties vengono
 		// aggiunte una volta sola
 		for (String aspectId : aspectIds) {
-			// properties.addAll(retrieveAllProperties(aspectId));
 			properties.addAll(customModelController.getProperties(aspectId));
 		}
 		if (properties != null) {
@@ -194,24 +210,10 @@ public class SlotInstEditBean {
 			}
 		}
 		FileContainer container = new FileContainer(item);
+		container.setEditable(editables);
 		container.setEmbeddedProperties(fileProperties);
 		return container;
 	}
-
-	// private Set<Property> retrieveAllProperties(String aspectId) {
-	// Set<Property> properties = new HashSet<Property>();
-	// Aspect aspect = customModelController.getAspect(aspectId);
-	// if (aspect != null) {
-	// properties.addAll(aspect.getProperties());
-	// if (aspect.getMandatoryAspectIds() != null) {
-	// for (String mandatoryAspectId : aspect.getMandatoryAspectIds()) {
-	// properties.addAll(retrieveAllProperties("P:"
-	// + mandatoryAspectId));
-	// }
-	// }
-	// }
-	// return properties;
-	// }
 
 	private DocumentPropertyInst buildValorisedDocumentPropertyInst(
 			Object item, boolean editables, Property p) {
@@ -225,11 +227,42 @@ public class SlotInstEditBean {
 		return embeddedPropertyInst;
 	}
 
-	public void save() {
+	private void cleanMessages() {
+		Set<String> filesKeys = filesMessages.keySet();
+		for (String key : filesKeys) {
+			ArrayList<VerifierMessage> messages = filesMessages.get(key);
+			if (messages != null) {
+				messages.clear();
+			}
+		}
+
+		Set<Long> collectionsKeys = collectionsMessages.keySet();
+		for (Long key : collectionsKeys) {
+			ArrayList<VerifierMessage> messages = collectionsMessages.get(key);
+			if (messages != null) {
+				messages.clear();
+			}
+		}
+
+		if (this.slotMessages != null) {
+			slotMessages.clear();
+		}
+	}
+
+	public String save() {
+		cleanMessages();
+		boolean sizeCollectionPassed = checkCollectionsSize();
+		if (!sizeCollectionPassed) {
+			FacesMessages
+					.instance()
+					.add("Le dimensioni di alcune collection non rispettano le specifiche");
+			return "failed";
+		}
+
 		boolean passed = verify();
 		if (!passed) {
 			FacesMessages.instance().add("Rules not verified!");
-			return;
+			return "failed";
 		}
 
 		slotInstHome.getInstance().setPropertyInsts(
@@ -281,7 +314,7 @@ public class SlotInstEditBean {
 					// TODO: se il documento è stato creato farsi dare l'id e
 					// toglierlo per avere una garanzia "transazionale"
 					e.printStackTrace();
-					return;
+					return "failed";
 				}
 			}
 		}
@@ -296,6 +329,37 @@ public class SlotInstEditBean {
 		FacesMessages.instance().add(
 				"Slot " + this.slotDefHome.getInstance().getName()
 						+ " successfully created");
+		return "saved";
+	}
+
+	private boolean checkCollectionsSize() {
+		boolean passed = true;
+
+		for (DocDefCollection defCollection : slotDefHome.getInstance()
+				.getDocDefCollections()) {
+			List<FileContainer> list = datas.get(defCollection.getId());
+			int size = list.size();
+			if (defCollection.getMin() != null && size < defCollection.getMin()) {
+				passed = false;
+				this.addCollectionMessage(defCollection.getId(),
+						new VerifierMessage(
+								"La quantità minima di documenti in questa collection è di "
+										+ defCollection.getMin()
+										+ " documento/i",
+								VerifierMessageType.ERROR));
+			}
+
+			if (defCollection.getMax() != null && size > defCollection.getMax()) {
+				passed = false;
+				this.addCollectionMessage(defCollection.getId(),
+						new VerifierMessage(
+								"La quantità massima di documenti in questa collection è di "
+										+ defCollection.getMax()
+										+ " documento/i",
+								VerifierMessageType.ERROR));
+			}
+		}
+		return passed;
 	}
 
 	private AlfrescoFolder retrieveSlotFolder() {
@@ -398,10 +462,7 @@ public class SlotInstEditBean {
 
 	public void listener(UploadEvent event) {
 		UploadItem item = event.getUploadItem();
-		addItemToDatas(item);
-	}
 
-	private void addItemToDatas(UploadItem item) {
 		String fileName = item.getFileName();
 		Long docDefCollectionId = this.activeCollectionId;
 		List<FileContainer> list = datas.get(docDefCollectionId);
@@ -412,14 +473,29 @@ public class SlotInstEditBean {
 		System.out.println("-> " + fileName + " successfully uploaded");
 		DocDefCollection docDefCollection = entityManager.find(
 				DocDefCollection.class, docDefCollectionId);
-		FileContainer container = buildContainer(docDefCollection, item, true);
-		datas.get(docDefCollection.getId()).add(container);
+		FileContainer container = buildFileContainer(docDefCollection, item,
+				true);
+		//
+		this.activeFileContainer = container;
+		//
+	}
+
+	public void addActiveItemToDatas() {
+		if (!datas.get(this.activeCollectionId).contains(
+				this.activeFileContainer)) {
+			datas.get(this.activeCollectionId).add(this.activeFileContainer);
+		}
 	}
 
 	public void remove(Long collectionId, FileContainer container) {
 		System.out.println("---> removing " + container.getFileName() + "...");
 		List<FileContainer> filesList = datas.get(collectionId);
 		filesList.remove(container);
+		ArrayList<VerifierMessage> messages = filesMessages.get(container
+				.getId());
+		if (messages != null) {
+			messages.clear();
+		}
 	}
 
 	private String storeOnAlfresco(UploadItem item,
@@ -571,210 +647,262 @@ public class SlotInstEditBean {
 
 	public void addDocFromPrimary(Long docDefCollectionId,
 			FileContainer container) {
+		//
+		container.setEditable(false);
+		//
 		this.activeCollectionId = docDefCollectionId;
 		datas.get(docDefCollectionId).add(container);
+	}
+
+	public void editItem(Long docDefCollectionId, FileContainer container) {
+		this.activeCollectionId = docDefCollectionId;
+		this.activeFileContainer = container;
 	}
 
 	private boolean verify() {
 		SlotDef slotDef = this.slotDefHome.getInstance();
 		Set<Rule> rules = slotDef.getRules();
-		boolean passed = false;
+		boolean passed = true;
 		if (rules != null && !rules.isEmpty()) {
 			for (Rule rule : rules) {
-				Map<String, String> parametersMap = rule.getParametersMap();
-				IRuleVerifier verifier = rule.getVerifier();
-				List<Map<String, Object>> paramenterValues = retrieveParamenterValues(parametersMap);
-				for (Map<String, Object> map : paramenterValues) {
-					passed = verifier.verify(map);
+				boolean rulePassed = verifyRule(rule);
+				if (!rulePassed) {
+					passed = false;
 				}
 			}
-		} else {
-			passed = true;
 		}
 		return passed;
 	}
 
-	private List<Map<String, Object>> retrieveParamenterValues(
-			Map<String, String> encodedParametersMap) {
-		Map<FileContainer, Map<String, Object>> fileContainersPropertiesMap = new HashMap<FileContainer, Map<String, Object>>();
-		Map<String, Object> singleMap = new HashMap<String, Object>();
+	private boolean verifyRule(Rule rule) {
+		//
+		Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap = new HashMap<VerifierParameterInst, FileContainer>();
+		//
 
-		Map<String, Couple> collectionsParameterDefs = new HashMap<String, SlotInstEditBean.Couple>();
-		Map<String, Couple> slotParameterDefs = new HashMap<String, SlotInstEditBean.Couple>();
+		Map<String, String> encodedParametersMap = rule.getParametersMap();
+		IRuleVerifier verifier = rule.getVerifier();
+		List<VerifierParameterDef> inParams = verifier.getInParams();
 
-		Set<String> keySet = encodedParametersMap.keySet();
-		for (String paramName : keySet) {
+		// mappa da passare al Verifier
+		Map<String, List<VerifierParameterInst>> inInstParams = new HashMap<String, List<VerifierParameterInst>>();
+
+		boolean verifiable = true;
+
+		boolean failAllowed = false;
+
+		for (VerifierParameterDef verifierParameterDef : inParams) {
+			String paramName = verifierParameterDef.getName();
 			String encodedParams = encodedParametersMap.get(paramName);
-			String[] splitted = encodedParams.split("\\|");
-			String source = splitted[0];
-			String field = splitted[1];
-			Object sourceDef = ruleParametersResolver.resolveSourceDef(source);
-			Object fieldDef = ruleParametersResolver.resolveFieldDef(field);
-			if (sourceDef instanceof DocDefCollection) {
-				collectionsParameterDefs.put(paramName, new Couple(sourceDef,
-						fieldDef));
-			} else if (sourceDef instanceof SlotDef) {
-				slotParameterDefs.put(paramName,
-						new Couple(sourceDef, fieldDef));
-			}
-		}
 
-		// Assumo che se un parametro riferisce una collection allora ci sarà
-		// una lista di mappe (una mappa per file contenuto nella collection).
-		// Se invece i parametri riferiscono solo lo slot l'output sarà una sola
-		// mappa
-		Set<String> collectionsKeys = collectionsParameterDefs.keySet();
-		for (String paramName : collectionsKeys) {
-			Couple couple = collectionsParameterDefs.get(paramName);
-			Object sourceDef = couple.getSourceDef();
-			Object fieldDef = couple.getFieldDef();
-
-			Property property = (Property) fieldDef;
-			DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
-			List<FileContainer> list = datas.get(docDefCollection.getId());
-			for (FileContainer fileContainer : list) {
-				List<DocumentPropertyInst> embeddedProperties = fileContainer
-						.getEmbeddedProperties();
-				Iterator<DocumentPropertyInst> iterator = embeddedProperties
-						.iterator();
-				boolean found = false;
-				while (iterator.hasNext() && found == false) {
-					DocumentPropertyInst embeddedPropertyInst = iterator.next();
-					if (embeddedPropertyInst.getProperty().equals(property)) {
-						Object value = embeddedPropertyInst.getValue();
-						Map<String, Object> valuesMap = fileContainersPropertiesMap
-								.get(fileContainer);
-						if (valuesMap == null) {
-							valuesMap = new HashMap<String, Object>();
-							fileContainersPropertiesMap.put(fileContainer,
-									valuesMap);
-						}
-						valuesMap.put(paramName, value);
-						found = true;
-					}
-				}
-			}
-		}
-
-		Set<String> slotKeys = slotParameterDefs.keySet();
-		for (String paramName : slotKeys) {
-			Couple couple = slotParameterDefs.get(paramName);
-			// Object sourceDef = couple.getSourceDef();
-			Object fieldDef = couple.getFieldDef();
-			if (fieldDef instanceof PropertyDef) {
-				PropertyDef propertyDef = (PropertyDef) fieldDef;
-				Iterator<PropertyInst> iterator = this.getPropertyInsts()
-						.iterator();
-				boolean found = false;
-				while (iterator.hasNext() && found == false) {
-					PropertyInst propertyInst = iterator.next();
-					if (propertyInst.getPropertyDef().equals(propertyDef)) {
-						Object value = propertyInst.getValue();
-						Collection<Map<String, Object>> mapValues = fileContainersPropertiesMap
-								.values();
-						if (!mapValues.isEmpty()) {
-							for (Map<String, Object> tmpmap : mapValues) {
-								tmpmap.put(paramName, value);
+			if (encodedParams != null && !encodedParams.equals("")) {
+				String[] splitted = encodedParams.split("\\|");
+				String source = splitted[0];
+				String field = splitted[1];
+				Object sourceDef = ruleParametersResolver
+						.resolveSourceDef(source);
+				Object fieldDef = ruleParametersResolver.resolveFieldDef(field);
+				List<VerifierParameterInst> paramInsts = new ArrayList<VerifierParameterInst>();
+				if (sourceDef instanceof DocDefCollection) {
+					DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
+					Property property = (Property) fieldDef;
+					List<FileContainer> list = datas.get(docDefCollection
+							.getId());
+					if (list != null && !list.isEmpty()) {
+						for (FileContainer fileContainer : list) {
+							List<DocumentPropertyInst> embeddedProperties = fileContainer
+									.getEmbeddedProperties();
+							Iterator<DocumentPropertyInst> iterator = embeddedProperties
+									.iterator();
+							boolean found = false;
+							while (iterator.hasNext() && found == false) {
+								DocumentPropertyInst documentPropertyInst = iterator
+										.next();
+								if (documentPropertyInst.getProperty().equals(
+										property)) {
+									Object value = documentPropertyInst
+											.getValue();
+									found = true;
+									if (value != null) {
+										VerifierParameterInst parameterInst = new VerifierParameterInst(
+												verifierParameterDef, value,
+												true);
+										paramInsts.add(parameterInst);
+										//
+										processedPropertiesResolverMap.put(
+												parameterInst, fileContainer);
+										//
+									} else {
+										if (!verifierParameterDef.isOptional()) {
+											verifiable = false;
+											if (rule.isMandatory()) {
+												this.addFileMessage(
+														fileContainer.getId(),
+														new VerifierMessage(
+																documentPropertyInst
+																		.getProperty()
+																		.getTitle()
+																		+ " non può essere nulla per verificare una regola di tipo "
+																		+ rule.getType()
+																				.value(),
+																VerifierMessageType.ERROR));
+											} else {
+												failAllowed = true;
+											}
+										}
+									}
+								}
 							}
-						} else {
-							singleMap.put(paramName, value);
 						}
-						found = true;
+					} else {
+						if (!verifierParameterDef.isOptional()) {
+							verifiable = false;
+							if (rule.isMandatory()) {
+								addCollectionMessage(
+										docDefCollection.getId(),
+										new VerifierMessage(
+												docDefCollection.getName()
+														+ " non può essere vuota per verificare una regola di tipo "
+														+ rule.getType()
+																.value()
+														+ " sulla proprietà "
+														+ property.getTitle()
+														+ " dei files che contiene",
+												VerifierMessageType.ERROR));
+							} else {
+								failAllowed = true;
+							}
+						}
 					}
+
+				} else if (sourceDef instanceof SlotDef) {
+					if (fieldDef instanceof PropertyDef) {
+						PropertyDef propertyDef = (PropertyDef) fieldDef;
+						Iterator<PropertyInst> iterator = this
+								.getPropertyInsts().iterator();
+						boolean found = false;
+						while (iterator.hasNext() && found == false) {
+							PropertyInst propertyInst = iterator.next();
+							if (propertyInst.getPropertyDef().equals(
+									propertyDef)) {
+								Object value = propertyInst.getValue();
+								found = true;
+								if (value != null) {
+									VerifierParameterInst parameterInst = new VerifierParameterInst(
+											verifierParameterDef, value, true);
+									paramInsts.add(parameterInst);
+								} else {
+									if (!verifierParameterDef.isOptional()) {
+										verifiable = false;
+										if (rule.isMandatory()) {
+											this.addMainMessage(new VerifierMessage(
+													propertyDef.getName()
+															+ " non può essere nulla per verificare una regola di tipo "
+															+ rule.getType()
+																	.value(),
+													VerifierMessageType.ERROR));
+										} else {
+											failAllowed = true;
+										}
+									}
+								}
+							}
+						}
+					} else if (fieldDef instanceof EmbeddedProperty) {
+						EmbeddedProperty embeddedProperty = (EmbeddedProperty) fieldDef;
+						Object value = embeddedProperty.getValue();
+						if (value != null) {
+							VerifierParameterInst parameterInst = new VerifierParameterInst(
+									verifierParameterDef, value, false);
+							paramInsts.add(parameterInst);
+						} else {
+							if (!verifierParameterDef.isOptional()) {
+								verifiable = false;
+								if (rule.isMandatory()) {
+									this.addMainMessage(new VerifierMessage(
+											embeddedProperty.getName()
+													+ " non può essere nulla per verificare una regola di tipo "
+													+ rule.getType().value(),
+											VerifierMessageType.ERROR));
+								} else {
+									failAllowed = true;
+								}
+							}
+						}
+					}
+
+				} else if (sourceDef instanceof Rule) {
+					// TODO: usare anche le embedded properties nelle rules!!!
 				}
-			} else if (fieldDef instanceof SlotDefEmbeddedProperty) {
-				SlotDefEmbeddedProperty embeddedProperty = (SlotDefEmbeddedProperty) fieldDef;
-				Object value = embeddedProperty.getValue();
-				Collection<Map<String, Object>> mapValues = fileContainersPropertiesMap
-						.values();
-				if (!mapValues.isEmpty()) {
-					for (Map<String, Object> tmpmap : mapValues) {
-						tmpmap.put(paramName, value);
+				inInstParams.put(paramName, paramInsts);
+			} else {
+				if (!verifierParameterDef.isOptional()) {
+					verifiable = false;
+					if (rule.isMandatory()) {
+						this.addMainMessage(new VerifierMessage(
+								verifierParameterDef.getLabel()
+										+ " not defined in rule!",
+								VerifierMessageType.ERROR));
+					} else {
+						failAllowed = true;
 					}
-				} else {
-					singleMap.put(paramName, value);
 				}
 			}
 		}
 
-		if (!fileContainersPropertiesMap.values().isEmpty()) {
-			return new ArrayList<Map<String, Object>>(
-					fileContainersPropertiesMap.values());
-		} else {
-			ArrayList<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-			resultList.add(singleMap);
-			return resultList;
+		//
+		//
+		//
+		//
+		//
+
+		if (verifiable) {
+			boolean passed = true;
+			VerifierReport report = verifier.verify(inInstParams);
+			if (report.getResult().equals(VerifierResult.ERROR)) {
+				passed = false;
+				List<VerifierParameterInst> failedParams = report
+						.getFailedParams();
+				for (VerifierParameterInst parameterInst : failedParams) {
+					FileContainer fileContainer = processedPropertiesResolverMap
+							.get(parameterInst);
+					if (fileContainer != null) {
+						this.addFileMessage(fileContainer.getId(),
+								rule.getErrorMessage());
+					} else {
+						this.addMainMessage(rule.getErrorMessage());
+					}
+				}
+			}
+			return passed;
+		} else if (failAllowed) {
+			return true;
 		}
 
+		return false;
 	}
 
-	// funziona solo con regole che abbiano almeno un param in una docdefcoll
-	// (filecontainer), non funziona se tutti i param sono dullo slot
-	private List<Map<String, Object>> retrieveParamenterValuesOLD(
-			Map<String, String> parametersMap) {
-		Map<FileContainer, Map<String, Object>> fileContainersPropertiesMap = new HashMap<FileContainer, Map<String, Object>>();
-		Map<String, Object> singleMap = new HashMap<String, Object>();
-		Map<DocDefCollection, Property> docDefCollectionMap = new HashMap<DocDefCollection, Property>();
-
-		Set<String> keySet = parametersMap.keySet();
-		for (String paramName : keySet) {
-			String encodedParams = parametersMap.get(paramName);
-			String[] splitted = encodedParams.split("\\|");
-			String source = splitted[0];
-			String field = splitted[1];
-			Object sourceDef = ruleParametersResolver.resolveSourceDef(source);
-			Object fieldDef = ruleParametersResolver.resolveFieldDef(field);
-
-			if (sourceDef instanceof DocDefCollection) {
-				Property property = (Property) fieldDef;
-				DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
-				List<FileContainer> list = datas.get(docDefCollection.getId());
-				for (FileContainer fileContainer : list) {
-					List<DocumentPropertyInst> embeddedProperties = fileContainer
-							.getEmbeddedProperties();
-					Iterator<DocumentPropertyInst> iterator = embeddedProperties
-							.iterator();
-					boolean found = false;
-					while (iterator.hasNext() && found == false) {
-						DocumentPropertyInst embeddedPropertyInst = iterator
-								.next();
-						if (embeddedPropertyInst.getProperty().equals(property)) {
-							Object value = embeddedPropertyInst.getValue();
-							Map<String, Object> valuesMap = fileContainersPropertiesMap
-									.get(fileContainer);
-							if (valuesMap == null) {
-								valuesMap = new HashMap<String, Object>();
-								fileContainersPropertiesMap.put(fileContainer,
-										valuesMap);
-							}
-							valuesMap.put(paramName, value);
-							found = true;
-						}
-					}
-				}
-			} else if (sourceDef instanceof SlotDef) {
-				PropertyDef propertyDef = (PropertyDef) fieldDef;
-				Iterator<PropertyInst> iterator = this.getPropertyInsts()
-						.iterator();
-				boolean found = false;
-				while (iterator.hasNext() && found == false) {
-					PropertyInst propertyInst = iterator.next();
-					if (propertyInst.getPropertyDef().equals(propertyDef)) {
-						Object value = propertyInst.getValue();
-						Collection<Map<String, Object>> mapValues = fileContainersPropertiesMap
-								.values();
-						for (Map<String, Object> tmpmap : mapValues) {
-							tmpmap.put(paramName, value);
-						}
-						found = true;
-					}
-				}
-			}
-
+	private void addCollectionMessage(Long collectionId, VerifierMessage message) {
+		ArrayList<VerifierMessage> messages = collectionsMessages
+				.get(collectionId);
+		if (messages == null) {
+			messages = new ArrayList<VerifierMessage>();
+			collectionsMessages.put(collectionId, messages);
 		}
+		messages.add(message);
+	}
 
-		return new ArrayList<Map<String, Object>>(
-				fileContainersPropertiesMap.values());
+	private void addFileMessage(String fileContainerId, VerifierMessage message) {
+		ArrayList<VerifierMessage> messages = filesMessages
+				.get(fileContainerId);
+		if (messages == null) {
+			messages = new ArrayList<VerifierMessage>();
+			filesMessages.put(fileContainerId, messages);
+		}
+		messages.add(message);
+	}
+
+	private void addMainMessage(VerifierMessage message) {
+		slotMessages.add(message);
 	}
 
 	public List<PropertyInst> getPropertyInsts() {
@@ -817,114 +945,70 @@ public class SlotInstEditBean {
 		this.primaryDocs = primaryDocs;
 	}
 
-	public List<SlotDefEmbeddedProperty> getEmbeddedProperties() {
-		return new ArrayList<SlotDefEmbeddedProperty>(this.slotDefHome
+	public List<EmbeddedProperty> getEmbeddedProperties() {
+		return new ArrayList<EmbeddedProperty>(this.slotDefHome
 				.getInstance().getEmbeddedProperties());
 	}
 
-	public class FileContainer {
-		private UploadItem uploadItem;
-		private AlfrescoDocument document;
-		private List<DocumentPropertyInst> embeddedProperties = new ArrayList<DocumentPropertyInst>();
+	// public class Couple {
+	// private Object sourceDef;
+	// private Object fieldDef;
+	//
+	// public Couple(Object sourceDef, Object fieldDef) {
+	// super();
+	// this.sourceDef = sourceDef;
+	// this.fieldDef = fieldDef;
+	// }
+	//
+	// public Object getSourceDef() {
+	// return sourceDef;
+	// }
+	//
+	// public void setSourceDef(Object sourceDef) {
+	// this.sourceDef = sourceDef;
+	// }
+	//
+	// public Object getFieldDef() {
+	// return fieldDef;
+	// }
+	//
+	// public void setFieldDef(Object fieldDef) {
+	// this.fieldDef = fieldDef;
+	// }
+	// }
 
-		public FileContainer(AlfrescoDocument alfrescoDocument) {
-			super();
-			this.document = alfrescoDocument;
-		}
-
-		public FileContainer(UploadItem uploadItem) {
-			super();
-			this.uploadItem = uploadItem;
-		}
-
-		public FileContainer(Object item) {
-			if (item instanceof AlfrescoDocument)
-				this.document = (AlfrescoDocument) item;
-			else if (item instanceof UploadItem)
-				this.uploadItem = (UploadItem) item;
-		}
-
-		public UploadItem getUploadItem() {
-			return uploadItem;
-		}
-
-		public void setUploadItem(UploadItem uploadItem) {
-			this.uploadItem = uploadItem;
-		}
-
-		public AlfrescoDocument getDocument() {
-			return document;
-		}
-
-		public void setDocument(AlfrescoDocument alfrescoDocument) {
-			this.document = alfrescoDocument;
-		}
-
-		public String getRealFileName() {
-			if (uploadItem != null && !uploadItem.getFileName().equals("")) {
-				return uploadItem.getFileName();
-			} else if (document != null && !document.getName().equals("")) {
-				return document.getName();
-			}
-			return "";
-		}
-
-		public String getFileName() {
-			String realFileName = getRealFileName();
-			String name = realFileName;
-			String extension = "";
-			int dotIndex = realFileName.lastIndexOf(".");
-			if (dotIndex != -1) {
-				extension = realFileName.substring(dotIndex);
-				name = realFileName.substring(0, dotIndex);
-			}
-
-			int underscoreIndex = realFileName.lastIndexOf("_");
-			String fileName = realFileName;
-			if (underscoreIndex != -1) {
-				fileName = realFileName.substring(0, underscoreIndex);
-			} else {
-				fileName = name;
-			}
-			return fileName.concat(extension);
-		}
-
-		public List<DocumentPropertyInst> getEmbeddedProperties() {
-			return embeddedProperties;
-		}
-
-		public void setEmbeddedProperties(
-				List<DocumentPropertyInst> embeddedProperties) {
-			this.embeddedProperties = embeddedProperties;
-		}
-
+	public ArrayList<VerifierMessage> getSlotMessages() {
+		return slotMessages;
 	}
 
-	public class Couple {
-		private Object sourceDef;
-		private Object fieldDef;
+	public void setSlotMessages(ArrayList<VerifierMessage> slotMessages) {
+		this.slotMessages = slotMessages;
+	}
 
-		public Couple(Object sourceDef, Object fieldDef) {
-			super();
-			this.sourceDef = sourceDef;
-			this.fieldDef = fieldDef;
-		}
+	public HashMap<String, ArrayList<VerifierMessage>> getFilesMessages() {
+		return filesMessages;
+	}
 
-		public Object getSourceDef() {
-			return sourceDef;
-		}
+	public void setFilesMessages(
+			HashMap<String, ArrayList<VerifierMessage>> filesMessages) {
+		this.filesMessages = filesMessages;
+	}
 
-		public void setSourceDef(Object sourceDef) {
-			this.sourceDef = sourceDef;
-		}
+	public HashMap<Long, ArrayList<VerifierMessage>> getCollectionsMessages() {
+		return collectionsMessages;
+	}
 
-		public Object getFieldDef() {
-			return fieldDef;
-		}
+	public void setCollectionsMessages(
+			HashMap<Long, ArrayList<VerifierMessage>> collectionsMessages) {
+		this.collectionsMessages = collectionsMessages;
+	}
 
-		public void setFieldDef(Object fieldDef) {
-			this.fieldDef = fieldDef;
-		}
+	public FileContainer getActiveFileContainer() {
+		return activeFileContainer;
+	}
+
+	public void setActiveFileContainer(FileContainer activeFileContainer) {
+		this.activeFileContainer = activeFileContainer;
 	}
 
 }

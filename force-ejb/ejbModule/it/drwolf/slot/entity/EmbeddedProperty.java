@@ -9,11 +9,12 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 @Entity
-public class SlotDefEmbeddedProperty {
+public class EmbeddedProperty {
 
 	private Long id;
 
@@ -21,7 +22,7 @@ public class SlotDefEmbeddedProperty {
 
 	private DataType type;
 
-	private SlotDef slotDef;
+	// private SlotDef slotDef;
 
 	private String stringValue;
 
@@ -58,14 +59,14 @@ public class SlotDefEmbeddedProperty {
 		this.type = type;
 	}
 
-	@ManyToOne
-	public SlotDef getSlotDef() {
-		return slotDef;
-	}
-
-	public void setSlotDef(SlotDef slotDef) {
-		this.slotDef = slotDef;
-	}
+	// @ManyToOne
+	// public SlotDef getSlotDef() {
+	// return slotDef;
+	// }
+	//
+	// public void setSlotDef(SlotDef slotDef) {
+	// this.slotDef = slotDef;
+	// }
 
 	public String getStringValue() {
 		return stringValue;
@@ -91,6 +92,7 @@ public class SlotDefEmbeddedProperty {
 		this.booleanValue = booleanValue;
 	}
 
+	@Temporal(TemporalType.DATE)
 	public Date getDateValue() {
 		return dateValue;
 	}

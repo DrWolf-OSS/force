@@ -16,22 +16,34 @@
         <rich:panel>
             <f:facet name="header">#{ruleHome.managed ? 'Edit' : 'Add'} Rule</f:facet>
  
-            <s:decorate id="typeField" template="layout/edit.xhtml">
+ <a:region>
+            <s:decorate id="description" template="/layout/display.xhtml">
+                <ui:define name="label">Description</ui:define>
+                <h:outputText value="#{ruleHome.instance.verifier.description}" rendered="#{ruleHome.instance.verifier != null}"/>
+            </s:decorate>
+ 
+			<s:decorate id="mandatoryField" template="/layout/edit.xhtml">
+                <ui:define name="label">Mandatory</ui:define>
+                <h:selectBooleanCheckbox value="#{ruleHome.instance.mandatory}" />
+            </s:decorate>
+            
+            <s:decorate id="typeField" template="/layout/edit.xhtml">
                 <ui:define name="label">Type</ui:define>
                 <h:selectOneMenu id="ruleType" value="#{ruleHome.instance.type}" >
                     	<s:selectItems value="#{ruleTypes}" 
 						var="type" label="#{type.value()}" noSelectionLabel="-- select rule type --"/>
-					<a:support event="onchange" actionListener="#{ruleEditBean.ruleTypeListener}" reRender="inParams"/>
+					<a:support event="onchange" actionListener="#{ruleEditBean.ruleTypeListener}" reRender="inParams,description"/>
              	</h:selectOneMenu>
             </s:decorate>
             
+            
             <s:div id="inParams">
-            <s:decorate id="params" template="layout/display.xhtml">
+            <s:decorate id="params" template="/layout/display.xhtml">
                 <ui:define name="label">Parameters</ui:define>
                 
                 <h:panelGrid columns="2">
                 
-                <ui:repeat var="p" value="#{ruleHome.instance.verifier.inParams}">
+                <ui:repeat var="p" value="#{ruleEditBean.normalParameters}">
                 <s:div>
                 	<h:outputText value="#{p.label}"/>
                 	&#160;#{messages.left}#{messages.left}&#160;
@@ -45,7 +57,7 @@
 		            &#160; : &#160;
 		            <h:selectOneMenu value="#{ruleEditBean.targetPropertyMap[p.name]}" rendered="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties != null}">
 		            	<s:selectItems value="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties}"
-		            					var="prop" label="#{prop.label}" itemValue="#{prop}" disabled="#{prop.type != p.type}"/>
+		            					var="prop" label="#{prop.label}" itemValue="#{prop}" disabled="#{prop.type != p.type}" />
 		            	<f:converter converterId="propertyContainerConverter"/>
 		            	<a:support event="onchange" reRender="inParams"/>
 		            </h:selectOneMenu>
@@ -55,6 +67,19 @@
               
             </s:decorate>
             </s:div>
+            
+            </a:region>
+            
+            <s:decorate id="errorMsg" template="/layout/edit.xhtml">
+            	<ui:define name="label">Error Message</ui:define>
+            	<h:inputTextarea value="#{ruleEditBean.errorMessage.text}" cols="50"/>
+            </s:decorate>
+            
+            <s:decorate id="warningMsg" template="/layout/edit.xhtml">
+            	<ui:define name="label">Warning Message</ui:define>
+            	<h:inputTextarea value="#{ruleEditBean.warningMessage.text}"  cols="50"/>
+            </s:decorate>
+            
 
 
 

@@ -3,17 +3,24 @@ package it.drwolf.slot.entity;
 import it.drwolf.slot.entity.listeners.RuleListener;
 import it.drwolf.slot.enums.RuleType;
 import it.drwolf.slot.interfaces.IRuleVerifier;
+import it.drwolf.slot.ruleverifier.VerifierMessage;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.CollectionOfElements;
@@ -28,9 +35,17 @@ public class Rule {
 
 	private Map<String, String> parametersMap = new HashMap<String, String>();
 
+	private Set<EmbeddedProperty> embeddedProperties = new HashSet<EmbeddedProperty>();
+
 	private RuleType type;
 
+	private boolean mandatory = false;
+
 	private IRuleVerifier verifier;
+
+	private VerifierMessage errorMessage;
+
+	private VerifierMessage warningMessage;
 
 	@Id
 	@GeneratedValue
@@ -78,6 +93,42 @@ public class Rule {
 
 	public void setSlotDef(SlotDef slotDef) {
 		this.slotDef = slotDef;
+	}
+
+	@OneToOne(cascade = CascadeType.ALL)
+	public VerifierMessage getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(VerifierMessage errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
+	@OneToOne(cascade = CascadeType.ALL)
+	public VerifierMessage getWarningMessage() {
+		return warningMessage;
+	}
+
+	public void setWarningMessage(VerifierMessage warningMessage) {
+		this.warningMessage = warningMessage;
+	}
+
+	public boolean isMandatory() {
+		return mandatory;
+	}
+
+	public void setMandatory(boolean mandatory) {
+		this.mandatory = mandatory;
+	}
+
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "rule_id")
+	public Set<EmbeddedProperty> getEmbeddedProperties() {
+		return embeddedProperties;
+	}
+
+	public void setEmbeddedProperties(Set<EmbeddedProperty> embeddedProperties) {
+		this.embeddedProperties = embeddedProperties;
 	}
 
 }
