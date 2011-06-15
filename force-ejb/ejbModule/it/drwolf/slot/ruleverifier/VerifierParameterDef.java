@@ -8,14 +8,16 @@ public class VerifierParameterDef {
 	private DataType type;
 	private String label;
 	private boolean optional;
+	private boolean ruleEmbedded;
 
 	public VerifierParameterDef(String name, String label, DataType type,
-			boolean optional) {
+			boolean optional, boolean ruleEmbedded) {
 		super();
 		this.name = name;
 		this.label = label;
 		this.type = type;
 		this.optional = optional;
+		this.ruleEmbedded = ruleEmbedded;
 	}
 
 	public String getName() {
@@ -56,5 +58,13 @@ public class VerifierParameterDef {
 
 	public void setOptional(boolean optional) {
 		this.optional = optional;
+	}
+
+	public boolean isRuleEmbedded() {
+		return ruleEmbedded;
+	}
+
+	public void setRuleEmbedded(boolean ruleEmbedded) {
+		this.ruleEmbedded = ruleEmbedded;
 	}
 }

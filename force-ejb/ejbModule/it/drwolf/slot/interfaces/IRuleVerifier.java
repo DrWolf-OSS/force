@@ -18,4 +18,6 @@ public interface IRuleVerifier {
 
 	public VerifierMessage getDefaultWarningMessage();
 
+	public String getDescription();
+
 }

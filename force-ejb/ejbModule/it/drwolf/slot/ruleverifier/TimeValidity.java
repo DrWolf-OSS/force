@@ -15,17 +15,21 @@ public class TimeValidity implements IRuleVerifier {
 	private final String FOLLOWING_DATE = "FollowingDate";
 	private final String WARNING_THRESHOLD = "WarningThreshold";
 
+	private final String DESCRIPTION = "La regola controlla che la data selezionata per il parametro \"Data Anteriore\" "
+			+ "sia anteriore a quella selezionata per \"Data Posteriore\". "
+			+ "Nel caso le date siano molteplici vengono confrontate in modo che tutte le Earlier siano anteriori alle Following";
+
 	final private List<VerifierParameterDef> params = new ArrayList<VerifierParameterDef>();
 
 	private VerifierReport verifierReport = new VerifierReport();
 
 	public TimeValidity() {
-		params.add(new VerifierParameterDef(this.EARLIER_DATE, "Earlier Date",
-				DataType.DATE, false));
+		params.add(new VerifierParameterDef(this.EARLIER_DATE,
+				"Data Anteriore", DataType.DATE, false, false));
 		params.add(new VerifierParameterDef(this.FOLLOWING_DATE,
-				"Following date", DataType.DATE, false));
+				"Data Posteriore", DataType.DATE, false, false));
 		params.add(new VerifierParameterDef(this.WARNING_THRESHOLD,
-				"Warning Theshold", DataType.INTEGER, true));
+				"Warning Theshold", DataType.INTEGER, true, true));
 	}
 
 	public VerifierReport verify(Map<String, List<VerifierParameterInst>> params) {
@@ -45,40 +49,13 @@ public class TimeValidity implements IRuleVerifier {
 		} else {
 			fromFollowers(earlierParametersInst, followingParametersInst);
 		}
-		// Object earlierDateObj = params.get(this.EARLIER_DATE);
-		// Date earlierDate = null;
-		// if (earlierDateObj instanceof Calendar) {
-		// Calendar earlierDateCalendar = (Calendar) earlierDateObj;
-		// earlierDate = earlierDateCalendar.getTime();
-		// } else if (earlierDateObj instanceof Date) {
-		// earlierDate = (Date) earlierDateObj;
-		// }
-		//
-		// Object followingDateObj = params.get(this.FOLLOWING_DATE);
-		// Date followingDate = null;
-		// if (followingDateObj instanceof Calendar) {
-		// Calendar followingDateCalendar = (Calendar) followingDateObj;
-		// followingDate = followingDateCalendar.getTime();
-		// } else if (followingDateObj instanceof Date) {
-		// followingDate = (Date) followingDateObj;
-		// }
-		//
-		// VerifierReport report = new VerifierReport();
-		// if (followingDate.before(earlierDate)) {
-		// report.setResult(VerifierResult.ERROR);
-		// } else {
-		// report.setResult(VerifierResult.PASSED);
-		// }
-		// return report;
+
 		return this.verifierReport;
 	}
 
 	private void fromEarliers(
 			List<VerifierParameterInst> earlierParametersInst,
 			List<VerifierParameterInst> followingParametersInst) {
-
-		// List<VerifierParameterInst> failedParams = new
-		// ArrayList<VerifierParameterInst>();
 
 		// trovo la soglia maggiore che deve essere rispettata
 		Date earlierThreshold = null;
@@ -169,6 +146,10 @@ public class TimeValidity implements IRuleVerifier {
 	public VerifierMessage getDefaultWarningMessage() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public String getDescription() {
+		return this.DESCRIPTION;
 	}
 
 }

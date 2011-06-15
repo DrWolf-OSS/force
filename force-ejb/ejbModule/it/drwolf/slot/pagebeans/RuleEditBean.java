@@ -52,9 +52,16 @@ public class RuleEditBean {
 	private VerifierMessage warningMessage = new VerifierMessage("",
 			VerifierMessageType.WARNING);
 
+	private List<VerifierParameterDef> normalParameters = new ArrayList<VerifierParameterDef>();
+	private List<VerifierParameterDef> embeddedParameters = new ArrayList<VerifierParameterDef>();
+
 	@Factory("ruleTypes")
 	public List<RuleType> getRuleTypes() {
 		return Arrays.asList(RuleType.values());
+	}
+
+	public void init() {
+
 	}
 
 	public void ruleTypeListener(ActionEvent event) {
@@ -65,11 +72,22 @@ public class RuleEditBean {
 
 		if (verifier != null) {
 			List<VerifierParameterDef> inParams = verifier.getInParams();
+			//
+			this.embeddedParameters.clear();
+			this.normalParameters.clear();
+			for (VerifierParameterDef verifierParameter : inParams) {
+				if (verifierParameter.isRuleEmbedded()) {
+					this.embeddedParameters.add(verifierParameter);
+				} else {
+					this.normalParameters.add(verifierParameter);
+				}
+			}
+			//
 			SlotDef slotDef = slotDefHome.getInstance();
 			Set<DocDefCollection> docDefCollections = slotDef
 					.getDocDefCollections();
 
-			for (VerifierParameterDef verifierParameter : inParams) {
+			for (VerifierParameterDef verifierParameter : normalParameters) {
 				ArrayList<PropertiesSourceContainer> propertiesSourceContainerList = new ArrayList<PropertiesSourceContainer>();
 				for (DocDefCollection collection : docDefCollections) {
 					PropertiesSourceContainer sourceContainer = new PropertiesSourceContainer(
@@ -174,6 +192,23 @@ public class RuleEditBean {
 
 	public void setWarningMessage(VerifierMessage warningMessage) {
 		this.warningMessage = warningMessage;
+	}
+
+	public List<VerifierParameterDef> getNormalParameters() {
+		return normalParameters;
+	}
+
+	public void setNormalParameters(List<VerifierParameterDef> normalParameters) {
+		this.normalParameters = normalParameters;
+	}
+
+	public List<VerifierParameterDef> getEmbeddedParameters() {
+		return embeddedParameters;
+	}
+
+	public void setEmbeddedParameters(
+			List<VerifierParameterDef> embeddedParameters) {
+		this.embeddedParameters = embeddedParameters;
 	}
 
 }
