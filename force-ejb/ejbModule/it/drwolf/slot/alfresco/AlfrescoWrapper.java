@@ -6,6 +6,8 @@ import it.drwolf.slot.prefs.Preferences;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -19,9 +21,13 @@ import org.apache.chemistry.opencmis.client.api.Rendition;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.data.Ace;
+import org.apache.chemistry.opencmis.commons.enums.AclPropagation;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlEntryImpl;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlPrincipalDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.io.IOUtils;
 import org.jboss.seam.ScopeType;
@@ -57,6 +63,26 @@ public class AlfrescoWrapper {
 
 	@In(create = true)
 	AlfrescoInfo alfrescoInfo;
+
+	public void applyACL(Folder folder, String groupName) {
+		Session session = this.alfrescoUserIdentity.getSession();
+		// faccio un workaround per recuperare la session senza stravolgere....
+		// si deve fare refactor e far passare la session come parametro
+		if (session == null) {
+			session = this.alfrescoAdminIdentity.getSession();
+		}
+		try {
+
+			Ace ace = new AccessControlEntryImpl(
+					new AccessControlPrincipalDataImpl(groupName),
+					Arrays.asList("cmis:read", " cmis:write"));
+
+			folder.applyAcl(Arrays.asList(ace), new ArrayList<Ace>(),
+					AclPropagation.PROPAGATE);
+		} catch (CmisObjectNotFoundException e) {
+
+		}
+	}
 
 	public AlfrescoFolder findOrCreateFolder(Folder father, String folderName) {
 		AlfrescoFolder folder = null;

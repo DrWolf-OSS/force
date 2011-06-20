@@ -9,6 +9,7 @@ import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.alfresco.cmis.client.AlfrescoFolder;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityHome;
@@ -89,8 +90,9 @@ public class AziendaHome extends EntityHome<Azienda> {
 		String res = awsc.addGroupOrUser("aziende", groupName, true);
 
 		// creo la cartella groupName sotto il progetto Force
-		this.alfrescoWrapper.findOrCreateFolder(
-				this.alfrescoWrapper.getMainProjectFolder(), groupName);
+		AlfrescoFolder alfrescoGroupFolder = this.alfrescoWrapper
+				.findOrCreateFolder(
+						this.alfrescoWrapper.getMainProjectFolder(), groupName);
 
 		// creo l'utente con l'email del referente
 		HashMap<String, String> args = new HashMap<String, String>();
@@ -107,17 +109,8 @@ public class AziendaHome extends EntityHome<Azienda> {
 		// Aggiungo i provilegi di collaboratore all'utente creato sulla
 		// cartella
 		// groupName
-
-		/*
-		 * a questo punto deve fare le seguenti operazioni: 1. Creazione gruppo
-		 * su alfresco legato all'azienda (es: ragionesociale_id) 2. Creazione
-		 * all'interno di un path predefinito (es: force/slot) di una cartella
-		 * con lo stesso nome del gruppo creato al passo 1 3. Assegnazione dei
-		 * permessi di owner della cartella creata al passo 2 al gruppo creato
-		 * al passo 1 4. Creazione di un utente partendo da nome e cognome del
-		 * referente dell'azienda 5. Assegnazione di tale utente al gruppo
-		 * creato al passo 1
-		 */
+		this.alfrescoWrapper
+				.applyACL(alfrescoGroupFolder, "GROUP_" + groupName);
 
 		return "OK";
 	}
