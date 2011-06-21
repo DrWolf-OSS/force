@@ -61,6 +61,14 @@ public abstract class AlfrescoIdentity {
 		return true;
 	}
 
+	public Authority getActiveGroup() {
+		return this.activeGroup;
+	}
+
+	public List<Authority> getGroups() {
+		return this.groups;
+	}
+
 	public String getPassword() {
 		return this.password;
 	}
@@ -71,10 +79,6 @@ public abstract class AlfrescoIdentity {
 
 	public String getUrl() {
 		return this.url;
-	}
-
-	public String getUsername() {
-		return this.username;
 	}
 
 	public AlfrescoFolder getUserHomeFolder() {
@@ -94,20 +98,24 @@ public abstract class AlfrescoIdentity {
 		return this.getUserHomeFolder().getId();
 	}
 
-	public List<Authority> getGroups() {
-		return groups;
+	public String getUsername() {
+		return this.username;
 	}
 
-	public void setGroups(List<Authority> groups) {
-		this.groups = groups;
-	}
-
-	public Authority getActiveGroup() {
-		return activeGroup;
+	public Boolean isMemberOf(String groupName) {
+		for (Authority auth : this.groups) {
+			if (auth.getShortName().equals(groupName)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void setActiveGroup(Authority activeGroup) {
 		this.activeGroup = activeGroup;
 	}
 
+	public void setGroups(List<Authority> groups) {
+		this.groups = groups;
+	}
 }

@@ -5,6 +5,7 @@ import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.alfresco.webscripts.model.Authority;
 import it.drwolf.slot.alfresco.webscripts.model.AuthorityType;
+import it.drwolf.slot.entitymanager.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,36 +34,14 @@ public class Authenticator {
 	@In(create = true)
 	AlfrescoInfo alfrescoInfo;
 
-	public boolean authenticate() {
-		log.info("authenticating {0}", credentials.getUsername());
-		// write your authentication logic here,
-		// return true if the authentication was
-		// successful, false otherwise
-		// if ("admin".equals(credentials.getUsername())) {
-		// identity.addRole("admin");
-		// return true;
-		// }
-
-		if (identity.getCredentials().getUsername().equals(""))
-			return false;
-
-		if (identity.getCredentials().getPassword().equals(""))
-			return false;
-
-		alfrescoUserIdentity.authenticate(identity.getCredentials()
-				.getUsername(), identity.getCredentials().getPassword(),
-				alfrescoInfo.getRepositoryUri());
-
-		assignGroups();
-
-		return true;
-	}
+	@In(create = true)
+	PreferenceManager preferenceManager;
 
 	private void assignGroups() {
 		AlfrescoWebScriptClient alfrescoWebScriptClient = new AlfrescoWebScriptClient(
-				identity.getCredentials().getUsername(), identity
+				this.identity.getCredentials().getUsername(), this.identity
 						.getCredentials().getPassword(),
-				alfrescoInfo.getRepositoryUri());
+				this.alfrescoInfo.getRepositoryUri());
 
 		List<Authority> userGroups = new ArrayList<Authority>();
 		List<Authority> groups = alfrescoWebScriptClient.getGroupsList("*", "");
@@ -72,23 +51,58 @@ public class Authenticator {
 							AuthorityType.USER.name());
 			Iterator<Authority> iterator = users.iterator();
 			boolean found = false;
-			while (iterator.hasNext() && found == false) {
+			while (iterator.hasNext() && (found == false)) {
 				Authority user = iterator.next();
 				if (user.getShortName().equals(
-						identity.getCredentials().getUsername())) {
+						this.identity.getCredentials().getUsername())) {
 					userGroups.add(group);
 					found = true;
 				}
 			}
 		}
-		alfrescoUserIdentity.setGroups(userGroups);
+		this.alfrescoUserIdentity.setGroups(userGroups);
 
 		// SETTO A MERDA il primo della lista come activeGroup
-		alfrescoUserIdentity.setActiveGroup(userGroups.get(0));
-		System.out.println("---> " + identity.getCredentials().getUsername()
+		this.alfrescoUserIdentity.setActiveGroup(userGroups.get(0));
+		System.out.println("---> "
+				+ this.identity.getCredentials().getUsername()
 				+ " entered as \""
-				+ alfrescoUserIdentity.getActiveGroup().getShortName()
+				+ this.alfrescoUserIdentity.getActiveGroup().getShortName()
 				+ "\" member");
+	}
+
+	public boolean authenticate() {
+		this.log.info("authenticating {0}", this.credentials.getUsername());
+		// write your authentication logic here,
+		// return true if the authentication was
+		// successful, false otherwise
+		// if ("admin".equals(credentials.getUsername())) {
+		// identity.addRole("admin");
+		// return true;
+		// }
+
+		if (this.identity.getCredentials().getUsername().equals("")) {
+			return false;
+		}
+
+		if (this.identity.getCredentials().getPassword().equals("")) {
+			return false;
+		}
+
+		this.alfrescoUserIdentity.authenticate(this.identity.getCredentials()
+				.getUsername(), this.identity.getCredentials().getPassword(),
+				this.alfrescoInfo.getRepositoryUri());
+
+		this.assignGroups();
+
+		if (this.alfrescoUserIdentity.isMemberOf(this.preferenceManager
+				.getPreference("FORCE_ADMIN").getStringValue())) {
+			this.identity.addRole("ADMIN");
+		} else {
+
+		}
+
+		return true;
 	}
 
 }

@@ -9,4 +9,5 @@ import org.jboss.seam.annotations.Scope;
 @Name("alfrescoUserIdentity")
 @Scope(ScopeType.SESSION)
 public class AlfrescoUserIdentity extends AlfrescoIdentity {
+
 }
