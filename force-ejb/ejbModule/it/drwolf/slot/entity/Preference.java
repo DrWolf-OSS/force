@@ -37,11 +37,16 @@ public class Preference implements Serializable {
 			PreferenceKey.CUSTOM_MODEL_XML_NAME.name(), "slotModel.xml");
 	private static Preference FORCE_GROUPS_PATH = new Preference(
 			PreferenceKey.FORCE_GROUPS_PATH.name(), "/Force");
+	private static Preference FORCE_ADMIN = new Preference(
+			PreferenceKey.FORCE_ADMIN.name(), "CNA");
 
-	public static Preference[] defaults = new Preference[] { ALFRESCO_LOCATION,
-			ALFRESCO_ADMIN_USER, ALFRESCO_ADMIN_PWD, ALFRESCO_USERS_HOME,
-			CUSTOM_MODEL_JAR_PATH, CUSTOM_MODEL_XML_PATH_IN_JAR,
-			CUSTOM_MODEL_XML_PATH, CUSTOM_MODEL_XML_NAME, FORCE_GROUPS_PATH };
+	public static Preference[] defaults = new Preference[] {
+			Preference.ALFRESCO_LOCATION, Preference.ALFRESCO_ADMIN_USER,
+			Preference.ALFRESCO_ADMIN_PWD, Preference.ALFRESCO_USERS_HOME,
+			Preference.CUSTOM_MODEL_JAR_PATH,
+			Preference.CUSTOM_MODEL_XML_PATH_IN_JAR,
+			Preference.CUSTOM_MODEL_XML_PATH, Preference.CUSTOM_MODEL_XML_NAME,
+			Preference.FORCE_GROUPS_PATH, Preference.FORCE_ADMIN };
 
 	private Integer id;
 	private String keyValue;
@@ -60,23 +65,23 @@ public class Preference implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	public Integer getId() {
-		return id;
+		return this.id;
+	}
+
+	public String getKeyValue() {
+		return this.keyValue;
+	}
+
+	public String getStringValue() {
+		return this.stringValue;
 	}
 
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public String getKeyValue() {
-		return keyValue;
-	}
-
 	public void setKeyValue(String key) {
 		this.keyValue = key;
-	}
-
-	public String getStringValue() {
-		return stringValue;
 	}
 
 	public void setStringValue(String value) {

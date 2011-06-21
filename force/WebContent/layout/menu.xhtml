@@ -85,6 +85,7 @@
     <!-- @newMenuItem@ -->
     <rich:toolBarGroup location="right">
         <h:outputText id="menuWelcomeId" value="signed in as: #{credentials.username}" rendered="#{identity.loggedIn}"/>
+        <s:link id="menuList" view="/AziendaList.xhtml" value="Elenco Aziende" rendered="#{identity.hasRole('ADMIN')}" propagation="none"/>
         <s:link id="menuAddId" view="/AddAzienda.xhtml" value="Registrati" rendered="#{not identity.loggedIn}" propagation="none"/>
         <s:link id="menuLoginId" view="/login.xhtml" value="Login" rendered="#{not identity.loggedIn}" propagation="none"/>
         <s:link id="menuLogoutId" view="/home.xhtml" action="#{identity.logout}" value="Logout" rendered="#{identity.loggedIn}" propagation="none"/>
