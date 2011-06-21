@@ -34,20 +34,22 @@ public class Azienda implements Serializable {
 	private String provincia;
 	private String cap;
 
+	private String partitaIva;
 	private String email;
 	private String emailCertificata;
 
 	// Referente
 	private String nome;
 	private String cognome;
+
 	private String emailReferente;
 	private String telefono;
 	private String fax;
 	private String cellulare;
-
 	private FormaGiuridica formaGiuridica;
 	private Settore settore;
 
+	private String posizioneCNA;
 	private String stato;
 
 	// per Alfresco
@@ -135,6 +137,16 @@ public class Azienda implements Serializable {
 		return this.nome;
 	}
 
+	@Column
+	public String getPartitaIva() {
+		return this.partitaIva;
+	}
+
+	@Column(nullable = false)
+	public String getPosizioneCNA() {
+		return this.posizioneCNA;
+	}
+
 	@Column(nullable = false)
 	@NotNull
 	public String getProvincia() {
@@ -219,6 +231,14 @@ public class Azienda implements Serializable {
 
 	public void setNome(String nome) {
 		this.nome = nome;
+	}
+
+	public void setPartitaIva(String partitaIva) {
+		this.partitaIva = partitaIva;
+	}
+
+	public void setPosizioneCNA(String posizioneCNA) {
+		this.posizioneCNA = posizioneCNA;
 	}
 
 	public void setProvincia(String provincia) {

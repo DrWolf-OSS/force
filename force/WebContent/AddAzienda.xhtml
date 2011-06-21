@@ -42,6 +42,15 @@
                                 <s:convertEntity />
                 </h:selectOneMenu>
             </s:decorate>
+            <s:decorate id="cnaField" template="layout/edit.xhtml">
+                <ui:define name="label">Posizione in CNA</ui:define>
+                <h:selectOneMenu required="true" value="#{aziendaHome.instance.posizioneCNA}"
+                                 defaultLabel="seleziona">
+                    <s:selectItems value="#{aziendaHome.posizioneCNA}" var="valore" itemValue="#{valore.nome}" 
+                                    hideNoSelectionLabel="false" noSelectionLabel="--Scegli--" label="#{valore.testo}" />
+                                <s:convertEntity />
+                </h:selectOneMenu>
+            </s:decorate>
             <s:decorate id="indirizzoField" template="layout/edit.xhtml">
                 <ui:define name="label">Indirizzo</ui:define>
                 <h:inputTextarea id="indirizzo"
@@ -91,26 +100,7 @@
                                maxlength="11"
                                size="11"
                                required="true"
-                               value="#{aziendaHome.partitaIva}"/>
-            </s:decorate>
-
-            <s:decorate id="codiceFiscaleField" template="layout/edit.xhtml">
-                <ui:define name="label">Codice Fiscale</ui:define>
-                <h:inputText id="codiceFiscale"
-                               maxlength="16"
-                               size="16"
-                               required="true"
-                               value="#{aziendaHome.codiceFiscale}"/>
-            </s:decorate>
- 
-            <s:decorate id="annoCostituzioneField" template="layout/edit.xhtml">
-                <ui:define name="label">Anno di Costituzione</ui:define>
-                <rich:calendar id="annoCostituzione"
-                            required="true"
-                            value="#{aziendaHome.dataCostituzione}" popup="true"
-                            enableManualInput="true" datePattern="dd/MM/yyyy"
-                            showApplyButton="false">
-                        </rich:calendar>
+                               value="#{aziendaHome.instance.partitaIva}"/>
             </s:decorate>
 
             <s:decorate id="emailField" template="layout/edit.xhtml">
