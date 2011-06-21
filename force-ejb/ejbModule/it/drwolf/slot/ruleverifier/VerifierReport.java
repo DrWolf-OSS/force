@@ -9,6 +9,8 @@ public class VerifierReport {
 
 	private List<VerifierParameterInst> failedParams = new ArrayList<VerifierParameterInst>();
 
+	private List<VerifierParameterInst> warningParams = new ArrayList<VerifierParameterInst>();
+
 	public VerifierResult getResult() {
 		return result;
 	}
@@ -23,6 +25,14 @@ public class VerifierReport {
 
 	public void setFailedParams(List<VerifierParameterInst> failedParams) {
 		this.failedParams = failedParams;
+	}
+
+	public List<VerifierParameterInst> getWarningParams() {
+		return warningParams;
+	}
+
+	public void setWarningParams(List<VerifierParameterInst> warningParas) {
+		this.warningParams = warningParas;
 	}
 
 	// private boolean passed;

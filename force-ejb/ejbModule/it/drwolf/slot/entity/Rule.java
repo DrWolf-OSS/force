@@ -6,9 +6,7 @@ import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.ruleverifier.VerifierMessage;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -17,8 +15,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
@@ -35,7 +33,7 @@ public class Rule {
 
 	private Map<String, String> parametersMap = new HashMap<String, String>();
 
-	private Set<EmbeddedProperty> embeddedProperties = new HashSet<EmbeddedProperty>();
+	private Map<String, RuleParameterInst> embeddedParametersMap = new HashMap<String, RuleParameterInst>();
 
 	private RuleType type;
 
@@ -121,14 +119,15 @@ public class Rule {
 		this.mandatory = mandatory;
 	}
 
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "rule_id")
-	public Set<EmbeddedProperty> getEmbeddedProperties() {
-		return embeddedProperties;
+	@MapKey(name = "parameterName")
+	@OneToMany(mappedBy = "rule", cascade = CascadeType.ALL)
+	public Map<String, RuleParameterInst> getEmbeddedParametersMap() {
+		return embeddedParametersMap;
 	}
 
-	public void setEmbeddedProperties(Set<EmbeddedProperty> embeddedProperties) {
-		this.embeddedProperties = embeddedProperties;
+	public void setEmbeddedParametersMap(
+			Map<String, RuleParameterInst> embeddedParametersMap) {
+		this.embeddedParametersMap = embeddedParametersMap;
 	}
 
 }

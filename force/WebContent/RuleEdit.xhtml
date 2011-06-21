@@ -32,7 +32,7 @@
                 <h:selectOneMenu id="ruleType" value="#{ruleHome.instance.type}" >
                     	<s:selectItems value="#{ruleTypes}" 
 						var="type" label="#{type.value()}" noSelectionLabel="-- select rule type --"/>
-					<a:support event="onchange" actionListener="#{ruleEditBean.ruleTypeListener}" reRender="inParams,description"/>
+					<a:support event="onchange" actionListener="#{ruleEditBean.ruleTypeListener}" reRender="inParams,description,embeddedParameters"/>
              	</h:selectOneMenu>
             </s:decorate>
             
@@ -69,6 +69,27 @@
             </s:div>
             
             </a:region>
+            
+            <s:div id="embeddedParameters">
+            <ui:repeat var="ep" value="#{ruleEditBean.embeddedParameters}">
+	            <s:decorate template="/layout/edit.xhtml">
+	           		<ui:define name="label">#{ep.verifierParameterDef.label}</ui:define>
+	           		<h:inputText value="#{ep.stringValue}"
+								rendered="#{ep.verifierParameterDef.type == 'STRING'}"
+								required="#{not ep.verifierParameterDef.optional}" />
+					<h:inputText value="#{ep.integerValue}"
+								rendered="#{ep.verifierParameterDef.type == 'INTEGER'}"
+								required="#{not ep.verifierParameterDef.optional}" />
+					<h:selectBooleanCheckbox value="#{ep.booleanValue}"
+								rendered="#{ep.verifierParameterDef.type == 'BOOLEAN'}"
+								required="#{not ep.verifierParameterDef.optional}" />
+					<rich:calendar id="subscriptionDate" mode="client"
+								value="#{ep.dateValue}" datePattern="dd/MM/yyyy"
+								rendered="#{ep.verifierParameterDef.type == 'DATE'}"
+								required="#{not ep.verifierParameterDef.optional}" />
+	            </s:decorate>
+            </ui:repeat>
+            </s:div>
             
             <s:decorate id="errorMsg" template="/layout/edit.xhtml">
             	<ui:define name="label">Error Message</ui:define>

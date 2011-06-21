@@ -28,6 +28,12 @@
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
       </rule>
+      <rule if-outcome="warning">
+         <redirect>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         </redirect>
+      </rule>
    </navigation>
    
    <navigation from-action="#{slotInstEditBean.update()}">
