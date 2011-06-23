@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.DateUtils;
+
 public class TimeValidity implements IRuleVerifier {
 
 	private final String EARLIER_DATE = "EarlierDate";
@@ -38,16 +40,24 @@ public class TimeValidity implements IRuleVerifier {
 		List<VerifierParameterInst> followingParametersInst = params
 				.get(this.FOLLOWING_DATE);
 
+		VerifierParameterInst warningThresholdParameterInst = params.get(
+				this.WARNING_THRESHOLD).get(0);
+
+		this.verifierReport = new VerifierReport();
 		this.verifierReport.setResult(VerifierResult.PASSED);
 
 		if (!earlierParametersInst.get(0).isFallible()) {
-			fromEarliers(earlierParametersInst, followingParametersInst);
+			fromEarliers(earlierParametersInst, followingParametersInst,
+					warningThresholdParameterInst);
 		} else if (!followingParametersInst.get(0).isFallible()) {
-			fromFollowers(earlierParametersInst, followingParametersInst);
+			fromFollowers(earlierParametersInst, followingParametersInst,
+					warningThresholdParameterInst);
 		} else if (earlierParametersInst.size() == 1) {
-			fromEarliers(earlierParametersInst, followingParametersInst);
+			fromEarliers(earlierParametersInst, followingParametersInst,
+					warningThresholdParameterInst);
 		} else {
-			fromFollowers(earlierParametersInst, followingParametersInst);
+			fromFollowers(earlierParametersInst, followingParametersInst,
+					warningThresholdParameterInst);
 		}
 
 		return this.verifierReport;
@@ -55,7 +65,10 @@ public class TimeValidity implements IRuleVerifier {
 
 	private void fromEarliers(
 			List<VerifierParameterInst> earlierParametersInst,
-			List<VerifierParameterInst> followingParametersInst) {
+			List<VerifierParameterInst> followingParametersInst,
+			VerifierParameterInst warningThresholdParameterInst) {
+
+		Integer threshold = (Integer) warningThresholdParameterInst.getValue();
 
 		// trovo la soglia maggiore che deve essere rispettata
 		Date earlierThreshold = null;
@@ -74,6 +87,7 @@ public class TimeValidity implements IRuleVerifier {
 			}
 		}
 
+		// verifico
 		for (VerifierParameterInst parameterInst : followingParametersInst) {
 			Object value = parameterInst.getValue();
 			Date fDate = null;
@@ -87,13 +101,25 @@ public class TimeValidity implements IRuleVerifier {
 			if (fDate.before(earlierThreshold)) {
 				this.verifierReport.setResult(VerifierResult.ERROR);
 				this.verifierReport.getFailedParams().add(parameterInst);
+			} else if (threshold != null) {
+				Date addDays = DateUtils.addDays(earlierThreshold, threshold);
+				if (addDays.after(fDate)) {
+					if (!this.verifierReport.getResult().equals(
+							VerifierResult.ERROR)) {
+						this.verifierReport.setResult(VerifierResult.WARNING);
+					}
+					this.verifierReport.getWarningParams().add(parameterInst);
+				}
 			}
 		}
 	}
 
 	private void fromFollowers(
 			List<VerifierParameterInst> earlierParametersInst,
-			List<VerifierParameterInst> followingParametersInst) {
+			List<VerifierParameterInst> followingParametersInst,
+			VerifierParameterInst warningThresholdParameterInst) {
+
+		Integer threshold = (Integer) warningThresholdParameterInst.getValue();
 
 		// trovo la soglia minore che deve essere rispettata
 		Date followerThreshold = null;
@@ -112,6 +138,7 @@ public class TimeValidity implements IRuleVerifier {
 			}
 		}
 
+		// verifico
 		for (VerifierParameterInst parameterInst : earlierParametersInst) {
 			Object value = parameterInst.getValue();
 			Date eDate = null;
@@ -125,6 +152,15 @@ public class TimeValidity implements IRuleVerifier {
 			if (eDate.after(followerThreshold)) {
 				this.verifierReport.setResult(VerifierResult.ERROR);
 				this.verifierReport.getFailedParams().add(parameterInst);
+			} else if (threshold != null) {
+				Date addDays = DateUtils.addDays(eDate, threshold);
+				if (addDays.after(followerThreshold)) {
+					if (!this.verifierReport.getResult().equals(
+							VerifierResult.ERROR)) {
+						this.verifierReport.setResult(VerifierResult.WARNING);
+					}
+					this.verifierReport.getWarningParams().add(parameterInst);
+				}
 			}
 		}
 	}
@@ -138,14 +174,12 @@ public class TimeValidity implements IRuleVerifier {
 		return this.getClass().getName();
 	}
 
-	public VerifierMessage getDefaultErrorMessage() {
-		return new VerifierMessage("Time validity rule not verified!",
-				VerifierMessageType.ERROR);
+	public String getDefaultErrorMessage() {
+		return "Time validity rule not verified!";
 	}
 
-	public VerifierMessage getDefaultWarningMessage() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getDefaultWarningMessage() {
+		return "Default Warning!";
 	}
 
 	public String getDescription() {

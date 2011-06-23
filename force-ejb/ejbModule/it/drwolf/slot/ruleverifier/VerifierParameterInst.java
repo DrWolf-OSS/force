@@ -48,4 +48,9 @@ public class VerifierParameterInst {
 		this.fallible = fallible;
 	}
 
+	@Override
+	public String toString() {
+		return value.toString();
+	}
+
 }

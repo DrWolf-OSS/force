@@ -28,14 +28,36 @@
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
       </rule>
+      <rule if-outcome="warning">
+     	 <end-conversation before-redirect="true"/>
+         <redirect>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         </redirect>
+      </rule>
    </navigation>
    
    <navigation from-action="#{slotInstEditBean.update()}">
+      <rule if-outcome="updated">
          <end-conversation before-redirect="true"/>
          <redirect view-id="/SlotInstEdit.xhtml">
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
+      </rule>
+      <rule if-outcome="failed">
+         <redirect view-id="/SlotInstEdit.xhtml">
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         </redirect>
+      </rule>
+      <rule if-outcome="warning">
+      	 <end-conversation before-redirect="true"/>
+         <redirect view-id="/SlotInstEdit.xhtml">
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         </redirect>
+      </rule>
    </navigation>
 
 <!--   <navigation from-action="#{slotInstHome.persist}">-->

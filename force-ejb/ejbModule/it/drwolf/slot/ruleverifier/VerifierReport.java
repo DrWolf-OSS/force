@@ -9,6 +9,8 @@ public class VerifierReport {
 
 	private List<VerifierParameterInst> failedParams = new ArrayList<VerifierParameterInst>();
 
+	private List<VerifierParameterInst> warningParams = new ArrayList<VerifierParameterInst>();
+
 	public VerifierResult getResult() {
 		return result;
 	}
@@ -25,24 +27,12 @@ public class VerifierReport {
 		this.failedParams = failedParams;
 	}
 
-	// private boolean passed;
+	public List<VerifierParameterInst> getWarningParams() {
+		return warningParams;
+	}
 
-	// private VerifierMessage message;
-
-	// public boolean isPassed() {
-	// return passed;
-	// }
-	//
-	// public void setPassed(boolean result) {
-	// this.passed = result;
-	// }
-
-	// public VerifierMessage getMessage() {
-	// return message;
-	// }
-	//
-	// public void setMessage(VerifierMessage message) {
-	// this.message = message;
-	// }
+	public void setWarningParams(List<VerifierParameterInst> warningParas) {
+		this.warningParams = warningParas;
+	}
 
 }

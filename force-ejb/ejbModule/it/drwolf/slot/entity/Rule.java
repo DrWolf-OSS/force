@@ -3,12 +3,9 @@ package it.drwolf.slot.entity;
 import it.drwolf.slot.entity.listeners.RuleListener;
 import it.drwolf.slot.enums.RuleType;
 import it.drwolf.slot.interfaces.IRuleVerifier;
-import it.drwolf.slot.ruleverifier.VerifierMessage;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -17,10 +14,9 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.CollectionOfElements;
@@ -35,7 +31,7 @@ public class Rule {
 
 	private Map<String, String> parametersMap = new HashMap<String, String>();
 
-	private Set<EmbeddedProperty> embeddedProperties = new HashSet<EmbeddedProperty>();
+	private Map<String, RuleParameterInst> embeddedParametersMap = new HashMap<String, RuleParameterInst>();
 
 	private RuleType type;
 
@@ -43,9 +39,13 @@ public class Rule {
 
 	private IRuleVerifier verifier;
 
-	private VerifierMessage errorMessage;
+	// private VerifierMessage errorMessage;
+	//
+	// private VerifierMessage warningMessage;
 
-	private VerifierMessage warningMessage;
+	private String errorMessage;
+
+	private String warningMessage;
 
 	@Id
 	@GeneratedValue
@@ -95,23 +95,23 @@ public class Rule {
 		this.slotDef = slotDef;
 	}
 
-	@OneToOne(cascade = CascadeType.ALL)
-	public VerifierMessage getErrorMessage() {
-		return errorMessage;
-	}
-
-	public void setErrorMessage(VerifierMessage errorMessage) {
-		this.errorMessage = errorMessage;
-	}
-
-	@OneToOne(cascade = CascadeType.ALL)
-	public VerifierMessage getWarningMessage() {
-		return warningMessage;
-	}
-
-	public void setWarningMessage(VerifierMessage warningMessage) {
-		this.warningMessage = warningMessage;
-	}
+	// @OneToOne(cascade = CascadeType.ALL)
+	// public VerifierMessage getErrorMessage() {
+	// return errorMessage;
+	// }
+	//
+	// public void setErrorMessage(VerifierMessage errorMessage) {
+	// this.errorMessage = errorMessage;
+	// }
+	//
+	// @OneToOne(cascade = CascadeType.ALL)
+	// public VerifierMessage getWarningMessage() {
+	// return warningMessage;
+	// }
+	//
+	// public void setWarningMessage(VerifierMessage warningMessage) {
+	// this.warningMessage = warningMessage;
+	// }
 
 	public boolean isMandatory() {
 		return mandatory;
@@ -121,14 +121,31 @@ public class Rule {
 		this.mandatory = mandatory;
 	}
 
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "rule_id")
-	public Set<EmbeddedProperty> getEmbeddedProperties() {
-		return embeddedProperties;
+	@MapKey(name = "parameterName")
+	@OneToMany(mappedBy = "rule", cascade = CascadeType.ALL)
+	public Map<String, RuleParameterInst> getEmbeddedParametersMap() {
+		return embeddedParametersMap;
 	}
 
-	public void setEmbeddedProperties(Set<EmbeddedProperty> embeddedProperties) {
-		this.embeddedProperties = embeddedProperties;
+	public void setEmbeddedParametersMap(
+			Map<String, RuleParameterInst> embeddedParametersMap) {
+		this.embeddedParametersMap = embeddedParametersMap;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
+	public String getWarningMessage() {
+		return warningMessage;
+	}
+
+	public void setWarningMessage(String warningMessage) {
+		this.warningMessage = warningMessage;
 	}
 
 }

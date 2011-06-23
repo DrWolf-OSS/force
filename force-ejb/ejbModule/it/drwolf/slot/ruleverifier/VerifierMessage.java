@@ -1,15 +1,8 @@
 package it.drwolf.slot.ruleverifier;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
-@Entity
 public class VerifierMessage {
 
-	private Long id;
+	// private Long id;
 	private String text;
 	private VerifierMessageType type;
 
@@ -21,15 +14,15 @@ public class VerifierMessage {
 		this.type = type;
 	}
 
-	@Id
-	@GeneratedValue
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+	// @Id
+	// @GeneratedValue
+	// public Long getId() {
+	// return id;
+	// }
+	//
+	// public void setId(Long id) {
+	// this.id = id;
+	// }
 
 	public String getText() {
 		return text;
@@ -39,7 +32,7 @@ public class VerifierMessage {
 		this.text = text;
 	}
 
-	@Enumerated(EnumType.STRING)
+	// @Enumerated(EnumType.STRING)
 	public VerifierMessageType getType() {
 		return type;
 	}

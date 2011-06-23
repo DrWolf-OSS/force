@@ -1,6 +1,5 @@
 package it.drwolf.slot.interfaces;
 
-import it.drwolf.slot.ruleverifier.VerifierMessage;
 import it.drwolf.slot.ruleverifier.VerifierParameterDef;
 import it.drwolf.slot.ruleverifier.VerifierParameterInst;
 import it.drwolf.slot.ruleverifier.VerifierReport;
@@ -14,9 +13,9 @@ public interface IRuleVerifier {
 
 	public List<VerifierParameterDef> getInParams();
 
-	public VerifierMessage getDefaultErrorMessage();
+	public String getDefaultErrorMessage();
 
-	public VerifierMessage getDefaultWarningMessage();
+	public String getDefaultWarningMessage();
 
 	public String getDescription();
 

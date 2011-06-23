@@ -8,11 +8,12 @@ import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
+import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.entity.Rule;
+import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
-import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.FileContainer;
 import it.drwolf.slot.prefs.PreferenceKey;
@@ -57,6 +58,7 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.security.Identity;
 import org.richfaces.event.UploadEvent;
@@ -114,9 +116,21 @@ public class SlotInstEditBean {
 
 	private FileContainer activeFileContainer;
 
+	boolean verifiable = true;
+
+	boolean failAllowed = false;
+
+	boolean warning = false;
+
+	private void resetFlags() {
+		verifiable = true;
+		failAllowed = false;
+		// warning = false;
+	}
+
 	@Create
 	public void init() {
-		if (!slotInstHome.isIdDefined()) {
+		if (slotInstHome.getId() == null) {
 			this.propertyInsts = new ArrayList<PropertyInst>();
 			for (PropertyDef propertyDef : slotDefHome.getInstance()
 					.getPropertyDefs()) {
@@ -187,7 +201,10 @@ public class SlotInstEditBean {
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
 			}
+
+			verify();
 		}
+
 	}
 
 	private FileContainer buildFileContainer(DocDefCollection docDefCollection,
@@ -259,9 +276,9 @@ public class SlotInstEditBean {
 			return "failed";
 		}
 
-		boolean passed = verify();
-		if (!passed) {
-			FacesMessages.instance().add("Rules not verified!");
+		boolean rulesPassed = verify();
+		if (!rulesPassed) {
+			FacesMessages.instance().add("Alcune regole non sono verificate!");
 			return "failed";
 		}
 
@@ -321,14 +338,18 @@ public class SlotInstEditBean {
 
 		slotInstHome.getInstance().setDocInstCollections(
 				new HashSet<DocInstCollection>(docInstCollections));
-		// slotInstHome.getInstance().setOwnerId(
-		// identity.getCredentials().getUsername());
 		slotInstHome.getInstance().setOwnerId(
 				alfrescoUserIdentity.getActiveGroup().getShortName());
 		slotInstHome.persist();
 		FacesMessages.instance().add(
 				"Slot " + this.slotDefHome.getInstance().getName()
 						+ " successfully created");
+
+		if (this.warning) {
+			warning = false;
+			return "warning";
+		}
+
 		return "saved";
 	}
 
@@ -372,7 +393,31 @@ public class SlotInstEditBean {
 		return slotFolder;
 	}
 
-	public void update() {
+	@Transactional
+	public String update() {
+		cleanMessages();
+		boolean sizeCollectionPassed = checkCollectionsSize();
+		if (!sizeCollectionPassed) {
+			FacesMessages
+					.instance()
+					.add("Le dimensioni di alcune collection non rispettano le specifiche");
+			return "failed";
+		}
+
+		boolean rulesPassed = verify();
+		if (!rulesPassed) {
+			FacesMessages.instance().add("Alcune regole non sono verificate!");
+
+			Long slotInstId = slotInstHome.getSlotInstId();
+			entityManager.clear();
+			slotInstHome.clearInstance();
+			slotInstHome.setId(slotInstId);
+			slotInstHome.load();
+			init();
+
+			return "failed";
+		}
+
 		Set<DocInstCollection> persistedDocInstCollections = slotInstHome
 				.getInstance().getDocInstCollections();
 
@@ -440,6 +485,16 @@ public class SlotInstEditBean {
 		FacesMessages.instance().add(
 				"Slot " + this.slotDefHome.getInstance().getName()
 						+ " successfully updated");
+
+		if (this.warning) {
+			warning = false;
+			//
+			init();
+			//
+			return "warning";
+		}
+
+		return "updated";
 	}
 
 	// quando trovo l'element lo tolgo così lascio solo quelli del tutto nuovi
@@ -551,31 +606,6 @@ public class SlotInstEditBean {
 		return newName;
 	}
 
-	// private AlfrescoFolder findOrCreateSlotFolder(Session session) {
-	// // AlfrescoFolder homeFolder = alfrescoUserIdentity.getUserHomeFolder();
-	//
-	// AlfrescoFolder homeFolder = alfrescoWrapper.retrieveGroupFolder(
-	// preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH.name()),
-	// alfrescoUserIdentity.getGroups().get(0).getShortName());
-	//
-	// // cerco la cartella con il nome dello slot e se non c'è la creo
-	// String slotName = slotInstHome.getInstance().getSlotDef().getName();
-	// String userHomePath = alfrescoUserIdentity.getUserHomePath();
-	// AlfrescoFolder slotFolder;
-	// try {
-	// slotFolder = (AlfrescoFolder) session.getObjectByPath(userHomePath
-	// + "/" + slotName);
-	// } catch (CmisObjectNotFoundException e) {
-	// HashMap<String, Object> props = new HashMap<String, Object>();
-	// props.put(PropertyIds.NAME, slotName);
-	// props.put(PropertyIds.OBJECT_TYPE_ID,
-	// BaseTypeId.CMIS_FOLDER.value());
-	// slotFolder = (AlfrescoFolder) homeFolder.createFolder(props, null,
-	// null, null, session.createOperationContext());
-	// }
-	// return slotFolder;
-	// }
-
 	private String copyDocumentOnAlfresco(AlfrescoDocument document,
 			DocInstCollection instCollection,
 			List<DocumentPropertyInst> embeddedProperties, Folder slotFolder) {
@@ -675,6 +705,7 @@ public class SlotInstEditBean {
 	}
 
 	private boolean verifyRule(Rule rule) {
+		resetFlags();
 		//
 		Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap = new HashMap<VerifierParameterInst, FileContainer>();
 		//
@@ -686,153 +717,30 @@ public class SlotInstEditBean {
 		// mappa da passare al Verifier
 		Map<String, List<VerifierParameterInst>> inInstParams = new HashMap<String, List<VerifierParameterInst>>();
 
-		boolean verifiable = true;
-
-		boolean failAllowed = false;
-
 		for (VerifierParameterDef verifierParameterDef : inParams) {
 			String paramName = verifierParameterDef.getName();
+
+			RuleParameterInst embeddedParameter = rule
+					.getEmbeddedParametersMap().get(paramName);
 			String encodedParams = encodedParametersMap.get(paramName);
 
-			if (encodedParams != null && !encodedParams.equals("")) {
+			if (embeddedParameter != null) {
+				List<VerifierParameterInst> paramInsts = new ArrayList<VerifierParameterInst>();
+				VerifierParameterInst parameterInst = new VerifierParameterInst(
+						verifierParameterDef, embeddedParameter.getValue());
+				parameterInst.setFallible(false);
+				paramInsts.add(parameterInst);
+				inInstParams.put(paramName, paramInsts);
+			} else if (encodedParams != null && !encodedParams.equals("")) {
 				String[] splitted = encodedParams.split("\\|");
 				String source = splitted[0];
 				String field = splitted[1];
 				Object sourceDef = ruleParametersResolver
 						.resolveSourceDef(source);
 				Object fieldDef = ruleParametersResolver.resolveFieldDef(field);
-				List<VerifierParameterInst> paramInsts = new ArrayList<VerifierParameterInst>();
-				if (sourceDef instanceof DocDefCollection) {
-					DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
-					Property property = (Property) fieldDef;
-					List<FileContainer> list = datas.get(docDefCollection
-							.getId());
-					if (list != null && !list.isEmpty()) {
-						for (FileContainer fileContainer : list) {
-							List<DocumentPropertyInst> embeddedProperties = fileContainer
-									.getEmbeddedProperties();
-							Iterator<DocumentPropertyInst> iterator = embeddedProperties
-									.iterator();
-							boolean found = false;
-							while (iterator.hasNext() && found == false) {
-								DocumentPropertyInst documentPropertyInst = iterator
-										.next();
-								if (documentPropertyInst.getProperty().equals(
-										property)) {
-									Object value = documentPropertyInst
-											.getValue();
-									found = true;
-									if (value != null) {
-										VerifierParameterInst parameterInst = new VerifierParameterInst(
-												verifierParameterDef, value,
-												true);
-										paramInsts.add(parameterInst);
-										//
-										processedPropertiesResolverMap.put(
-												parameterInst, fileContainer);
-										//
-									} else {
-										if (!verifierParameterDef.isOptional()) {
-											verifiable = false;
-											if (rule.isMandatory()) {
-												this.addFileMessage(
-														fileContainer.getId(),
-														new VerifierMessage(
-																documentPropertyInst
-																		.getProperty()
-																		.getTitle()
-																		+ " non può essere nulla per verificare una regola di tipo "
-																		+ rule.getType()
-																				.value(),
-																VerifierMessageType.ERROR));
-											} else {
-												failAllowed = true;
-											}
-										}
-									}
-								}
-							}
-						}
-					} else {
-						if (!verifierParameterDef.isOptional()) {
-							verifiable = false;
-							if (rule.isMandatory()) {
-								addCollectionMessage(
-										docDefCollection.getId(),
-										new VerifierMessage(
-												docDefCollection.getName()
-														+ " non può essere vuota per verificare una regola di tipo "
-														+ rule.getType()
-																.value()
-														+ " sulla proprietà "
-														+ property.getTitle()
-														+ " dei files che contiene",
-												VerifierMessageType.ERROR));
-							} else {
-								failAllowed = true;
-							}
-						}
-					}
-
-				} else if (sourceDef instanceof SlotDef) {
-					if (fieldDef instanceof PropertyDef) {
-						PropertyDef propertyDef = (PropertyDef) fieldDef;
-						Iterator<PropertyInst> iterator = this
-								.getPropertyInsts().iterator();
-						boolean found = false;
-						while (iterator.hasNext() && found == false) {
-							PropertyInst propertyInst = iterator.next();
-							if (propertyInst.getPropertyDef().equals(
-									propertyDef)) {
-								Object value = propertyInst.getValue();
-								found = true;
-								if (value != null) {
-									VerifierParameterInst parameterInst = new VerifierParameterInst(
-											verifierParameterDef, value, true);
-									paramInsts.add(parameterInst);
-								} else {
-									if (!verifierParameterDef.isOptional()) {
-										verifiable = false;
-										if (rule.isMandatory()) {
-											this.addMainMessage(new VerifierMessage(
-													propertyDef.getName()
-															+ " non può essere nulla per verificare una regola di tipo "
-															+ rule.getType()
-																	.value(),
-													VerifierMessageType.ERROR));
-										} else {
-											failAllowed = true;
-										}
-									}
-								}
-							}
-						}
-					} else if (fieldDef instanceof EmbeddedProperty) {
-						EmbeddedProperty embeddedProperty = (EmbeddedProperty) fieldDef;
-						Object value = embeddedProperty.getValue();
-						if (value != null) {
-							VerifierParameterInst parameterInst = new VerifierParameterInst(
-									verifierParameterDef, value, false);
-							paramInsts.add(parameterInst);
-						} else {
-							if (!verifierParameterDef.isOptional()) {
-								verifiable = false;
-								if (rule.isMandatory()) {
-									this.addMainMessage(new VerifierMessage(
-											embeddedProperty.getName()
-													+ " non può essere nulla per verificare una regola di tipo "
-													+ rule.getType().value(),
-											VerifierMessageType.ERROR));
-								} else {
-									failAllowed = true;
-								}
-							}
-						}
-					}
-
-				} else if (sourceDef instanceof Rule) {
-					// TODO: usare anche le embedded properties nelle rules!!!
-				}
+				List<VerifierParameterInst> paramInsts = retrieveValueInsts(
+						rule, processedPropertiesResolverMap,
+						verifierParameterDef, sourceDef, fieldDef);
 				inInstParams.put(paramName, paramInsts);
 			} else {
 				if (!verifierParameterDef.isOptional()) {
@@ -847,6 +755,7 @@ public class SlotInstEditBean {
 					}
 				}
 			}
+
 		}
 
 		//
@@ -854,31 +763,189 @@ public class SlotInstEditBean {
 		//
 		//
 		//
-
+		// Comunicazione di eventuali errori o warnings
 		if (verifiable) {
 			boolean passed = true;
 			VerifierReport report = verifier.verify(inInstParams);
 			if (report.getResult().equals(VerifierResult.ERROR)) {
 				passed = false;
-				List<VerifierParameterInst> failedParams = report
-						.getFailedParams();
-				for (VerifierParameterInst parameterInst : failedParams) {
-					FileContainer fileContainer = processedPropertiesResolverMap
-							.get(parameterInst);
-					if (fileContainer != null) {
-						this.addFileMessage(fileContainer.getId(),
-								rule.getErrorMessage());
-					} else {
-						this.addMainMessage(rule.getErrorMessage());
+			} else if (report.getResult().equals(VerifierResult.WARNING)) {
+				warning = true;
+			}
+
+			List<VerifierParameterInst> failedParams = report.getFailedParams();
+			for (VerifierParameterInst parameterInst : failedParams) {
+				FileContainer fileContainer = processedPropertiesResolverMap
+						.get(parameterInst);
+				if (fileContainer != null) {
+					String errorMessage = rule.getErrorMessage();
+					if (errorMessage == null || errorMessage.equals("")) {
+						errorMessage = verifier.getDefaultErrorMessage();
 					}
+					this.addFileMessage(fileContainer.getId(),
+							new VerifierMessage(errorMessage,
+									VerifierMessageType.ERROR));
+					this.addMainMessage(new VerifierMessage(errorMessage,
+							VerifierMessageType.ERROR));
+				}
+			}
+
+			List<VerifierParameterInst> warningParams = report
+					.getWarningParams();
+			for (VerifierParameterInst parameterInst : warningParams) {
+				FileContainer fileContainer = processedPropertiesResolverMap
+						.get(parameterInst);
+				String warningMessage = rule.getWarningMessage();
+				if (warningMessage == null || warningMessage.equals("")) {
+					warningMessage = verifier.getDefaultWarningMessage();
+				}
+				if (fileContainer != null) {
+					this.addFileMessage(fileContainer.getId(),
+							new VerifierMessage(warningMessage,
+									VerifierMessageType.WARNING));
+				} else {
+					this.addMainMessage(new VerifierMessage(warningMessage,
+							VerifierMessageType.WARNING));
 				}
 			}
 			return passed;
+
 		} else if (failAllowed) {
 			return true;
 		}
 
 		return false;
+	}
+
+	private List<VerifierParameterInst> retrieveValueInsts(
+			Rule rule,
+			Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap,
+			VerifierParameterDef verifierParameterDef, Object sourceDef,
+			Object fieldDef) {
+		List<VerifierParameterInst> paramInsts = new ArrayList<VerifierParameterInst>();
+		if (sourceDef instanceof DocDefCollection) {
+			DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
+			Property property = (Property) fieldDef;
+			List<FileContainer> list = datas.get(docDefCollection.getId());
+			if (list != null && !list.isEmpty()) {
+				for (FileContainer fileContainer : list) {
+					List<DocumentPropertyInst> embeddedProperties = fileContainer
+							.getEmbeddedProperties();
+					Iterator<DocumentPropertyInst> iterator = embeddedProperties
+							.iterator();
+					boolean found = false;
+					while (iterator.hasNext() && found == false) {
+						DocumentPropertyInst documentPropertyInst = iterator
+								.next();
+						if (documentPropertyInst.getProperty().equals(property)) {
+							Object value = documentPropertyInst.getValue();
+							found = true;
+							if (value != null) {
+								VerifierParameterInst parameterInst = new VerifierParameterInst(
+										verifierParameterDef, value, true);
+								paramInsts.add(parameterInst);
+								//
+								processedPropertiesResolverMap.put(
+										parameterInst, fileContainer);
+								//
+							} else {
+								if (!verifierParameterDef.isOptional()) {
+									verifiable = false;
+									if (rule.isMandatory()) {
+										this.addFileMessage(
+												fileContainer.getId(),
+												new VerifierMessage(
+														documentPropertyInst
+																.getProperty()
+																.getTitle()
+																+ " non può essere nulla per verificare una regola di tipo "
+																+ rule.getType()
+																		.value(),
+														VerifierMessageType.ERROR));
+									} else {
+										failAllowed = true;
+									}
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if (!verifierParameterDef.isOptional()) {
+					verifiable = false;
+					if (rule.isMandatory()) {
+						addCollectionMessage(
+								docDefCollection.getId(),
+								new VerifierMessage(
+										docDefCollection.getName()
+												+ " non può essere vuota per verificare una regola di tipo "
+												+ rule.getType().value()
+												+ " sulla proprietà "
+												+ property.getTitle()
+												+ " dei files che contiene",
+										VerifierMessageType.ERROR));
+					} else {
+						failAllowed = true;
+					}
+				}
+			}
+
+		} else if (sourceDef instanceof SlotDef) {
+			if (fieldDef instanceof PropertyDef) {
+				PropertyDef propertyDef = (PropertyDef) fieldDef;
+				Iterator<PropertyInst> iterator = this.getPropertyInsts()
+						.iterator();
+				boolean found = false;
+				while (iterator.hasNext() && found == false) {
+					PropertyInst propertyInst = iterator.next();
+					if (propertyInst.getPropertyDef().equals(propertyDef)) {
+						Object value = propertyInst.getValue();
+						found = true;
+						if (value != null) {
+							VerifierParameterInst parameterInst = new VerifierParameterInst(
+									verifierParameterDef, value, true);
+							paramInsts.add(parameterInst);
+						} else {
+							if (!verifierParameterDef.isOptional()) {
+								verifiable = false;
+								if (rule.isMandatory()) {
+									this.addMainMessage(new VerifierMessage(
+											propertyDef.getName()
+													+ " non può essere nulla per verificare una regola di tipo "
+													+ rule.getType().value(),
+											VerifierMessageType.ERROR));
+								} else {
+									failAllowed = true;
+								}
+							}
+						}
+					}
+				}
+			} else if (fieldDef instanceof EmbeddedProperty) {
+				EmbeddedProperty embeddedProperty = (EmbeddedProperty) fieldDef;
+				Object value = embeddedProperty.getValue();
+				if (value != null) {
+					VerifierParameterInst parameterInst = new VerifierParameterInst(
+							verifierParameterDef, value, false);
+					paramInsts.add(parameterInst);
+				} else {
+					if (!verifierParameterDef.isOptional()) {
+						verifiable = false;
+						if (rule.isMandatory()) {
+							this.addMainMessage(new VerifierMessage(
+									embeddedProperty.getName()
+											+ " non può essere nulla per verificare una regola di tipo "
+											+ rule.getType().value(),
+									VerifierMessageType.ERROR));
+						} else {
+							failAllowed = true;
+						}
+					}
+				}
+			}
+
+		}
+		return paramInsts;
 	}
 
 	private void addCollectionMessage(Long collectionId, VerifierMessage message) {
@@ -946,8 +1013,8 @@ public class SlotInstEditBean {
 	}
 
 	public List<EmbeddedProperty> getEmbeddedProperties() {
-		return new ArrayList<EmbeddedProperty>(this.slotDefHome
-				.getInstance().getEmbeddedProperties());
+		return new ArrayList<EmbeddedProperty>(this.slotDefHome.getInstance()
+				.getEmbeddedProperties());
 	}
 
 	// public class Couple {
