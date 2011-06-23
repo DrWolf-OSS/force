@@ -1,22 +1,21 @@
 package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.interfaces.DataInstance;
 
 import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 @Entity
-public class EmbeddedProperty {
+public class EmbeddedProperty extends ValueInstance implements DataDefinition,
+		DataInstance {
 
-	private Long id;
+	// private Long id;
 
 	private String name;
 
@@ -24,23 +23,23 @@ public class EmbeddedProperty {
 
 	// private SlotDef slotDef;
 
-	private String stringValue;
+	// private String stringValue;
+	//
+	// private Integer integerValue;
+	//
+	// private Boolean booleanValue;
+	//
+	// private Date dateValue;
 
-	private Integer integerValue;
-
-	private Boolean booleanValue;
-
-	private Date dateValue;
-
-	@Id
-	@GeneratedValue
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+	// @Id
+	// @GeneratedValue
+	// public Long getId() {
+	// return id;
+	// }
+	//
+	// public void setId(Long id) {
+	// this.id = id;
+	// }
 
 	public String getName() {
 		return name;
@@ -68,38 +67,38 @@ public class EmbeddedProperty {
 	// this.slotDef = slotDef;
 	// }
 
-	public String getStringValue() {
-		return stringValue;
-	}
-
-	public void setStringValue(String stringValue) {
-		this.stringValue = stringValue;
-	}
-
-	public Integer getIntegerValue() {
-		return integerValue;
-	}
-
-	public void setIntegerValue(Integer integerValue) {
-		this.integerValue = integerValue;
-	}
-
-	public Boolean getBooleanValue() {
-		return booleanValue;
-	}
-
-	public void setBooleanValue(Boolean booleanValue) {
-		this.booleanValue = booleanValue;
-	}
-
-	@Temporal(TemporalType.DATE)
-	public Date getDateValue() {
-		return dateValue;
-	}
-
-	public void setDateValue(Date dateValue) {
-		this.dateValue = dateValue;
-	}
+	// public String getStringValue() {
+	// return stringValue;
+	// }
+	//
+	// public void setStringValue(String stringValue) {
+	// this.stringValue = stringValue;
+	// }
+	//
+	// public Integer getIntegerValue() {
+	// return integerValue;
+	// }
+	//
+	// public void setIntegerValue(Integer integerValue) {
+	// this.integerValue = integerValue;
+	// }
+	//
+	// public Boolean getBooleanValue() {
+	// return booleanValue;
+	// }
+	//
+	// public void setBooleanValue(Boolean booleanValue) {
+	// this.booleanValue = booleanValue;
+	// }
+	//
+	// @Temporal(TemporalType.DATE)
+	// public Date getDateValue() {
+	// return dateValue;
+	// }
+	//
+	// public void setDateValue(Date dateValue) {
+	// this.dateValue = dateValue;
+	// }
 
 	@Transient
 	public Object getValue() {
@@ -130,6 +129,31 @@ public class EmbeddedProperty {
 			this.setType(DataType.BOOLEAN);
 			this.setBooleanValue((Boolean) value);
 		}
+	}
+
+	@Transient
+	public DataDefinition getDataDefinition() {
+		return this;
+	}
+
+	@Transient
+	public String getLabel() {
+		return this.name;
+	}
+
+	@Transient
+	public DataType getDataType() {
+		return this.type;
+	}
+
+	@Transient
+	public boolean isRequired() {
+		return false;
+	}
+
+	@Transient
+	public boolean isEditable() {
+		return true;
 	}
 
 }

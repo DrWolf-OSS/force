@@ -1,15 +1,17 @@
 package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.interfaces.DataDefinition;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 @Entity
-public class PropertyDef {
+public class PropertyDef implements DataDefinition {
 
 	private Long id;
 
@@ -103,6 +105,21 @@ public class PropertyDef {
 
 	public void setRequired(boolean required) {
 		this.required = required;
+	}
+
+	@Transient
+	public String getLabel() {
+		return this.name;
+	}
+
+	@Transient
+	public DataType getDataType() {
+		return this.type;
+	}
+
+	@Transient
+	public boolean isEditable() {
+		return true;
 	}
 
 }

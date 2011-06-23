@@ -32,20 +32,26 @@
             </s:decorate>
             
             <s:div id="embeddedProperties">
-			<c:forEach var="embeddedProp" items="#{slotDefEditBean.embeddedProperties}">
-				<s:decorate template="/layout/display.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="#{embeddedProp.name}" />
+			<c:forEach var="dataInstance" items="#{slotDefEditBean.embeddedProperties}">
+	            <s:decorate template="/layout/display.xhtml">
+					<ui:define name="label">
+						<h:outputText value="#{dataInstance.dataDefinition.label}" />
 					</ui:define>
-					<h:outputText value="#{embeddedProp.stringValue}" rendered="#{embeddedProp.type == 'STRING'}"/>
-					<h:outputText value="#{embeddedProp.integerValue}" rendered="#{embeddedProp.type == 'INTEGER'}"/>
-					<h:outputText value="#{embeddedProp.booleanValue ? 'true' : 'false'}" rendered="#{embeddedProp.type == 'BOOLEAN'}"/>
-					<h:outputText value="#{embeddedProp.dateValue}" rendered="#{embeddedProp.type == 'DATE'}">
-                		<s:convertDateTime type="date" dateStyle="short"/>
-            		</h:outputText>
+					<h:outputText value="#{dataInstance.stringValue}"
+						rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"/>
+					<h:outputText value="#{dataInstance.integerValue}"
+						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER'}" />
+					<h:outputText value="#{dataInstance.booleanValue ? 'true' : 'false'}"
+						rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}" />
+					<h:outputText value="#{dataInstance.dateValue}"
+						rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}">
+						<s:convertDateTime type="date" dateStyle="short"
+							pattern="dd/MM/yyyy" />
+					</h:outputText>
             		<a:commandButton value="remove" action="#{slotDefEditBean.removeEmbeddedProp(embeddedProp)}" reRender="embeddedProperties"/>
 		            <a:commandButton value="edit" action="#{slotDefEditBean.editEmbeddedProp(embeddedProp)}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel"/>
-	            </s:decorate>			
+				</s:decorate>
+		
 			</c:forEach>
 			</s:div>
             

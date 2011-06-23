@@ -662,7 +662,7 @@ public class SlotInstEditBean {
 				.createQuery(
 						"from DocInst d where d.docInstCollection.slotInst.slotDef.type = 'Primary' and d.docInstCollection.slotInst.ownerId=:ownerId and d.docInstCollection.docDefCollection.docDef.id=:docDefId")
 				.setParameter("ownerId",
-						identity.getCredentials().getUsername())
+						alfrescoUserIdentity.getActiveGroup().getShortName())
 				.setParameter("docDefId", docDefId).getResultList();
 		if (resultList != null) {
 			for (DocInst docInst : resultList) {
@@ -777,14 +777,15 @@ public class SlotInstEditBean {
 			for (VerifierParameterInst parameterInst : failedParams) {
 				FileContainer fileContainer = processedPropertiesResolverMap
 						.get(parameterInst);
+				String errorMessage = rule.getErrorMessage();
 				if (fileContainer != null) {
-					String errorMessage = rule.getErrorMessage();
 					if (errorMessage == null || errorMessage.equals("")) {
 						errorMessage = verifier.getDefaultErrorMessage();
 					}
 					this.addFileMessage(fileContainer.getId(),
 							new VerifierMessage(errorMessage,
 									VerifierMessageType.ERROR));
+				} else {
 					this.addMainMessage(new VerifierMessage(errorMessage,
 							VerifierMessageType.ERROR));
 				}

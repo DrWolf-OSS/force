@@ -1,31 +1,27 @@
 package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataType;
-
-import java.util.Date;
+import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.interfaces.DataInstance;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 @Entity
-public class PropertyInst {
+public class PropertyInst extends ValueInstance implements DataInstance {
 
-	private Long id;
+	// private Long id;
 
 	private PropertyDef propertyDef;
 
-	private String stringValue;
-
-	private Integer integerValue;
-
-	private Boolean booleanValue;
-
-	private Date dateValue;
+	// private String stringValue;
+	//
+	// private Integer integerValue;
+	//
+	// private Boolean booleanValue;
+	//
+	// private Date dateValue;
 
 	private SlotInst slotInst;
 
@@ -48,15 +44,15 @@ public class PropertyInst {
 		}
 	}
 
-	@Id
-	@GeneratedValue
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+	// @Id
+	// @GeneratedValue
+	// public Long getId() {
+	// return id;
+	// }
+	//
+	// public void setId(Long id) {
+	// this.id = id;
+	// }
 
 	@ManyToOne
 	public PropertyDef getPropertyDef() {
@@ -67,38 +63,38 @@ public class PropertyInst {
 		this.propertyDef = propertytDef;
 	}
 
-	public String getStringValue() {
-		return stringValue;
-	}
-
-	public void setStringValue(String stringValue) {
-		this.stringValue = stringValue;
-	}
-
-	public Integer getIntegerValue() {
-		return integerValue;
-	}
-
-	public void setIntegerValue(Integer integerValue) {
-		this.integerValue = integerValue;
-	}
-
-	public Boolean getBooleanValue() {
-		return booleanValue;
-	}
-
-	public void setBooleanValue(Boolean booleanValue) {
-		this.booleanValue = booleanValue;
-	}
-
-	@Temporal(TemporalType.DATE)
-	public Date getDateValue() {
-		return dateValue;
-	}
-
-	public void setDateValue(Date dateValue) {
-		this.dateValue = dateValue;
-	}
+	// public String getStringValue() {
+	// return stringValue;
+	// }
+	//
+	// public void setStringValue(String stringValue) {
+	// this.stringValue = stringValue;
+	// }
+	//
+	// public Integer getIntegerValue() {
+	// return integerValue;
+	// }
+	//
+	// public void setIntegerValue(Integer integerValue) {
+	// this.integerValue = integerValue;
+	// }
+	//
+	// public Boolean getBooleanValue() {
+	// return booleanValue;
+	// }
+	//
+	// public void setBooleanValue(Boolean booleanValue) {
+	// this.booleanValue = booleanValue;
+	// }
+	//
+	// @Temporal(TemporalType.DATE)
+	// public Date getDateValue() {
+	// return dateValue;
+	// }
+	//
+	// public void setDateValue(Date dateValue) {
+	// this.dateValue = dateValue;
+	// }
 
 	@ManyToOne
 	public SlotInst getSlotInst() {
@@ -121,6 +117,11 @@ public class PropertyInst {
 			return this.getBooleanValue();
 		else
 			return null;
+	}
+
+	@Transient
+	public DataDefinition getDataDefinition() {
+		return this.propertyDef;
 	}
 
 }
