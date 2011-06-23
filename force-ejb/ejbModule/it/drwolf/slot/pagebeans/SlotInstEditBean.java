@@ -58,6 +58,7 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.security.Identity;
 import org.richfaces.event.UploadEvent;
@@ -121,9 +122,15 @@ public class SlotInstEditBean {
 
 	boolean warning = false;
 
+	private void resetFlags() {
+		verifiable = true;
+		failAllowed = false;
+		// warning = false;
+	}
+
 	@Create
 	public void init() {
-		if (!slotInstHome.isIdDefined()) {
+		if (slotInstHome.getId() == null) {
 			this.propertyInsts = new ArrayList<PropertyInst>();
 			for (PropertyDef propertyDef : slotDefHome.getInstance()
 					.getPropertyDefs()) {
@@ -194,7 +201,10 @@ public class SlotInstEditBean {
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
 			}
+
+			verify();
 		}
+
 	}
 
 	private FileContainer buildFileContainer(DocDefCollection docDefCollection,
@@ -266,9 +276,9 @@ public class SlotInstEditBean {
 			return "failed";
 		}
 
-		boolean passed = verify();
-		if (!passed) {
-			FacesMessages.instance().add("Rules not verified!");
+		boolean rulesPassed = verify();
+		if (!rulesPassed) {
+			FacesMessages.instance().add("Alcune regole non sono verificate!");
 			return "failed";
 		}
 
@@ -328,8 +338,6 @@ public class SlotInstEditBean {
 
 		slotInstHome.getInstance().setDocInstCollections(
 				new HashSet<DocInstCollection>(docInstCollections));
-		// slotInstHome.getInstance().setOwnerId(
-		// identity.getCredentials().getUsername());
 		slotInstHome.getInstance().setOwnerId(
 				alfrescoUserIdentity.getActiveGroup().getShortName());
 		slotInstHome.persist();
@@ -338,6 +346,7 @@ public class SlotInstEditBean {
 						+ " successfully created");
 
 		if (this.warning) {
+			warning = false;
 			return "warning";
 		}
 
@@ -384,7 +393,31 @@ public class SlotInstEditBean {
 		return slotFolder;
 	}
 
-	public void update() {
+	@Transactional
+	public String update() {
+		cleanMessages();
+		boolean sizeCollectionPassed = checkCollectionsSize();
+		if (!sizeCollectionPassed) {
+			FacesMessages
+					.instance()
+					.add("Le dimensioni di alcune collection non rispettano le specifiche");
+			return "failed";
+		}
+
+		boolean rulesPassed = verify();
+		if (!rulesPassed) {
+			FacesMessages.instance().add("Alcune regole non sono verificate!");
+
+			Long slotInstId = slotInstHome.getSlotInstId();
+			entityManager.clear();
+			slotInstHome.clearInstance();
+			slotInstHome.setId(slotInstId);
+			slotInstHome.load();
+			init();
+
+			return "failed";
+		}
+
 		Set<DocInstCollection> persistedDocInstCollections = slotInstHome
 				.getInstance().getDocInstCollections();
 
@@ -452,6 +485,16 @@ public class SlotInstEditBean {
 		FacesMessages.instance().add(
 				"Slot " + this.slotDefHome.getInstance().getName()
 						+ " successfully updated");
+
+		if (this.warning) {
+			warning = false;
+			//
+			init();
+			//
+			return "warning";
+		}
+
+		return "updated";
 	}
 
 	// quando trovo l'element lo tolgo così lascio solo quelli del tutto nuovi
@@ -563,31 +606,6 @@ public class SlotInstEditBean {
 		return newName;
 	}
 
-	// private AlfrescoFolder findOrCreateSlotFolder(Session session) {
-	// // AlfrescoFolder homeFolder = alfrescoUserIdentity.getUserHomeFolder();
-	//
-	// AlfrescoFolder homeFolder = alfrescoWrapper.retrieveGroupFolder(
-	// preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH.name()),
-	// alfrescoUserIdentity.getGroups().get(0).getShortName());
-	//
-	// // cerco la cartella con il nome dello slot e se non c'è la creo
-	// String slotName = slotInstHome.getInstance().getSlotDef().getName();
-	// String userHomePath = alfrescoUserIdentity.getUserHomePath();
-	// AlfrescoFolder slotFolder;
-	// try {
-	// slotFolder = (AlfrescoFolder) session.getObjectByPath(userHomePath
-	// + "/" + slotName);
-	// } catch (CmisObjectNotFoundException e) {
-	// HashMap<String, Object> props = new HashMap<String, Object>();
-	// props.put(PropertyIds.NAME, slotName);
-	// props.put(PropertyIds.OBJECT_TYPE_ID,
-	// BaseTypeId.CMIS_FOLDER.value());
-	// slotFolder = (AlfrescoFolder) homeFolder.createFolder(props, null,
-	// null, null, session.createOperationContext());
-	// }
-	// return slotFolder;
-	// }
-
 	private String copyDocumentOnAlfresco(AlfrescoDocument document,
 			DocInstCollection instCollection,
 			List<DocumentPropertyInst> embeddedProperties, Folder slotFolder) {
@@ -687,6 +705,7 @@ public class SlotInstEditBean {
 	}
 
 	private boolean verifyRule(Rule rule) {
+		resetFlags();
 		//
 		Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap = new HashMap<VerifierParameterInst, FileContainer>();
 		//
@@ -914,8 +933,6 @@ public class SlotInstEditBean {
 				}
 			}
 
-		} else if (sourceDef instanceof Rule) {
-			// TODO: usare anche le embedded properties nelle rules!!!
 		}
 		return paramInsts;
 	}

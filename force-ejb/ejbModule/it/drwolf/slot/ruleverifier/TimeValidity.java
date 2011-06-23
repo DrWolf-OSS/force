@@ -103,9 +103,9 @@ public class TimeValidity implements IRuleVerifier {
 			if (fDate.before(earlierThreshold)) {
 				this.verifierReport.setResult(VerifierResult.ERROR);
 				this.verifierReport.getFailedParams().add(parameterInst);
-			} else {
+			} else if (threshold != null) {
 				Date addDays = DateUtils.addDays(earlierThreshold, threshold);
-				if (addDays.after(earlierThreshold)) {
+				if (addDays.after(fDate)) {
 					if (!this.verifierReport.getResult().equals(
 							VerifierResult.ERROR)) {
 						this.verifierReport.setResult(VerifierResult.WARNING);
@@ -154,7 +154,7 @@ public class TimeValidity implements IRuleVerifier {
 			if (eDate.after(followerThreshold)) {
 				this.verifierReport.setResult(VerifierResult.ERROR);
 				this.verifierReport.getFailedParams().add(parameterInst);
-			} else {
+			} else if (threshold != null) {
 				Date addDays = DateUtils.addDays(eDate, threshold);
 				if (addDays.after(followerThreshold)) {
 					if (!this.verifierReport.getResult().equals(
