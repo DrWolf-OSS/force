@@ -93,12 +93,12 @@
             
             <s:decorate id="errorMsg" template="/layout/edit.xhtml">
             	<ui:define name="label">Error Message</ui:define>
-            	<h:inputTextarea value="#{ruleEditBean.errorMessage.text}" cols="50"/>
+            	<h:inputTextarea value="#{ruleHome.instance.errorMessage}" cols="50"/>
             </s:decorate>
             
             <s:decorate id="warningMsg" template="/layout/edit.xhtml">
             	<ui:define name="label">Warning Message</ui:define>
-            	<h:inputTextarea value="#{ruleEditBean.warningMessage.text}"  cols="50"/>
+            	<h:inputTextarea value="#{ruleHome.instance.warningMessage}"  cols="50"/>
             </s:decorate>
             
 

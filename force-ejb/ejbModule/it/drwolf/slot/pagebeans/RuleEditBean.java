@@ -10,8 +10,6 @@ import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.PropertiesSourceContainer;
 import it.drwolf.slot.pagebeans.support.PropertyContainer;
 import it.drwolf.slot.ruleverifier.RuleParametersResolver;
-import it.drwolf.slot.ruleverifier.VerifierMessage;
-import it.drwolf.slot.ruleverifier.VerifierMessageType;
 import it.drwolf.slot.ruleverifier.VerifierParameterDef;
 import it.drwolf.slot.session.RuleHome;
 import it.drwolf.slot.session.SlotDefHome;
@@ -54,14 +52,12 @@ public class RuleEditBean {
 	private HashMap<String, PropertiesSourceContainer> targetPropertiesSourceMap = new HashMap<String, PropertiesSourceContainer>();
 	private HashMap<String, PropertyContainer> targetPropertyMap = new HashMap<String, PropertyContainer>();
 
-	private VerifierMessage errorMessage = new VerifierMessage("",
-			VerifierMessageType.ERROR);
-	private VerifierMessage warningMessage = new VerifierMessage("",
-			VerifierMessageType.WARNING);
+	// private VerifierMessage errorMessage = new VerifierMessage("",
+	// VerifierMessageType.ERROR);
+	// private VerifierMessage warningMessage = new VerifierMessage("",
+	// VerifierMessageType.WARNING);
 
 	private List<VerifierParameterDef> normalParameters = new ArrayList<VerifierParameterDef>();
-	// private List<VerifierParameterDef> embeddedParameters = new
-	// ArrayList<VerifierParameterDef>();
 
 	private List<RuleParameterInst> embeddedParameters = new ArrayList<RuleParameterInst>();
 
@@ -180,12 +176,12 @@ public class RuleEditBean {
 					encodedRule = encodedRule.concat("|"
 							+ propertyContainer.toString());
 					parametersMap.put(parameter.getName(), encodedRule);
-					if (!this.errorMessage.getText().equals("")) {
-						rule.setErrorMessage(this.errorMessage);
-					}
-					if (!this.warningMessage.getText().equals("")) {
-						rule.setWarningMessage(this.warningMessage);
-					}
+					// if (!this.errorMessage.getText().equals("")) {
+					// rule.setErrorMessage(this.errorMessage);
+					// }
+					// if (!this.warningMessage.getText().equals("")) {
+					// rule.setWarningMessage(this.warningMessage);
+					// }
 				} else {
 					if (!parameter.isOptional()) {
 						error = true;
@@ -244,21 +240,21 @@ public class RuleEditBean {
 		this.targetPropertyMap = targetPropertyMap;
 	}
 
-	public VerifierMessage getErrorMessage() {
-		return errorMessage;
-	}
-
-	public void setErrorMessage(VerifierMessage errorMessage) {
-		this.errorMessage = errorMessage;
-	}
-
-	public VerifierMessage getWarningMessage() {
-		return warningMessage;
-	}
-
-	public void setWarningMessage(VerifierMessage warningMessage) {
-		this.warningMessage = warningMessage;
-	}
+	// public VerifierMessage getErrorMessage() {
+	// return errorMessage;
+	// }
+	//
+	// public void setErrorMessage(VerifierMessage errorMessage) {
+	// this.errorMessage = errorMessage;
+	// }
+	//
+	// public VerifierMessage getWarningMessage() {
+	// return warningMessage;
+	// }
+	//
+	// public void setWarningMessage(VerifierMessage warningMessage) {
+	// this.warningMessage = warningMessage;
+	// }
 
 	public List<VerifierParameterDef> getNormalParameters() {
 		return normalParameters;

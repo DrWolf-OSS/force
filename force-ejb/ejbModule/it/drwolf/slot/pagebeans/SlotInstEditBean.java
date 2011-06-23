@@ -763,7 +763,7 @@ public class SlotInstEditBean {
 		//
 		//
 		//
-
+		// Comunicazione di eventuali errori o warnings
 		if (verifiable) {
 			boolean passed = true;
 			VerifierReport report = verifier.verify(inInstParams);
@@ -778,10 +778,15 @@ public class SlotInstEditBean {
 				FileContainer fileContainer = processedPropertiesResolverMap
 						.get(parameterInst);
 				if (fileContainer != null) {
+					String errorMessage = rule.getErrorMessage();
+					if (errorMessage == null || errorMessage.equals("")) {
+						errorMessage = verifier.getDefaultErrorMessage();
+					}
 					this.addFileMessage(fileContainer.getId(),
-							rule.getErrorMessage());
-				} else {
-					this.addMainMessage(rule.getErrorMessage());
+							new VerifierMessage(errorMessage,
+									VerifierMessageType.ERROR));
+					this.addMainMessage(new VerifierMessage(errorMessage,
+							VerifierMessageType.ERROR));
 				}
 			}
 
@@ -790,11 +795,17 @@ public class SlotInstEditBean {
 			for (VerifierParameterInst parameterInst : warningParams) {
 				FileContainer fileContainer = processedPropertiesResolverMap
 						.get(parameterInst);
+				String warningMessage = rule.getWarningMessage();
+				if (warningMessage == null || warningMessage.equals("")) {
+					warningMessage = verifier.getDefaultWarningMessage();
+				}
 				if (fileContainer != null) {
 					this.addFileMessage(fileContainer.getId(),
-							rule.getWarningMessage());
+							new VerifierMessage(warningMessage,
+									VerifierMessageType.WARNING));
 				} else {
-					this.addMainMessage(rule.getWarningMessage());
+					this.addMainMessage(new VerifierMessage(warningMessage,
+							VerifierMessageType.WARNING));
 				}
 			}
 			return passed;

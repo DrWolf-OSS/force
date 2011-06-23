@@ -42,8 +42,6 @@ public class TimeValidity implements IRuleVerifier {
 
 		VerifierParameterInst warningThresholdParameterInst = params.get(
 				this.WARNING_THRESHOLD).get(0);
-		// Integer warningThreshold = (Integer)
-		// warningThresholdParameterInst.getValue();
 
 		this.verifierReport = new VerifierReport();
 		this.verifierReport.setResult(VerifierResult.PASSED);
@@ -176,14 +174,12 @@ public class TimeValidity implements IRuleVerifier {
 		return this.getClass().getName();
 	}
 
-	public VerifierMessage getDefaultErrorMessage() {
-		return new VerifierMessage("Time validity rule not verified!",
-				VerifierMessageType.ERROR);
+	public String getDefaultErrorMessage() {
+		return "Time validity rule not verified!";
 	}
 
-	public VerifierMessage getDefaultWarningMessage() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getDefaultWarningMessage() {
+		return "Default Warning!";
 	}
 
 	public String getDescription() {

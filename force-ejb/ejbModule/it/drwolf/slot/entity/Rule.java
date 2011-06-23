@@ -3,7 +3,6 @@ package it.drwolf.slot.entity;
 import it.drwolf.slot.entity.listeners.RuleListener;
 import it.drwolf.slot.enums.RuleType;
 import it.drwolf.slot.interfaces.IRuleVerifier;
-import it.drwolf.slot.ruleverifier.VerifierMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +17,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.CollectionOfElements;
@@ -41,9 +39,13 @@ public class Rule {
 
 	private IRuleVerifier verifier;
 
-	private VerifierMessage errorMessage;
+	// private VerifierMessage errorMessage;
+	//
+	// private VerifierMessage warningMessage;
 
-	private VerifierMessage warningMessage;
+	private String errorMessage;
+
+	private String warningMessage;
 
 	@Id
 	@GeneratedValue
@@ -93,23 +95,23 @@ public class Rule {
 		this.slotDef = slotDef;
 	}
 
-	@OneToOne(cascade = CascadeType.ALL)
-	public VerifierMessage getErrorMessage() {
-		return errorMessage;
-	}
-
-	public void setErrorMessage(VerifierMessage errorMessage) {
-		this.errorMessage = errorMessage;
-	}
-
-	@OneToOne(cascade = CascadeType.ALL)
-	public VerifierMessage getWarningMessage() {
-		return warningMessage;
-	}
-
-	public void setWarningMessage(VerifierMessage warningMessage) {
-		this.warningMessage = warningMessage;
-	}
+	// @OneToOne(cascade = CascadeType.ALL)
+	// public VerifierMessage getErrorMessage() {
+	// return errorMessage;
+	// }
+	//
+	// public void setErrorMessage(VerifierMessage errorMessage) {
+	// this.errorMessage = errorMessage;
+	// }
+	//
+	// @OneToOne(cascade = CascadeType.ALL)
+	// public VerifierMessage getWarningMessage() {
+	// return warningMessage;
+	// }
+	//
+	// public void setWarningMessage(VerifierMessage warningMessage) {
+	// this.warningMessage = warningMessage;
+	// }
 
 	public boolean isMandatory() {
 		return mandatory;
@@ -128,6 +130,22 @@ public class Rule {
 	public void setEmbeddedParametersMap(
 			Map<String, RuleParameterInst> embeddedParametersMap) {
 		this.embeddedParametersMap = embeddedParametersMap;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
+	public String getWarningMessage() {
+		return warningMessage;
+	}
+
+	public void setWarningMessage(String warningMessage) {
+		this.warningMessage = warningMessage;
 	}
 
 }
