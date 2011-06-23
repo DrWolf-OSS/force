@@ -3,6 +3,7 @@ package it.drwolf.force.session.lists;
 import it.drwolf.force.entity.Azienda;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityQuery;
@@ -41,5 +42,10 @@ public class AziendaList extends EntityQuery<Azienda> {
 
 	public Azienda getAzienda() {
 		return this.azienda;
+	}
+
+	public List<Azienda> getAziendeNuove() {
+		this.azienda.setStato("NUOVA");
+		return this.getResultList();
 	}
 }

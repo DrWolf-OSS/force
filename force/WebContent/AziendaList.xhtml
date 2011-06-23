@@ -116,8 +116,8 @@
 
     <rich:dataTable id="aziendaList"
                 var="_azienda"
-              value="#{aziendaList.resultList}"
-           rendered="#{not empty aziendaList.resultList}">
+              value="#{aziendaList.aziendeNuove}"
+           rendered="#{not empty aziendaList.aziendeNuove}">
         <h:column>
             <f:facet name="header">
                 <ui:include src="layout/sort.xhtml">
