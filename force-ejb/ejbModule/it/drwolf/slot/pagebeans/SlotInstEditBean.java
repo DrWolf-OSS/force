@@ -14,6 +14,7 @@ import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
+import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.FileContainer;
 import it.drwolf.slot.prefs.PreferenceKey;
@@ -396,6 +397,8 @@ public class SlotInstEditBean {
 	@Transactional
 	public String update() {
 		cleanMessages();
+		SlotInst instance = slotInstHome.getInstance();
+
 		boolean sizeCollectionPassed = checkCollectionsSize();
 		if (!sizeCollectionPassed) {
 			FacesMessages
@@ -407,19 +410,12 @@ public class SlotInstEditBean {
 		boolean rulesPassed = verify();
 		if (!rulesPassed) {
 			FacesMessages.instance().add("Alcune regole non sono verificate!");
-
-			Long slotInstId = slotInstHome.getSlotInstId();
 			entityManager.clear();
-			slotInstHome.clearInstance();
-			slotInstHome.setId(slotInstId);
-			slotInstHome.load();
-			init();
-
 			return "failed";
 		}
 
-		Set<DocInstCollection> persistedDocInstCollections = slotInstHome
-				.getInstance().getDocInstCollections();
+		Set<DocInstCollection> persistedDocInstCollections = instance
+				.getDocInstCollections();
 
 		AlfrescoFolder slotFolder = retrieveSlotFolder();
 
@@ -481,7 +477,13 @@ public class SlotInstEditBean {
 				}
 			}
 		}
-		slotInstHome.update();
+		//
+		// boolean contains = entityManager.contains(instance);
+		entityManager.merge(instance);
+		entityManager.flush();
+		// entityManager.persist(merged);
+		//
+		// slotInstHome.update();
 		FacesMessages.instance().add(
 				"Slot " + this.slotDefHome.getInstance().getName()
 						+ " successfully updated");
@@ -662,7 +664,7 @@ public class SlotInstEditBean {
 				.createQuery(
 						"from DocInst d where d.docInstCollection.slotInst.slotDef.type = 'Primary' and d.docInstCollection.slotInst.ownerId=:ownerId and d.docInstCollection.docDefCollection.docDef.id=:docDefId")
 				.setParameter("ownerId",
-						identity.getCredentials().getUsername())
+						alfrescoUserIdentity.getActiveGroup().getShortName())
 				.setParameter("docDefId", docDefId).getResultList();
 		if (resultList != null) {
 			for (DocInst docInst : resultList) {
@@ -777,14 +779,15 @@ public class SlotInstEditBean {
 			for (VerifierParameterInst parameterInst : failedParams) {
 				FileContainer fileContainer = processedPropertiesResolverMap
 						.get(parameterInst);
+				String errorMessage = rule.getErrorMessage();
 				if (fileContainer != null) {
-					String errorMessage = rule.getErrorMessage();
 					if (errorMessage == null || errorMessage.equals("")) {
 						errorMessage = verifier.getDefaultErrorMessage();
 					}
 					this.addFileMessage(fileContainer.getId(),
 							new VerifierMessage(errorMessage,
 									VerifierMessageType.ERROR));
+				} else {
 					this.addMainMessage(new VerifierMessage(errorMessage,
 							VerifierMessageType.ERROR));
 				}
