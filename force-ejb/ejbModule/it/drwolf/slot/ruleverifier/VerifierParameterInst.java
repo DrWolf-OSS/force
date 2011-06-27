@@ -8,6 +8,8 @@ public class VerifierParameterInst {
 
 	private boolean fallible = true;
 
+	private ParameterCoordinates parameterCoordinates;
+
 	public VerifierParameterInst(VerifierParameterDef verifierParameterDef,
 			Object value) {
 		super();
@@ -51,6 +53,15 @@ public class VerifierParameterInst {
 	@Override
 	public String toString() {
 		return value.toString();
+	}
+
+	public ParameterCoordinates getParameterCoordinates() {
+		return parameterCoordinates;
+	}
+
+	public void setParameterCoordinates(
+			ParameterCoordinates parameterCoordinates) {
+		this.parameterCoordinates = parameterCoordinates;
 	}
 
 }

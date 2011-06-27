@@ -14,10 +14,13 @@ import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
+import it.drwolf.slot.exceptions.FailedRuleException;
+import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.FileContainer;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
+import it.drwolf.slot.ruleverifier.ParameterCoordinates;
 import it.drwolf.slot.ruleverifier.RuleParametersResolver;
 import it.drwolf.slot.ruleverifier.VerifierMessage;
 import it.drwolf.slot.ruleverifier.VerifierMessageType;
@@ -58,7 +61,6 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.security.Identity;
 import org.richfaces.event.UploadEvent;
@@ -202,7 +204,7 @@ public class SlotInstEditBean {
 				primaryDocs.put(defCollection.getId(), fileContainers);
 			}
 
-			verify();
+			// verify();
 		}
 
 	}
@@ -393,8 +395,7 @@ public class SlotInstEditBean {
 		return slotFolder;
 	}
 
-	@Transactional
-	public String update() {
+	public String update() throws FailedRuleException {
 		cleanMessages();
 		boolean sizeCollectionPassed = checkCollectionsSize();
 		if (!sizeCollectionPassed) {
@@ -407,15 +408,15 @@ public class SlotInstEditBean {
 		boolean rulesPassed = verify();
 		if (!rulesPassed) {
 			FacesMessages.instance().add("Alcune regole non sono verificate!");
-
-			Long slotInstId = slotInstHome.getSlotInstId();
-			entityManager.clear();
-			slotInstHome.clearInstance();
-			slotInstHome.setId(slotInstId);
-			slotInstHome.load();
-			init();
-
-			return "failed";
+			throw new FailedRuleException();
+			// Long slotInstId = slotInstHome.getSlotInstId();
+			// entityManager.clear();
+			// slotInstHome.clearInstance();
+			// slotInstHome.setId(slotInstId);
+			// slotInstHome.load();
+			// init();
+			//
+			// return "failed";
 		}
 
 		Set<DocInstCollection> persistedDocInstCollections = slotInstHome
@@ -777,17 +778,21 @@ public class SlotInstEditBean {
 			for (VerifierParameterInst parameterInst : failedParams) {
 				FileContainer fileContainer = processedPropertiesResolverMap
 						.get(parameterInst);
+				String prefix = "La proprietà "
+						+ parameterInst.getParameterCoordinates().getFieldDef()
+								.getLabel() + " ha un valore errato. ";
 				String errorMessage = rule.getErrorMessage();
 				if (fileContainer != null) {
 					if (errorMessage == null || errorMessage.equals("")) {
-						errorMessage = verifier.getDefaultErrorMessage();
+						errorMessage = prefix.concat(verifier
+								.getDefaultErrorMessage());
 					}
 					this.addFileMessage(fileContainer.getId(),
 							new VerifierMessage(errorMessage,
 									VerifierMessageType.ERROR));
 				} else {
-					this.addMainMessage(new VerifierMessage(errorMessage,
-							VerifierMessageType.ERROR));
+					this.addMainMessage(new VerifierMessage(prefix
+							.concat(errorMessage), VerifierMessageType.ERROR));
 				}
 			}
 
@@ -823,6 +828,9 @@ public class SlotInstEditBean {
 			Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap,
 			VerifierParameterDef verifierParameterDef, Object sourceDef,
 			Object fieldDef) {
+		ParameterCoordinates parameterCoordinates = new ParameterCoordinates(
+				sourceDef, (DataDefinition) fieldDef);
+
 		List<VerifierParameterInst> paramInsts = new ArrayList<VerifierParameterInst>();
 		if (sourceDef instanceof DocDefCollection) {
 			DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
@@ -845,6 +853,9 @@ public class SlotInstEditBean {
 								VerifierParameterInst parameterInst = new VerifierParameterInst(
 										verifierParameterDef, value, true);
 								paramInsts.add(parameterInst);
+								//
+								parameterInst
+										.setParameterCoordinates(parameterCoordinates);
 								//
 								processedPropertiesResolverMap.put(
 										parameterInst, fileContainer);
@@ -905,6 +916,10 @@ public class SlotInstEditBean {
 						if (value != null) {
 							VerifierParameterInst parameterInst = new VerifierParameterInst(
 									verifierParameterDef, value, true);
+							//
+							parameterInst
+									.setParameterCoordinates(parameterCoordinates);
+							//
 							paramInsts.add(parameterInst);
 						} else {
 							if (!verifierParameterDef.isOptional()) {
@@ -928,6 +943,9 @@ public class SlotInstEditBean {
 				if (value != null) {
 					VerifierParameterInst parameterInst = new VerifierParameterInst(
 							verifierParameterDef, value, false);
+					//
+					parameterInst.setParameterCoordinates(parameterCoordinates);
+					//
 					paramInsts.add(parameterInst);
 				} else {
 					if (!verifierParameterDef.isOptional()) {
@@ -1017,33 +1035,6 @@ public class SlotInstEditBean {
 		return new ArrayList<EmbeddedProperty>(this.slotDefHome.getInstance()
 				.getEmbeddedProperties());
 	}
-
-	// public class Couple {
-	// private Object sourceDef;
-	// private Object fieldDef;
-	//
-	// public Couple(Object sourceDef, Object fieldDef) {
-	// super();
-	// this.sourceDef = sourceDef;
-	// this.fieldDef = fieldDef;
-	// }
-	//
-	// public Object getSourceDef() {
-	// return sourceDef;
-	// }
-	//
-	// public void setSourceDef(Object sourceDef) {
-	// this.sourceDef = sourceDef;
-	// }
-	//
-	// public Object getFieldDef() {
-	// return fieldDef;
-	// }
-	//
-	// public void setFieldDef(Object fieldDef) {
-	// this.fieldDef = fieldDef;
-	// }
-	// }
 
 	public ArrayList<VerifierMessage> getSlotMessages() {
 		return slotMessages;
