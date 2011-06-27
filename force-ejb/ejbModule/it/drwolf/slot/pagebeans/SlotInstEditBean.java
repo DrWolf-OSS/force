@@ -14,6 +14,7 @@ import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
+import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.exceptions.FailedRuleException;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.IRuleVerifier;
@@ -397,6 +398,8 @@ public class SlotInstEditBean {
 
 	public String update() throws FailedRuleException {
 		cleanMessages();
+		SlotInst instance = slotInstHome.getInstance();
+
 		boolean sizeCollectionPassed = checkCollectionsSize();
 		if (!sizeCollectionPassed) {
 			FacesMessages
@@ -408,19 +411,16 @@ public class SlotInstEditBean {
 		boolean rulesPassed = verify();
 		if (!rulesPassed) {
 			FacesMessages.instance().add("Alcune regole non sono verificate!");
-			throw new FailedRuleException();
-			// Long slotInstId = slotInstHome.getSlotInstId();
-			// entityManager.clear();
-			// slotInstHome.clearInstance();
-			// slotInstHome.setId(slotInstId);
-			// slotInstHome.load();
-			// init();
-			//
-			// return "failed";
+
+			// throw new FailedRuleException();
+
+			entityManager.clear();
+			return "failed";
+
 		}
 
-		Set<DocInstCollection> persistedDocInstCollections = slotInstHome
-				.getInstance().getDocInstCollections();
+		Set<DocInstCollection> persistedDocInstCollections = instance
+				.getDocInstCollections();
 
 		AlfrescoFolder slotFolder = retrieveSlotFolder();
 
@@ -482,7 +482,13 @@ public class SlotInstEditBean {
 				}
 			}
 		}
-		slotInstHome.update();
+		//
+		// boolean contains = entityManager.contains(instance);
+		entityManager.merge(instance);
+		entityManager.flush();
+		// entityManager.persist(merged);
+		//
+		// slotInstHome.update();
 		FacesMessages.instance().add(
 				"Slot " + this.slotDefHome.getInstance().getName()
 						+ " successfully updated");
@@ -778,6 +784,7 @@ public class SlotInstEditBean {
 			for (VerifierParameterInst parameterInst : failedParams) {
 				FileContainer fileContainer = processedPropertiesResolverMap
 						.get(parameterInst);
+
 				String prefix = "La proprietà "
 						+ parameterInst.getParameterCoordinates().getFieldDef()
 								.getLabel() + " ha un valore errato. ";

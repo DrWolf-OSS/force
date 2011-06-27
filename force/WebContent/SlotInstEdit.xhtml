@@ -213,7 +213,10 @@
 			<s:button id="cancelAdd"
 				value="Cancel" propagation="end"
 				view="/#{empty slotInstFrom ? 'SlotInstList' : slotInstFrom}.xhtml"
-				rendered="#{!slotInstHome.managed}" /></div>
+				rendered="#{!slotInstHome.managed}" />
+			<h:commandButton id="update2"
+				value="UPDATE" action="#{slotInstEditBean.update()}"/>
+			</div>
 		</a:form>
 
 		<rich:tabPanel switchType="ajax">
