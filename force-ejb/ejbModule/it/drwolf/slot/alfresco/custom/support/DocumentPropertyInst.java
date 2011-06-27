@@ -1,25 +1,25 @@
 package it.drwolf.slot.alfresco.custom.support;
 
 import it.drwolf.slot.alfresco.custom.model.Property;
-import it.drwolf.slot.entity.ValueInstance;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.DataInstance;
 
 import java.math.BigInteger;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class DocumentPropertyInst extends ValueInstance implements DataInstance {
+public class DocumentPropertyInst implements DataInstance {
 
 	private Property property;
 
-	// private String stringValue;
-	//
-	// private BigInteger integerValue;
-	//
-	// private Boolean booleanValue;
-	//
-	// private Date dateValue;
+	private String stringValue;
+
+	private Integer integerValue;
+
+	private Boolean booleanValue;
+
+	private Date dateValue;
 	//
 	// private GregorianCalendar calendarValue;
 
@@ -33,39 +33,39 @@ public class DocumentPropertyInst extends ValueInstance implements DataInstance 
 		// }
 	}
 
-	// public String getStringValue() {
-	// return stringValue;
-	// }
-	//
-	// public void setStringValue(String stringValue) {
-	// this.stringValue = stringValue;
-	// }
+	public String getStringValue() {
+		return stringValue;
+	}
 
-	// public Integer getIntegerValue() {
-	// return integerValue;
-	// }
-	//
-	// public void setIntegerValue(BigInteger integerValue) {
-	// this.integerValue = integerValue;
-	// }
+	public void setStringValue(String stringValue) {
+		this.stringValue = stringValue;
+	}
 
-	// public Boolean getBooleanValue() {
-	// return booleanValue;
-	// }
-	//
-	// public void setBooleanValue(Boolean booleanValue) {
-	// this.booleanValue = booleanValue;
-	// }
+	public Integer getIntegerValue() {
+		return integerValue;
+	}
 
-	// public Date getDateValue() {
-	// return dateValue;
-	// }
+	public void setIntegerValue(Integer integerValue) {
+		this.integerValue = integerValue;
+	}
 
-	// public void setDateValue(Date dateValue) {
-	// this.dateValue = dateValue;
-	// this.calendarValue = new GregorianCalendar();
-	// this.calendarValue.setTime(this.dateValue);
-	// }
+	public Boolean getBooleanValue() {
+		return booleanValue;
+	}
+
+	public void setBooleanValue(Boolean booleanValue) {
+		this.booleanValue = booleanValue;
+	}
+
+	public Date getDateValue() {
+		return dateValue;
+	}
+
+	public void setDateValue(Date dateValue) {
+		this.dateValue = dateValue;
+		// this.calendarValue = new GregorianCalendar();
+		// this.calendarValue.setTime(this.dateValue);
+	}
 
 	public Property getProperty() {
 		return property;
