@@ -9,7 +9,7 @@
         <h:outputText value="#{projectName}:" />
         <s:link id="menuHomeId" view="/home.xhtml" value="Home" propagation="none"/>
     </rich:toolBarGroup>
-    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none">
+     <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none">
         <f:facet name="label">Browse data</f:facet>
 	<rich:menuItem>
     	<s:link view="/SlotDefList.xhtml"
@@ -82,10 +82,51 @@
             propagation="none"/>
      </rich:menuItem>
     </rich:dropDownMenu>
+     <!-- @newMenuItem@ -->
+    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('ADMIN')}">
+        <f:facet name="label">Gestione Aziende</f:facet>
+        <rich:menuItem>
+            <s:link view="/admin/NewAziendaList.xhtml"
+                value="Aziende da Attivare"
+                id="NewCompId"
+                includePageParams="false"
+                propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem>
+            <s:link view="/admin/AziendaList.xhtml"
+                value="Aziende Attive"
+                id="ActiveCompId"
+                includePageParams="false"
+                propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem>
+            <s:link view="/admin/SuspendAziendaList.xhtml"
+                value="Aziende Sospese"
+                id="SuspCompId"
+                includePageParams="false"
+                propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem>
+            <s:link view="/admin/RevokedAziendaList.xhtml"
+                value="Aziende Revocate"
+                id="RevCompId"
+                includePageParams="false"
+                propagation="none"/>
+        </rich:menuItem>
+    </rich:dropDownMenu>
+    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('ADMIN')}">
+        <f:facet name="label">Gestione Bandi</f:facet>
+        <rich:menuItem>
+            <s:link view="/admin/AziendaList.xhtml"
+                value="Da definire"
+                id="tobedefined"
+                includePageParams="false"
+                propagation="none"/>
+        </rich:menuItem>
+    </rich:dropDownMenu>
     <!-- @newMenuItem@ -->
     <rich:toolBarGroup location="right">
         <h:outputText id="menuWelcomeId" value="signed in as: #{credentials.username}" rendered="#{identity.loggedIn}"/>
-        <s:link id="menuList" view="/AziendaList.xhtml" value="Elenco Aziende" rendered="#{identity.hasRole('ADMIN')}" propagation="none"/>
         <s:link id="menuAddId" view="/AddAzienda.xhtml" value="Registrati" rendered="#{not identity.loggedIn}" propagation="none"/>
         <s:link id="menuLoginId" view="/login.xhtml" value="Login" rendered="#{not identity.loggedIn}" propagation="none"/>
         <s:link id="menuLogoutId" view="/home.xhtml" action="#{identity.logout}" value="Logout" rendered="#{identity.loggedIn}" propagation="none"/>

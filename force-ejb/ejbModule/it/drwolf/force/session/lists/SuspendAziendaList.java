@@ -3,12 +3,13 @@ package it.drwolf.force.session.lists;
 import it.drwolf.force.entity.Azienda;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityQuery;
 
-@Name("aziendaList")
-public class AziendaList extends EntityQuery<Azienda> {
+@Name("suspendAziendaList")
+public class SuspendAziendaList extends EntityQuery<Azienda> {
 
 	private static final String EJBQL = "select azienda from Azienda azienda";
 
@@ -27,15 +28,15 @@ public class AziendaList extends EntityQuery<Azienda> {
 			"lower(azienda.nome) like lower(concat(#{aziendaList.azienda.nome},'%'))",
 			"lower(azienda.provincia) like lower(concat(#{aziendaList.azienda.provincia},'%'))",
 			"lower(azienda.ragioneSociale) like lower(concat(#{aziendaList.azienda.ragioneSociale},'%'))",
-			"lower(azienda.stato) like lower(concat(#{'ATTIVA'},'%'))",
+			"lower(azienda.stato) like lower(concat(#{'SOSPESA'},'%'))",
 			"lower(azienda.telefono) like lower(concat(#{aziendaList.azienda.telefono},'%'))", };
 
 	private Azienda azienda = new Azienda();
 
-	public AziendaList() {
-		this.setEjbql(AziendaList.EJBQL);
+	public SuspendAziendaList() {
+		this.setEjbql(SuspendAziendaList.EJBQL);
 		this.setRestrictionExpressionStrings(Arrays
-				.asList(AziendaList.RESTRICTIONS));
+				.asList(SuspendAziendaList.RESTRICTIONS));
 		this.setMaxResults(25);
 	}
 
@@ -43,4 +44,8 @@ public class AziendaList extends EntityQuery<Azienda> {
 		return this.azienda;
 	}
 
+	@Override
+	public List<Azienda> getResultList() {
+		return super.getResultList();
+	}
 }
