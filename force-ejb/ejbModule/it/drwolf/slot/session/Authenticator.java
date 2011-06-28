@@ -98,10 +98,22 @@ public class Authenticator {
 		if (this.alfrescoUserIdentity.isMemberOf(this.preferenceManager
 				.getPreference("FORCE_ADMIN").getStringValue())) {
 			this.identity.addRole("ADMIN");
-		} else if (this.alfrescoUserIdentity.isMemberOf(this.preferenceManager
-				.getPreference("FORCE_USER_GROUP").getStringValue())) {
-			this.identity.addRole("AZIENDE");
 		} else {
+			AlfrescoWebScriptClient awsc = new AlfrescoWebScriptClient(
+					this.alfrescoInfo.getAdminUser(),
+					this.alfrescoInfo.getAdminPwd(),
+					this.alfrescoInfo.getRepositoryUri());
+			List<Authority> lista = awsc.getListOfChildAuthorities(
+					this.preferenceManager.getPreference("FORCE_USER_GROUP")
+							.getStringValue(), "GROUP");
+			for (Authority authority : lista) {
+				if (authority.getShortName().equals(
+						this.alfrescoUserIdentity.getActiveGroup()
+								.getShortName())) {
+					this.identity.addRole("AZIENDE");
+					return true;
+				}
+			}
 
 		}
 
