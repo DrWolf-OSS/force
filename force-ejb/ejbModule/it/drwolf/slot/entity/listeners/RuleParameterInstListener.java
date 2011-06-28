@@ -7,6 +7,7 @@ import it.drwolf.slot.ruleverifier.VerifierParameterDef;
 import java.util.Iterator;
 
 import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
 
 public class RuleParameterInstListener {
 
@@ -22,6 +23,12 @@ public class RuleParameterInstListener {
 				return;
 			}
 		}
+	}
+
+	@PrePersist
+	public void setVerifierParameterName(RuleParameterInst parameterInst) {
+		parameterInst.setParameterName(parameterInst.getVerifierParameterDef()
+				.getName());
 	}
 
 }

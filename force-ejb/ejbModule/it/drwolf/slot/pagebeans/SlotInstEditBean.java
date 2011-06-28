@@ -205,7 +205,7 @@ public class SlotInstEditBean {
 				primaryDocs.put(defCollection.getId(), fileContainers);
 			}
 
-			// verify();
+			verify();
 		}
 
 	}
@@ -482,13 +482,10 @@ public class SlotInstEditBean {
 				}
 			}
 		}
-		//
-		// boolean contains = entityManager.contains(instance);
+
 		entityManager.merge(instance);
 		entityManager.flush();
-		// entityManager.persist(merged);
-		//
-		// slotInstHome.update();
+
 		FacesMessages.instance().add(
 				"Slot " + this.slotDefHome.getInstance().getName()
 						+ " successfully updated");
@@ -496,7 +493,7 @@ public class SlotInstEditBean {
 		if (this.warning) {
 			warning = false;
 			//
-			init();
+			// init();
 			//
 			return "warning";
 		}
