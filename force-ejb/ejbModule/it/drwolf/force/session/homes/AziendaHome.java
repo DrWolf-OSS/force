@@ -39,14 +39,73 @@ public class AziendaHome extends EntityHome<Azienda> {
 	@In
 	EntityManager entityManager;
 
+	public String attivaAzienda(Azienda azienda) {
+		try {
+
+			// creazione del nome del gruppo
+			String groupName = azienda.getRagioneSociale().replaceAll("\\s",
+					"_");
+			groupName = groupName + "_" + azienda.getId();
+
+			AlfrescoWebScriptClient awsc = new AlfrescoWebScriptClient(
+					this.alfrescoInfo.getAdminUser(),
+					this.alfrescoInfo.getAdminPwd(),
+					this.alfrescoInfo.getRepositoryUri());
+
+			String res = awsc.addGroupOrUser("aziende", groupName, true);
+
+			// creo la cartella groupName sotto il progetto Force
+			AlfrescoFolder alfrescoGroupFolder = this.alfrescoWrapper
+					.findOrCreateFolder(
+							this.alfrescoWrapper.getMainProjectFolder(),
+							groupName);
+
+			// creo l'utente con l'email del referente
+			HashMap<String, String> args = new HashMap<String, String>();
+			args.put("userName", azienda.getEmailReferente());
+			args.put("firstName", azienda.getNome());
+			args.put("lastName", azienda.getCognome());
+			args.put("email", azienda.getEmailReferente());
+			// forse dovrei settare la password dato che di default è a
+			// "password"?
+			// args.put("password", "");
+			awsc.addPerson(args);
+
+			// Aggiungo l'utente al gruppo creato in precedenza
+			awsc.addGroupOrUser(groupName, azienda.getEmailReferente(), false);
+
+			// Aggiungo i provilegi di collaboratore all'utente creato sulla
+			// cartella
+			// groupName
+			this.alfrescoWrapper.applyACL(alfrescoGroupFolder, "GROUP_"
+					+ groupName);
+
+			// se l'azienda è amministrata gli utenti del gruppo "CNA" devono i
+			// permessi sulla cartella
+			if (azienda.getPosizioneCNA() == PosizioneCNA.AMMINISTRATA
+					.toString()) {
+				this.alfrescoWrapper.applyACL(alfrescoGroupFolder, "GROUP_CNA");
+
+			}
+			// alla fine dovrei mandare una mail con gli accessi al referente
+			azienda.setStato(StatoAzienda.ATTIVA.getNome());
+			azienda.setAlfrescoGroupId(groupName);
+			this.entityManager.persist(azienda);
+			return "ok";
+
+		} catch (Exception e) {
+			return "KO";
+		}
+	}
+
 	@Override
 	protected Azienda createInstance() {
 		Azienda azienda = new Azienda();
 		return azienda;
 	}
 
-	public Long getAziendaId() {
-		return (Long) this.getId();
+	public Integer getAziendaId() {
+		return (Integer) this.getId();
 	}
 
 	public Azienda getDefinedInstance() {
@@ -73,51 +132,6 @@ public class AziendaHome extends EntityHome<Azienda> {
 			this.getInstance().setStato(StatoAzienda.NUOVA.toString());
 			// persisto l'entity azienda
 			super.persist();
-			// creazione del nome del gruppo
-			String groupName = this.getInstance().getRagioneSociale()
-					.replaceAll("\\s", "_");
-			groupName = groupName + "_" + this.getInstance().getId();
-
-			AlfrescoWebScriptClient awsc = new AlfrescoWebScriptClient(
-					this.alfrescoInfo.getAdminUser(),
-					this.alfrescoInfo.getAdminPwd(),
-					this.alfrescoInfo.getRepositoryUri());
-
-			String res = awsc.addGroupOrUser("aziende", groupName, true);
-
-			// creo la cartella groupName sotto il progetto Force
-			AlfrescoFolder alfrescoGroupFolder = this.alfrescoWrapper
-					.findOrCreateFolder(
-							this.alfrescoWrapper.getMainProjectFolder(),
-							groupName);
-
-			// creo l'utente con l'email del referente
-			HashMap<String, String> args = new HashMap<String, String>();
-			args.put("userName", this.getInstance().getEmailReferente());
-			args.put("firstName", this.getInstance().getNome());
-			args.put("lastName", this.getInstance().getCognome());
-			args.put("email", this.getInstance().getEmailReferente());
-			// forse dovrei settare la password dato che di default è a
-			// "password"?
-			awsc.addPerson(args);
-
-			// Aggiungo l'utente al gruppo creato in precedenza
-			awsc.addGroupOrUser(groupName, this.getInstance()
-					.getEmailReferente(), false);
-
-			// Aggiungo i provilegi di collaboratore all'utente creato sulla
-			// cartella
-			// groupName
-			this.alfrescoWrapper.applyACL(alfrescoGroupFolder, "GROUP_"
-					+ groupName);
-
-			// se l'azienda è amministrata gli utenti del gruppo "CNA" devono i
-			// permessi sulla cartella
-			if (this.getInstance().getPosizioneCNA() == PosizioneCNA.AMMINISTRATA
-					.toString()) {
-				this.alfrescoWrapper.applyACL(alfrescoGroupFolder, "GROUP_CNA");
-
-			}
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -128,7 +142,7 @@ public class AziendaHome extends EntityHome<Azienda> {
 		return "OK";
 	}
 
-	public void setAziendaId(Long id) {
+	public void setAziendaId(Integer id) {
 		this.setId(id);
 	}
 

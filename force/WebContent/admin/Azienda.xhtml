@@ -1,0 +1,193 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="/layout/template.xhtml">
+
+<ui:define name="body">
+
+    <rich:panel>
+        <f:facet name="header">Azienda Details</f:facet>
+
+
+        <s:decorate id="alfrescoGroupId" template="/layout/display.xhtml">
+            <ui:define name="label">Alfresco group id</ui:define>
+            <h:outputText value="#{aziendaHome.instance.alfrescoGroupId}"/>
+        </s:decorate>
+
+        <s:decorate id="cap" template="/layout/display.xhtml">
+            <ui:define name="label">Cap</ui:define>
+            <h:outputText value="#{aziendaHome.instance.cap}"/>
+        </s:decorate>
+
+        <s:decorate id="cellulare" template="/layout/display.xhtml">
+            <ui:define name="label">Cellulare</ui:define>
+            <h:outputText value="#{aziendaHome.instance.cellulare}"/>
+        </s:decorate>
+
+        <s:decorate id="cognome" template="/layout/display.xhtml">
+            <ui:define name="label">Cognome</ui:define>
+            <h:outputText value="#{aziendaHome.instance.cognome}"/>
+        </s:decorate>
+
+        <s:decorate id="comune" template="/layout/display.xhtml">
+            <ui:define name="label">Comune</ui:define>
+            <h:outputText value="#{aziendaHome.instance.comune}"/>
+        </s:decorate>
+
+        <s:decorate id="email" template="/layout/display.xhtml">
+            <ui:define name="label">Email</ui:define>
+            <h:outputText value="#{aziendaHome.instance.email}"/>
+        </s:decorate>
+
+        <s:decorate id="emailCertificata" template="/layout/display.xhtml">
+            <ui:define name="label">Email certificata</ui:define>
+            <h:outputText value="#{aziendaHome.instance.emailCertificata}"/>
+        </s:decorate>
+
+        <s:decorate id="emailReferente" template="/layout/display.xhtml">
+            <ui:define name="label">Email referente</ui:define>
+            <h:outputText value="#{aziendaHome.instance.emailReferente}"/>
+        </s:decorate>
+
+        <s:decorate id="fax" template="/layout/display.xhtml">
+            <ui:define name="label">Fax</ui:define>
+            <h:outputText value="#{aziendaHome.instance.fax}"/>
+        </s:decorate>
+
+        <s:decorate id="indirizzo" template="/layout/display.xhtml">
+            <ui:define name="label">Indirizzo</ui:define>
+            <h:outputText value="#{aziendaHome.instance.indirizzo}"/>
+        </s:decorate>
+
+        <s:decorate id="localita" template="/layout/display.xhtml">
+            <ui:define name="label">Localita</ui:define>
+            <h:outputText value="#{aziendaHome.instance.localita}"/>
+        </s:decorate>
+
+        <s:decorate id="nome" template="/layout/display.xhtml">
+            <ui:define name="label">Nome</ui:define>
+            <h:outputText value="#{aziendaHome.instance.nome}"/>
+        </s:decorate>
+
+        <s:decorate id="provincia" template="/layout/display.xhtml">
+            <ui:define name="label">Provincia</ui:define>
+            <h:outputText value="#{aziendaHome.instance.provincia}"/>
+        </s:decorate>
+
+        <s:decorate id="ragioneSociale" template="/layout/display.xhtml">
+            <ui:define name="label">Ragione sociale</ui:define>
+            <h:outputText value="#{aziendaHome.instance.ragioneSociale}"/>
+        </s:decorate>
+
+        <s:decorate id="stato" template="/layout/display.xhtml">
+            <ui:define name="label">Stato</ui:define>
+            <h:outputText value="#{aziendaHome.instance.stato}"/>
+        </s:decorate>
+
+        <s:decorate id="telefono" template="/layout/display.xhtml">
+            <ui:define name="label">Telefono</ui:define>
+            <h:outputText value="#{aziendaHome.instance.telefono}"/>
+        </s:decorate>
+
+        <div style="clear:both"/>
+
+    </rich:panel>
+
+    <div class="actionButtons">
+
+        <s:button view="/AziendaEdit.xhtml"
+                    id="edit"
+                 value="Edit"/>
+
+        <s:button view="/#{empty aziendaFrom ? 'AziendaList' : aziendaFrom}.xhtml"
+                    id="done"
+                 value="Done"/>
+
+    </div>
+
+    <rich:tabPanel switchType="ajax">
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/manytoone.gif" style="vertical-align: middle; padding-right: 4px;"/>Forma giuridica</h:panelGroup>
+        </f:facet>
+    <div class="association" id="formaGiuridicaParent">
+
+        <h:outputText value="There is no formaGiuridica associated with this azienda."
+                   rendered="#{aziendaHome.instance.formaGiuridica == null}"/>
+
+        <rich:dataTable var="_formaGiuridica"
+                   value="#{aziendaHome.instance.formaGiuridica}"
+                rendered="#{aziendaHome.instance.formaGiuridica != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="formaGiuridicaTable">
+            <h:column>
+                <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{_formaGiuridica.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Nome</f:facet>
+                <h:outputText value="#{_formaGiuridica.nome}"/>
+            </h:column>
+            <h:column styleClass="action">
+                <f:facet name="header">Action</f:facet>
+                <s:link id="viewformaGiuridica"
+                     value="View"
+                      view="/FormaGiuridica.xhtml">
+                    <f:param name="formaGiuridicaId"
+                           value="#{_formaGiuridica.id}"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </div>
+    </rich:tab>
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/manytoone.gif" style="vertical-align: middle; padding-right: 4px;"/>Settore</h:panelGroup>
+        </f:facet>
+    <div class="association" id="settoreParent">
+
+        <h:outputText value="There is no settore associated with this azienda."
+                   rendered="#{aziendaHome.instance.settore == null}"/>
+
+        <rich:dataTable var="_settore"
+                   value="#{aziendaHome.instance.settore}"
+                rendered="#{aziendaHome.instance.settore != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="settoreTable">
+            <h:column>
+                <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{_settore.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Nome</f:facet>
+                <h:outputText value="#{_settore.nome}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Slot def id</f:facet>
+                <h:outputText value="#{_settore.slotDef.id}"/>
+            </h:column>
+            <h:column styleClass="action">
+                <f:facet name="header">Action</f:facet>
+                <s:link id="viewsettore"
+                     value="View"
+                      view="/Settore.xhtml">
+                    <f:param name="settoreId"
+                           value="#{_settore.id}"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </div>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

@@ -100,12 +100,12 @@
         </div>
 
     </h:form>
-
+    <h:form id="aziendaActive" >
     <rich:panel>
         <f:facet name="header">Elenco delle aziende in attesa di attivazione (#{empty newAziendaList.resultList ? 0 : (newAziendaList.paginated ? newAziendaList.resultCount : newAziendaList.resultList.size)})</f:facet>
     <div class="results" id="aziendaList">
 
-    <h:outputText value="The azienda search returned no results."
+    <h:outputText value="La ricerca non ha prodotto nessun risultato."
                rendered="#{empty newAziendaList.resultList}"/>
 
     <rich:dataTable id="aziendaList"
@@ -294,28 +294,34 @@
         </h:column>
         <rich:column styleClass="action">
             <f:facet name="header">Action</f:facet>
-            <s:link view="/#{empty from ? 'Azienda' : from}.xhtml"
-                   value="#{empty from ? 'View' : 'Select'}"
+            <s:link view="/admin/#{empty from ? 'Azienda' : from}.xhtml"
+                   value="#{empty from ? 'Vedi' : 'Select'}"
              propagation="#{empty from ? 'none' : 'default'}"
                       id="aziendaViewId">
                 <f:param name="aziendaId"
                         value="#{_azienda.id}"/>
             </s:link>
             #{' '}
-            <s:link view="/AziendaEdit.xhtml"
-                   value="Edit"
+            <s:link view="/admin/AziendaEdit.xhtml"
+                   value="Modifica"
              propagation="none"
                       id="aziendaEdit"
                 rendered="#{empty from}">
                 <f:param name="aziendaId"
                         value="#{_azienda.id}"/>
             </s:link>
+             #{' '}
+            <h:commandButton value="Attiva"
+                          styleClass="DeleteAction Action"
+                          action="#{aziendaHome.attivaAzienda(_azienda)}"
+                           onclick="if (!confirm('Sei sicuro di voler attiva #{_azienda.ragioneSociale}?')) return false"
+                          id="attivaAzienda" />
         </rich:column>
     </rich:dataTable>
 
     </div>
     </rich:panel>
-
+    </h:form>
     <div class="tableControl">
 
         <s:link view="/AziendaList.xhtml"

@@ -3,6 +3,11 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd">
 
+ <begin-conversation join="true"/>
+     <navigation from-action="#{aziendaHome.attivaAzienda(_azienda)}">
+            <end-conversation />
+            <redirect view-id="/admin/NewAziendaList.xhtml" />
+   </navigation>
    <param name="firstResult" value="#{aziendaList.firstResult}"/>
    <param name="sort" value="#{aziendaList.orderColumn}"/>
    <param name="dir" value="#{aziendaList.orderDirection}"/>
