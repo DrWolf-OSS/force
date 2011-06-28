@@ -39,6 +39,8 @@ public class Preference implements Serializable {
 			PreferenceKey.FORCE_GROUPS_PATH.name(), "/Force");
 	private static Preference FORCE_ADMIN = new Preference(
 			PreferenceKey.FORCE_ADMIN.name(), "CNA");
+	private static Preference FORCE_USER_GROUP = new Preference(
+			PreferenceKey.FORCE_USER_GROUP.name(), "aziende");
 
 	public static Preference[] defaults = new Preference[] {
 			Preference.ALFRESCO_LOCATION, Preference.ALFRESCO_ADMIN_USER,
@@ -46,7 +48,8 @@ public class Preference implements Serializable {
 			Preference.CUSTOM_MODEL_JAR_PATH,
 			Preference.CUSTOM_MODEL_XML_PATH_IN_JAR,
 			Preference.CUSTOM_MODEL_XML_PATH, Preference.CUSTOM_MODEL_XML_NAME,
-			Preference.FORCE_GROUPS_PATH, Preference.FORCE_ADMIN };
+			Preference.FORCE_GROUPS_PATH, Preference.FORCE_ADMIN,
+			Preference.FORCE_USER_GROUP };
 
 	private Integer id;
 	private String keyValue;

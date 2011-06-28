@@ -97,6 +97,8 @@ public class AziendaHome extends EntityHome<Azienda> {
 			args.put("firstName", this.getInstance().getNome());
 			args.put("lastName", this.getInstance().getCognome());
 			args.put("email", this.getInstance().getEmailReferente());
+			// forse dovrei settare la password dato che di default è a
+			// "password"?
 			awsc.addPerson(args);
 
 			// Aggiungo l'utente al gruppo creato in precedenza

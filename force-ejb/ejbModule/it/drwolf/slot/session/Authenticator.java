@@ -98,6 +98,9 @@ public class Authenticator {
 		if (this.alfrescoUserIdentity.isMemberOf(this.preferenceManager
 				.getPreference("FORCE_ADMIN").getStringValue())) {
 			this.identity.addRole("ADMIN");
+		} else if (this.alfrescoUserIdentity.isMemberOf(this.preferenceManager
+				.getPreference("FORCE_USER_GROUP").getStringValue())) {
+			this.identity.addRole("AZIENDE");
 		} else {
 
 		}
