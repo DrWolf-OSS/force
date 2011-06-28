@@ -122,11 +122,10 @@
 									<h:outputText value="No files uploaded"
 										rendered="#{slotInstEditBean.datas[coll.docDefCollection.id] == null or (empty slotInstEditBean.datas[coll.docDefCollection.id])}" />
 
-									<rich:dataGrid id="fileGrid_#{coll.docDefCollection.id}"
-										columns="1"
+									<a:repeat id="fileGrid_#{coll.docDefCollection.id}"								
 										value="#{slotInstEditBean.datas[coll.docDefCollection.id]}"
-										var="item" rowKeyVar="row">
-
+										var="item">
+										<s:div styleClass="fileItem">
 										<ui:repeat var="message"
 											value="#{slotInstEditBean.filesMessages[item.id]}">
 											<h:graphicImage value="/img/msgerror.png"
@@ -166,14 +165,15 @@
 										<a:region>
 											<a:commandButton value="Remove"
 												action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}"
-												reRender="infoPanel_#{slotInstEditBean.activeCollectionId},primaryRegion_#{coll.docDefCollection.id}" />
+												reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}" />
 											<a:commandButton value="Edit"
 												action="#{slotInstEditBean.editItem(coll.docDefCollection.id, item)}" 
 												reRender="editPanel" 
 												oncomplete="#{rich:component('editPanel')}.show()"
 												disabled="#{not item.editable}"/>
 										</a:region>
-									</rich:dataGrid>
+									</s:div>
+									</a:repeat>
 									<div style="clear: both" />
 
 									<a:region>
