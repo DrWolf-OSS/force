@@ -7,7 +7,7 @@
 	xmlns:c="http://java.sun.com/jstl/core"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:a="http://richfaces.org/a4j"
-	xmlns:rich="http://richfaces.org/rich" template="layout/template.xhtml">
+	xmlns:rich="http://richfaces.org/rich" template="/layout/template.xhtml">
 
 	<ui:define name="body">
 
@@ -25,47 +25,46 @@
 				</ui:repeat>
 
 				<s:div id="embeddedProperties">
-					<c:forEach var="embeddedProp"
+					<c:forEach var="dataInstance"
 						items="#{slotInstEditBean.embeddedProperties}">
-						<s:decorate template="/layout/display.xhtml">
-							<ui:define name="label">
-								<h:outputText value="#{embeddedProp.name}" />
-							</ui:define>
-							<h:outputText value="#{embeddedProp.stringValue}"
-								rendered="#{embeddedProp.type == 'STRING'}" />
-							<h:outputText value="#{embeddedProp.integerValue}"
-								rendered="#{embeddedProp.type == 'INTEGER'}" />
-							<h:outputText
-								value="#{embeddedProp.booleanValue ? 'true' : 'false'}"
-								rendered="#{embeddedProp.type == 'BOOLEAN'}" />
-							<h:outputText value="#{embeddedProp.dateValue}"
-								rendered="#{embeddedProp.type == 'DATE'}">
-								<s:convertDateTime type="date" dateStyle="short"
-									pattern="dd/MM/yyyy" />
-							</h:outputText>
-						</s:decorate>
+					<s:decorate template="/layout/display.xhtml">
+						<ui:define name="label">
+							<h:outputText value="#{dataInstance.dataDefinition.label}" />
+						</ui:define>
+						<h:outputText value="#{dataInstance.stringValue}"
+							rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"/>
+						<h:outputText value="#{dataInstance.integerValue}"
+							rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER'}" />
+						<h:outputText value="#{dataInstance.booleanValue ? 'true' : 'false'}"
+							rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}" />
+						<h:outputText value="#{dataInstance.dateValue}"
+							rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}">
+							<s:convertDateTime type="date" dateStyle="short"
+								pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</s:decorate>
 					</c:forEach>
 				</s:div>
 
 				<s:div id="properties">
-					<c:forEach var="propInst" items="#{slotInstEditBean.propertyInsts}">
+					<c:forEach var="dataInstance" items="#{slotInstEditBean.propertyInsts}">
 						<s:decorate template="/layout/edit.xhtml">
 							<ui:define name="label">
-								<h:outputText value="#{propInst.propertyDef.name}" />
+								<h:outputText value="#{dataInstance.dataDefinition.label}" />
 							</ui:define>
-							<h:inputText value="#{propInst.stringValue}"
-								rendered="#{propInst.propertyDef.type == 'STRING'}"
-								required="#{propInst.propertyDef.required}" />
-							<h:inputText value="#{propInst.integerValue}"
-								rendered="#{propInst.propertyDef.type == 'INTEGER'}"
-								required="#{propInst.propertyDef.required}" />
-							<h:selectBooleanCheckbox value="#{propInst.booleanValue}"
-								rendered="#{propInst.propertyDef.type == 'BOOLEAN'}"
-								required="#{propInst.propertyDef.required}" />
+							<h:inputText value="#{dataInstance.stringValue}"
+								rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"
+								required="#{dataInstance.dataDefinition.required}" />
+							<h:inputText value="#{dataInstance.integerValue}"
+								rendered="#{dataInstance.dataDefinition.dataType== 'INTEGER'}"
+								required="#{dataInstance.dataDefinition.required}" />
+							<h:selectBooleanCheckbox value="#{dataInstance.booleanValue}"
+								rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}"
+								required="#{dataInstance.dataDefinition.required}" />
 							<rich:calendar id="subscriptionDate" mode="client"
-								value="#{propInst.dateValue}" datePattern="dd/MM/yyyy"
-								rendered="#{propInst.propertyDef.type == 'DATE'}"
-								required="#{propInst.propertyDef.required}" />
+								value="#{dataInstance.dateValue}" datePattern="dd/MM/yyyy"
+								rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}"
+								required="#{dataInstance.dataDefinition.required}" />
 						</s:decorate>
 					</c:forEach>
 				</s:div>
@@ -123,11 +122,10 @@
 									<h:outputText value="No files uploaded"
 										rendered="#{slotInstEditBean.datas[coll.docDefCollection.id] == null or (empty slotInstEditBean.datas[coll.docDefCollection.id])}" />
 
-									<rich:dataGrid id="fileGrid_#{coll.docDefCollection.id}"
-										columns="1"
+									<a:repeat id="fileGrid_#{coll.docDefCollection.id}"								
 										value="#{slotInstEditBean.datas[coll.docDefCollection.id]}"
-										var="item" rowKeyVar="row">
-
+										var="item">
+										<s:div styleClass="fileItem">
 										<ui:repeat var="message"
 											value="#{slotInstEditBean.filesMessages[item.id]}">
 											<h:graphicImage value="/img/msgerror.png"
@@ -145,19 +143,19 @@
 											<h:outputText value="#{item.fileName}" />
 										</s:decorate>
 
-										<ui:repeat var="propInst" value="#{item.embeddedProperties}">
+										<ui:repeat var="dataInstance" value="#{item.embeddedProperties}">
 											<s:decorate template="/layout/display.xhtml">
 												<ui:define name="label">
-													<h:outputText value="#{propInst.property.title}" />
+													<h:outputText value="#{dataInstance.dataDefinition.label}" />
 												</ui:define>
-												<h:outputText id="propT" value="#{propInst.stringValue}"
-													rendered="#{propInst.property.type == 'd:text'}"/>
-												<h:outputText value="#{propInst.integerValue}"
-													rendered="#{propInst.property.type == 'd:int'}" />
-												<h:outputText value="#{propInst.booleanValue ? 'true' : 'false'}"
-													rendered="#{propInst.property.type == 'd:boolean'}" />
-												<h:outputText value="#{propInst.dateValue}"
-													rendered="#{propInst.property.type == 'd:date'}">
+												<h:outputText value="#{dataInstance.stringValue}"
+													rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"/>
+												<h:outputText value="#{dataInstance.integerValue}"
+													rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER'}" />
+												<h:outputText value="#{dataInstance.booleanValue ? 'true' : 'false'}"
+													rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}" />
+												<h:outputText value="#{dataInstance.dateValue}"
+													rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}">
 													<s:convertDateTime type="date" dateStyle="short"
 														pattern="dd/MM/yyyy" />
 												</h:outputText>
@@ -167,14 +165,15 @@
 										<a:region>
 											<a:commandButton value="Remove"
 												action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}"
-												reRender="infoPanel_#{slotInstEditBean.activeCollectionId},primaryRegion_#{coll.docDefCollection.id}" />
+												reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}" />
 											<a:commandButton value="Edit"
 												action="#{slotInstEditBean.editItem(coll.docDefCollection.id, item)}" 
 												reRender="editPanel" 
 												oncomplete="#{rich:component('editPanel')}.show()"
 												disabled="#{not item.editable}"/>
 										</a:region>
-									</rich:dataGrid>
+									</s:div>
+									</a:repeat>
 									<div style="clear: both" />
 
 									<a:region>
@@ -200,11 +199,10 @@
 			<div class="actionButtons">
 			<h:commandButton id="save"
 				value="Save" action="#{slotInstEditBean.save()}"
-				disabled="#{!slotInstHome.wired}"
-				rendered="#{!slotInstHome.managed}" />
+				rendered="#{slotInstHome.id == null}" />
 			<h:commandButton id="update"
 				value="Save" action="#{slotInstEditBean.update()}"
-				rendered="#{slotInstHome.managed}" />
+				rendered="#{slotInstHome.id != null}" />
 			<h:commandButton id="delete"
 				value="Delete" action="#{slotInstHome.remove}" immediate="true"
 				rendered="#{slotInstHome.managed}" />
@@ -215,8 +213,6 @@
 				value="Cancel" propagation="end"
 				view="/#{empty slotInstFrom ? 'SlotInstList' : slotInstFrom}.xhtml"
 				rendered="#{!slotInstHome.managed}" />
-			<h:commandButton id="update2"
-				value="UPDATE" action="#{slotInstEditBean.update()}"/>
 			</div>
 		</a:form>
 
@@ -318,30 +314,30 @@
 						value="#{slotInstEditBean.activeFileContainer.fileName}" />
 				</s:decorate>
 
-				<ui:repeat var="propInst"
+				<ui:repeat var="dataInstance"
 					value="#{slotInstEditBean.activeFileContainer.embeddedProperties}">
-					<s:decorate template="/layout/edit.xhtml" >
 					<ui:param name="prefix" value="epf" />
+					<s:decorate template="/layout/edit.xhtml">
 						<ui:define name="label">
-							<h:outputText value="#{propInst.property.title}" />
+							<h:outputText value="#{dataInstance.dataDefinition.label}" />
 						</ui:define>
-						<h:inputText id="propT" value="#{propInst.stringValue}"
-							rendered="#{propInst.property.type == 'd:text'}"
-							disabled="#{not propInst.editable}"
-							required="#{propInst.property.mandatory}" />
-						<h:inputText value="#{propInst.integerValue}"
-							rendered="#{propInst.property.type == 'd:int'}"
-							disabled="#{not propInst.editable}"
-							required="#{propInst.property.mandatory}" />
-						<h:selectBooleanCheckbox value="#{propInst.booleanValue}"
-							rendered="#{propInst.property.type == 'd:boolean'}"
-							disabled="#{not propInst.editable}"
-							required="#{propInst.property.mandatory}" />
+						<h:inputText value="#{dataInstance.stringValue}"
+							rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"
+							required="#{dataInstance.dataDefinition.required}"
+							disabled="#{not dataInstance.dataDefinition.editable}" />
+						<h:inputText value="#{dataInstance.integerValue}"
+							rendered="#{dataInstance.dataDefinition.dataType== 'INTEGER'}"
+							required="#{dataInstance.dataDefinition.required}"
+							disabled="#{not dataInstance.dataDefinition.editable}" />
+						<h:selectBooleanCheckbox value="#{dataInstance.booleanValue}"
+							rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}"
+							required="#{dataInstance.dataDefinition.required}"
+							disabled="#{not dataInstance.dataDefinition.editable}" />
 						<rich:calendar id="subscriptionDate" mode="client"
-							value="#{propInst.dateValue}" datePattern="dd/MM/yyyy"
-							rendered="#{propInst.property.type == 'd:date'}"
-							disabled="#{not propInst.editable}"
-							required="#{propInst.property.mandatory}" />
+							value="#{dataInstance.dateValue}" datePattern="dd/MM/yyyy"
+							rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}"
+							required="#{dataInstance.dataDefinition.required}"
+							disabled="#{not dataInstance.dataDefinition.editable}" />
 					</s:decorate>
 				</ui:repeat>
 				<div style="clear: both" />
@@ -349,8 +345,9 @@
 					action="#{slotInstEditBean.addActiveItemToDatas}"
 					reRender="editPanelForm, infoPanel_#{slotInstEditBean.activeCollectionId}" 
 					oncomplete="if(!epfinvalid){#{rich:component('editPanel')}.hide();};"/>
-				<a:commandButton value="Cancel"
-					onclick="#{rich:component('editPanel')}.hide()"/>
+				<a:region>
+				<a:commandButton value="Cancel" onclick="#{rich:component('editPanel')}.hide()"/>
+				</a:region>
 			</a:form>
 		</rich:modalPanel>
 

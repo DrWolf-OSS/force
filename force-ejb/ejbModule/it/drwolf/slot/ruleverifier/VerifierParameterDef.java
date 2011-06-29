@@ -1,8 +1,9 @@
 package it.drwolf.slot.ruleverifier;
 
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.interfaces.DataDefinition;
 
-public class VerifierParameterDef {
+public class VerifierParameterDef implements DataDefinition {
 
 	private String name;
 	private DataType type;
@@ -66,5 +67,18 @@ public class VerifierParameterDef {
 
 	public void setRuleEmbedded(boolean ruleEmbedded) {
 		this.ruleEmbedded = ruleEmbedded;
+	}
+
+	//
+	public DataType getDataType() {
+		return this.type;
+	}
+
+	public boolean isRequired() {
+		return !optional;
+	}
+
+	public boolean isEditable() {
+		return true;
 	}
 }

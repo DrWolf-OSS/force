@@ -1,6 +1,8 @@
 package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.interfaces.DataInstance;
 
 import java.util.Date;
 
@@ -14,7 +16,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 @Entity
-public class EmbeddedProperty {
+public class EmbeddedProperty implements DataDefinition, DataInstance {
 
 	private Long id;
 
@@ -130,6 +132,31 @@ public class EmbeddedProperty {
 			this.setType(DataType.BOOLEAN);
 			this.setBooleanValue((Boolean) value);
 		}
+	}
+
+	@Transient
+	public DataDefinition getDataDefinition() {
+		return this;
+	}
+
+	@Transient
+	public String getLabel() {
+		return this.name;
+	}
+
+	@Transient
+	public DataType getDataType() {
+		return this.type;
+	}
+
+	@Transient
+	public boolean isRequired() {
+		return false;
+	}
+
+	@Transient
+	public boolean isEditable() {
+		return true;
 	}
 
 }

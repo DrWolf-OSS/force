@@ -1,11 +1,14 @@
 package it.drwolf.slot.alfresco.custom.model;
 
+import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.interfaces.DataDefinition;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
 @Root
-public class Property {
+public class Property implements DataDefinition {
 
 	@Attribute
 	private String name;
@@ -100,6 +103,33 @@ public class Property {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		return true;
+	}
+
+	//
+	// /
+	public String getLabel() {
+		return this.title;
+	}
+
+	public DataType getDataType() {
+		if (this.type.equals("d:text"))
+			return DataType.STRING;
+		else if (this.type.equals("d:int"))
+			return DataType.INTEGER;
+		else if (this.type.equals("d:boolean"))
+			return DataType.BOOLEAN;
+		else if (this.type.equals("d:date"))
+			return DataType.DATE;
+		else
+			return null;
+	}
+
+	public boolean isRequired() {
+		return this.mandatory;
+	}
+
+	public boolean isEditable() {
 		return true;
 	}
 

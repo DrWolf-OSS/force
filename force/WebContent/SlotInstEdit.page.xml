@@ -46,7 +46,7 @@
          </redirect>
       </rule>
       <rule if-outcome="failed">
-         <redirect view-id="/SlotInstEdit.xhtml">
+         <redirect>
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
@@ -81,10 +81,10 @@
       </rule>
    </navigation>
    
-   <navigation from-action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}">
-         <redirect view-id="/SlotInstEdit.xhtml">
-         	<param name="slotDefId" value="#{slotDefHome.id}"/>
-         </redirect>
-   </navigation>
+<!--   <navigation from-action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}">-->
+<!--         <redirect view-id="/SlotInstEdit.xhtml">-->
+<!--         	<param name="slotDefId" value="#{slotDefHome.id}"/>-->
+<!--         </redirect>-->
+<!--   </navigation>-->
 
 </page>

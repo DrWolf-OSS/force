@@ -1,6 +1,8 @@
 package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.interfaces.DataInstance;
 
 import java.util.Date;
 
@@ -13,7 +15,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 @Entity
-public class PropertyInst {
+public class PropertyInst implements DataInstance {
 
 	private Long id;
 
@@ -121,6 +123,11 @@ public class PropertyInst {
 			return this.getBooleanValue();
 		else
 			return null;
+	}
+
+	@Transient
+	public DataDefinition getDataDefinition() {
+		return this.propertyDef;
 	}
 
 }

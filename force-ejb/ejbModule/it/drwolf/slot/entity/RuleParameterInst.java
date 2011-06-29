@@ -2,6 +2,8 @@ package it.drwolf.slot.entity;
 
 import it.drwolf.slot.entity.listeners.RuleParameterInstListener;
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.interfaces.DataInstance;
 import it.drwolf.slot.ruleverifier.VerifierParameterDef;
 
 import java.util.Date;
@@ -17,7 +19,7 @@ import javax.persistence.Transient;
 
 @Entity
 @EntityListeners(value = RuleParameterInstListener.class)
-public class RuleParameterInst {
+public class RuleParameterInst implements DataInstance {
 
 	private Long id;
 
@@ -114,11 +116,17 @@ public class RuleParameterInst {
 			return this.getIntegerValue();
 		else if (this.getVerifierParameterDef().getType()
 				.equals(DataType.BOOLEAN))
-			return this.booleanValue;
+			return this.getBooleanValue();
 		else if (this.getVerifierParameterDef().getType().equals(DataType.DATE))
-			return this.dateValue;
+			return this.getDateValue();
 		else
 			return null;
+	}
+
+	//
+	@Transient
+	public DataDefinition getDataDefinition() {
+		return this.getVerifierParameterDef();
 	}
 
 }

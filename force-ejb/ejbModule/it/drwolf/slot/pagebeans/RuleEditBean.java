@@ -17,6 +17,7 @@ import it.drwolf.slot.session.SlotDefHome;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,6 +61,8 @@ public class RuleEditBean {
 	private List<VerifierParameterDef> normalParameters = new ArrayList<VerifierParameterDef>();
 
 	private List<RuleParameterInst> embeddedParameters = new ArrayList<RuleParameterInst>();
+
+	private RuleParameterInst activeEmbeddedParameter;
 
 	@Factory("ruleTypes")
 	public List<RuleType> getRuleTypes() {
@@ -125,8 +128,8 @@ public class RuleEditBean {
 					RuleParameterInst embeddedParameterInst = new RuleParameterInst();
 					embeddedParameterInst
 							.setVerifierParameterDef(verifierParameter);
-					embeddedParameterInst.setParameterName(verifierParameter
-							.getName());
+					// embeddedParameterInst.setParameterName(verifierParameter
+					// .getName());
 					embeddedParameterInst.setRule(instance);
 					embeddedParameters.add(embeddedParameterInst);
 				} else {
@@ -152,6 +155,9 @@ public class RuleEditBean {
 			}
 
 		} else {
+			this.normalParameters.clear();
+			this.embeddedParameters.clear();
+
 			targetPropertiesSourceMap.clear();
 			targetPropertyMap.clear();
 		}
@@ -183,7 +189,7 @@ public class RuleEditBean {
 					// rule.setWarningMessage(this.warningMessage);
 					// }
 				} else {
-					if (!parameter.isOptional()) {
+					if (!parameter.isOptional() && !isInEmbedded(parameter)) {
 						error = true;
 						FacesMessages.instance()
 								.add(Severity.ERROR,
@@ -211,6 +217,39 @@ public class RuleEditBean {
 		if (!error) {
 			ruleHome.persist();
 		}
+	}
+
+	private boolean isInEmbedded(VerifierParameterDef parameterDef) {
+		Iterator<RuleParameterInst> iterator = this.embeddedParameters
+				.iterator();
+		while (iterator.hasNext()) {
+			RuleParameterInst parameterInst = iterator.next();
+			if (parameterInst.getVerifierParameterDef().equals(parameterDef)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void setTmpParameter(VerifierParameterDef parameterDef) {
+		RuleParameterInst parameterInst = new RuleParameterInst();
+		parameterInst.setVerifierParameterDef(parameterDef);
+		// parameterInst.setParameterName(parameterDef.getName());
+		this.activeEmbeddedParameter = parameterInst;
+	}
+
+	public void addEmbeddedParameter() {
+		//
+		// vanno messi in una collection a parte per poi poterli riconoscere e
+		// togliere
+		this.embeddedParameters.add(this.activeEmbeddedParameter);
+		this.normalParameters.remove(this.activeEmbeddedParameter
+				.getVerifierParameterDef());
+	}
+
+	public void removeEmbeddedParameter(RuleParameterInst parameterInst) {
+		this.embeddedParameters.remove(parameterInst);
+		this.normalParameters.add(parameterInst.getVerifierParameterDef());
 	}
 
 	public HashMap<String, List<PropertiesSourceContainer>> getSourcePropertiesSourceMap() {
@@ -270,6 +309,15 @@ public class RuleEditBean {
 
 	public void setEmbeddedParameters(List<RuleParameterInst> embeddedParameters) {
 		this.embeddedParameters = embeddedParameters;
+	}
+
+	public RuleParameterInst getActiveEmbeddedParameter() {
+		return activeEmbeddedParameter;
+	}
+
+	public void setActiveEmbeddedParameter(
+			RuleParameterInst activeEmbeddedParameter) {
+		this.activeEmbeddedParameter = activeEmbeddedParameter;
 	}
 
 	// public List<VerifierParameterDef> getEmbeddedParameters() {

@@ -1,24 +1,27 @@
 package it.drwolf.slot.alfresco.custom.support;
 
 import it.drwolf.slot.alfresco.custom.model.Property;
+import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.interfaces.DataInstance;
 
 import java.math.BigInteger;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class DocumentPropertyInst {
+public class DocumentPropertyInst implements DataInstance {
 
 	private Property property;
 
 	private String stringValue;
 
-	private BigInteger integerValue;
+	private Integer integerValue;
 
 	private Boolean booleanValue;
 
 	private Date dateValue;
-
-	private GregorianCalendar calendarValue;
+	//
+	// private GregorianCalendar calendarValue;
 
 	private boolean editable = true;
 
@@ -38,11 +41,11 @@ public class DocumentPropertyInst {
 		this.stringValue = stringValue;
 	}
 
-	public BigInteger getIntegerValue() {
+	public Integer getIntegerValue() {
 		return integerValue;
 	}
 
-	public void setIntegerValue(BigInteger integerValue) {
+	public void setIntegerValue(Integer integerValue) {
 		this.integerValue = integerValue;
 	}
 
@@ -60,8 +63,8 @@ public class DocumentPropertyInst {
 
 	public void setDateValue(Date dateValue) {
 		this.dateValue = dateValue;
-		this.calendarValue = new GregorianCalendar();
-		this.calendarValue.setTime(this.dateValue);
+		// this.calendarValue = new GregorianCalendar();
+		// this.calendarValue.setTime(this.dateValue);
 	}
 
 	public Property getProperty() {
@@ -76,16 +79,20 @@ public class DocumentPropertyInst {
 	// il Calendar perchè è il tipo che vuole Alfresco per una Property di tipo
 	// d:date
 	public Object getValue() {
-		if (this.stringValue != null)
-			return this.stringValue;
-		else if (this.integerValue != null)
-			return this.integerValue;
-		else if (this.booleanValue != null)
-			return this.booleanValue;
-		else if (this.calendarValue != null)
-			return this.calendarValue;
-		else if (this.dateValue != null)
-			return this.dateValue;
+		if (this.getStringValue() != null)
+			return this.getStringValue();
+		else if (this.getIntegerValue() != null)
+			return this.getIntegerValue();
+		else if (this.getBooleanValue() != null)
+			return this.getBooleanValue();
+		// else if (this.getCalendarValue() != null)
+		// return this.getCalendarValue();
+		else if (this.getDateValue() != null) {
+			// return this.getDateValue();
+			Calendar calendar = new GregorianCalendar();
+			calendar.setTime(this.getDateValue());
+			return calendar;
+		}
 
 		return null;
 	}
@@ -93,16 +100,14 @@ public class DocumentPropertyInst {
 	public void setValue(Object value) {
 		// TODO COMPLETARE TRASFORMAZIONI
 		if (value instanceof String)
-			this.stringValue = (String) value;
+			this.setStringValue((String) value);
 		else if (value instanceof BigInteger)
-			this.integerValue = (BigInteger) value;
-		else if (value instanceof Integer)
-			this.integerValue = (BigInteger) value;
+			this.setIntegerValue(((BigInteger) value).intValue());
 		else if (value instanceof Boolean)
-			this.booleanValue = (Boolean) value;
+			this.setBooleanValue((Boolean) value);
 		else if (value instanceof GregorianCalendar) {
-			this.dateValue = ((GregorianCalendar) value).getTime();
-			this.calendarValue = (GregorianCalendar) value;
+			this.setDateValue(((GregorianCalendar) value).getTime());
+			// this.setCalendarValue((GregorianCalendar) value);
 		}
 	}
 
@@ -111,14 +116,14 @@ public class DocumentPropertyInst {
 		return this.getValue().toString();
 	}
 
-	public GregorianCalendar getCalendarValue() {
-		return calendarValue;
-	}
-
-	public void setCalendarValue(GregorianCalendar calendar) {
-		this.calendarValue = calendar;
-		this.dateValue = calendar.getTime();
-	}
+	// public GregorianCalendar getCalendarValue() {
+	// return calendarValue;
+	// }
+	//
+	// public void setCalendarValue(GregorianCalendar calendar) {
+	// this.calendarValue = calendar;
+	// this.dateValue = calendar.getTime();
+	// }
 
 	public boolean isEditable() {
 		return editable;
@@ -126,6 +131,10 @@ public class DocumentPropertyInst {
 
 	public void setEditable(boolean editable) {
 		this.editable = editable;
+	}
+
+	public DataDefinition getDataDefinition() {
+		return this.property;
 	}
 
 }

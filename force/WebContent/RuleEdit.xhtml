@@ -16,7 +16,7 @@
         <rich:panel>
             <f:facet name="header">#{ruleHome.managed ? 'Edit' : 'Add'} Rule</f:facet>
  
- <a:region>
+ 		<a:region>
             <s:decorate id="description" template="/layout/display.xhtml">
                 <ui:define name="label">Description</ui:define>
                 <h:outputText value="#{ruleHome.instance.verifier.description}" rendered="#{ruleHome.instance.verifier != null}"/>
@@ -29,49 +29,45 @@
             
             <s:decorate id="typeField" template="/layout/edit.xhtml">
                 <ui:define name="label">Type</ui:define>
-                <h:selectOneMenu id="ruleType" value="#{ruleHome.instance.type}" >
+                <h:selectOneMenu id="ruleType" value="#{ruleHome.instance.type}">
                     	<s:selectItems value="#{ruleTypes}" 
 						var="type" label="#{type.value()}" noSelectionLabel="-- select rule type --"/>
-					<a:support event="onchange" actionListener="#{ruleEditBean.ruleTypeListener}" reRender="inParams,description,embeddedParameters"/>
+					<a:support event="onchange" actionListener="#{ruleEditBean.ruleTypeListener}" reRender="inParams,description,embeddedParameters,sep1,sep2"/>
              	</h:selectOneMenu>
             </s:decorate>
             
+            <div style="clear:both"/>
+            <rich:separator id="sep1" height="25px" lineType="none" />
             
             <s:div id="inParams">
-            <s:decorate id="params" template="/layout/display.xhtml">
-                <ui:define name="label">Parameters</ui:define>
-                
-                <h:panelGrid columns="2">
-                
-                <ui:repeat var="p" value="#{ruleEditBean.normalParameters}">
-                <s:div>
-                	<h:outputText value="#{p.label}"/>
-                	&#160;#{messages.left}#{messages.left}&#160;
-	                <h:selectOneMenu value="#{ruleEditBean.targetPropertiesSourceMap[p.name]}" rendered="#{ruleEditBean.sourcePropertiesSourceMap[p.name] != null}">
-		            	<s:selectItems value="#{ruleEditBean.sourcePropertiesSourceMap[p.name]}"
-		            					var="sourceContainer" label="#{sourceContainer.label}" itemValue="#{sourceContainer}" 
-		            					disabled="#{not sourceContainer.hasPropertiesOfType(p.type)}" noSelectionLabel="-- select a collection or a slot --"/>
-		            	<f:converter converterId="propertiesSourceContainerConverter"/>
-		            <a:support event="onchange" reRender="inParams"/>
-		            </h:selectOneMenu>
-		            &#160; : &#160;
-		            <h:selectOneMenu value="#{ruleEditBean.targetPropertyMap[p.name]}" rendered="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties != null}">
-		            	<s:selectItems value="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties}"
-		            					var="prop" label="#{prop.label}" itemValue="#{prop}" disabled="#{prop.type != p.type}" />
-		            	<f:converter converterId="propertyContainerConverter"/>
-		            	<a:support event="onchange" reRender="inParams"/>
-		            </h:selectOneMenu>
-	            </s:div>
-	            </ui:repeat>
-	            </h:panelGrid>
-              
-            </s:decorate>
+            <ui:repeat var="p" value="#{ruleEditBean.normalParameters}">
+	            <s:decorate id="params" template="/layout/edit.xhtml">
+	                <ui:define name="label">#{p.label}</ui:define>
+		                <h:selectOneMenu value="#{ruleEditBean.targetPropertiesSourceMap[p.name]}" rendered="#{ruleEditBean.sourcePropertiesSourceMap[p.name] != null}">
+			            	<s:selectItems value="#{ruleEditBean.sourcePropertiesSourceMap[p.name]}"
+			            					var="sourceContainer" label="#{sourceContainer.label}" itemValue="#{sourceContainer}" 
+			            					disabled="#{not sourceContainer.hasPropertiesOfType(p.type)}" noSelectionLabel="-- select a collection or a slot --"/>
+			            	<f:converter converterId="propertiesSourceContainerConverter"/>
+			            <a:support event="onchange" reRender="inParams"/>
+			            </h:selectOneMenu>
+			            &#160;
+			            <h:selectOneMenu value="#{ruleEditBean.targetPropertyMap[p.name]}" rendered="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties != null}">
+			            	<s:selectItems value="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties}"
+			            					var="prop" label="#{prop.label}" itemValue="#{prop}" disabled="#{prop.type != p.type}" />
+			            	<f:converter converterId="propertyContainerConverter"/>
+			            	<a:support event="onchange" reRender="inParams"/>
+			            </h:selectOneMenu>
+			            &#160;
+			            <a:commandButton value="+" action="#{ruleEditBean.setTmpParameter(p)}" 
+			            			oncomplete="#{rich:component('embeddedParameterPanel')}.show()" 
+			            			reRender="embeddedParameterPanel"/>
+	            </s:decorate>
+	        </ui:repeat>
             </s:div>
-            
             </a:region>
             
             <s:div id="embeddedParameters">
-            <ui:repeat var="ep" value="#{ruleEditBean.embeddedParameters}">
+            <a:repeat var="ep" value="#{ruleEditBean.embeddedParameters}">
 	            <s:decorate template="/layout/edit.xhtml">
 	           		<ui:define name="label">#{ep.verifierParameterDef.label}</ui:define>
 	           		<h:inputText value="#{ep.stringValue}"
@@ -87,9 +83,19 @@
 								value="#{ep.dateValue}" datePattern="dd/MM/yyyy"
 								rendered="#{ep.verifierParameterDef.type == 'DATE'}"
 								required="#{not ep.verifierParameterDef.optional}" />
+					&#160;
+					<a:region>
+					<a:commandButton value="-" action="#{ruleEditBean.removeEmbeddedParameter(ep)}"
+								rendered="#{not ep.verifierParameterDef.ruleEmbedded}" reRender="embeddedParameters,inParams,rule">
+					<a:support event="oncomplete" reRender="embeddedParameters,inParams,rule" />
+					</a:commandButton>
+					</a:region>
 	            </s:decorate>
-            </ui:repeat>
+            </a:repeat>
             </s:div>
+            
+            <div style="clear:both"/>
+            <rich:separator id="sep2" height="25px" lineType="none"/>
             
             <s:decorate id="errorMsg" template="/layout/edit.xhtml">
             	<ui:define name="label">Error Message</ui:define>
@@ -178,6 +184,30 @@
     </div>
     </rich:tab>
 </rich:tabPanel>
-</ui:define>
 
+		<rich:modalPanel id="embeddedParameterPanel" autosized="true" width="400"
+			moveable="false" resizeable="false">
+			<f:facet name="header">
+				<h:outputText value="Add Embedded Property" />
+			</f:facet>
+			<a:form>
+			<s:decorate template="/layout/display.xhtml">
+                <ui:define name="label">
+                	<h:outputText value="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.label}" />
+				</ui:define>
+				<h:inputText value="#{ruleEditBean.activeEmbeddedParameter.stringValue}" rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'STRING'}"/>
+				<h:inputText value="#{ruleEditBean.activeEmbeddedParameter.integerValue}" rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'INTEGER'}"/>
+				<h:selectBooleanCheckbox value="#{ruleEditBean.activeEmbeddedParameter.booleanValue}" rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'BOOLEAN'}"/>
+				<rich:calendar mode="client"
+                         value="#{ruleEditBean.activeEmbeddedParameter.dateValue}"
+                         datePattern="dd/MM/yyyy"
+                         rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'DATE'}"/>
+            </s:decorate>
+            <div style="clear:both"/>
+			<a:commandButton value="Ok" action="#{ruleEditBean.addEmbeddedParameter()}" oncomplete="#{rich:component('embeddedParameterPanel')}.hide()" reRender="embeddedParameterPanel,embeddedParameters,inParams" />
+			<a:commandButton value="Cancel" onclick="#{rich:component('embeddedParameterPanel')}.hide()"/>
+			</a:form>
+		</rich:modalPanel>
+
+</ui:define>
 </ui:composition>
