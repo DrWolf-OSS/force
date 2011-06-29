@@ -7,7 +7,7 @@
 	xmlns:c="http://java.sun.com/jstl/core"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:a="http://richfaces.org/a4j"
-	xmlns:rich="http://richfaces.org/rich" template="layout/template.xhtml">
+	xmlns:rich="http://richfaces.org/rich" template="/layout/template.xhtml">
 
 	<ui:define name="body">
 
@@ -199,11 +199,10 @@
 			<div class="actionButtons">
 			<h:commandButton id="save"
 				value="Save" action="#{slotInstEditBean.save()}"
-				disabled="#{!slotInstHome.wired}"
-				rendered="#{!slotInstHome.managed}" />
+				rendered="#{slotInstHome.id == null}" />
 			<h:commandButton id="update"
 				value="Save" action="#{slotInstEditBean.update()}"
-				rendered="#{slotInstHome.managed}" />
+				rendered="#{slotInstHome.id != null}" />
 			<h:commandButton id="delete"
 				value="Delete" action="#{slotInstHome.remove}" immediate="true"
 				rendered="#{slotInstHome.managed}" />
@@ -214,8 +213,6 @@
 				value="Cancel" propagation="end"
 				view="/#{empty slotInstFrom ? 'SlotInstList' : slotInstFrom}.xhtml"
 				rendered="#{!slotInstHome.managed}" />
-			<h:commandButton id="update2"
-				value="UPDATE" action="#{slotInstEditBean.update()}"/>
 			</div>
 		</a:form>
 
@@ -348,8 +345,9 @@
 					action="#{slotInstEditBean.addActiveItemToDatas}"
 					reRender="editPanelForm, infoPanel_#{slotInstEditBean.activeCollectionId}" 
 					oncomplete="if(!epfinvalid){#{rich:component('editPanel')}.hide();};"/>
-				<a:commandButton value="Cancel"
-					onclick="#{rich:component('editPanel')}.hide()"/>
+				<a:region>
+				<a:commandButton value="Cancel" onclick="#{rich:component('editPanel')}.hide()"/>
+				</a:region>
 			</a:form>
 		</rich:modalPanel>
 

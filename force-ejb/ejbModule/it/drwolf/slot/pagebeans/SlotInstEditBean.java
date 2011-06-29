@@ -63,7 +63,7 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
-import org.jboss.seam.security.Identity;
+import org.jboss.seam.international.StatusMessage.Severity;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
 
@@ -88,9 +88,6 @@ public class SlotInstEditBean {
 
 	@In(create = true)
 	private AlfrescoWrapper alfrescoWrapper;
-
-	@In
-	private Identity identity;
 
 	@In(create = true)
 	private Preferences preferences;
@@ -275,13 +272,15 @@ public class SlotInstEditBean {
 		if (!sizeCollectionPassed) {
 			FacesMessages
 					.instance()
-					.add("Le dimensioni di alcune collection non rispettano le specifiche");
+					.add(Severity.ERROR,
+							"Le dimensioni di alcune collection non rispettano le specifiche");
 			return "failed";
 		}
 
 		boolean rulesPassed = verify();
 		if (!rulesPassed) {
-			FacesMessages.instance().add("Alcune regole non sono verificate!");
+			FacesMessages.instance().add(Severity.ERROR,
+					"Alcune regole non sono verificate!");
 			return "failed";
 		}
 
@@ -404,16 +403,15 @@ public class SlotInstEditBean {
 		if (!sizeCollectionPassed) {
 			FacesMessages
 					.instance()
-					.add("Le dimensioni di alcune collection non rispettano le specifiche");
+					.add(Severity.ERROR,
+							"Le dimensioni di alcune collection non rispettano le specifiche");
 			return "failed";
 		}
 
 		boolean rulesPassed = verify();
 		if (!rulesPassed) {
-			FacesMessages.instance().add("Alcune regole non sono verificate!");
-
-			// throw new FailedRuleException();
-
+			FacesMessages.instance().add(Severity.ERROR,
+					"Alcune regole non sono verificate!");
 			entityManager.clear();
 			return "failed";
 
