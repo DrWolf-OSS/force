@@ -15,7 +15,6 @@ import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
-import it.drwolf.slot.exceptions.FailedRuleException;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.FileContainer;
@@ -291,40 +290,47 @@ public class SlotInstEditBean {
 
 		Set<Long> keySet = datas.keySet();
 		for (Long key : keySet) {
-			DocInstCollection instCollection = null;
-			// controllo se c'è una collection che corrisponde a quell'id (ed è
-			// la destinataria dei files uploadati)
-			boolean found = false;
-			Iterator<DocInstCollection> instCollIterator = docInstCollections
-					.iterator();
-			while (instCollIterator.hasNext() && found == false) {
-				instCollection = instCollIterator.next();
-				if (instCollection.getDocDefCollection().getId().equals(key)) {
-					found = true;
-				}
-			}
-			if (found) {
+			// DocInstCollection instCollection = null;
+			// // controllo se c'è una collection che corrisponde a quell'id (ed
+			// è
+			// // la destinataria dei files uploadati)
+			// boolean found = false;
+			// Iterator<DocInstCollection> instCollIterator = docInstCollections
+			// .iterator();
+			// while (instCollIterator.hasNext() && found == false) {
+			// instCollection = instCollIterator.next();
+			// if (instCollection.getDocDefCollection().getId().equals(key)) {
+			// found = true;
+			// }
+			// }
+			DocInstCollection instCollection = findInstCollection(key);
+			if (instCollection != null) {
 				try {
 					List<FileContainer> containers = datas.get(key);
-					for (FileContainer container : containers) {
-						if (container.getUploadItem() != null) {
-							String storedRef = storeOnAlfresco(
-									container.getUploadItem(), instCollection,
-									container.getEmbeddedProperties(),
-									slotFolder);
-							DocInst docInst = new DocInst(instCollection,
-									storedRef);
-							instCollection.getDocInsts().add(docInst);
-						} else if (container.getDocument() != null) {
-							System.out.println("si deve copiare "
-									+ container.getDocument().getName());
-							String storedRef = copyDocumentOnAlfresco(
-									container.getDocument(), instCollection,
-									container.getEmbeddedProperties(),
-									slotFolder);
-							DocInst docInst = new DocInst(instCollection,
-									storedRef);
-							instCollection.getDocInsts().add(docInst);
+					if (containers != null) {
+						for (FileContainer container : containers) {
+							if (container.getDocument().hasAspect("P:util:tmp")) {
+								// String storedRef = storeOnAlfresco(
+								// container.getUploadItem(), instCollection,
+								// container.getEmbeddedProperties(),
+								// slotFolder);
+								container.getDocument().removeAspect(
+										"P:util:tmp");
+								DocInst docInst = new DocInst(instCollection,
+										container.getDocument().getId());
+								instCollection.getDocInsts().add(docInst);
+							} else {
+								System.out.println("si deve copiare "
+										+ container.getDocument().getName());
+								String storedRef = copyDocumentOnAlfresco(
+										container.getDocument(),
+										instCollection,
+										container.getEmbeddedProperties(),
+										slotFolder);
+								DocInst docInst = new DocInst(instCollection,
+										storedRef);
+								instCollection.getDocInsts().add(docInst);
+							}
 						}
 					}
 				} catch (Exception e) {
@@ -353,6 +359,24 @@ public class SlotInstEditBean {
 		}
 
 		return "saved";
+	}
+
+	private DocInstCollection findInstCollection(Long defCollectionId) {
+		DocInstCollection instCollection = null;
+		// controllo se c'è una collection che corrisponde a quell'id (ed è
+		// la destinataria dei files uploadati)
+		// boolean found = false;
+		Iterator<DocInstCollection> instCollIterator = docInstCollections
+				.iterator();
+		while (instCollIterator.hasNext()) {
+			instCollection = instCollIterator.next();
+			if (instCollection.getDocDefCollection().getId()
+					.equals(defCollectionId)) {
+				// found = true;
+				return instCollection;
+			}
+		}
+		return null;
 	}
 
 	private boolean checkCollectionsSize() {
@@ -395,7 +419,7 @@ public class SlotInstEditBean {
 		return slotFolder;
 	}
 
-	public String update() throws FailedRuleException {
+	public String update() {
 		cleanMessages();
 		SlotInst instance = slotInstHome.getInstance();
 
@@ -414,9 +438,9 @@ public class SlotInstEditBean {
 					"Alcune regole non sono verificate!");
 			entityManager.clear();
 			return "failed";
-
 		}
 
+		entityManager.merge(instance);
 		Set<DocInstCollection> persistedDocInstCollections = instance
 				.getDocInstCollections();
 
@@ -442,6 +466,7 @@ public class SlotInstEditBean {
 				if (itemContained == null) {
 					document.deleteAllVersions();
 					iterator.remove();
+					entityManager.merge(docInst);
 					entityManager.remove(docInst);
 				} else {
 					// il file è quello vecchio ma potrebbe necessitare di
@@ -454,26 +479,25 @@ public class SlotInstEditBean {
 			}
 
 			// Aggiungo elementi nuovi
-			List<FileContainer> filesList = datas.get(instCollection
+			List<FileContainer> containers = datas.get(instCollection
 					.getDocDefCollection().getId());
-			if (filesList != null) {
-				for (FileContainer item : filesList) {
-					if (item.getUploadItem() != null) {
-						// elemento nuovo da upload
-						System.out.println("Doc " + item.getFileName()
-								+ " nuovo da upload");
-						String storedRef = storeOnAlfresco(
-								item.getUploadItem(), instCollection,
-								item.getEmbeddedProperties(), slotFolder);
-						DocInst docInst = new DocInst(instCollection, storedRef);
+			if (containers != null) {
+				for (FileContainer container : containers) {
+					if (container.getDocument().hasAspect("P:util:tmp")) {
+						// String storedRef = storeOnAlfresco(
+						// container.getUploadItem(), instCollection,
+						// container.getEmbeddedProperties(),
+						// slotFolder);
+						container.getDocument().removeAspect("P:util:tmp");
+						DocInst docInst = new DocInst(instCollection, container
+								.getDocument().getId());
 						instCollection.getDocInsts().add(docInst);
 					} else {
-						// elemento nuovo proveniente da primary doc
-						System.out.println("Doc " + item.getFileName()
-								+ " nuovo da primary docs");
+						System.out.println("si deve copiare "
+								+ container.getDocument().getName());
 						String storedRef = copyDocumentOnAlfresco(
-								item.getDocument(), instCollection,
-								item.getEmbeddedProperties(), slotFolder);
+								container.getDocument(), instCollection,
+								container.getEmbeddedProperties(), slotFolder);
 						DocInst docInst = new DocInst(instCollection, storedRef);
 						instCollection.getDocInsts().add(docInst);
 					}
@@ -481,7 +505,7 @@ public class SlotInstEditBean {
 			}
 		}
 
-		entityManager.merge(instance);
+		// entityManager.merge(instance);
 		entityManager.flush();
 
 		FacesMessages.instance().add(
@@ -490,9 +514,6 @@ public class SlotInstEditBean {
 
 		if (this.warning) {
 			warning = false;
-			//
-			// init();
-			//
 			return "warning";
 		}
 
@@ -540,6 +561,19 @@ public class SlotInstEditBean {
 	public void addActiveItemToDatas() {
 		if (!datas.get(this.activeCollectionId).contains(
 				this.activeFileContainer)) {
+			DocInstCollection instCollection = findInstCollection(activeCollectionId);
+			AlfrescoFolder slotFolder = retrieveSlotFolder();
+			String refId = storeOnAlfresco(activeFileContainer.getUploadItem(),
+					instCollection,
+					activeFileContainer.getEmbeddedProperties(), slotFolder);
+			Session session = alfrescoUserIdentity.getSession();
+			AlfrescoDocument document = (AlfrescoDocument) session
+					.getObject(refId);
+			document.addAspect("P:util:tmp");
+
+			// activeFileContainer.setUploadItem(null);
+			activeFileContainer.setDocument(document);
+
 			datas.get(this.activeCollectionId).add(this.activeFileContainer);
 		}
 	}
@@ -569,7 +603,7 @@ public class SlotInstEditBean {
 							+ item.getFile().length()), contentType,
 					new FileInputStream(item.getFile()));
 
-			Set<String> aspects = instCollection.getDocDefCollection()
+			Set<String> aspectIds = instCollection.getDocDefCollection()
 					.getDocDef().getAspectIds();
 
 			Map<String, Object> properties = new HashMap<String, Object>();
@@ -586,7 +620,7 @@ public class SlotInstEditBean {
 					.getObject(objectId);
 
 			// prima si aggiungono gli aspect
-			for (String aspect : aspects) {
+			for (String aspect : aspectIds) {
 				document.addAspect(aspect);
 			}
 

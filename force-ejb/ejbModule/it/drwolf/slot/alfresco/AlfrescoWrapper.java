@@ -109,8 +109,8 @@ public class AlfrescoWrapper {
 
 	public AlfrescoFolder findOrCreateFolder(String path, String folderName) {
 		Session session = this.alfrescoUserIdentity.getSession();
-		AlfrescoFolder father = (AlfrescoFolder) session.getObjectByPath(path);
-		return this.findOrCreateFolder(father, folderName);
+		AlfrescoFolder parent = (AlfrescoFolder) session.getObjectByPath(path);
+		return this.findOrCreateFolder(parent, folderName);
 	}
 
 	public Folder getMainProjectFolder() {
