@@ -125,6 +125,17 @@
         </rich:menuItem>
     </rich:dropDownMenu>
     <!-- @newMenuItem@ -->
+    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('AZIENDE')}">
+        <f:facet name="label">Gestione Bandi</f:facet>
+        <rich:menuItem>
+            <s:link view="/admin/AziendaList.xhtml"
+                value="Da definire"
+                id="tobedefined2"
+                includePageParams="false"
+                propagation="none"/>
+        </rich:menuItem>
+    </rich:dropDownMenu>
+    <!-- @newMenuItem@ -->
     <rich:toolBarGroup location="right">
         <h:outputText id="menuWelcomeId" value="signed in as: #{credentials.username}" rendered="#{identity.loggedIn}"/>
         <s:link id="menuAddId" view="/AddAzienda.xhtml" value="Registrati" rendered="#{not identity.loggedIn}" propagation="none"/>
