@@ -447,6 +447,7 @@ public class SlotInstEditBean {
 		AlfrescoFolder slotFolder = retrieveSlotFolder();
 
 		for (DocInstCollection instCollection : persistedDocInstCollections) {
+			// entityManager.merge(instCollection);
 			Set<DocInst> docInsts = instCollection.getDocInsts();
 			Iterator<DocInst> iterator = docInsts.iterator();
 			while (iterator.hasNext()) {
@@ -466,8 +467,10 @@ public class SlotInstEditBean {
 				if (itemContained == null) {
 					document.deleteAllVersions();
 					iterator.remove();
-					entityManager.merge(docInst);
-					entityManager.remove(docInst);
+					Long id = docInst.getId();
+					DocInst foundDocInst = entityManager
+							.find(DocInst.class, id);
+					entityManager.remove(foundDocInst);
 				} else {
 					// il file è quello vecchio ma potrebbe necessitare di
 					// un aggiornamento delle properties
@@ -505,7 +508,7 @@ public class SlotInstEditBean {
 			}
 		}
 
-		// entityManager.merge(instance);
+		entityManager.merge(instance);
 		entityManager.flush();
 
 		FacesMessages.instance().add(
