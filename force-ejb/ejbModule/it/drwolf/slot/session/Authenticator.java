@@ -149,7 +149,7 @@ public class Authenticator {
 							this.setSlotInstId(slonInst.getId());
 						}
 					} catch (Exception e) {
-						// Non è ancora stato creato uno slotInst
+						// Non √® ancora stato creato uno slotInst
 					}
 					return true;
 				}
