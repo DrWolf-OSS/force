@@ -1,6 +1,7 @@
 package it.drwolf.force.entity;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -57,6 +59,8 @@ public class Azienda implements Serializable {
 	// per Alfresco
 	private String alfrescoGroupId;
 
+	private Set<CategoriaMerceologica> categorieMerceologiche;
+
 	public Azienda() {
 	}
 
@@ -68,6 +72,11 @@ public class Azienda implements Serializable {
 	@NotNull
 	public String getCap() {
 		return this.cap;
+	}
+
+	@ManyToMany
+	public Set<CategoriaMerceologica> getCategorieMerceologiche() {
+		return this.categorieMerceologiche;
 	}
 
 	@Column(nullable = true)
@@ -190,6 +199,11 @@ public class Azienda implements Serializable {
 
 	public void setCap(String cap) {
 		this.cap = cap;
+	}
+
+	public void setCategorieMerceologiche(
+			Set<CategoriaMerceologica> categorieMerceologiche) {
+		this.categorieMerceologiche = categorieMerceologiche;
 	}
 
 	public void setCellulare(String cellulare) {

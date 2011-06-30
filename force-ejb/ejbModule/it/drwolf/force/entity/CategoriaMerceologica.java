@@ -1,12 +1,14 @@
 package it.drwolf.force.entity;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -24,6 +26,13 @@ public class CategoriaMerceologica implements Serializable {
 
 	private String type;
 
+	private Set<Azienda> aziende;
+
+	@ManyToMany(mappedBy = "categorieMerceologiche")
+	public Set<Azienda> getAziende() {
+		return this.aziende;
+	}
+
 	@Column
 	public String getCategoria() {
 		return this.categoria;
@@ -38,6 +47,10 @@ public class CategoriaMerceologica implements Serializable {
 	@Column
 	public String getType() {
 		return this.type;
+	}
+
+	public void setAziende(Set<Azienda> aziende) {
+		this.aziende = aziende;
 	}
 
 	public void setCategoria(String categoria) {
