@@ -135,16 +135,22 @@ public class Authenticator {
 											.getUsername()).getSingleResult();
 					Long slotDefId = azienda.getSettore().getSlotDef().getId();
 					this.setSlotDefId(slotDefId);
-					SlotInst slonInst = (SlotInst) this.entityManager
-							.createQuery(
-									"from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
-							.setParameter("slotDef",
-									azienda.getSettore().getSlotDef())
-							.setParameter("ownerId",
-									azienda.getAlfrescoGroupId())
-							.getSingleResult();
-					this.setSlotInstId(slonInst.getId());
-
+					SlotInst slonInst;
+					try {
+						slonInst = (SlotInst) this.entityManager
+								.createQuery(
+										"from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
+								.setParameter("slotDef",
+										azienda.getSettore().getSlotDef())
+								.setParameter("ownerId",
+										azienda.getAlfrescoGroupId())
+								.getSingleResult();
+						if (slonInst != null) {
+							this.setSlotInstId(slonInst.getId());
+						}
+					} catch (Exception e) {
+						// Non è ancora stato creato uno slotInst
+					}
 					return true;
 				}
 			}
