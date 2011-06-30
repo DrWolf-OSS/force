@@ -35,7 +35,9 @@ public class Azienda implements Serializable {
 	private String cap;
 
 	private String partitaIva;
+	private String codiceFiscale;
 	private String email;
+
 	private String emailCertificata;
 
 	// Referente
@@ -44,11 +46,11 @@ public class Azienda implements Serializable {
 
 	private String emailReferente;
 	private String telefono;
+
 	private String fax;
 	private String cellulare;
 	private FormaGiuridica formaGiuridica;
 	private Settore settore;
-
 	private String posizioneCNA;
 	private String stato;
 
@@ -71,6 +73,11 @@ public class Azienda implements Serializable {
 	@Column(nullable = true)
 	public String getCellulare() {
 		return this.cellulare;
+	}
+
+	@Column
+	public String getCodiceFiscale() {
+		return this.codiceFiscale;
 	}
 
 	@Column(nullable = false)
@@ -187,6 +194,10 @@ public class Azienda implements Serializable {
 
 	public void setCellulare(String cellulare) {
 		this.cellulare = cellulare;
+	}
+
+	public void setCodiceFiscale(String codiceFiscale) {
+		this.codiceFiscale = codiceFiscale;
 	}
 
 	public void setCognome(String cognome) {
