@@ -4,6 +4,13 @@
       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd">
 
    <navigation from-action="#{identity.login}">
+       <rule if="#{identity.hasRole('AZIENDE')}">
+         <redirect view-id="/SlotInstEdit.xhtml">
+            <param name="slotDefId" value="#{authenticator.slotDefId}"/>
+            <param name="slotInstId" value="#{authenticator.slotInstId}"/>
+         </redirect>
+         
+      </rule>
       <rule if="#{identity.loggedIn}">
          <redirect view-id="/home.xhtml"/>
       </rule>

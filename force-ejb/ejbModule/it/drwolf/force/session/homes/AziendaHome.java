@@ -94,6 +94,7 @@ public class AziendaHome extends EntityHome<Azienda> {
 			return "ok";
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			return "KO";
 		}
 	}

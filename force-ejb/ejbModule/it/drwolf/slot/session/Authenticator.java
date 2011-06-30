@@ -1,24 +1,31 @@
 package it.drwolf.slot.session;
 
+import it.drwolf.force.entity.Azienda;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.alfresco.webscripts.model.Authority;
 import it.drwolf.slot.alfresco.webscripts.model.AuthorityType;
+import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.entitymanager.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
+import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.log.Log;
 import org.jboss.seam.security.Credentials;
 import org.jboss.seam.security.Identity;
 
 @Name("authenticator")
+@Scope(ScopeType.SESSION)
 public class Authenticator {
 	@Logger
 	private Log log;
@@ -36,6 +43,13 @@ public class Authenticator {
 
 	@In(create = true)
 	PreferenceManager preferenceManager;
+
+	@In
+	EntityManager entityManager;
+
+	private Long slotDefId;
+
+	private Long slotInstId;
 
 	private void assignGroups() {
 		AlfrescoWebScriptClient alfrescoWebScriptClient = new AlfrescoWebScriptClient(
@@ -111,6 +125,26 @@ public class Authenticator {
 						this.alfrescoUserIdentity.getActiveGroup()
 								.getShortName())) {
 					this.identity.addRole("AZIENDE");
+					// devo prendere l'id dello slotdef associato
+					Azienda azienda = (Azienda) this.entityManager
+							.createQuery(
+									"from Azienda where emailReferente = :username")
+							.setParameter(
+									"username",
+									this.identity.getCredentials()
+											.getUsername()).getSingleResult();
+					Long slotDefId = azienda.getSettore().getSlotDef().getId();
+					this.setSlotDefId(slotDefId);
+					SlotInst slonInst = (SlotInst) this.entityManager
+							.createQuery(
+									"from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
+							.setParameter("slotDef",
+									azienda.getSettore().getSlotDef())
+							.setParameter("ownerId",
+									azienda.getAlfrescoGroupId())
+							.getSingleResult();
+					this.setSlotInstId(slonInst.getId());
+
 					return true;
 				}
 			}
@@ -118,6 +152,22 @@ public class Authenticator {
 		}
 
 		return true;
+	}
+
+	public Long getSlotDefId() {
+		return this.slotDefId;
+	}
+
+	public Long getSlotInstId() {
+		return this.slotInstId;
+	}
+
+	public void setSlotDefId(Long slotDefId) {
+		this.slotDefId = slotDefId;
+	}
+
+	public void setSlotInstId(Long slotInstId) {
+		this.slotInstId = slotInstId;
 	}
 
 }
