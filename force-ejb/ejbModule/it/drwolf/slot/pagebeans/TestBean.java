@@ -134,4 +134,13 @@ public class TestBean {
 						+ identity.getCredentials().getUsername());
 		System.out.println("-->");
 	}
+
+	public void test3() {
+		Session session = alfrescoAdminIdentity.getSession();
+		AlfrescoDocument object = (AlfrescoDocument) session
+				.getObject("workspace://SpacesStore/03917305-2d21-4bc4-af53-ce963bf4de3e");
+		System.out.println(object.getPaths().get(0) + " ... "
+				+ object.getName());
+		System.out.println("---> debug");
+	}
 }

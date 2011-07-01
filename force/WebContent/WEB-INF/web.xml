@@ -45,6 +45,14 @@
     <servlet-name>Seam Resource Servlet</servlet-name>
     <url-pattern>/seam/resource/*</url-pattern>
   </servlet-mapping>
+  <servlet>
+  	<servlet-name>Thumbnail Servlet</servlet-name>
+  	<servlet-class>it.drwolf.slot.servlets.ThumbnailServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>Thumbnail Servlet</servlet-name>
+  	<url-pattern>/tn/*</url-pattern>
+  </servlet-mapping>
   <context-param>
     <param-name>facelets.DEVELOPMENT</param-name>
     <param-value>true</param-value>

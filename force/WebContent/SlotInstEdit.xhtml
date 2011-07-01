@@ -125,7 +125,9 @@
 									<a:repeat id="fileGrid_#{coll.docDefCollection.id}"								
 										value="#{slotInstEditBean.datas[coll.docDefCollection.id]}"
 										var="item">
+										
 										<s:div styleClass="fileItem">
+				
 										<ui:repeat var="message"
 											value="#{slotInstEditBean.filesMessages[item.id]}">
 											<h:graphicImage value="/img/msgerror.png"
@@ -137,9 +139,19 @@
 										</ui:repeat>
 
 										<s:decorate template="/layout/display.xhtml">
+											<rich:toolTip direction="top-left">
+										 		<img src="/force/tn?id=#{item.document.id}&amp;name=doclib"/>
+											</rich:toolTip>
 											<ui:define name="label">
 												<h:outputText value="File Name" />
 											</ui:define>
+											<h:graphicImage value="/img/mimetype/document-pdf.png" rendered="#{item.mimetype.contains('pdf')}"/>
+											<h:graphicImage value="/img/mimetype/document-word.png" rendered="#{item.mimetype.contains('word')}"/>
+											<h:graphicImage value="/img/mimetype/document-powerpoint.png" rendered="#{item.mimetype.contains('powerpoint')}"/>
+											<h:graphicImage value="/img/mimetype/document-excel.png" rendered="#{item.mimetype.contains('excel')}"/>
+											<h:graphicImage value="/img/mimetype/document-image.png" rendered="#{item.mimetype.contains('image')}"/>
+											<h:graphicImage value="/img/mimetype/document-text.png" rendered="#{item.mimetype.contains('text') or item.mimetype.contains('rtf')}"/>
+											<h:graphicImage value="/img/mimetype/document.png" rendered="#{item.mimetype.contains('octed')}" />
 											<h:outputText value="#{item.fileName}" />
 										</s:decorate>
 

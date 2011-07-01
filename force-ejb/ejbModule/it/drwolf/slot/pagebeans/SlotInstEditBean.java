@@ -32,7 +32,6 @@ import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.persistence.EntityManager;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
@@ -306,33 +304,36 @@ public class SlotInstEditBean {
 			DocInstCollection instCollection = findInstCollection(key);
 			if (instCollection != null) {
 				try {
-					List<FileContainer> containers = datas.get(key);
-					if (containers != null) {
-						for (FileContainer container : containers) {
-							if (container.getDocument().hasAspect("P:util:tmp")) {
-								// String storedRef = storeOnAlfresco(
-								// container.getUploadItem(), instCollection,
-								// container.getEmbeddedProperties(),
-								// slotFolder);
-								container.getDocument().removeAspect(
-										"P:util:tmp");
-								DocInst docInst = new DocInst(instCollection,
-										container.getDocument().getId());
-								instCollection.getDocInsts().add(docInst);
-							} else {
-								System.out.println("si deve copiare "
-										+ container.getDocument().getName());
-								String storedRef = copyDocumentOnAlfresco(
-										container.getDocument(),
-										instCollection,
-										container.getEmbeddedProperties(),
-										slotFolder);
-								DocInst docInst = new DocInst(instCollection,
-										storedRef);
-								instCollection.getDocInsts().add(docInst);
-							}
-						}
-					}
+
+					addCollectionsNewDocumentsToSlot(slotFolder, instCollection);
+
+					// List<FileContainer> containers = datas.get(key);
+					// if (containers != null) {
+					// for (FileContainer container : containers) {
+					// if (container.getDocument().hasAspect("P:util:tmp")) {
+					// // String storedRef = storeOnAlfresco(
+					// // container.getUploadItem(), instCollection,
+					// // container.getEmbeddedProperties(),
+					// // slotFolder);
+					// container.getDocument().removeAspect(
+					// "P:util:tmp");
+					// DocInst docInst = new DocInst(instCollection,
+					// container.getDocument().getId());
+					// instCollection.getDocInsts().add(docInst);
+					// } else {
+					// System.out.println("si deve copiare "
+					// + container.getDocument().getName());
+					// String storedRef = copyDocumentOnAlfresco(
+					// container.getDocument(),
+					// instCollection,
+					// container.getEmbeddedProperties(),
+					// slotFolder);
+					// DocInst docInst = new DocInst(instCollection,
+					// storedRef);
+					// instCollection.getDocInsts().add(docInst);
+					// }
+					// }
+					// }
 				} catch (Exception e) {
 					FacesMessages.instance().add(
 							"Errors in Alfresco storage process");
@@ -481,31 +482,7 @@ public class SlotInstEditBean {
 				}
 			}
 
-			// Aggiungo elementi nuovi
-			List<FileContainer> containers = datas.get(instCollection
-					.getDocDefCollection().getId());
-			if (containers != null) {
-				for (FileContainer container : containers) {
-					if (container.getDocument().hasAspect("P:util:tmp")) {
-						// String storedRef = storeOnAlfresco(
-						// container.getUploadItem(), instCollection,
-						// container.getEmbeddedProperties(),
-						// slotFolder);
-						container.getDocument().removeAspect("P:util:tmp");
-						DocInst docInst = new DocInst(instCollection, container
-								.getDocument().getId());
-						instCollection.getDocInsts().add(docInst);
-					} else {
-						System.out.println("si deve copiare "
-								+ container.getDocument().getName());
-						String storedRef = copyDocumentOnAlfresco(
-								container.getDocument(), instCollection,
-								container.getEmbeddedProperties(), slotFolder);
-						DocInst docInst = new DocInst(instCollection, storedRef);
-						instCollection.getDocInsts().add(docInst);
-					}
-				}
-			}
+			addCollectionsNewDocumentsToSlot(slotFolder, instCollection);
 		}
 
 		entityManager.merge(instance);
@@ -521,6 +498,35 @@ public class SlotInstEditBean {
 		}
 
 		return "updated";
+	}
+
+	private void addCollectionsNewDocumentsToSlot(AlfrescoFolder slotFolder,
+			DocInstCollection instCollection) {
+		// Aggiungo elementi nuovi
+		List<FileContainer> containers = datas.get(instCollection
+				.getDocDefCollection().getId());
+		if (containers != null) {
+			for (FileContainer container : containers) {
+				if (container.getDocument().hasAspect("P:util:tmp")) {
+					// String storedRef = storeOnAlfresco(
+					// container.getUploadItem(), instCollection,
+					// container.getEmbeddedProperties(),
+					// slotFolder);
+					container.getDocument().removeAspect("P:util:tmp");
+					DocInst docInst = new DocInst(instCollection, container
+							.getDocument().getId());
+					instCollection.getDocInsts().add(docInst);
+				} else {
+					System.out.println("si deve copiare "
+							+ container.getDocument().getName());
+					String storedRef = copyDocumentOnAlfresco(
+							container.getDocument(), instCollection,
+							container.getEmbeddedProperties(), slotFolder);
+					DocInst docInst = new DocInst(instCollection, storedRef);
+					instCollection.getDocInsts().add(docInst);
+				}
+			}
+		}
 	}
 
 	// quando trovo l'element lo tolgo così lascio solo quelli del tutto nuovi
@@ -564,20 +570,31 @@ public class SlotInstEditBean {
 	public void addActiveItemToDatas() {
 		if (!datas.get(this.activeCollectionId).contains(
 				this.activeFileContainer)) {
-			DocInstCollection instCollection = findInstCollection(activeCollectionId);
-			AlfrescoFolder slotFolder = retrieveSlotFolder();
-			String refId = storeOnAlfresco(activeFileContainer.getUploadItem(),
-					instCollection,
-					activeFileContainer.getEmbeddedProperties(), slotFolder);
-			Session session = alfrescoUserIdentity.getSession();
-			AlfrescoDocument document = (AlfrescoDocument) session
-					.getObject(refId);
-			document.addAspect("P:util:tmp");
+			try {
+				DocInstCollection instCollection = findInstCollection(activeCollectionId);
+				AlfrescoFolder slotFolder = retrieveSlotFolder();
+				String refId;
+				refId = storeOnAlfresco(activeFileContainer.getUploadItem(),
+						instCollection,
+						activeFileContainer.getEmbeddedProperties(), slotFolder);
+				Session session = alfrescoUserIdentity.getSession();
+				AlfrescoDocument document = (AlfrescoDocument) session
+						.getObject(refId);
+				document.addAspect("P:util:tmp");
 
-			// activeFileContainer.setUploadItem(null);
-			activeFileContainer.setDocument(document);
+				// activeFileContainer.setUploadItem(null);
+				activeFileContainer.setDocument(document);
 
-			datas.get(this.activeCollectionId).add(this.activeFileContainer);
+				datas.get(this.activeCollectionId)
+						.add(this.activeFileContainer);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				FacesMessages
+						.instance()
+						.add(Severity.ERROR,
+								"Errore interno del sistema di salvataggio dei documenti!");
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -594,53 +611,64 @@ public class SlotInstEditBean {
 
 	private String storeOnAlfresco(UploadItem item,
 			DocInstCollection instCollection,
-			List<DocumentPropertyInst> embeddedProperties, Folder slotFolder) {
+			List<DocumentPropertyInst> embeddedProperties, Folder slotFolder)
+			throws Exception {
 		String nodeRef = "";
-		try {
-			Session session = alfrescoUserIdentity.getSession();
-			// AlfrescoFolder slotFolder = findOrCreateSlotFolder(session);
-			String contentType = new MimetypesFileTypeMap().getContentType(item
-					.getFileName());
-			ContentStreamImpl contentStreamImpl = new ContentStreamImpl(
-					item.getFileName(), new BigInteger(""
-							+ item.getFile().length()), contentType,
-					new FileInputStream(item.getFile()));
+		Session session = alfrescoUserIdentity.getSession();
 
-			Set<String> aspectIds = instCollection.getDocDefCollection()
-					.getDocDef().getAspectIds();
+		String fileName = item.getFileName();
+		// int dotIndex = fileName.lastIndexOf(".");
+		// String extension = fileName.substring(dotIndex + 1);
+		// String mimetype = Resolver.mimetypeForExtension(extension);
+		// if (mimetype == null)
+		// mimetype = "application/octet-stream";
+		// System.out.println("---> \"" + fileName + " MIME Type of \" : "
+		// + mimetype);
 
-			Map<String, Object> properties = new HashMap<String, Object>();
-			properties.put(PropertyIds.NAME,
-					this.encodeFilename(item.getFileName()));
-			properties.put(PropertyIds.OBJECT_TYPE_ID,
-					BaseTypeId.CMIS_DOCUMENT.value());
+		// Metto un mimetype generico, ci pensa Alfresco a mettere il mimetype
+		// giusto tramite l'esecuzione di uno script
+		String mimetype = "application/octet-stream";
 
-			ObjectId objectId = session.createDocument(properties, slotFolder,
-					contentStreamImpl, VersioningState.NONE, null, null, null);
-			System.out.println(objectId);
+		// String contentType = new
+		// MimetypesFileTypeMap().getContentType(fileName);
+		ContentStreamImpl contentStreamImpl = new ContentStreamImpl(fileName,
+				new BigInteger("" + item.getFile().length()), mimetype,
+				new FileInputStream(item.getFile()));
 
-			AlfrescoDocument document = (AlfrescoDocument) session
-					.getObject(objectId);
+		Set<String> aspectIds = instCollection.getDocDefCollection()
+				.getDocDef().getAspectIds();
 
-			// prima si aggiungono gli aspect
-			for (String aspect : aspectIds) {
-				document.addAspect(aspect);
-			}
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put(PropertyIds.NAME, this.encodeFilename(fileName));
+		properties.put(PropertyIds.OBJECT_TYPE_ID,
+				BaseTypeId.CMIS_DOCUMENT.value());
 
-			// poi si aggiungono i valori delle relative properties
-			updateProperties(document, embeddedProperties);
-			nodeRef = objectId.getId();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		ObjectId objectId = session.createDocument(properties, slotFolder,
+				contentStreamImpl, VersioningState.NONE, null, null, null);
+		System.out.println(objectId);
+
+		AlfrescoDocument document = (AlfrescoDocument) session
+				.getObject(objectId);
+
+		// prima si aggiungono gli aspect
+		for (String aspect : aspectIds) {
+			document.addAspect(aspect);
 		}
+
+		// poi si aggiungono i valori delle relative properties
+		updateProperties(document, embeddedProperties);
+		nodeRef = objectId.getId();
 		return nodeRef;
 	}
 
 	private String encodeFilename(String origin) {
 		int dotIndex = origin.lastIndexOf(".");
-		String name = origin.substring(0, dotIndex);
-		String extension = origin.substring(dotIndex);
+		String name = origin;
+		String extension = "";
+		if (dotIndex > 0) {
+			name = origin.substring(0, dotIndex);
+			extension = origin.substring(dotIndex);
+		}
 		String newName = name + "_" + System.currentTimeMillis() + extension;
 		return newName;
 	}

@@ -139,7 +139,7 @@ public class AlfrescoWrapper {
 	public Object getThumbnail(String id, String name) {
 		if ((id == null) || (id.length() > 20)) {
 			try {
-				Session session = this.alfrescoUserIdentity.getSession();
+				Session session = this.alfrescoAdminIdentity.getSession();
 				OperationContext context = session.createOperationContext();
 
 				context.setRenditionFilterString("*");
@@ -147,15 +147,15 @@ public class AlfrescoWrapper {
 				Document doc = (Document) session.getObject(
 						AlfrescoWrapper.ref2id(id), context);
 
-				if (doc.getContentStream().getMimeType().contains("image")) {
+				// if (doc.getContentStream().getMimeType().contains("image")) {
 
-					for (Rendition r : doc.getRenditions()) {
-						if (name.equals(r.getTitle())) {
-							return IOUtils.toByteArray(r.getContentStream()
-									.getStream());
-						}
+				for (Rendition r : doc.getRenditions()) {
+					if (name.equals(r.getTitle())) {
+						return IOUtils.toByteArray(r.getContentStream()
+								.getStream());
 					}
 				}
+				// }
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
