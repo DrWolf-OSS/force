@@ -3,9 +3,6 @@ package it.drwolf.slot.session;
 import it.drwolf.force.session.UserSession;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
-import it.drwolf.slot.entitymanager.PreferenceManager;
-
-import javax.persistence.EntityManager;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
@@ -32,12 +29,6 @@ public class Authenticator {
 
 	@In(create = true)
 	AlfrescoInfo alfrescoInfo;
-
-	@In(create = true)
-	PreferenceManager preferenceManager;
-
-	@In
-	EntityManager entityManager;
 
 	@In
 	private UserSession userSession;

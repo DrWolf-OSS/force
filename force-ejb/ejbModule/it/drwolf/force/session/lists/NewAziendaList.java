@@ -11,6 +11,11 @@ import org.jboss.seam.framework.EntityQuery;
 @Name("newAziendaList")
 public class NewAziendaList extends EntityQuery<Azienda> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private static final String EJBQL = "select azienda from Azienda azienda";
 
 	private static final String[] RESTRICTIONS = {
