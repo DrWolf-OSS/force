@@ -5,7 +5,7 @@
       
       <action execute="#{userSession.getPrimarySlotDef()}"/>
 
-   <navigation from-action="#{authenticator.getPrimarySlotDef()}">
+   <navigation from-action="#{userSession.getPrimarySlotDef()}">
        <rule if="#{identity.hasRole('AZIENDE')}">
          <redirect view-id="/SlotInstEdit.xhtml">
             <param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
