@@ -64,6 +64,28 @@ public class Azienda implements Serializable {
 	public Azienda() {
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		Azienda other = (Azienda) obj;
+		if (this.id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!this.id.equals(other.id)) {
+			return false;
+		}
+		return true;
+	}
+
 	public String getAlfrescoGroupId() {
 		return this.alfrescoGroupId;
 	}
@@ -193,6 +215,14 @@ public class Azienda implements Serializable {
 		return this.telefono;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 89;
+		int result = 1;
+		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
+		return result;
+	}
+
 	public void setAlfrescoGroupId(String alfrescoGroupId) {
 		this.alfrescoGroupId = alfrescoGroupId;
 	}
@@ -285,4 +315,5 @@ public class Azienda implements Serializable {
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
+
 }

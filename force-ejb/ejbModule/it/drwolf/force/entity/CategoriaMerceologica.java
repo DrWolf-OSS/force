@@ -28,6 +28,28 @@ public class CategoriaMerceologica implements Serializable {
 
 	private Set<Azienda> aziende;
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		CategoriaMerceologica other = (CategoriaMerceologica) obj;
+		if (this.id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!this.id.equals(other.id)) {
+			return false;
+		}
+		return true;
+	}
+
 	@ManyToMany(mappedBy = "categorieMerceologiche")
 	public Set<Azienda> getAziende() {
 		return this.aziende;
@@ -47,6 +69,14 @@ public class CategoriaMerceologica implements Serializable {
 	@Column
 	public String getType() {
 		return this.type;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 113;
+		int result = 1;
+		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
+		return result;
 	}
 
 	public void setAziende(Set<Azienda> aziende) {
