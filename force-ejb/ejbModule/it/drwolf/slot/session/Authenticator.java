@@ -1,6 +1,7 @@
 package it.drwolf.slot.session;
 
 import it.drwolf.force.entity.Azienda;
+import it.drwolf.force.session.UserSession;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
@@ -46,6 +47,9 @@ public class Authenticator {
 
 	@In
 	EntityManager entityManager;
+
+	@In
+	private UserSession userSession;
 
 	private Long slotDefId;
 
@@ -103,61 +107,64 @@ public class Authenticator {
 			return false;
 		}
 
-		this.alfrescoUserIdentity.authenticate(this.identity.getCredentials()
-				.getUsername(), this.identity.getCredentials().getPassword(),
-				this.alfrescoInfo.getRepositoryUri());
-
-		this.assignGroups();
-
-		if (this.alfrescoUserIdentity.isMemberOf(this.preferenceManager
-				.getPreference("FORCE_ADMIN").getStringValue())) {
-			this.identity.addRole("ADMIN");
-		} else {
-			AlfrescoWebScriptClient awsc = new AlfrescoWebScriptClient(
-					this.alfrescoInfo.getAdminUser(),
-					this.alfrescoInfo.getAdminPwd(),
-					this.alfrescoInfo.getRepositoryUri());
-			List<Authority> lista = awsc.getListOfChildAuthorities(
-					this.preferenceManager.getPreference("FORCE_USER_GROUP")
-							.getStringValue(), "GROUP");
-			for (Authority authority : lista) {
-				if (authority.getShortName().equals(
-						this.alfrescoUserIdentity.getActiveGroup()
-								.getShortName())) {
-					this.identity.addRole("AZIENDE");
-					// devo prendere l'id dello slotdef associato
-					Azienda azienda = (Azienda) this.entityManager
-							.createQuery(
-									"from Azienda where emailReferente = :username")
-							.setParameter(
-									"username",
-									this.identity.getCredentials()
-											.getUsername()).getSingleResult();
-					Long slotDefId = azienda.getSettore().getSlotDef().getId();
-					this.setSlotDefId(slotDefId);
-					SlotInst slonInst;
-					try {
-						slonInst = (SlotInst) this.entityManager
+		if (this.alfrescoUserIdentity.authenticate(this.identity
+				.getCredentials().getUsername(), this.identity.getCredentials()
+				.getPassword(), this.alfrescoInfo.getRepositoryUri())) {
+			this.assignGroups();
+			if (this.alfrescoUserIdentity.isMemberOf(this.preferenceManager
+					.getPreference("FORCE_ADMIN").getStringValue())) {
+				this.identity.addRole("ADMIN");
+			} else {
+				AlfrescoWebScriptClient awsc = new AlfrescoWebScriptClient(
+						this.alfrescoInfo.getAdminUser(),
+						this.alfrescoInfo.getAdminPwd(),
+						this.alfrescoInfo.getRepositoryUri());
+				List<Authority> lista = awsc.getListOfChildAuthorities(
+						this.preferenceManager
+								.getPreference("FORCE_USER_GROUP")
+								.getStringValue(), "GROUP");
+				for (Authority authority : lista) {
+					if (authority.getShortName().equals(
+							this.alfrescoUserIdentity.getActiveGroup()
+									.getShortName())) {
+						this.identity.addRole("AZIENDE");
+						// devo prendere l'id dello slotdef associato
+						Azienda azienda = (Azienda) this.entityManager
 								.createQuery(
-										"from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
-								.setParameter("slotDef",
-										azienda.getSettore().getSlotDef())
-								.setParameter("ownerId",
-										azienda.getAlfrescoGroupId())
+										"from Azienda where emailReferente = :username")
+								.setParameter(
+										"username",
+										this.identity.getCredentials()
+												.getUsername())
 								.getSingleResult();
-						if (slonInst != null) {
-							this.setSlotInstId(slonInst.getId());
+						Long slotDefId = azienda.getSettore().getSlotDef()
+								.getId();
+						this.setSlotDefId(slotDefId);
+						SlotInst slonInst;
+						try {
+							slonInst = (SlotInst) this.entityManager
+									.createQuery(
+											"from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
+									.setParameter("slotDef",
+											azienda.getSettore().getSlotDef())
+									.setParameter("ownerId",
+											azienda.getAlfrescoGroupId())
+									.getSingleResult();
+							if (slonInst != null) {
+								this.setSlotInstId(slonInst.getId());
+							}
+						} catch (Exception e) {
+							// Non è ancora stato creato uno slotInst
 						}
-					} catch (Exception e) {
-						// Non è ancora stato creato uno slotInst
+						return true;
 					}
-					return true;
+
 				}
+
 			}
 
 		}
-
-		return true;
+		return false;
 	}
 
 	public Long getSlotDefId() {
