@@ -6,8 +6,8 @@
    <navigation from-action="#{identity.login}">
        <rule if="#{identity.hasRole('AZIENDE')}">
          <redirect view-id="/SlotInstEdit.xhtml">
-            <param name="slotDefId" value="#{authenticator.slotDefId}"/>
-            <param name="slotInstId" value="#{authenticator.slotInstId}"/>
+            <param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
+            <param name="slotInstId" value="#{userSession.primarySlotInst.id}"/>
          </redirect>
          
       </rule>

@@ -3,13 +3,13 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd">
       
-      <action execute="#{authenticator.getSlotDefId()}"/>
+      <action execute="#{userSession.getPrimarySlotDef()}"/>
 
-   <navigation from-action="#{authenticator.getSlotDefId()}">
+   <navigation from-action="#{authenticator.getPrimarySlotDef()}">
        <rule if="#{identity.hasRole('AZIENDE')}">
          <redirect view-id="/SlotInstEdit.xhtml">
-            <param name="slotDefId" value="#{authenticator.slotDefId}"/>
-            <param name="slotInstId" value="#{authenticator.slotInstId}"/>
+            <param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
+            <param name="slotInstId" value="#{userSession.primarySlotInst.id}"/>
          </redirect>
          
       </rule>
