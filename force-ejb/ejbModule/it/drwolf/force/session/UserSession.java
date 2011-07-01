@@ -53,6 +53,8 @@ public class UserSession implements Serializable {
 
 	private SlotInst primarySlotInst;
 
+	private Azienda azienda;
+
 	private void assignGroups() {
 		AlfrescoWebScriptClient alfrescoWebScriptClient = new AlfrescoWebScriptClient(
 				this.identity.getCredentials().getUsername(), this.identity
@@ -85,6 +87,10 @@ public class UserSession implements Serializable {
 				+ " entered as \""
 				+ this.alfrescoUserIdentity.getActiveGroup().getShortName()
 				+ "\" member");
+	}
+
+	public Azienda getAzienda() {
+		return this.azienda;
 	}
 
 	public SlotDef getPrimarySlotDef() {
@@ -122,6 +128,7 @@ public class UserSession implements Serializable {
 									this.identity.getCredentials()
 											.getUsername()).getSingleResult();
 					this.setPrimarySlotDef(azienda.getSettore().getSlotDef());
+					this.setAzienda(azienda);
 					SlotInst slonInst;
 					try {
 						slonInst = (SlotInst) this.entityManager
@@ -145,6 +152,10 @@ public class UserSession implements Serializable {
 
 		}
 
+	}
+
+	public void setAzienda(Azienda azienda) {
+		this.azienda = azienda;
 	}
 
 	public void setPrimarySlotDef(SlotDef primarySlotDef) {
