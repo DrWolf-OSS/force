@@ -66,7 +66,7 @@ public class AziendaHome extends EntityHome<Azienda> {
 			args.put("firstName", azienda.getNome());
 			args.put("lastName", azienda.getCognome());
 			args.put("email", azienda.getEmailReferente());
-			// forse dovrei settare la password dato che di default è a
+			// forse dovrei settare la password dato che di default ÔøΩ a
 			// "password"?
 			// args.put("password", "");
 			awsc.addPerson(args);
@@ -80,7 +80,7 @@ public class AziendaHome extends EntityHome<Azienda> {
 			this.alfrescoWrapper.applyACL(alfrescoGroupFolder, "GROUP_"
 					+ groupName);
 
-			// se l'azienda è amministrata gli utenti del gruppo "CNA" devono i
+			// se l'azienda ÔøΩ amministrata gli utenti del gruppo "CNA" devono i
 			// permessi sulla cartella
 			if (azienda.getPosizioneCNA() == PosizioneCNA.AMMINISTRATA
 					.toString()) {
@@ -117,22 +117,11 @@ public class AziendaHome extends EntityHome<Azienda> {
 		return Arrays.asList(PosizioneCNA.values());
 	}
 
-	public boolean isWired() {
-		return true;
-	}
-
-	public void load() {
-		if (this.isIdDefined()) {
-			this.wire();
-		}
-	}
-
-	@Override
-	public String persist() {
+	public String inserisciAzienda() {
 		try {
 			this.getInstance().setStato(StatoAzienda.NUOVA.toString());
 			// persisto l'entity azienda
-			super.persist();
+			this.persist();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -141,6 +130,17 @@ public class AziendaHome extends EntityHome<Azienda> {
 		}
 
 		return "OK";
+
+	}
+
+	public boolean isWired() {
+		return true;
+	}
+
+	public void load() {
+		if (this.isIdDefined()) {
+			this.wire();
+		}
 	}
 
 	public void setAziendaId(Integer id) {

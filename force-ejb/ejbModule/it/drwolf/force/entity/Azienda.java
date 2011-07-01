@@ -1,6 +1,9 @@
 package it.drwolf.force.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -13,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.validator.NotNull;
@@ -99,6 +103,13 @@ public class Azienda implements Serializable {
 	@ManyToMany
 	public Set<CategoriaMerceologica> getCategorieMerceologiche() {
 		return this.categorieMerceologiche;
+	}
+
+	@Transient
+	public List<CategoriaMerceologica> getCategorieMerceologicheAsList() {
+		return new ArrayList<CategoriaMerceologica>(
+				this.getCategorieMerceologiche());
+
 	}
 
 	@Column(nullable = true)
@@ -234,6 +245,12 @@ public class Azienda implements Serializable {
 	public void setCategorieMerceologiche(
 			Set<CategoriaMerceologica> categorieMerceologiche) {
 		this.categorieMerceologiche = categorieMerceologiche;
+	}
+
+	@Transient
+	public void setCategorieMerceologicheAsList(
+			List<CategoriaMerceologica> lista) {
+		this.setCategorieMerceologiche(new HashSet<CategoriaMerceologica>(lista));
 	}
 
 	public void setCellulare(String cellulare) {
