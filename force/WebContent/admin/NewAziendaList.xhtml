@@ -267,21 +267,12 @@
                 <ui:include src="/layout/sort.xhtml">
                     <ui:param name="entityList" value="#{newAziendaList}"/>
                     <ui:param name="propertyLabel" value="Settore id"/>
-                    <ui:param name="propertyPath" value="azienda.settore.id"/>
+                    <ui:param name="propertyPath" value="azienda.settore.nome"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_azienda.settore.id}"/>
+            <h:outputText value="#{_azienda.settore.nome}"/>
         </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{newAziendaList}"/>
-                    <ui:param name="propertyLabel" value="Stato"/>
-                    <ui:param name="propertyPath" value="azienda.stato"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.stato}"/>
-        </h:column>
+        
         <h:column>
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">
