@@ -65,6 +65,8 @@ public class Azienda implements Serializable {
 
 	private Set<CategoriaMerceologica> categorieMerceologiche;
 
+	private Set<SOA> SOA;
+
 	public Azienda() {
 	}
 
@@ -215,6 +217,17 @@ public class Azienda implements Serializable {
 		return this.settore;
 	}
 
+	@ManyToMany
+	public Set<SOA> getSOA() {
+		return this.SOA;
+	}
+
+	@Transient
+	public List<SOA> getSOAAsList() {
+		return new ArrayList<SOA>(this.getSOA());
+
+	}
+
 	@Column(nullable = false)
 	@NotNull
 	public String getStato() {
@@ -323,6 +336,15 @@ public class Azienda implements Serializable {
 
 	public void setSettore(Settore settore) {
 		this.settore = settore;
+	}
+
+	public void setSOA(Set<SOA> categoriaOpereGenerali) {
+		this.SOA = categoriaOpereGenerali;
+	}
+
+	@Transient
+	public void setSOAAsList(List<SOA> lista) {
+		this.setSOA(new HashSet<SOA>(lista));
 	}
 
 	public void setStato(String stato) {

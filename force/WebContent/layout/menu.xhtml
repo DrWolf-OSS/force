@@ -136,6 +136,15 @@
                 <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
            </s:link>
         </rich:menuItem>
+        <rich:menuItem rendered="#{userSession.llpp}">
+            <s:link view="/user/SOAEdit.xhtml"
+                value="Gestisci SOA"
+                id="SOA"
+                includePageParams="false"
+                propagation="none">
+                <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+           </s:link>
+        </rich:menuItem>
         <rich:menuItem>
             <s:link view="/admin/AziendaList.xhtml"
                 value="Archivio Lavori Svolti"

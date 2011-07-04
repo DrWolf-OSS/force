@@ -55,6 +55,8 @@ public class UserSession implements Serializable {
 
 	private Integer aziendaId;
 
+	private boolean llpp = false;
+
 	private void assignGroups() {
 		AlfrescoWebScriptClient alfrescoWebScriptClient = new AlfrescoWebScriptClient(
 				this.identity.getCredentials().getUsername(), this.identity
@@ -129,6 +131,9 @@ public class UserSession implements Serializable {
 											.getUsername()).getSingleResult();
 					this.setPrimarySlotDef(azienda.getSettore().getSlotDef());
 					this.setAziendaId(azienda.getId());
+					if (azienda.getSettore().getNome().equals("Edilizia")) {
+						this.setLlpp(true);
+					}
 					SlotInst slonInst;
 					try {
 						slonInst = (SlotInst) this.entityManager
@@ -154,8 +159,16 @@ public class UserSession implements Serializable {
 
 	}
 
+	public boolean isLlpp() {
+		return this.llpp;
+	}
+
 	public void setAziendaId(Integer aziendaId) {
 		this.aziendaId = aziendaId;
+	}
+
+	public void setLlpp(boolean llpp) {
+		this.llpp = llpp;
 	}
 
 	public void setPrimarySlotDef(SlotDef primarySlotDef) {
