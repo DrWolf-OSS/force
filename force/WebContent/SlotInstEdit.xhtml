@@ -96,7 +96,8 @@
 													id="addPrimaryDoc_#{coll.docDefCollection.id}"
 													action="#{slotInstEditBean.addDocFromPrimary(coll.docDefCollection.id,item)}"
 													reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}"
-													disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}" />
+													disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}" 
+													styleClass="primaryArrows"/>
 											</a:region>
 										</rich:dataGrid>
 
@@ -125,7 +126,9 @@
 									<a:repeat id="fileGrid_#{coll.docDefCollection.id}"								
 										value="#{slotInstEditBean.datas[coll.docDefCollection.id]}"
 										var="item">
+										
 										<s:div styleClass="fileItem">
+				
 										<ui:repeat var="message"
 											value="#{slotInstEditBean.filesMessages[item.id]}">
 											<h:graphicImage value="/img/msgerror.png"
@@ -137,9 +140,24 @@
 										</ui:repeat>
 
 										<s:decorate template="/layout/display.xhtml">
+											<rich:toolTip direction="top-left">
+										 		<img src="/force/tn?id=#{item.document.id}&amp;name=imgpreview"/>
+											</rich:toolTip>
 											<ui:define name="label">
 												<h:outputText value="File Name" />
 											</ui:define>
+											<h:graphicImage value="/img/mimetype/document-pdf.png" rendered="#{item.mimetype.contains('pdf')}" styleClass="fileIcon"/>
+											<h:graphicImage value="/img/mimetype/document-word.png" rendered="#{item.mimetype.contains('word')}" styleClass="fileIcon"/>
+											<h:graphicImage value="/img/mimetype/document-powerpoint.png" rendered="#{item.mimetype.contains('powerpoint')}" styleClass="fileIcon"/>
+											<h:graphicImage value="/img/mimetype/document-excel.png" rendered="#{item.mimetype.contains('excel')}" styleClass="fileIcon"/>
+											<h:graphicImage value="/img/mimetype/document-image.png" rendered="#{item.mimetype.contains('image')}" styleClass="fileIcon"/>
+											<h:graphicImage value="/img/mimetype/document-text.png" rendered="#{item.mimetype.contains('text') or item.mimetype.contains('rtf')}"
+															styleClass="fileIcon"/>
+											<h:graphicImage value="/img/mimetype/document.png" 
+															rendered="#{not item.mimetype.contains('pdf') and not item.mimetype.contains('word') and not item.mimetype.contains('powerpoint')
+																		and not item.mimetype.contains('excel') and not item.mimetype.contains('image') 
+																		and not item.mimetype.contains('text') and not item.mimetype.contains('rtf')}" 
+															styleClass="fileIcon"/>
 											<h:outputText value="#{item.fileName}" />
 										</s:decorate>
 

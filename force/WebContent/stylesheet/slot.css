@@ -8,3 +8,11 @@
 	border-width: thin;
 	border-style: solid;
 }
+
+.fileIcon{
+	vertical-align: text-bottom;
+	padding-right: 2px;
+}
+
+.primaryArrows{
+}

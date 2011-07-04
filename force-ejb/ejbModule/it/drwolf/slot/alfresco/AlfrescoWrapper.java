@@ -108,8 +108,8 @@ public class AlfrescoWrapper {
 
 	public AlfrescoFolder findOrCreateFolder(String path, String folderName) {
 		Session session = this.alfrescoUserIdentity.getSession();
-		AlfrescoFolder father = (AlfrescoFolder) session.getObjectByPath(path);
-		return this.findOrCreateFolder(father, folderName);
+		AlfrescoFolder parent = (AlfrescoFolder) session.getObjectByPath(path);
+		return this.findOrCreateFolder(parent, folderName);
 	}
 
 	public Folder getMainProjectFolder() {
@@ -138,7 +138,7 @@ public class AlfrescoWrapper {
 	public Object getThumbnail(String id, String name) {
 		if ((id == null) || (id.length() > 20)) {
 			try {
-				Session session = this.alfrescoUserIdentity.getSession();
+				Session session = this.alfrescoAdminIdentity.getSession();
 				OperationContext context = session.createOperationContext();
 
 				context.setRenditionFilterString("*");
@@ -146,20 +146,19 @@ public class AlfrescoWrapper {
 				Document doc = (Document) session.getObject(
 						AlfrescoWrapper.ref2id(id), context);
 
-				if (doc.getContentStream().getMimeType().contains("image")) {
-
-					for (Rendition r : doc.getRenditions()) {
-						if (name.equals(r.getTitle())) {
-							return IOUtils.toByteArray(r.getContentStream()
-									.getStream());
-						}
+				for (Rendition r : doc.getRenditions()) {
+					if (name.equals(r.getTitle())) {
+						return IOUtils.toByteArray(r.getContentStream()
+								.getStream());
 					}
 				}
+				return IOUtils.toByteArray(AlfrescoWrapper.class
+						.getResourceAsStream("notavailable.gif"));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		return AlfrescoWrapper.class.getResourceAsStream("image-missing.png");
+		return null;
 	}
 
 	public AlfrescoFolder retrieveGroupFolder(String path, String shortName) {

@@ -1,6 +1,7 @@
 package it.drwolf.slot.pagebeans.support;
 
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
+import it.drwolf.utils.mimetypes.Resolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,20 @@ public class FileContainer {
 			fileName = name;
 		}
 		return fileName.concat(extension);
+	}
+
+	public String getExtension() {
+		String fileName = this.getFileName();
+		int dotIndex = fileName.lastIndexOf(".");
+		return fileName.substring(dotIndex + 1);
+	}
+
+	public String getMimetype() {
+		try {
+			return this.document.getContentStreamMimeType();
+		} catch (Exception e) {
+			return Resolver.mimetypeForExtension(this.getExtension());
+		}
 	}
 
 	public List<DocumentPropertyInst> getEmbeddedProperties() {

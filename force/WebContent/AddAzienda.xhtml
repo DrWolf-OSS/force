@@ -46,8 +46,8 @@
                 <ui:define name="label">Posizione in CNA</ui:define>
                 <h:selectOneMenu required="true" value="#{aziendaHome.instance.posizioneCNA}"
                                  defaultLabel="seleziona">
-                    <s:selectItems value="#{aziendaHome.posizioneCNA}" var="valore" itemValue="#{valore.nome}" 
-                                    hideNoSelectionLabel="false" noSelectionLabel="--Scegli--" label="#{valore.testo}" />
+                    <s:selectItems value="#{aziendaHome.posizioneCNA}" var="valore" 
+                                    hideNoSelectionLabel="false" noSelectionLabel="--Scegli--" label="#{valore.testo}" itemValue="#{valore.nome}"/>
                 </h:selectOneMenu>
             </s:decorate>
             <s:decorate id="indirizzoField" template="layout/edit.xhtml">
