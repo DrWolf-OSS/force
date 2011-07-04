@@ -1,5 +1,20 @@
 @CHARSET "UTF-8";
 
+a:LINK {
+	text-decoration: none;
+	color: black;
+}
+
+a:VISITED {
+	text-decoration: none;
+	color: black;
+}
+
+a:HOVER {
+	text-decoration: none;
+	color: purple;
+}
+
 .fileItem{
 	padding: 10px;
 	margin: 2px;
