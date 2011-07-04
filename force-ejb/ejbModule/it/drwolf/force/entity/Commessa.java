@@ -14,8 +14,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "Comesse")
-public class Commesse implements Serializable {
+@Table(name = "Comessa")
+public class Commessa implements Serializable {
 
 	/**
 	 * 
