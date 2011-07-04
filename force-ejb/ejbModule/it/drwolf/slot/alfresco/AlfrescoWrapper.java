@@ -147,20 +147,19 @@ public class AlfrescoWrapper {
 				Document doc = (Document) session.getObject(
 						AlfrescoWrapper.ref2id(id), context);
 
-				// if (doc.getContentStream().getMimeType().contains("image")) {
-
 				for (Rendition r : doc.getRenditions()) {
 					if (name.equals(r.getTitle())) {
 						return IOUtils.toByteArray(r.getContentStream()
 								.getStream());
 					}
 				}
-				// }
+				return IOUtils.toByteArray(AlfrescoWrapper.class
+						.getResourceAsStream("notavailable.gif"));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		return AlfrescoWrapper.class.getResourceAsStream("image-missing.png");
+		return null;
 	}
 
 	public AlfrescoFolder retrieveGroupFolder(String path, String shortName) {

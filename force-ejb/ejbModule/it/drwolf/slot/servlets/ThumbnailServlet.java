@@ -27,11 +27,11 @@ public class ThumbnailServlet extends HttpServlet {
 		Object data = aw.getThumbnail(req.getParameter("id"),
 				req.getParameter("name"));
 		resp.setHeader("Content-Type", "image/png");
-
-		byte[] bytes = (byte[]) data;
-		resp.getOutputStream().write(bytes);
-		resp.getOutputStream().close();
-
-		Lifecycle.endCall();
+		if (data != null) {
+			byte[] bytes = (byte[]) data;
+			resp.getOutputStream().write(bytes);
+			resp.getOutputStream().close();
+			Lifecycle.endCall();
+		}
 	}
 }

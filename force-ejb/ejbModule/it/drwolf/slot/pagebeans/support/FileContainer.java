@@ -86,7 +86,11 @@ public class FileContainer {
 	}
 
 	public String getMimetype() {
-		return Resolver.mimetypeForExtension(this.getExtension());
+		try {
+			return this.document.getContentStreamMimeType();
+		} catch (Exception e) {
+			return Resolver.mimetypeForExtension(this.getExtension());
+		}
 	}
 
 	public List<DocumentPropertyInst> getEmbeddedProperties() {
