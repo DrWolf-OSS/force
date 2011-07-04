@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
@@ -66,6 +67,8 @@ public class Azienda implements Serializable {
 	private Set<CategoriaMerceologica> categorieMerceologiche;
 
 	private Set<SOA> SOA;
+
+	private Set<Commessa> commesse;
 
 	public Azienda() {
 	}
@@ -128,6 +131,11 @@ public class Azienda implements Serializable {
 	@NotNull
 	public String getCognome() {
 		return this.cognome;
+	}
+
+	@OneToMany(mappedBy = "azienda")
+	public Set<Commessa> getCommesse() {
+		return this.commesse;
 	}
 
 	@Column(nullable = false)
@@ -276,6 +284,10 @@ public class Azienda implements Serializable {
 
 	public void setCognome(String cognome) {
 		this.cognome = cognome;
+	}
+
+	public void setCommesse(Set<Commessa> commesse) {
+		this.commesse = commesse;
 	}
 
 	public void setComune(String comune) {

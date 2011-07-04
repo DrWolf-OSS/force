@@ -7,4 +7,10 @@
    <begin-conversation join="true"/>
    <action execute="#{aziendaHome.wire}"/>
    <param name="aziendaId" value="#{aziendaHome.aziendaId}"/>
+   
+   <param name="firstResult" value="#{commessaList.firstResult}"/>
+   <param name="sort" value="#{commessaList.orderColumn}"/>
+   <param name="dir" value="#{commessaList.orderDirection}"/>
+   <param name="logic" value="#{commessaList.restrictionLogicOperator}"/>
+      
 </page>

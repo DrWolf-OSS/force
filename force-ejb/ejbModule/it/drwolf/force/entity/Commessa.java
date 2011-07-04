@@ -3,6 +3,9 @@ package it.drwolf.force.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -10,8 +13,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "Commessa")
@@ -24,17 +30,34 @@ public class Commessa implements Serializable {
 
 	private Integer id;
 
+	private String descrizione;
+
 	private BigDecimal importo;
 
 	private Date dataCommessa;
 
 	private String committente;
 
-	private Set<CategoriaMerceologica> categorieMerceologiche;
+	private Azienda azienda;
+
+	private Set<CategoriaMerceologica> categorieMerceologiche = new HashSet<CategoriaMerceologica>();
+
+	@ManyToOne
+	@JoinColumn(name = "azienda_fk")
+	public Azienda getAzienda() {
+		return this.azienda;
+	}
 
 	@ManyToMany
 	public Set<CategoriaMerceologica> getCategorieMerceologiche() {
 		return this.categorieMerceologiche;
+	}
+
+	@Transient
+	public List<CategoriaMerceologica> getCategorieMerceologicheAsList() {
+		return new ArrayList<CategoriaMerceologica>(
+				this.getCategorieMerceologiche());
+
 	}
 
 	@Column
@@ -45,6 +68,11 @@ public class Commessa implements Serializable {
 	@Column
 	public Date getDataCommessa() {
 		return this.dataCommessa;
+	}
+
+	@Column
+	public String getDescrizione() {
+		return this.descrizione;
 	}
 
 	@Id
@@ -58,9 +86,19 @@ public class Commessa implements Serializable {
 		return this.importo;
 	}
 
+	public void setAzienda(Azienda azienda) {
+		this.azienda = azienda;
+	}
+
 	public void setCategorieMerceologiche(
 			Set<CategoriaMerceologica> categorieMerceologiche) {
 		this.categorieMerceologiche = categorieMerceologiche;
+	}
+
+	@Transient
+	public void setCategorieMerceologicheAsList(
+			List<CategoriaMerceologica> lista) {
+		this.setCategorieMerceologiche(new HashSet<CategoriaMerceologica>(lista));
 	}
 
 	public void setCommittente(String committente) {
@@ -69,6 +107,10 @@ public class Commessa implements Serializable {
 
 	public void setDataCommessa(Date dataCommessa) {
 		this.dataCommessa = dataCommessa;
+	}
+
+	public void setDescrizione(String descrizione) {
+		this.descrizione = descrizione;
 	}
 
 	public void setId(Integer id) {
