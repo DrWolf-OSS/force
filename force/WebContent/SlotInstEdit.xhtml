@@ -141,7 +141,7 @@
 
 										<s:decorate template="/layout/display.xhtml">
 											<rich:toolTip direction="top-left">
-										 		<img src="/force/tn?id=#{item.document.id}&amp;name=doclib"/>
+										 		<img src="/force/tn?id=#{item.document.id}&amp;name=imgpreview"/>
 											</rich:toolTip>
 											<ui:define name="label">
 												<h:outputText value="File Name" />
@@ -154,7 +154,7 @@
 											<h:graphicImage value="/img/mimetype/document-text.png" rendered="#{item.mimetype.contains('text') or item.mimetype.contains('rtf')}"
 															styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document.png" 
-															rendered="#{not item.mimetype.contains('pdf') and not item.mimetype.contains('wandd') and not item.mimetype.contains('powerpoint')
+															rendered="#{not item.mimetype.contains('pdf') and not item.mimetype.contains('word') and not item.mimetype.contains('powerpoint')
 																		and not item.mimetype.contains('excel') and not item.mimetype.contains('image') 
 																		and not item.mimetype.contains('text') and not item.mimetype.contains('rtf')}" 
 															styleClass="fileIcon"/>
