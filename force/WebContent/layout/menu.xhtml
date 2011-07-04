@@ -146,11 +146,13 @@
            </s:link>
         </rich:menuItem>
         <rich:menuItem>
-            <s:link view="/admin/AziendaList.xhtml"
-                value="Archivio Lavori Svolti"
+            <s:link view="/user/CommesseEdit.xhtml"
+                value="Gestione Archivio Commesse"
                 id="tobed"
                 includePageParams="false"
-                propagation="none"/>
+                propagation="none">
+                <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+            </s:link>
         </rich:menuItem>
         <rich:menuItem>
             <s:link view="/admin/AziendaList.xhtml"
