@@ -109,7 +109,9 @@
 																		and not item.mimetype.contains('excel') and not item.mimetype.contains('image') 
 																		and not item.mimetype.contains('text') and not item.mimetype.contains('rtf')}" 
 															styleClass="fileIcon"/>
+											<a href="#{alfrescoInfo.repositoryUri}/d/a/workspace/SpacesStore/#{item.nodeRef}/#{item.fileName}">
 											<h:outputText value="#{item.fileName}" />
+											</a>
 											<a:region>
 												<a:commandButton value=">>"
 													id="addPrimaryDoc_#{coll.docDefCollection.id}"
@@ -178,7 +180,9 @@
 																		and not item.mimetype.contains('excel') and not item.mimetype.contains('image') 
 																		and not item.mimetype.contains('text') and not item.mimetype.contains('rtf')}" 
 															styleClass="fileIcon"/>
+											<a href="#{alfrescoInfo.repositoryUri}/d/a/workspace/SpacesStore/#{item.nodeRef}/#{item.fileName}">
 											<h:outputText value="#{item.fileName}" />
+											</a>
 										</s:decorate>
 
 										<ui:repeat var="dataInstance" value="#{item.embeddedProperties}">

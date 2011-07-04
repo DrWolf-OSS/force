@@ -1,5 +1,6 @@
 package it.drwolf.slot.pagebeans.support;
 
+import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
 import it.drwolf.utils.mimetypes.Resolver;
 
@@ -77,6 +78,13 @@ public class FileContainer {
 			fileName = name;
 		}
 		return fileName.concat(extension);
+	}
+
+	public String getNodeRef() {
+		if (this.document != null) {
+			return AlfrescoWrapper.id2ref(this.document.getId());
+		}
+		return "";
 	}
 
 	public String getExtension() {

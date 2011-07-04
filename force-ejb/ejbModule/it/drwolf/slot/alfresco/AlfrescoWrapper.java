@@ -52,6 +52,14 @@ public class AlfrescoWrapper {
 				ref) : new ObjectIdImpl(AlfrescoWrapper.NODEREF_PREFIX + ref);
 	}
 
+	public static String id2ref(String id) {
+		int slashIndex = id.lastIndexOf("/");
+		if (slashIndex > 0) {
+			return id.substring(slashIndex, id.length());
+		}
+		return "";
+	}
+
 	@In
 	private AlfrescoAdminIdentity alfrescoAdminIdentity;
 
