@@ -53,6 +53,14 @@
   	<servlet-name>Thumbnail Servlet</servlet-name>
   	<url-pattern>/tn/*</url-pattern>
   </servlet-mapping>
+  <servlet>
+  	<servlet-name>Download Servlet</servlet-name>
+  	<servlet-class>it.drwolf.slot.servlets.DownloadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>Download Servlet</servlet-name>
+  	<url-pattern>/download/*</url-pattern>
+  </servlet-mapping>
   <context-param>
     <param-name>facelets.DEVELOPMENT</param-name>
     <param-value>true</param-value>
