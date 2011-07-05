@@ -51,7 +51,16 @@
             </f:facet>
             <h:outputText value="#{_commessa.dataCommessa}"/>
         </h:column>
-        </rich:dataTable>           
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{commessaList}"/>
+                    <ui:param name="propertyLabel" value="Categorie Merceologiche"/>
+                    <ui:param name="propertyPath" value="commessa.categorieMerceologiche"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_commessa.categorieMerceologicheAsString}"/>
+        </h:column>        </rich:dataTable>           
     </div>
     </rich:panel>
     <div class="actionButtons">
@@ -65,17 +74,19 @@
                    value="Fatto"
                     view="/home.xhtml"/>
         </div>
-        <rich:modalPanel id="nuovaCommesaPanelId" styleClass="reportPanel borderless"  width="600" height="500">
+</h:form>
+    <rich:modalPanel id="nuovaCommesaPanelId" styleClass="reportPanel borderless"  width="600" height="500">
                      <f:facet name="header">Dati nuova commessa</f:facet>
+                    <a4j:form>
                         <table>
                      <tbody>
                         <s:decorate id="descrizioneField" template="/layout/trEdit.xhtml">
-			                <ui:define name="label">Descrizione commessa</ui:define>
-			                <h:inputTextarea id="descrizioneCommessa"
-			                               cols="50"
-			                               rows="3"
-			                               required="true"
-			                              value="#{commessaHome.instance.descrizione}"/>
+                            <ui:define name="label">Descrizione commessa</ui:define>
+                            <h:inputTextarea id="descrizioneCommessa"
+                                           cols="50"
+                                           rows="3"
+                                           required="true"
+                                          value="#{commessaHome.instance.descrizione}"/>
                         </s:decorate>
                         <s:decorate id="importoField" template="/layout/trEdit.xhtml">
                             <ui:define name="label">Importo commessa</ui:define>
@@ -95,7 +106,7 @@
                             <ui:define name="label">Data Commessa</ui:define>
                             <rich:calendar id="dataC"
                                         required="true"
-                                        value="#{commessaHome.instance.committente}">
+                                        value="#{commessaHome.instance.dataCommessa}">
                             </rich:calendar>
                         </s:decorate>
                         <s:decorate id="categorieMField" template="/layout/trEdit.xhtml">
@@ -108,16 +119,12 @@
                         </s:decorate>
                         </tbody>
                         </table>
-                     
-                     <s:button id="done"
-                       value="Salva" onclick="Richfaces.hideModalPanel('nuovaCommesaPanelId'); return 0;">
-                    </s:button>
-
-                    <div style="clear:both" />
-                        
-                    
-        </rich:modalPanel>
-</h:form>
-
+                     <a4j:commandButton value="Salva" action="#{commessaHome.persist()}" oncomplete="Richfaces.hideModalPanel('nuovaCommesaPanelId'); return 0;" reRender="commessaList"/>
+  
+<div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>                    </a4j:form>
+        </rich:modalPanel> 
 </ui:define>
 </ui:composition>

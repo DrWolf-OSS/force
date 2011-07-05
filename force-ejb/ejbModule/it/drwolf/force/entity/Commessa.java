@@ -2,8 +2,8 @@ package it.drwolf.force.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,6 +58,16 @@ public class Commessa implements Serializable {
 		return new ArrayList<CategoriaMerceologica>(
 				this.getCategorieMerceologiche());
 
+	}
+
+	@Transient
+	public String getCategorieMerceologicheAsString() {
+		String result = new String();
+		for (CategoriaMerceologica categoriaMerceologica : this
+				.getCategorieMerceologicheAsList()) {
+			result += categoriaMerceologica.getCategoria() + " , ";
+		}
+		return result;
 	}
 
 	@Column

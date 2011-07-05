@@ -19,6 +19,9 @@ public class CommessaHome extends EntityHome<Commessa> {
 	@In
 	EntityManager entityManager;
 
+	@In
+	AziendaHome aziendaHome;
+
 	@Override
 	protected Commessa createInstance() {
 		Commessa commessa = new Commessa();
@@ -41,6 +44,12 @@ public class CommessaHome extends EntityHome<Commessa> {
 		if (this.isIdDefined()) {
 			this.wire();
 		}
+	}
+
+	@Override
+	public String persist() {
+		this.getInstance().setAzienda(this.aziendaHome.getInstance());
+		return super.persist();
 	}
 
 	public void setAziendaId(Integer id) {
