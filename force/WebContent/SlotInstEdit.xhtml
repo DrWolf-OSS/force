@@ -95,21 +95,22 @@
 										 		<img src="/force/tn?id=#{item.document.id}&amp;name=imgpreview"/>
 											</rich:toolTip>
 											<ui:define name="label">
-												<h:outputText value="File Name" style="padding-right:5px"/>
+												<h:outputText value="File Name" />
 											</ui:define>
 											<h:graphicImage value="/img/mimetype/document-pdf.png" rendered="#{item.mimetype.contains('pdf')}" styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document-word.png" rendered="#{item.mimetype.contains('word')}" styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document-powerpoint.png" rendered="#{item.mimetype.contains('powerpoint')}" styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document-excel.png" rendered="#{item.mimetype.contains('excel')}" styleClass="fileIcon"/>
+											<h:graphicImage value="/img/mimetype/document-table.png" rendered="#{item.mimetype.contains('opendocument.spreadsheet')}" styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document-image.png" rendered="#{item.mimetype.contains('image')}" styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document-text.png" rendered="#{item.mimetype.contains('text') or item.mimetype.contains('rtf')}"
 															styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document.png" 
 															rendered="#{not item.mimetype.contains('pdf') and not item.mimetype.contains('word') and not item.mimetype.contains('powerpoint')
-																		and not item.mimetype.contains('excel') and not item.mimetype.contains('image') 
+																		and not item.mimetype.contains('excel') and not item.mimetype.contains('opendocument.spreadsheet') and not item.mimetype.contains('image') 
 																		and not item.mimetype.contains('text') and not item.mimetype.contains('rtf')}" 
 															styleClass="fileIcon"/>
-											<a href="#{alfrescoInfo.repositoryUri}/d/a/workspace/SpacesStore/#{item.nodeRef}/#{item.fileName}">
+											<a href="/force/download/#{item.fileName}?ref=#{item.document.id}">
 											<h:outputText value="#{item.fileName}" />
 											</a>
 											<a:region>
@@ -172,15 +173,16 @@
 											<h:graphicImage value="/img/mimetype/document-word.png" rendered="#{item.mimetype.contains('word')}" styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document-powerpoint.png" rendered="#{item.mimetype.contains('powerpoint')}" styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document-excel.png" rendered="#{item.mimetype.contains('excel')}" styleClass="fileIcon"/>
+											<h:graphicImage value="/img/mimetype/document-table.png" rendered="#{item.mimetype.contains('opendocument.spreadsheet')}" styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document-image.png" rendered="#{item.mimetype.contains('image')}" styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document-text.png" rendered="#{item.mimetype.contains('text') or item.mimetype.contains('rtf')}"
 															styleClass="fileIcon"/>
 											<h:graphicImage value="/img/mimetype/document.png" 
 															rendered="#{not item.mimetype.contains('pdf') and not item.mimetype.contains('word') and not item.mimetype.contains('powerpoint')
-																		and not item.mimetype.contains('excel') and not item.mimetype.contains('image') 
+																		and not item.mimetype.contains('excel') and not item.mimetype.contains('opendocument.spreadsheet') and not item.mimetype.contains('image') 
 																		and not item.mimetype.contains('text') and not item.mimetype.contains('rtf')}" 
 															styleClass="fileIcon"/>
-											<a href="#{alfrescoInfo.repositoryUri}/d/a/workspace/SpacesStore/#{item.nodeRef}/#{item.fileName}">
+											<a href="/force/download/#{item.fileName}?ref=#{item.document.id}">
 											<h:outputText value="#{item.fileName}" />
 											</a>
 										</s:decorate>
@@ -241,13 +243,16 @@
 			<div class="actionButtons">
 			<h:commandButton id="save"
 				value="Save" action="#{slotInstEditBean.save()}"
-				rendered="#{slotInstHome.id == null}" />
+				rendered="#{slotInstHome.id == null}"
+				styleClass="modal" />
 			<h:commandButton id="update"
 				value="Save" action="#{slotInstEditBean.update()}"
-				rendered="#{slotInstHome.id != null}" />
+				rendered="#{slotInstHome.id != null}" 
+				styleClass="modal"/>
 			<h:commandButton id="delete"
 				value="Delete" action="#{slotInstHome.remove}" immediate="true"
-				rendered="#{slotInstHome.managed}" />
+				rendered="#{slotInstHome.managed}" 
+				styleClass="modal"/>
 			<s:button id="cancelEdit"
 				value="Cancel" propagation="end" view="/SlotInst.xhtml"
 				rendered="#{slotInstHome.managed}" />
@@ -386,7 +391,8 @@
 				<a:commandButton value="Confirm"
 					action="#{slotInstEditBean.addActiveItemToDatas}"
 					reRender="editPanelForm, infoPanel_#{slotInstEditBean.activeCollectionId}" 
-					oncomplete="if(!epfinvalid){#{rich:component('editPanel')}.hide();};"/>
+					oncomplete="if(!epfinvalid){#{rich:component('editPanel')}.hide();}#{rich:component('waitPanel')}.hide();"
+					onclick="#{rich:component('waitPanel')}.show();"/>
 				<a:region>
 				<a:commandButton value="Cancel" onclick="#{rich:component('editPanel')}.hide()"/>
 				</a:region>

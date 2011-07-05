@@ -2,12 +2,12 @@
 
 a:LINK {
 	text-decoration: none;
-	color: black;
+	color: blue;
 }
 
 a:VISITED {
 	text-decoration: none;
-	color: black;
+	color: blue;
 }
 
 a:HOVER {
@@ -31,4 +31,16 @@ a:HOVER {
 
 .primaryArrows{
 	margin: 5px;
+}
+
+.loaderImg{
+	float: right;
+	position: relative;
+	left: -40%;
+	margin-top: 15px;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.modal{
 }

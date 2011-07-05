@@ -1,0 +1,21 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich">
+    
+		<rich:modalPanel id="waitPanel" autosized="true" width="200" height="120"
+			moveable="false" resizeable="false">
+			<f:facet name="header">
+				<h:outputText value="Richiesta in elaborazione" />
+			</f:facet>
+			<h:outputText value="Attendere prego..." />
+			<s:div>
+				<h:graphicImage alt="loader" styleClass="loaderImg"
+					value="/img/ajax-loader.gif">
+				</h:graphicImage>
+			</s:div>
+		</rich:modalPanel>
+    
+</ui:composition>

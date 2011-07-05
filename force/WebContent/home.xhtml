@@ -16,20 +16,8 @@
         <rich:panel>
             <h:panelGrid columns="2">
                 <h:graphicImage value="/img/seamlogo.png" alt="Seam logo"/>
-                <s:div styleClass="info">
-                    <p></p>
-                    <ul class="bullets">
-                        <li></li>
-                    </ul>
-                </s:div>
             </h:panelGrid>
         </rich:panel>
-        <h:commandButton action="#{testBean.test2()}" value="test" />
-        <h:commandButton action="#{testBean.loadModel()}" value="load model" />
-        <a:commandButton action="#{customModelController.reloadModel()}" value="reload model"/>
-        <a:commandButton action="#{testBean.test3()}" value="test3"/>
-        <rich:fileUpload fileUploadListener="#{fileUploadBean.listener}">
-        </rich:fileUpload>
         
 	</h:form>
     </ui:define>

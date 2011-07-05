@@ -12,6 +12,7 @@
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
       <title>File yOuR raCE</title>
       <link rel="shortcut icon" href="#{request.contextPath}/favicon.ico"/>
+      <a:loadScript src="resource://jquery.js"/>
       <a:loadStyle src="/stylesheet/theme.xcss"/>
       <a:loadStyle src="/stylesheet/theme.css"/>
       <a:loadStyle src="/stylesheet/slot.css"/>
@@ -27,6 +28,7 @@
             rendered="#{showGlobalMessages != 'false'}"/>
          <ui:insert name="body"/>
       </div>
+      <ui:include src="/layout/waitPanel.xhtml" />
       <div class="footer">
             <p>
                 <h:graphicImage value="/img/regtosc.png" />  
@@ -48,5 +50,10 @@
          </s:fragment>
      </div>
    </body>
+   <script type="text/javascript">
+    	jQuery(document).ready(function(){
+	    	jQuery('.modal').click(function(){#{rich:component('waitPanel')}.show();});
+        })
+	</script>
 </html>
 </f:view>

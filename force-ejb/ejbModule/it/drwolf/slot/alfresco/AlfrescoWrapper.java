@@ -5,12 +5,17 @@ import it.drwolf.slot.prefs.Preferences;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.cmis.client.AlfrescoFolder;
 import org.apache.chemistry.opencmis.client.api.Document;
@@ -22,6 +27,7 @@ import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.Ace;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.AclPropagation;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
@@ -71,6 +77,9 @@ public class AlfrescoWrapper {
 
 	@In(create = true)
 	AlfrescoInfo alfrescoInfo;
+
+	@In(value = "#{facesContext.externalContext}", required = false)
+	private ExternalContext extCtx;
 
 	public void applyACL(Folder folder, String groupName) {
 		Session session = this.alfrescoUserIdentity.getSession();
@@ -193,6 +202,39 @@ public class AlfrescoWrapper {
 
 		adminSession.createDocument(props, folder, contentStreamImpl,
 				VersioningState.NONE, null, null, null);
+	}
+
+	public void download(String id) {
+		HttpServletResponse response = (HttpServletResponse) this.extCtx
+				.getResponse();
+
+		Document d = (Document) this.alfrescoAdminIdentity.getSession()
+				.getObject(AlfrescoWrapper.ref2id(id));
+
+		ContentStream cs = d.getContentStream();
+
+		response.setContentType(cs.getMimeType());
+
+		response.addHeader("Content-disposition", "attachment; filename=\""
+				+ d.getProperty(PropertyIds.NAME).getValueAsString() + "\"");
+		response.setHeader("Expires", "0");
+		response.setHeader("Cache-Control",
+				"must-revalidate, post-check=0, pre-check=0");
+		try {
+			response.setContentLength((int) cs.getLength());
+			ServletOutputStream os = response.getOutputStream();
+
+			byte[] buffer = new byte[8192];
+			int len;
+			while ((len = cs.getStream().read(buffer)) != -1) {
+				os.write(buffer, 0, len);
+			}
+			os.flush();
+			os.close();
+			FacesContext.getCurrentInstance().responseComplete();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// private JsonElement openJsonWebScript(String url)
