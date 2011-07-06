@@ -34,6 +34,8 @@ public class SOA implements Serializable {
 
 	private Set<Azienda> aziende;
 
+	private Set<Gara> gare;
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -68,6 +70,11 @@ public class SOA implements Serializable {
 
 	public String getDescrizione() {
 		return this.descrizione;
+	}
+
+	@ManyToMany(mappedBy = "SOA")
+	public Set<Gara> getGare() {
+		return this.gare;
 	}
 
 	@Id
@@ -109,6 +116,10 @@ public class SOA implements Serializable {
 
 	public void setDescrizione(String descrizione) {
 		this.descrizione = descrizione;
+	}
+
+	public void setGare(Set<Gara> gare) {
+		this.gare = gare;
 	}
 
 	public void setId(Integer id) {

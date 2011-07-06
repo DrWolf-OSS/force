@@ -115,11 +115,18 @@
         </rich:menuItem>
     </rich:dropDownMenu>
     <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('ADMIN')}">
-        <f:facet name="label">Gestione Bandi</f:facet>
+        <f:facet name="label">Gestione Gare</f:facet>
         <rich:menuItem>
-            <s:link view="/admin/AziendaList.xhtml"
-                value="Da definire"
-                id="tobedefined"
+            <s:link view="/admin/NewGareList.xhtml"
+                value="Nuove Gare"
+                id="newGare"
+                includePageParams="false"
+                propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem>
+            <s:link view="/admin/ActiveGareList.xhtml"
+                value="Gare Attive"
+                id="actGare"
                 includePageParams="false"
                 propagation="none"/>
         </rich:menuItem>
@@ -155,9 +162,9 @@
             </s:link>
         </rich:menuItem>
         <rich:menuItem>
-            <s:link view="/admin/AziendaList.xhtml"
+            <s:link view="/user/GareList.xhtml"
                 value="Gestione Gare"
-                id="tobed2"
+                id="gareList"
                 includePageParams="false"
                 propagation="none"/>
         </rich:menuItem>

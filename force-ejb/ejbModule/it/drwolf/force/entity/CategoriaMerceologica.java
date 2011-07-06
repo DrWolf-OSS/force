@@ -28,6 +28,8 @@ public class CategoriaMerceologica implements Serializable {
 
 	private Set<Azienda> aziende;
 
+	private Set<Gara> gare;
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -60,6 +62,11 @@ public class CategoriaMerceologica implements Serializable {
 		return this.categoria;
 	}
 
+	@ManyToMany(mappedBy = "categorieMerceologiche")
+	public Set<Gara> getGare() {
+		return this.gare;
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Integer getId() {
@@ -85,6 +92,10 @@ public class CategoriaMerceologica implements Serializable {
 
 	public void setCategoria(String categoria) {
 		this.categoria = categoria;
+	}
+
+	public void setGare(Set<Gara> gare) {
+		this.gare = gare;
 	}
 
 	public void setId(Integer id) {
