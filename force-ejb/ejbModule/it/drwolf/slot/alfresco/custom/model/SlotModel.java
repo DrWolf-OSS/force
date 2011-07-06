@@ -33,6 +33,9 @@ public class SlotModel {
 	@ElementList
 	private List<Aspect> aspects;
 
+	@ElementList
+	private List<Constraint> constraints;
+
 	public SlotModel() {
 	}
 
@@ -91,6 +94,14 @@ public class SlotModel {
 
 	public void setAspects(List<Aspect> aspects) {
 		this.aspects = aspects;
+	}
+
+	public List<Constraint> getConstraints() {
+		return constraints;
+	}
+
+	public void setConstraints(List<Constraint> constraints) {
+		this.constraints = constraints;
 	}
 
 }
