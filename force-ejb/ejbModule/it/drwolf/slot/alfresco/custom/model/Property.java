@@ -147,4 +147,12 @@ public class Property implements DataDefinition {
 		this.constraints = constraints;
 	}
 
+	public List<String> getDictionary() {
+		// TODO: CONTROLLARE PER BENE
+		if (this.constraints != null) {
+			return this.constraints.get(0).getParameter().getList();
+		}
+		return null;
+	}
+
 }

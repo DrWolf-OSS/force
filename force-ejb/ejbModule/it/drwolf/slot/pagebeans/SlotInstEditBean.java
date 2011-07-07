@@ -580,9 +580,11 @@ public class SlotInstEditBean {
 				Session session = alfrescoUserIdentity.getSession();
 				AlfrescoDocument document = (AlfrescoDocument) session
 						.getObject(refId);
-				document.addAspect("P:util:tmp");
 
-				// activeFileContainer.setUploadItem(null);
+				//
+				// document.addAspect("P:util:tmp");
+				//
+
 				activeFileContainer.setDocument(document);
 
 				datas.get(this.activeCollectionId)
@@ -649,6 +651,9 @@ public class SlotInstEditBean {
 
 		AlfrescoDocument document = (AlfrescoDocument) session
 				.getObject(objectId);
+		//
+		document.addAspect("P:util:tmp");
+		//
 
 		// prima si aggiungono gli aspect
 		for (String aspect : aspectIds) {

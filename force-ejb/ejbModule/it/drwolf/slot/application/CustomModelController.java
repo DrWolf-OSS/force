@@ -45,36 +45,10 @@ public class CustomModelController {
 
 	@Create
 	public void init() {
-		// loadModel();
-		loadModelFromInternalFolder();
+		loadModel();
 	}
 
-	// private void loadModel() {
-	// try {
-	// String customModelJarPath = preferences
-	// .getValue(PreferenceKey.CUSTOM_MODEL_JAR_PATH.name());
-	// String customModelXmlName = preferences
-	// .getValue(PreferenceKey.CUSTOM_MODEL_XML_PATH_IN_JAR.name());
-	// JarFile jar;
-	// jar = new JarFile(customModelJarPath);
-	//
-	// InputStream xmlSource = null;
-	// for (@SuppressWarnings("rawtypes")
-	// Enumeration entries = jar.entries(); entries.hasMoreElements();) {
-	// JarEntry jarElement = (JarEntry) entries.nextElement();
-	// String zipEntryName = jarElement.getName();
-	// if (zipEntryName.equals(customModelXmlName)) {
-	// xmlSource = jar.getInputStream(jarElement);
-	// }
-	// }
-	// Serializer serializer = new Persister();
-	// this.slotModel = serializer.read(SlotModel.class, xmlSource);
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	// }
-
-	private void loadModelFromInternalFolder() {
+	private void loadModel() {
 		try {
 			Strategy strategy = new CycleStrategy("id", "ref");
 			Serializer serializer = new Persister(strategy);
@@ -158,7 +132,7 @@ public class CustomModelController {
 	}
 
 	public void reloadModel() {
-		loadModelFromInternalFolder();
+		loadModel();
 	}
 
 	public SlotModel getSlotModel() {

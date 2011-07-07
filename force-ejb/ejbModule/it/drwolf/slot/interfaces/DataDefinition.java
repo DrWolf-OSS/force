@@ -2,6 +2,8 @@ package it.drwolf.slot.interfaces;
 
 import it.drwolf.slot.enums.DataType;
 
+import java.util.List;
+
 public interface DataDefinition {
 
 	public String getLabel();
@@ -12,4 +14,5 @@ public interface DataDefinition {
 
 	public boolean isEditable();
 
+	public List<String> getDictionary();
 }

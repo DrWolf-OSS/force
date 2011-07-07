@@ -7,6 +7,11 @@ import org.simpleframework.xml.Root;
 @Root
 public class Constraint {
 
+	public final static String LIST = "LIST";
+	public final static String REGEX = "REGEX";
+	public final static String LENGTH = "LENGTH";
+	public final static String MINMAX = "MINMAX";
+
 	@Attribute
 	private String name;
 

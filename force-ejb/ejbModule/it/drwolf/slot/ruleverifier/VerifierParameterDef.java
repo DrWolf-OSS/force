@@ -3,6 +3,8 @@ package it.drwolf.slot.ruleverifier;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
 
+import java.util.List;
+
 public class VerifierParameterDef implements DataDefinition {
 
 	private String name;
@@ -80,5 +82,10 @@ public class VerifierParameterDef implements DataDefinition {
 
 	public boolean isEditable() {
 		return true;
+	}
+
+	public List<String> getDictionary() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
