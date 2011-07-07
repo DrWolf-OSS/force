@@ -653,6 +653,11 @@ public class SlotInstEditBean {
 				.getObject(objectId);
 		//
 		document.addAspect("P:util:tmp");
+
+		// Map<String, Object> aspectsProperties = new HashMap<String,
+		// Object>();
+		// aspectsProperties.put(key, value)
+		// document
 		//
 
 		// prima si aggiungono gli aspect

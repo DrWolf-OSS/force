@@ -3,6 +3,7 @@ package it.drwolf.slot.alfresco.custom.model;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.simpleframework.xml.Attribute;
@@ -148,9 +149,14 @@ public class Property implements DataDefinition {
 	}
 
 	public List<String> getDictionary() {
-		// TODO: CONTROLLARE PER BENE
 		if (this.constraints != null) {
-			return this.constraints.get(0).getParameter().getList();
+			Iterator<Constraint> iterator = constraints.iterator();
+			while (iterator.hasNext()) {
+				Constraint constraint = iterator.next();
+				if (constraint.getType().equals(Constraint.LIST)) {
+					return constraint.getParameter().getList();
+				}
+			}
 		}
 		return null;
 	}

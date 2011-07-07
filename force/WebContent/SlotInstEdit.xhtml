@@ -402,7 +402,7 @@
              						rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionary != null}">
                     		<s:selectItems value="#{dataInstance.dataDefinition.dictionary}" 
 											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
-							<s:convertDateTime type="date" dateStyle="long" pattern="dd/MM/yyyy" /> 
+							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" /> 
              			</h:selectOneMenu>
              			
 					</s:decorate>
