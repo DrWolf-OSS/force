@@ -1064,6 +1064,17 @@ public class SlotInstEditBean {
 		messages.add(message);
 	}
 
+	public PropertyInst findPropertyIntByDef(PropertyDef propertyDef) {
+		Iterator<PropertyInst> iterator = propertyInsts.iterator();
+		while (iterator.hasNext()) {
+			PropertyInst propertyInst = iterator.next();
+			if (propertyInst.getPropertyDef().equals(propertyDef)) {
+				return propertyInst;
+			}
+		}
+		return null;
+	}
+
 	private void addMainMessage(VerifierMessage message) {
 		slotMessages.add(message);
 	}

@@ -69,25 +69,6 @@
 			</s:div>
 			
 			<div style="clear:both"/>
-			<ui:remove>
-			<rich:dataTable value="#{slotDefEditBean.properties}" var="prop">
-				<f:facet name="header">Properties table</f:facet>
-				<rich:column>
-					<f:facet name="header">Property name</f:facet>
-					<h:outputText value="#{prop.name}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">Property type</f:facet>
-					<h:outputText value="#{prop.type}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">Actions</f:facet>
-					 <a:commandLink value="remove" action="#{slotDefEditBean.removeProp(prop)}" reRender="properties"/>
-					 &#160;|&#160;
-		             <a:commandLink value="edit" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" reRender="propPanel"/>
-				</rich:column>
-			</rich:dataTable>
-			</ui:remove>
 			
 
 			<s:div id="collections">
@@ -305,6 +286,16 @@
 					</ui:define>
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.required}" />
 	            </s:decorate>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Dictionary" />
+					</ui:define>
+					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}">
+                    		<s:selectItems value="#{dictionaryList.resultList}" 
+											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- select a dictionary --"/>
+							<s:convertEntity/>
+             		</h:selectOneMenu>
+	            </s:decorate>
 	        </s:div>
 	        <div style="clear:both"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" onclick="#{rich:component('propPanel')}.hide()" reRender="properties,propPanel"/>
@@ -358,19 +349,23 @@
 			</a:form>
 		</rich:modalPanel>
 		
-		
+		<!-- TODO: Per controllare il form uso la variabile invalid invece di cpfinvalid che non viene valorizzata.. -->
 		<rich:modalPanel id="collPanel" autosized="true" width="400" 
 			moveable="false" resizeable="false">
 			<f:facet name="header">
 				<h:outputText value="Add Collection" />
 			</f:facet>
-			<a:form>
+			<a:form id="cpf">
+				<script type="text/javascript">
+					var invalid = false;
+				</script>
 			<s:div>
+			<a:region>
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Collection Name" />
 					</ui:define>
-					<h:inputText value="#{slotDefEditBean.collection.name}" />
+					<h:inputText value="#{slotDefEditBean.collection.name}" required="true"/>
 	            </s:decorate>
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
@@ -394,10 +389,47 @@
 						<s:convertEntity/>
              		</h:selectOneMenu>
 	            </s:decorate>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Conditional Property" />
+					</ui:define>
+					<h:selectOneMenu id="condPD" value="#{slotDefEditBean.collection.conditionalPropertyDef}">
+                    	<s:selectItems value="#{slotDefEditBean.properties}" 
+						var="propertyDef" label="#{propertyDef.label}" noSelectionLabel="-- select a value --"/>
+						<s:convertEntity/>
+						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="cpf"/>
+             		</h:selectOneMenu>
+	            </s:decorate>
+				</a:region>
+				
+				
+				<s:div rendered="#{slotDefEditBean.collection.conditionalPropertyDef != null}">			
+	            <s:decorate  template="/layout/edit.xhtml">
+	            	<ui:param name="prefix" value="cpf" />
+	                <ui:define name="label">
+	                	<h:outputText value="Conditional Property Value" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.collection.conditionalPropertyInst.stringValue}"
+							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'STRING' }"
+							required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"/>
+						<h:inputText value="#{slotDefEditBean.collection.conditionalPropertyInst.integerValue}"
+							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'INTEGER'}"
+							required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"/>
+						<h:selectBooleanCheckbox value="#{slotDefEditBean.collection.conditionalPropertyInst.booleanValue}"
+							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'BOOLEAN'}"
+							required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"/>
+						<rich:calendar id="subscriptionDate" mode="client"
+							value="#{slotDefEditBean.collection.conditionalPropertyInst.dateValue}" datePattern="dd/MM/yyyy"
+							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'DATE' }"
+							required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"/>
+	            </s:decorate>
+	            </s:div>
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addCollection()}" onclick="#{rich:component('collPanel')}.hide()" reRender="collections,collPanel"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addCollection()}" oncomplete="if(!invalid){#{rich:component('collPanel')}.hide();}" reRender="collections,cpf"/>
+			<a:region>
 			<a:commandButton value="Cancel" onclick="#{rich:component('collPanel')}.hide()"/>
+			</a:region>
 			</a:form>
 		</rich:modalPanel>
 

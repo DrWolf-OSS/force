@@ -3,6 +3,7 @@ package it.drwolf.slot.pagebeans;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
+import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.session.DocDefCollectionHome;
@@ -16,6 +17,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import javax.faces.event.ActionEvent;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -174,6 +177,15 @@ public class SlotDefEditBean {
 		}
 
 		slotDefHome.update();
+	}
+
+	public void conditionalPropertyListener(ActionEvent event) {
+		if (this.collection.getConditionalPropertyDef() != null) {
+			this.collection.setConditionalPropertyInst(new PropertyInst(
+					this.collection.getConditionalPropertyDef()));
+		} else {
+			this.collection.setConditionalPropertyInst(null);
+		}
 	}
 
 	public void removeEmbeddedProp(EmbeddedProperty embeddedProp) {

@@ -84,7 +84,7 @@ public class VerifierParameterDef implements DataDefinition {
 		return true;
 	}
 
-	public List<String> getDictionary() {
+	public List<String> getDictionaryValues() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -161,7 +161,7 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 	}
 
 	@Transient
-	public List<String> getDictionary() {
+	public List<String> getDictionaryValues() {
 		// TODO Auto-generated method stub
 		return null;
 	}
