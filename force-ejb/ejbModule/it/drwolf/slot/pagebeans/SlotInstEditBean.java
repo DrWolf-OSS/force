@@ -1064,15 +1064,44 @@ public class SlotInstEditBean {
 		messages.add(message);
 	}
 
-	public PropertyInst findPropertyIntByDef(PropertyDef propertyDef) {
+	public PropertyInst findPropertyInstByDefId(Long propertyDefId) {
 		Iterator<PropertyInst> iterator = propertyInsts.iterator();
 		while (iterator.hasNext()) {
 			PropertyInst propertyInst = iterator.next();
-			if (propertyInst.getPropertyDef().equals(propertyDef)) {
+			if (propertyInst.getPropertyDef().getId().equals(propertyDefId)) {
 				return propertyInst;
 			}
 		}
 		return null;
+	}
+
+	private void cleanCollection(Long docDefCollectionId) {
+		List<FileContainer> itemslist = this.datas.get(docDefCollectionId);
+		if (itemslist != null) {
+			itemslist.clear();
+		} else {
+			itemslist = new ArrayList<FileContainer>();
+		}
+	}
+
+	public void cleanConditionalCollection(PropertyInst propertyInst) {
+		Iterator<DocInstCollection> iterator = docInstCollections.iterator();
+		while (iterator.hasNext()) {
+			DocInstCollection instCollection = iterator.next();
+			if (instCollection.getDocDefCollection()
+					.getConditionalPropertyDef() != null
+					&& instCollection.getDocDefCollection()
+							.getConditionalPropertyDef().getId()
+							.equals(propertyInst.getPropertyDef().getId())) {
+				if (!instCollection.getDocDefCollection()
+						.getConditionalPropertyInst().getValue()
+						.equals(propertyInst.getValue())) {
+					cleanCollection(instCollection.getDocDefCollection()
+							.getId());
+				}
+			}
+		}
+
 	}
 
 	private void addMainMessage(VerifierMessage message) {
