@@ -371,11 +371,11 @@
 							<h:outputText value="#{dataInstance.dataDefinition.label}" />
 						</ui:define>
 						<h:inputText value="#{dataInstance.stringValue}"
-							rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"
+							rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionary == null}"
 							required="#{dataInstance.dataDefinition.required}"
 							disabled="#{not dataInstance.dataDefinition.editable}" />
 						<h:inputText value="#{dataInstance.integerValue}"
-							rendered="#{dataInstance.dataDefinition.dataType== 'INTEGER'}"
+							rendered="#{dataInstance.dataDefinition.dataType== 'INTEGER' and dataInstance.dataDefinition.dictionary == null}"
 							required="#{dataInstance.dataDefinition.required}"
 							disabled="#{not dataInstance.dataDefinition.editable}" />
 						<h:selectBooleanCheckbox value="#{dataInstance.booleanValue}"
@@ -384,9 +384,27 @@
 							disabled="#{not dataInstance.dataDefinition.editable}" />
 						<rich:calendar id="subscriptionDate" mode="client"
 							value="#{dataInstance.dateValue}" datePattern="dd/MM/yyyy"
-							rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}"
+							rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionary == null}"
 							required="#{dataInstance.dataDefinition.required}"
 							disabled="#{not dataInstance.dataDefinition.editable}" />
+						
+						<h:selectOneMenu value="#{dataInstance.stringValue}" required="#{dataInstance.dataDefinition.required}"
+									rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionary != null}">
+                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionary}" 
+											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+             			</h:selectOneMenu>
+             			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"
+             						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionary != null}" >
+                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionary}" 
+											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+             			</h:selectOneMenu>
+             			<h:selectOneMenu value="#{dataInstance.dateValue}"  required="#{dataInstance.dataDefinition.required}"
+             						rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionary != null}">
+                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionary}" 
+											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" /> 
+             			</h:selectOneMenu>
+             			
 					</s:decorate>
 				</ui:repeat>
 				<div style="clear: both" />

@@ -3,6 +3,8 @@ package it.drwolf.slot.entity;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -120,6 +122,12 @@ public class PropertyDef implements DataDefinition {
 	@Transient
 	public boolean isEditable() {
 		return true;
+	}
+
+	@Transient
+	public List<String> getDictionary() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

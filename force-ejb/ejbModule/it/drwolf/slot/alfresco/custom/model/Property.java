@@ -3,8 +3,12 @@ package it.drwolf.slot.alfresco.custom.model;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 @Root
@@ -27,6 +31,9 @@ public class Property implements DataDefinition {
 
 	@Element(required = false, name = "default")
 	private boolean defaultValue;
+
+	@ElementList(required = false)
+	private List<Constraint> constraints;
 
 	public String getName() {
 		return name;
@@ -131,6 +138,27 @@ public class Property implements DataDefinition {
 
 	public boolean isEditable() {
 		return true;
+	}
+
+	public List<Constraint> getConstraints() {
+		return constraints;
+	}
+
+	public void setConstraints(List<Constraint> constraints) {
+		this.constraints = constraints;
+	}
+
+	public List<String> getDictionary() {
+		if (this.constraints != null) {
+			Iterator<Constraint> iterator = constraints.iterator();
+			while (iterator.hasNext()) {
+				Constraint constraint = iterator.next();
+				if (constraint.getType().equals(Constraint.LIST)) {
+					return constraint.getParameter().getList();
+				}
+			}
+		}
+		return null;
 	}
 
 }

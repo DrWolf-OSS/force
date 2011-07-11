@@ -5,6 +5,7 @@ import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.DataInstance;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -157,6 +158,12 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 	@Transient
 	public boolean isEditable() {
 		return true;
+	}
+
+	@Transient
+	public List<String> getDictionary() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
