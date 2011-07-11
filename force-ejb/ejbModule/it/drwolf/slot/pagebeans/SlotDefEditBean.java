@@ -13,9 +13,11 @@ import it.drwolf.slot.session.SlotDefHome;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.faces.event.ActionEvent;
@@ -51,6 +53,8 @@ public class SlotDefEditBean {
 	private PropertyDef propertyDef = new PropertyDef();
 	private EmbeddedProperty embeddedProperty = new EmbeddedProperty();
 
+	private Map<String, PropertyDef> converterPropertyMap = new HashMap<String, PropertyDef>();
+
 	@Create
 	public void init() {
 		this.properties.addAll(slotDefHome.getInstance().getPropertyDefs());
@@ -75,6 +79,9 @@ public class SlotDefEditBean {
 	public void addProperty() {
 		if (!properties.contains(this.propertyDef)) {
 			properties.add(this.propertyDef);
+		}
+		if (converterPropertyMap.get(propertyDef.getName()) == null) {
+			converterPropertyMap.put(propertyDef.getName(), propertyDef);
 		}
 	}
 
@@ -251,6 +258,15 @@ public class SlotDefEditBean {
 
 	public void setEmbeddedProperty(EmbeddedProperty embeddedProperty) {
 		this.embeddedProperty = embeddedProperty;
+	}
+
+	public Map<String, PropertyDef> getConverterPropertyMap() {
+		return converterPropertyMap;
+	}
+
+	public void setConverterPropertyMap(
+			Map<String, PropertyDef> converterPropertyMap) {
+		this.converterPropertyMap = converterPropertyMap;
 	}
 
 }

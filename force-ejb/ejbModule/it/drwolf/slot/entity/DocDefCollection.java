@@ -86,7 +86,7 @@ public class DocDefCollection {
 		return name + ":" + min + "," + max + ";" + docDef;
 	}
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	public PropertyDef getConditionalPropertyDef() {
 		return conditionalPropertyDef;
 	}

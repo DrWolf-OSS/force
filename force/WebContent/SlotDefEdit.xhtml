@@ -393,12 +393,12 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Conditional Property" />
 					</ui:define>
-					<h:selectOneMenu id="condPD" value="#{slotDefEditBean.collection.conditionalPropertyDef}">
-                    	<s:selectItems value="#{slotDefEditBean.properties}" 
-						var="propertyDef" label="#{propertyDef.label}" noSelectionLabel="-- select a value --"/>
-						<s:convertEntity/>
+					<h:selectOneMenu id="condPD" value="#{slotDefEditBean.collection.conditionalPropertyDef}" converter="propertyDefConverter">
+     					<s:selectItems value="#{slotDefEditBean.properties}" label="#{propertyDef.name}"
+									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef}"/>
+
 						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="cpf"/>
-             		</h:selectOneMenu>
+					</h:selectOneMenu>
 	            </s:decorate>
 				</a:region>
 				
