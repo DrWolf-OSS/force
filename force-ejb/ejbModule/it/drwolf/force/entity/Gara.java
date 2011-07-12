@@ -13,6 +13,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,6 +38,8 @@ public class Gara implements Serializable {
 
 	private Date dataPubblicazione;
 
+	private Date dataScadenza;
+
 	private BigDecimal importo;
 
 	private BigDecimal requisitoTecnico;
@@ -50,6 +53,8 @@ public class Gara implements Serializable {
 	private Set<CategoriaMerceologica> categorieMerceologiche;
 
 	private Set<SOA> SOA;
+
+	private Settore settore;
 
 	@ManyToMany
 	public Set<CategoriaMerceologica> getCategorieMerceologiche() {
@@ -68,6 +73,11 @@ public class Gara implements Serializable {
 		return this.dataPubblicazione;
 	}
 
+	@Column
+	public Date getDataScadenza() {
+		return this.dataScadenza;
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Integer getId() {
@@ -78,8 +88,6 @@ public class Gara implements Serializable {
 	public BigDecimal getImporto() {
 		return this.importo;
 	}
-
-	// deve essere inserito anche un riferimento al settore?
 
 	@Column
 	public String getOggetto() {
@@ -94,6 +102,14 @@ public class Gara implements Serializable {
 	@Column
 	public BigDecimal getRequisitoTecnico() {
 		return this.requisitoTecnico;
+	}
+
+	// deve essere inserito anche un riferimento al settore?
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(nullable = false)
+	public Settore getSettore() {
+		return this.settore;
 	}
 
 	@ManyToOne
@@ -149,6 +165,10 @@ public class Gara implements Serializable {
 		this.dataPubblicazione = dataPubblicazione;
 	}
 
+	public void setDataScadenza(Date dataScadenza) {
+		this.dataScadenza = dataScadenza;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -167,6 +187,10 @@ public class Gara implements Serializable {
 
 	public void setRequisitoTecnico(BigDecimal requisitoTecnico) {
 		this.requisitoTecnico = requisitoTecnico;
+	}
+
+	public void setSettore(Settore settore) {
+		this.settore = settore;
 	}
 
 	public void setSlotDef(SlotDef slotDef) {

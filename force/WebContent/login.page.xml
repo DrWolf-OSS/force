@@ -5,9 +5,10 @@
 
    <navigation from-action="#{identity.login}">
        <rule if="#{identity.hasRole('AZIENDE')}">
-         <redirect view-id="/SlotInstEdit.xhtml">
+         <redirect view-id="/user/ControlPanel.xhtml">
             <param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
             <param name="slotInstId" value="#{userSession.primarySlotInst.id}"/>
+            <param name="aziendaId" value="#{userSession.aziendaId}" />
          </redirect>
          
       </rule>

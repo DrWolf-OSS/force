@@ -218,6 +218,11 @@ public class Azienda implements Serializable {
 		return this.ragioneSociale;
 	}
 
+	@Transient
+	public String getReferente() {
+		return this.getNome() + " " + this.getCognome();
+	}
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(nullable = false)
 	@NotNull
@@ -366,5 +371,4 @@ public class Azienda implements Serializable {
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
-
 }
