@@ -108,6 +108,10 @@
 							<ui:define name="label">
 								<h:outputText value="#{coll.docDefCollection.name}" />
 							</ui:define>
+							
+							<h:outputText value="#{coll.docDefCollection.conditionalPropertyDef.id}" /> ;
+							<h:outputText value="#{slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value}" /> ;
+							<h:outputText value="#{coll.docDefCollection.conditionalPropertyInst.value}" rendered="#{coll.docDefCollection.conditionalPropertyInst != null}"/>
 									
 							<s:div id="primaryRegion_#{coll.docDefCollection.id}" 
 								rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
