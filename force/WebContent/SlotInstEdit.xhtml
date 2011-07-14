@@ -104,18 +104,14 @@
 							
 						<s:decorate template="/layout/display.xhtml" 
 								rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
-										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
+										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
 							<ui:define name="label">
 								<h:outputText value="#{coll.docDefCollection.name}" />
 							</ui:define>
-							
-							<h:outputText value="#{coll.docDefCollection.conditionalPropertyDef.id}" /> ;
-							<h:outputText value="#{slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value}" /> ;
-							<h:outputText value="#{coll.docDefCollection.conditionalPropertyInst.value}" rendered="#{coll.docDefCollection.conditionalPropertyInst != null}"/>
 									
 							<s:div id="primaryRegion_#{coll.docDefCollection.id}" 
 								rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
-										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
+										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
 								<rich:panel rendered="#{slotDefHome.instance.type != 'PRIMARY'}">
 									<f:facet name="header">
 										<h:outputText value="Available #{coll.docDefCollection.docDef.name} on primary slot" />
@@ -166,7 +162,7 @@
 
 						<s:div id="infoPanel_#{coll.docDefCollection.id}"
 							rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
-										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
+										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
 							<ui:repeat var="message"
 								value="#{slotInstEditBean.collectionsMessages[coll.docDefCollection.id]}">
 								<h:graphicImage value="/img/msgerror.png"
