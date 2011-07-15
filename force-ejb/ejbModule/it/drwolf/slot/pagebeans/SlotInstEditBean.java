@@ -386,26 +386,34 @@ public class SlotInstEditBean {
 
 		for (DocDefCollection defCollection : slotDefHome.getInstance()
 				.getDocDefCollections()) {
-			List<FileContainer> list = datas.get(defCollection.getId());
-			int size = list.size();
-			if (defCollection.getMin() != null && size < defCollection.getMin()) {
-				passed = false;
-				this.addCollectionMessage(defCollection.getId(),
-						new VerifierMessage(
-								"La quantità minima di documenti in questa collection è di "
-										+ defCollection.getMin()
-										+ " documento/i",
-								VerifierMessageType.ERROR));
-			}
-
-			if (defCollection.getMax() != null && size > defCollection.getMax()) {
-				passed = false;
-				this.addCollectionMessage(defCollection.getId(),
-						new VerifierMessage(
-								"La quantità massima di documenti in questa collection è di "
-										+ defCollection.getMax()
-										+ " documento/i",
-								VerifierMessageType.ERROR));
+			if (defCollection.getConditionalPropertyDef() != null
+					&& findPropertyInstByDefId(
+							defCollection.getConditionalPropertyDef().getId())
+							.getValue().equals(
+									defCollection.getConditionalPropertyInst()
+											.getValue())) {
+				List<FileContainer> list = datas.get(defCollection.getId());
+				int size = list.size();
+				if (defCollection.getMin() != null
+						&& size < defCollection.getMin()) {
+					passed = false;
+					this.addCollectionMessage(defCollection.getId(),
+							new VerifierMessage(
+									"La quantità minima di documenti in questa collection è di "
+											+ defCollection.getMin()
+											+ " documento/i",
+									VerifierMessageType.ERROR));
+				}
+				if (defCollection.getMax() != null
+						&& size > defCollection.getMax()) {
+					passed = false;
+					this.addCollectionMessage(defCollection.getId(),
+							new VerifierMessage(
+									"La quantità massima di documenti in questa collection è di "
+											+ defCollection.getMax()
+											+ " documento/i",
+									VerifierMessageType.ERROR));
+				}
 			}
 		}
 		return passed;
