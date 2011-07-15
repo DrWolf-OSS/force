@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
@@ -1102,6 +1103,10 @@ public class SlotInstEditBean {
 			}
 		}
 
+	}
+
+	// prova..
+	public void valueChangeListener(ValueChangeEvent value) {
 	}
 
 	private void addMainMessage(VerifierMessage message) {

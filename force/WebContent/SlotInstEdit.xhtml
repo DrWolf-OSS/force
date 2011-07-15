@@ -79,7 +79,7 @@
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"
-	             						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues != null}" >
+	             						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues != null}">
 	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>

@@ -410,18 +410,37 @@
 	                	<h:outputText value="Conditional Property Value" />
 					</ui:define>
 					<h:inputText value="#{slotDefEditBean.collection.conditionalPropertyInst.stringValue}"
-							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'STRING' }"
+							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'STRING' and slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues == null}"
 							required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"/>
 						<h:inputText value="#{slotDefEditBean.collection.conditionalPropertyInst.integerValue}"
-							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'INTEGER'}"
+							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'INTEGER' and slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues == null}"
 							required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"/>
 						<h:selectBooleanCheckbox value="#{slotDefEditBean.collection.conditionalPropertyInst.booleanValue}"
 							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'BOOLEAN'}"
 							required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"/>
 						<rich:calendar id="subscriptionDate" mode="client"
 							value="#{slotDefEditBean.collection.conditionalPropertyInst.dateValue}" datePattern="dd/MM/yyyy"
-							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'DATE' }"
+							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'DATE' and slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues == null}"
 							required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"/>
+							
+						
+						<h:selectOneMenu value="#{slotDefEditBean.collection.conditionalPropertyInst.stringValue}" required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"
+									rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'STRING' and slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues != null}">
+                    		<s:selectItems value="#{slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues}" 
+											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+             			</h:selectOneMenu>
+             			<h:selectOneMenu value="#{slotDefEditBean.collection.conditionalPropertyInst.integerValue}" required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"
+									rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'INTEGER' and slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues != null}">
+                    		<s:selectItems value="#{slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues}" 
+											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+             			</h:selectOneMenu>
+             			<h:selectOneMenu value="#{slotDefEditBean.collection.conditionalPropertyInst.dateValue}"  required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"
+             						rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'DATE' and slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues != null}">
+                    		<s:selectItems value="#{slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues}" 
+											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+             			</h:selectOneMenu>
+
 	            </s:decorate>
 	            </s:div>
 	        </s:div>
