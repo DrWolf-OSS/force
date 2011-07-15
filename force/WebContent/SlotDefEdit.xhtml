@@ -259,25 +259,29 @@
 </rich:tabPanel>
 
        <rich:modalPanel id="propPanel" autosized="true" width="400" 
-			moveable="false" resizeable="false">
+				resizeable="false">
 			<f:facet name="header">
 				<h:outputText value="Add Property" />
 			</f:facet>
-			<a:form>
+			<a:form id="pf">
+				<script type="text/javascript">
+					var invalid = false;
+				</script>
 			<s:div>
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Property Name" />
 					</ui:define>
-					<h:inputText value="#{slotDefEditBean.propertyDef.name}" />
+					<h:inputText value="#{slotDefEditBean.propertyDef.name}" required="true"/>
 	            </s:decorate>
 	            <s:decorate template="/layout/edit.xhtml">
+
 	                <ui:define name="label">
 	                	<h:outputText value="Property Data Type" />
 					</ui:define>
-					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.propertyDef.type}" >
-                    	<s:selectItems value="#{dataTypes}" 
-						var="type" label="#{type}"/>
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.propertyDef.type}" required="true">
+                    	<s:selectItems value="#{dataTypes}" var="type" label="#{type}" noSelectionLabel="-- seleziona un tipo --"/>
+					<a:support event="onchange" reRender="pf"/>
              		</h:selectOneMenu>
 	            </s:decorate>
 	            <s:decorate template="/layout/edit.xhtml">
@@ -286,26 +290,28 @@
 					</ui:define>
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.required}" />
 	            </s:decorate>
-	            <s:decorate template="/layout/edit.xhtml">
+	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.type != 'BOOLEAN'}">
 	                <ui:define name="label">
 	                	<h:outputText value="Dictionary" />
 					</ui:define>
 					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}">
-                    		<s:selectItems value="#{dictionaryList.resultList}" 
+                    		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.propertyDef.type)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- select a dictionary --"/>
 							<s:convertEntity/>
              		</h:selectOneMenu>
 	            </s:decorate>
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" onclick="#{rich:component('propPanel')}.hide()" reRender="properties,propPanel,collPanel"/>
-			<a:commandButton value="Cancel" onclick="#{rich:component('propPanel')}.hide()"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" oncomplete="if(!invalid){#{rich:component('propPanel')}.hide();}" reRender="pf,properties,condPD"/>
+			<a:region>
+			<a:commandButton value="Cancel" onclick="#{rich:component('propPanel')}.hide()" reRender="propPanel"/>
+			</a:region>
 			</a:form>
 		</rich:modalPanel>
 		
 
 		<rich:modalPanel id="embeddedPropPanel" autosized="true" width="400" 
-			moveable="false" resizeable="false">
+				resizeable="false">
 			<f:facet name="header">
 				<h:outputText value="Add Embedded Property" />
 			</f:facet>
@@ -351,7 +357,7 @@
 		
 		<!-- TODO: Per controllare il form uso la variabile invalid invece di cpfinvalid che non viene valorizzata.. -->
 		<rich:modalPanel id="collPanel" autosized="true" width="400" 
-			moveable="false" resizeable="false">
+				resizeable="false">
 			<f:facet name="header">
 				<h:outputText value="Add Collection" />
 			</f:facet>
