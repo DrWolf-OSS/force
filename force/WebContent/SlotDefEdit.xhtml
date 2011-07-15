@@ -298,7 +298,7 @@
 	            </s:decorate>
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" onclick="#{rich:component('propPanel')}.hide()" reRender="properties,propPanel"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" onclick="#{rich:component('propPanel')}.hide()" reRender="properties,propPanel,collPanel"/>
 			<a:commandButton value="Cancel" onclick="#{rich:component('propPanel')}.hide()"/>
 			</a:form>
 		</rich:modalPanel>
