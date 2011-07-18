@@ -411,7 +411,7 @@
 				
 				<s:div rendered="#{slotDefEditBean.collection.conditionalPropertyDef != null}">			
 	            <s:decorate  template="/layout/edit.xhtml">
-	            	<ui:param name="prefix" value="cpf" />
+	            	
 	                <ui:define name="label">
 	                	<h:outputText value="Conditional Property Value" />
 					</ui:define>
@@ -451,9 +451,9 @@
 	            </s:div>
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addCollection()}" oncomplete="if(!invalid){#{rich:component('collPanel')}.hide();}" reRender="collections,cpf"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addCollection()}" oncomplete="if(!invalid){#{rich:component('collPanel')}.hide();}" reRender="cpf,collections"/>
 			<a:region>
-			<a:commandButton value="Cancel" onclick="#{rich:component('collPanel')}.hide()"/>
+			<a:commandButton value="Cancel" onclick="#{rich:component('collPanel')}.hide()" reRender="cpf"/>
 			</a:region>
 			</a:form>
 		</rich:modalPanel>
