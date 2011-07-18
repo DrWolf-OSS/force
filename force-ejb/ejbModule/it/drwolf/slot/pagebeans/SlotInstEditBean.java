@@ -15,9 +15,11 @@ import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
+import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.FileContainer;
+import it.drwolf.slot.pagebeans.support.ValueChangeListener;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 import it.drwolf.slot.ruleverifier.ParameterCoordinates;
@@ -119,6 +121,9 @@ public class SlotInstEditBean {
 	boolean failAllowed = false;
 
 	boolean warning = false;
+
+	@In(create = true)
+	private ValueChangeListener valueChangeListener;
 
 	private void resetFlags() {
 		verifiable = true;
@@ -386,12 +391,16 @@ public class SlotInstEditBean {
 
 		for (DocDefCollection defCollection : slotDefHome.getInstance()
 				.getDocDefCollections()) {
-			if (defCollection.getConditionalPropertyDef() != null
-					&& findPropertyInstByDefId(
+			if ((defCollection.getConditionalPropertyDef() == null)
+					|| (defCollection.getConditionalPropertyDef() != null
+							&& findPropertyInstByDefId(
+									defCollection.getConditionalPropertyDef()
+											.getId()).getValue() != null && findPropertyInstByDefId(
 							defCollection.getConditionalPropertyDef().getId())
 							.getValue().equals(
 									defCollection.getConditionalPropertyInst()
-											.getValue())) {
+											.getValue()))) {
+
 				List<FileContainer> list = datas.get(defCollection.getId());
 				int size = list.size();
 				if (defCollection.getMin() != null
@@ -399,7 +408,7 @@ public class SlotInstEditBean {
 					passed = false;
 					this.addCollectionMessage(defCollection.getId(),
 							new VerifierMessage(
-									"La quantità minima di documenti in questa collection è di "
+									"Questa collection deve contenere almeno "
 											+ defCollection.getMin()
 											+ " documento/i",
 									VerifierMessageType.ERROR));
@@ -409,7 +418,7 @@ public class SlotInstEditBean {
 					passed = false;
 					this.addCollectionMessage(defCollection.getId(),
 							new VerifierMessage(
-									"La quantità massima di documenti in questa collection è di "
+									"Questa collection deve contenere al massimo "
 											+ defCollection.getMax()
 											+ " documento/i",
 									VerifierMessageType.ERROR));
@@ -1094,6 +1103,14 @@ public class SlotInstEditBean {
 	}
 
 	public void cleanConditionalCollection(PropertyInst propertyInst) {
+
+		Object value = valueChangeListener.getValue();
+		if (value == null
+				&& !propertyInst.getPropertyDef().getDataType()
+						.equals(DataType.BOOLEAN)) {
+			propertyInst.clean();
+		}
+
 		Iterator<DocInstCollection> iterator = docInstCollections.iterator();
 		while (iterator.hasNext()) {
 			DocInstCollection instCollection = iterator.next();
@@ -1107,6 +1124,7 @@ public class SlotInstEditBean {
 						.equals(propertyInst.getValue())) {
 					cleanCollection(instCollection.getDocDefCollection()
 							.getId());
+
 				}
 			}
 		}

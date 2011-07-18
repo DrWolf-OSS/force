@@ -130,4 +130,16 @@ public class PropertyInst implements DataInstance {
 		return this.propertyDef;
 	}
 
+	@Transient
+	public void clean() {
+		if (this.getPropertyDef().getType().equals(DataType.STRING))
+			this.setStringValue(null);
+		else if (this.getPropertyDef().getType().equals(DataType.INTEGER))
+			this.setIntegerValue(null);
+		else if (this.getPropertyDef().getType().equals(DataType.DATE))
+			this.setDateValue(null);
+		else if (this.getPropertyDef().getType().equals(DataType.BOOLEAN))
+			this.setBooleanValue(null);
+	}
+
 }
