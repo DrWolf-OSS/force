@@ -91,6 +91,12 @@ public class UserSession implements Serializable {
 				+ "\" member");
 	}
 
+	public Azienda getAzienda() {
+		return (Azienda) this.entityManager
+				.createQuery("from Azienda where id = :id")
+				.setParameter("id", this.getAziendaId()).getSingleResult();
+	}
+
 	public Integer getAziendaId() {
 		return this.aziendaId;
 	}

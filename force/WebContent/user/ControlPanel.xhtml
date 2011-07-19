@@ -13,7 +13,10 @@
 <ui:define name="body">
 <h:panelGrid columns="2" width="100%" columnClasses="controlPanelclass,controlPanelclass">
 <rich:panel>
-     <f:facet name="header"><s:span><s:link value="Vedi tutto" view="/user/advancedEpoSearch.xhtml" styleClass="topCommandLink"/>
+     <f:facet name="header"><s:span>
+     <s:link value="Vedi tutto" view="/user/Azienda.xhtml" styleClass="topCommandLink">
+      <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+      </s:link>
     <h:outputText value="I Dati dell'Impresa" /></s:span></f:facet>
      <s:decorate id="ragsoc" template="/layout/display.xhtml">
             <ui:define name="label">Ragione Sociale</ui:define>
@@ -46,6 +49,9 @@
     </s:link>
     <h:outputText value="Documenti in Scadenza" /></s:span>
     </f:facet>
+    <h:outputText value="Non hai ancora inserito documenti nel tuo archivio."
+               rendered="#{empty controlPanelBean.docInstCollections}"/>
+    
     <c:forEach var="coll"
                items="#{controlPanelBean.docInstCollections}">
                                 <s:div id="infoPanel_#{coll.docDefCollection.id}">
@@ -133,7 +139,7 @@
 </rich:panel>
 <rich:panel>
     <f:facet name="header"><s:span>
-    <s:link value="Vedi tutto" view="/SlotInstEdit.xhtml" styleClass="topCommandLink">
+    <s:link value="Vedi tutto" view="/user/GareList.xhtml" styleClass="topCommandLink">
         <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
         <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
         <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
@@ -156,16 +162,104 @@
     
 </rich:panel>
 <rich:panel>
-    <f:facet name="header">Gare a cui partecipi</f:facet>
+    <f:facet name="header"><s:span>
+    <s:link value="Vedi tutto" view="/user/CommesseEdit.xhtml" styleClass="topCommandLink">
+        <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
+        <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+        <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+    </s:link>
+    <h:outputText value="Gare a cui partecipi" /></s:span></f:facet>
+    <rich:dataTable value="#{controlPanelBean.slotInst}" var="g">
+     <rich:column>
+        <f:facet name="header">Oggetto</f:facet>
+        <h:outputText value="#{g.slotDef.name}"></h:outputText>
+    </rich:column>
+     <rich:column>
+        <f:facet name="header">Azioni</f:facet>
+        <s:link value="Amministra" view="/SlotInstEdit.xhtml" styleClass="topCommandLink" propagation="none">
+        <f:param name="slotInstId" value="#{g.id}"/>
+        <f:param name="slotDefId" value="#{g.slotDef.id}"/>
+        <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+    </s:link>
+    </rich:column>
+    </rich:dataTable>
 </rich:panel>
 <rich:panel>
-    <f:facet name="header">Le tue Commesse</f:facet>
+    <f:facet name="header"><s:span>
+    <s:link value="Vedi tutto" view="/user/CommesseEdit.xhtml" styleClass="topCommandLink">
+        <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
+        <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+        <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+    </s:link>
+    <h:outputText value="Le tue Commesse" /></s:span></f:facet>
+     <rich:dataTable id="commessaList"
+                var="_commessa"
+              value="#{commessaList.commesseForAzienda}"
+           rendered="#{not empty commessaList.commesseForAzienda}">
+           <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{commessaList}"/>
+                    <ui:param name="propertyLabel" value="Descrizione"/>
+                    <ui:param name="propertyPath" value="commessa.descrizione"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_commessa.descrizione}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{commessaList}"/>
+                    <ui:param name="propertyLabel" value="Importo"/>
+                    <ui:param name="propertyPath" value="commessa.importo"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_commessa.importo} €"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{commessaList}"/>
+                    <ui:param name="propertyLabel" value="Data commessa"/>
+                    <ui:param name="propertyPath" value="commessa.dataCommessa"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_commessa.dataCommessa}"/>
+        </h:column>
+        </rich:dataTable>   
 </rich:panel>
 <rich:panel>
-    <f:facet name="header">Le tue Categorie Merceologiche</f:facet>
+    <f:facet name="header"><s:span>
+    <s:link value="Vedi tutto" view="/user/CatMerEdit.xhtml" styleClass="topCommandLink">
+        <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+    </s:link>
+    <h:outputText value="Le tue Categorie Merceologiche" /></s:span></f:facet>
+    <rich:dataTable id="catmerList"
+                var="catMer"
+              value="#{userSession.azienda.categorieMerceologicheAsList}"
+           rendered="#{not empty userSession.azienda.categorieMerceologicheAsList}">
+        <rich:column>
+        <h:outputText value="#{catMer.categoria}"></h:outputText>
+    </rich:column>
+    </rich:dataTable>
 </rich:panel>
 <rich:panel rendered="#{userSession.llpp}">
-    <f:facet name="header">Le tue SOA</f:facet>
+    <f:facet name="header"><s:span>
+    <s:link value="Vedi tutto" view="/user/SOAEdit.xhtml" styleClass="topCommandLink">
+        <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+    </s:link>
+    <h:outputText value="Le Tue SOA" /></s:span></f:facet>
+    <rich:dataTable id="soaList"
+                var="soa"
+              value="#{userSession.azienda.SOAAsList}"
+           rendered="#{not empty userSession.azienda.SOAAsList}">
+        <rich:column>
+        <h:outputText value="#{soa.codice}"></h:outputText>
+    </rich:column>
+        <rich:column>
+        <h:outputText value="#{soa.nome}"></h:outputText>
+    </rich:column>
+    </rich:dataTable>
 </rich:panel>
 
 </h:panelGrid>
