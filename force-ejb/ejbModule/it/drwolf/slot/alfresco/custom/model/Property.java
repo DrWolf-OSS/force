@@ -148,7 +148,7 @@ public class Property implements DataDefinition {
 		this.constraints = constraints;
 	}
 
-	public List<String> getDictionary() {
+	public List<String> getDictionaryValues() {
 		if (this.constraints != null) {
 			Iterator<Constraint> iterator = constraints.iterator();
 			while (iterator.hasNext()) {

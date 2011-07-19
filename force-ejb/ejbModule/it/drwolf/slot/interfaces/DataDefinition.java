@@ -14,5 +14,5 @@ public interface DataDefinition {
 
 	public boolean isEditable();
 
-	public List<String> getDictionary();
+	public List<String> getDictionaryValues();
 }

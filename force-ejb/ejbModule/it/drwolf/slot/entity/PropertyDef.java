@@ -10,6 +10,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 @Entity
@@ -22,6 +23,8 @@ public class PropertyDef implements DataDefinition {
 	private DataType type;
 
 	private boolean required = false;
+
+	private Dictionary dictionary;
 
 	public PropertyDef(String name, DataType type) {
 		super();
@@ -125,9 +128,21 @@ public class PropertyDef implements DataDefinition {
 	}
 
 	@Transient
-	public List<String> getDictionary() {
-		// TODO Auto-generated method stub
+	public List<String> getDictionaryValues() {
+		if (this.getDictionary() != null
+				&& !this.getDictionary().getValues().isEmpty()) {
+			return this.getDictionary().getValues();
+		}
 		return null;
+	}
+
+	@ManyToOne
+	public Dictionary getDictionary() {
+		return dictionary;
+	}
+
+	public void setDictionary(Dictionary dictionary) {
+		this.dictionary = dictionary;
 	}
 
 }

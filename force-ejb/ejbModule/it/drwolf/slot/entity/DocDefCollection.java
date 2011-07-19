@@ -1,5 +1,6 @@
 package it.drwolf.slot.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -22,6 +23,10 @@ public class DocDefCollection {
 	private DocDef docDef;
 
 	private SlotDef slotDef;
+
+	private PropertyDef conditionalPropertyDef;
+
+	private PropertyInst conditionalPropertyInst;
 
 	@Id
 	@GeneratedValue
@@ -57,7 +62,7 @@ public class DocDefCollection {
 		this.max = max;
 	}
 
-	@OneToOne
+	@ManyToOne
 	@NotNull
 	public DocDef getDocDef() {
 		return docDef;
@@ -79,6 +84,24 @@ public class DocDefCollection {
 	@Override
 	public String toString() {
 		return name + ":" + min + "," + max + ";" + docDef;
+	}
+
+	@ManyToOne(cascade = CascadeType.PERSIST)
+	public PropertyDef getConditionalPropertyDef() {
+		return conditionalPropertyDef;
+	}
+
+	public void setConditionalPropertyDef(PropertyDef conditionalPropertyDef) {
+		this.conditionalPropertyDef = conditionalPropertyDef;
+	}
+
+	@OneToOne(cascade = CascadeType.ALL)
+	public PropertyInst getConditionalPropertyInst() {
+		return conditionalPropertyInst;
+	}
+
+	public void setConditionalPropertyInst(PropertyInst conditionalPropertyInst) {
+		this.conditionalPropertyInst = conditionalPropertyInst;
 	}
 
 	// @Override

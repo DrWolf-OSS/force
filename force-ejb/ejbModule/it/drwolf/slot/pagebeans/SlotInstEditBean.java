@@ -15,9 +15,11 @@ import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
+import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.FileContainer;
+import it.drwolf.slot.pagebeans.support.ValueChangeListener;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 import it.drwolf.slot.ruleverifier.ParameterCoordinates;
@@ -41,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
@@ -118,6 +121,9 @@ public class SlotInstEditBean {
 	boolean failAllowed = false;
 
 	boolean warning = false;
+
+	@In(create = true)
+	private ValueChangeListener valueChangeListener;
 
 	private void resetFlags() {
 		verifiable = true;
@@ -385,26 +391,38 @@ public class SlotInstEditBean {
 
 		for (DocDefCollection defCollection : slotDefHome.getInstance()
 				.getDocDefCollections()) {
-			List<FileContainer> list = datas.get(defCollection.getId());
-			int size = list.size();
-			if (defCollection.getMin() != null && size < defCollection.getMin()) {
-				passed = false;
-				this.addCollectionMessage(defCollection.getId(),
-						new VerifierMessage(
-								"La quantità minima di documenti in questa collection è di "
-										+ defCollection.getMin()
-										+ " documento/i",
-								VerifierMessageType.ERROR));
-			}
+			if ((defCollection.getConditionalPropertyDef() == null)
+					|| (defCollection.getConditionalPropertyDef() != null
+							&& findPropertyInstByDefId(
+									defCollection.getConditionalPropertyDef()
+											.getId()).getValue() != null && findPropertyInstByDefId(
+							defCollection.getConditionalPropertyDef().getId())
+							.getValue().equals(
+									defCollection.getConditionalPropertyInst()
+											.getValue()))) {
 
-			if (defCollection.getMax() != null && size > defCollection.getMax()) {
-				passed = false;
-				this.addCollectionMessage(defCollection.getId(),
-						new VerifierMessage(
-								"La quantità massima di documenti in questa collection è di "
-										+ defCollection.getMax()
-										+ " documento/i",
-								VerifierMessageType.ERROR));
+				List<FileContainer> list = datas.get(defCollection.getId());
+				int size = list.size();
+				if (defCollection.getMin() != null
+						&& size < defCollection.getMin()) {
+					passed = false;
+					this.addCollectionMessage(defCollection.getId(),
+							new VerifierMessage(
+									"Questa collection deve contenere almeno "
+											+ defCollection.getMin()
+											+ " documento/i",
+									VerifierMessageType.ERROR));
+				}
+				if (defCollection.getMax() != null
+						&& size > defCollection.getMax()) {
+					passed = false;
+					this.addCollectionMessage(defCollection.getId(),
+							new VerifierMessage(
+									"Questa collection deve contenere al massimo "
+											+ defCollection.getMax()
+											+ " documento/i",
+									VerifierMessageType.ERROR));
+				}
 			}
 		}
 		return passed;
@@ -1062,6 +1080,59 @@ public class SlotInstEditBean {
 			filesMessages.put(fileContainerId, messages);
 		}
 		messages.add(message);
+	}
+
+	public PropertyInst findPropertyInstByDefId(Long propertyDefId) {
+		Iterator<PropertyInst> iterator = propertyInsts.iterator();
+		while (iterator.hasNext()) {
+			PropertyInst propertyInst = iterator.next();
+			if (propertyInst.getPropertyDef().getId().equals(propertyDefId)) {
+				return propertyInst;
+			}
+		}
+		return null;
+	}
+
+	private void cleanCollection(Long docDefCollectionId) {
+		List<FileContainer> itemslist = this.datas.get(docDefCollectionId);
+		if (itemslist != null) {
+			itemslist.clear();
+		} else {
+			itemslist = new ArrayList<FileContainer>();
+		}
+	}
+
+	public void cleanConditionalCollection(PropertyInst propertyInst) {
+
+		Object value = valueChangeListener.getValue();
+		if (value == null
+				&& !propertyInst.getPropertyDef().getDataType()
+						.equals(DataType.BOOLEAN)) {
+			propertyInst.clean();
+		}
+
+		Iterator<DocInstCollection> iterator = docInstCollections.iterator();
+		while (iterator.hasNext()) {
+			DocInstCollection instCollection = iterator.next();
+			if (instCollection.getDocDefCollection()
+					.getConditionalPropertyDef() != null
+					&& instCollection.getDocDefCollection()
+							.getConditionalPropertyDef().getId()
+							.equals(propertyInst.getPropertyDef().getId())) {
+				if (!instCollection.getDocDefCollection()
+						.getConditionalPropertyInst().getValue()
+						.equals(propertyInst.getValue())) {
+					cleanCollection(instCollection.getDocDefCollection()
+							.getId());
+
+				}
+			}
+		}
+
+	}
+
+	// prova..
+	public void valueChangeListener(ValueChangeEvent value) {
 	}
 
 	private void addMainMessage(VerifierMessage message) {

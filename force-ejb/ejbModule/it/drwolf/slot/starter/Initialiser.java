@@ -1,6 +1,8 @@
 package it.drwolf.slot.starter;
 
+import it.drwolf.slot.entity.Dictionary;
 import it.drwolf.slot.entity.Preference;
+import it.drwolf.slot.enums.DataType;
 
 import javax.persistence.EntityManager;
 
@@ -35,6 +37,12 @@ public class Initialiser {
 			}
 		}
 		checkParams(entityManager);
+
+		//
+		// createStrDictionary(entityManager);
+		// createIntDictionary(entityManager);
+		// createDateDictionary(entityManager);
+		//
 		System.out.println("---> Checked");
 	}
 
@@ -52,6 +60,38 @@ public class Initialiser {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private void createStrDictionary(EntityManager entityManager) {
+		Dictionary dictionary = new Dictionary();
+		dictionary.setName("dizionario di prova");
+		dictionary.setDataType(DataType.STRING);
+		dictionary.getValues().add("mela");
+		dictionary.getValues().add("pera");
+		dictionary.getValues().add("pesca");
+		dictionary.getValues().add("banana");
+		dictionary.getValues().add("ananas");
+		entityManager.persist(dictionary);
+	}
+
+	private void createIntDictionary(EntityManager entityManager) {
+		Dictionary dictionary = new Dictionary();
+		dictionary.setDataType(DataType.INTEGER);
+		dictionary.setName("dizionario di interi");
+		dictionary.getValues().add("1");
+		dictionary.getValues().add("2");
+		dictionary.getValues().add("3");
+		dictionary.getValues().add("4");
+		dictionary.getValues().add("5");
+		entityManager.persist(dictionary);
+	}
+
+	private void createDateDictionary(EntityManager entityManager) {
+		Dictionary dictionary = new Dictionary();
+		dictionary.setName("dizionario di date 2");
+		dictionary.setDataType(DataType.DATE);
+		dictionary.getValues().add("01/07/2011");
+		entityManager.persist(dictionary);
 	}
 
 }

@@ -5,7 +5,7 @@
                  xmlns:s="http://jboss.com/products/seam/taglib">
 
     <div class="prop">
-
+     <ui:insert name="prefix" />
         <s:label styleClass="name #{invalid?'errors':''}">
             <ui:insert name="label"/>
             <s:span styleClass="required" rendered="#{required}">*</s:span>
@@ -21,6 +21,7 @@
             <h:graphicImage value="/img/error.gif" rendered="#{invalid}" styleClass="errors"/>
             <s:message styleClass="errors"/>
         </span>
+       
       
 <s:fragment rendered="#{invalid}">
 <script type="text/javascript">

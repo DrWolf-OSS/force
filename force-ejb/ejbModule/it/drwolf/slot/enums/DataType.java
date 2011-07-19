@@ -22,4 +22,13 @@ public enum DataType {
 		throw new IllegalArgumentException(parameter);
 	}
 
+	public static DataType fromName(String parameter) {
+		for (DataType c : DataType.values()) {
+			if (c.name().equals(parameter)) {
+				return c;
+			}
+		}
+		throw new IllegalArgumentException(parameter);
+	}
+
 }
