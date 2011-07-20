@@ -205,4 +205,40 @@ public class AlfrescoWebScriptClient {
 
 		return parsed;
 	}
+
+	public String openGetRequest(String uri) throws HttpException, IOException {
+		HttpClient client = new HttpClient();
+		client.getParams().setParameter("http.useragent", "WebScript Client");
+		client.getState().setCredentials(AuthScope.ANY,
+				new UsernamePasswordCredentials(this.username, this.password));
+		GetMethod method = new GetMethod(uri);
+		int statusCode = client.executeMethod(method);
+
+		// InputStream responseStream = method.getResponseBodyAsStream();
+		//
+		// StringBuilder stringBuilder = new StringBuilder();
+		// String nl = System.getProperty("line.separator");
+		// Scanner scanner = new Scanner(responseStream);
+		// while (scanner.hasNextLine()) {
+		// stringBuilder.append(scanner.nextLine() + nl);
+		// }
+		// String response = stringBuilder.toString();
+
+		String response = method.getResponseBodyAsString();
+		// System.out.println("---> response: " + response);
+		return response.trim();
+	}
+
+	public String addSignature(String target, String name) {
+		try {
+			String serviceLocation = "/service/addSignature";
+			String uri = this.repositoryUri + serviceLocation + "?target="
+					+ target + "&name=" + name;
+			return openGetRequest(uri);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

@@ -4,7 +4,10 @@ import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
+import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.application.CustomModelController;
+import it.drwolf.slot.digsig.CertsController;
+import it.drwolf.slot.digsig.Utils;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
@@ -34,8 +37,14 @@ import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.Security;
+import java.security.cert.CertStore;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,7 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
@@ -57,6 +65,13 @@ import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSTypedStream;
+import org.bouncycastle.cms.SignerId;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -124,6 +139,9 @@ public class SlotInstEditBean {
 
 	@In(create = true)
 	private ValueChangeListener valueChangeListener;
+
+	@In(create = true)
+	private CertsController certsController;
 
 	private void resetFlags() {
 		verifiable = true;
@@ -686,6 +704,8 @@ public class SlotInstEditBean {
 		// poi si aggiungono i valori delle relative properties
 		updateProperties(document, embeddedProperties);
 		nodeRef = objectId.getId();
+
+		verifySignature(document);
 		return nodeRef;
 	}
 
@@ -1131,8 +1151,80 @@ public class SlotInstEditBean {
 
 	}
 
-	// prova..
-	public void valueChangeListener(ValueChangeEvent value) {
+	private void verifySignature(AlfrescoDocument document) {
+		try {
+			BouncyCastleProvider bcProv = new BouncyCastleProvider();
+			Security.addProvider(bcProv);
+			InputStream contentInputStream = document.getContentStream()
+					.getStream();
+			CMSSignedData cms = new CMSSignedData(contentInputStream);
+
+			CMSTypedStream typedStream = new CMSTypedStream(contentInputStream);
+			String type = typedStream.getContentType();
+
+			CertStore certStore = cms
+					.getCertificatesAndCRLs("Collection", "BC");
+
+			// ottenimento delle firme
+			SignerInformationStore infos = cms.getSignerInfos();
+
+			// per ogni signer ottiene l'insieme dei certificati
+			Collection<SignerInformation> signers = infos.getSigners();
+			for (SignerInformation info : signers) {
+
+				SignerId sid = info.getSID();
+
+				Collection<X509Certificate> certsCollection = (Collection<X509Certificate>) certStore
+						.getCertificates(sid);
+
+				for (X509Certificate x509Certificate : certsCollection) {
+					X509CertificateObject validCert = certsController
+							.getCerts().match(x509Certificate);
+
+					if (validCert != null) {
+						System.out.println("----> certificato trovato!");
+						addSignature(document, x509Certificate, validCert);
+					}
+				}
+			}
+		} catch (Exception e) {
+			System.out.println(document.getName()
+					+ " non è firmato digitalmente");
+			// e.printStackTrace();
+		}
+	}
+
+	private void addSignature(AlfrescoDocument document,
+			X509Certificate x509Certificate, X509CertificateObject validCert) {
+		String mysign = Utils.getCN(x509Certificate.getSubjectDN().toString());
+		Date notAfter = x509Certificate.getNotAfter();
+		String authority = Utils.getCN(validCert.getIssuerDN().toString());
+
+		String username = alfrescoUserIdentity.getUsername();
+		String password = alfrescoUserIdentity.getPassword();
+		String url = alfrescoUserIdentity.getUrl();
+		AlfrescoWebScriptClient webScriptClient = new AlfrescoWebScriptClient(
+				username, password, url);
+
+		document.addAspect("P:dw:signed");
+
+		String signatureNodeRef = webScriptClient.addSignature(
+				document.getId(),
+				"sign:" + Utils.md5Encode(x509Certificate.getSignature()));
+
+		Session session = alfrescoUserIdentity.getSession();
+		AlfrescoDocument signature = (AlfrescoDocument) session
+				.getObject(signatureNodeRef);
+
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put("dw:validity", Boolean.TRUE);
+		props.put("dw:expiry", Utils.dateToCalendar(notAfter));
+		props.put("dw:authority", authority);
+		props.put("dw:sign", mysign);
+		props.put("dw:cf", "");
+
+		signature.updateProperties(props);
+		System.out.println("-> Signature added to " + document.getName());
 	}
 
 	private void addMainMessage(VerifierMessage message) {
