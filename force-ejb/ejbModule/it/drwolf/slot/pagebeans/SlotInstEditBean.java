@@ -39,6 +39,7 @@ import it.drwolf.slot.session.SlotInstHome;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.Principal;
 import java.security.Security;
 import java.security.cert.CertStore;
 import java.security.cert.X509Certificate;
@@ -1196,7 +1197,10 @@ public class SlotInstEditBean {
 
 	private void addSignature(AlfrescoDocument document,
 			X509Certificate x509Certificate, X509CertificateObject validCert) {
-		String mysign = Utils.getCN(x509Certificate.getSubjectDN().toString());
+		Principal subjectDN = x509Certificate.getSubjectDN();
+
+		String mysign = Utils.getCN(subjectDN.toString());
+		String cf = Utils.getCF(subjectDN.toString());
 		Date notAfter = x509Certificate.getNotAfter();
 		String authority = Utils.getCN(validCert.getIssuerDN().toString());
 
@@ -1221,7 +1225,7 @@ public class SlotInstEditBean {
 		props.put("dw:expiry", Utils.dateToCalendar(notAfter));
 		props.put("dw:authority", authority);
 		props.put("dw:sign", mysign);
-		props.put("dw:cf", "");
+		props.put("dw:cf", cf);
 
 		signature.updateProperties(props);
 		System.out.println("-> Signature added to " + document.getName());

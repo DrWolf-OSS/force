@@ -223,6 +223,12 @@
 										<h:outputText value="#{item.fileName}" />
 										</a>
 									</s:decorate>
+									<s:decorate template="/layout/display.xhtml">
+										<ui:define name="label">
+											<h:outputText value="Signed" />
+										</ui:define>
+										<h:outputText value="#{item.document.hasAspect('P:dw:signed') ? 'Yes' : 'No'}"/>
+									</s:decorate>
 
 									<ui:repeat var="dataInstance" value="#{item.embeddedProperties}">
 										<s:decorate template="/layout/display.xhtml">
@@ -242,6 +248,8 @@
 											</h:outputText>
 										</s:decorate>
 									</ui:repeat>
+									
+									
 									<div style="clear: both" />
 									<a:region>
 										<a:commandButton value="Remove"

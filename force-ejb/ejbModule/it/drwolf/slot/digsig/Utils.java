@@ -10,14 +10,24 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
-	private static Pattern p = Pattern.compile("CN\\s*=([\\w\\s]+)");
+	private static Pattern cn = Pattern.compile("CN\\s*=([\\w\\s]+)");
+	private static Pattern cf = Pattern
+			.compile("SERIALNUMBER\\s*=([\\w:\\w]+)");
 
 	public static String getCN(String dn) {
-		Matcher m = Utils.p.matcher(dn);
+		Matcher m = Utils.cn.matcher(dn);
 		if (m.find()) {
 			return m.group(m.groupCount());
 		}
 		return "No CN";
+	}
+
+	public static String getCF(String dn) {
+		Matcher m = Utils.cf.matcher(dn);
+		if (m.find()) {
+			return m.group(m.groupCount());
+		}
+		return "No CF";
 	}
 
 	public static String md5Encode(byte[] signature) {
