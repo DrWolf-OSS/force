@@ -1181,38 +1181,45 @@ public class SlotInstEditBean {
 
 	private void addSignature(AlfrescoDocument document,
 			X509Certificate x509Certificate, X509CertificateObject validCert) {
-		Principal subjectDN = x509Certificate.getSubjectDN();
+		try {
+			Principal subjectDN = x509Certificate.getSubjectDN();
 
-		String mysign = Utils.getCN(subjectDN.toString());
-		String cf = Utils.getCF(subjectDN.toString());
-		Date notAfter = x509Certificate.getNotAfter();
-		String authority = Utils.getCN(validCert.getIssuerDN().toString());
+			String mysign = Utils.getCN(subjectDN.toString());
+			String cf = Utils.getCF(subjectDN.toString());
+			Date notAfter = x509Certificate.getNotAfter();
+			String authority = Utils.getCN(validCert.getIssuerDN().toString());
 
-		String username = alfrescoUserIdentity.getUsername();
-		String password = alfrescoUserIdentity.getPassword();
-		String url = alfrescoUserIdentity.getUrl();
-		AlfrescoWebScriptClient webScriptClient = new AlfrescoWebScriptClient(
-				username, password, url);
+			String username = alfrescoUserIdentity.getUsername();
+			String password = alfrescoUserIdentity.getPassword();
+			String url = alfrescoUserIdentity.getUrl();
+			AlfrescoWebScriptClient webScriptClient = new AlfrescoWebScriptClient(
+					username, password, url);
 
-		document.addAspect("P:dw:signed");
+			document.addAspect("P:dw:signed");
 
-		String signatureNodeRef = webScriptClient.addSignature(
-				document.getId(),
-				"sign:" + Utils.md5Encode(x509Certificate.getSignature()));
+			String signatureNodeRef = webScriptClient.addSignature(
+					document.getId(),
+					"sign_" + Utils.md5Encode(x509Certificate.getSignature()));
 
-		Session session = alfrescoUserIdentity.getSession();
-		AlfrescoDocument signature = (AlfrescoDocument) session
-				.getObject(signatureNodeRef);
+			Session session = alfrescoUserIdentity.getSession();
+			AlfrescoDocument signature = (AlfrescoDocument) session
+					.getObject(signatureNodeRef);
 
-		Map<String, Object> props = new HashMap<String, Object>();
-		props.put("dw:validity", Boolean.TRUE);
-		props.put("dw:expiry", Utils.dateToCalendar(notAfter));
-		props.put("dw:authority", authority);
-		props.put("dw:sign", mysign);
-		props.put("dw:cf", cf);
+			Map<String, Object> props = new HashMap<String, Object>();
+			props.put("dw:validity", Boolean.TRUE);
+			props.put("dw:expiry", Utils.dateToCalendar(notAfter));
+			props.put("dw:authority", authority);
+			props.put("dw:sign", mysign);
+			props.put("dw:cf", cf);
 
-		signature.updateProperties(props);
-		System.out.println("-> Signature added to " + document.getName());
+			signature.updateProperties(props);
+			System.out.println("-> Signature added to " + document.getName());
+		} catch (Exception e) {
+			System.out
+					.println("---> Errore nell aggiungere una firma al documento "
+							+ document.getName());
+			e.printStackTrace();
+		}
 	}
 
 	private void addMainMessage(VerifierMessage message) {

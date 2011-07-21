@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -214,17 +215,17 @@ public class AlfrescoWebScriptClient {
 		GetMethod method = new GetMethod(uri);
 		int statusCode = client.executeMethod(method);
 
-		// InputStream responseStream = method.getResponseBodyAsStream();
-		//
-		// StringBuilder stringBuilder = new StringBuilder();
-		// String nl = System.getProperty("line.separator");
-		// Scanner scanner = new Scanner(responseStream);
-		// while (scanner.hasNextLine()) {
-		// stringBuilder.append(scanner.nextLine() + nl);
-		// }
-		// String response = stringBuilder.toString();
+		InputStream responseStream = method.getResponseBodyAsStream();
 
-		String response = method.getResponseBodyAsString();
+		StringBuilder stringBuilder = new StringBuilder();
+		String nl = System.getProperty("line.separator");
+		Scanner scanner = new Scanner(responseStream);
+		while (scanner.hasNextLine()) {
+			stringBuilder.append(scanner.nextLine() + nl);
+		}
+		String response = stringBuilder.toString();
+
+		// String response = method.getResponseBodyAsString();
 		// System.out.println("---> response: " + response);
 		return response.trim();
 	}
