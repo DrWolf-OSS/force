@@ -610,13 +610,13 @@ public class SlotInstEditBean {
 			try {
 				DocInstCollection instCollection = findInstCollection(activeCollectionId);
 				AlfrescoFolder slotFolder = retrieveSlotFolder();
-				String refId;
-				refId = storeOnAlfresco(activeFileContainer.getUploadItem(),
-						instCollection,
+				// String refId;
+				AlfrescoDocument document = storeOnAlfresco(
+						activeFileContainer.getUploadItem(), instCollection,
 						activeFileContainer.getEmbeddedProperties(), slotFolder);
-				Session session = alfrescoUserIdentity.getSession();
-				AlfrescoDocument document = (AlfrescoDocument) session
-						.getObject(refId);
+				// Session session = alfrescoUserIdentity.getSession();
+				// AlfrescoDocument document = (AlfrescoDocument) session
+				// .getObject(refId);
 
 				//
 				// document.addAspect("P:util:tmp");
@@ -648,28 +648,19 @@ public class SlotInstEditBean {
 		}
 	}
 
-	private String storeOnAlfresco(UploadItem item,
+	private AlfrescoDocument storeOnAlfresco(UploadItem item,
 			DocInstCollection instCollection,
 			List<DocumentPropertyInst> embeddedProperties, Folder slotFolder)
 			throws Exception {
-		String nodeRef = "";
+
 		Session session = alfrescoUserIdentity.getSession();
 
 		String fileName = item.getFileName();
-		// int dotIndex = fileName.lastIndexOf(".");
-		// String extension = fileName.substring(dotIndex + 1);
-		// String mimetype = Resolver.mimetypeForExtension(extension);
-		// if (mimetype == null)
-		// mimetype = "application/octet-stream";
-		// System.out.println("---> \"" + fileName + " MIME Type of \" : "
-		// + mimetype);
 
 		// Metto un mimetype generico, ci pensa Alfresco a mettere il mimetype
 		// giusto tramite l'esecuzione di uno script
 		String mimetype = "application/octet-stream";
 
-		// String contentType = new
-		// MimetypesFileTypeMap().getContentType(fileName);
 		ContentStreamImpl contentStreamImpl = new ContentStreamImpl(fileName,
 				new BigInteger("" + item.getFile().length()), mimetype,
 				new FileInputStream(item.getFile()));
@@ -684,18 +675,12 @@ public class SlotInstEditBean {
 
 		ObjectId objectId = session.createDocument(properties, slotFolder,
 				contentStreamImpl, VersioningState.NONE, null, null, null);
-		System.out.println(objectId);
+		// System.out.println(objectId);
 
 		AlfrescoDocument document = (AlfrescoDocument) session
 				.getObject(objectId);
 		//
 		document.addAspect("P:util:tmp");
-
-		// Map<String, Object> aspectsProperties = new HashMap<String,
-		// Object>();
-		// aspectsProperties.put(key, value)
-		// document
-		//
 
 		// prima si aggiungono gli aspect
 		for (String aspect : aspectIds) {
@@ -704,10 +689,9 @@ public class SlotInstEditBean {
 
 		// poi si aggiungono i valori delle relative properties
 		updateProperties(document, embeddedProperties);
-		nodeRef = objectId.getId();
-
 		verifySignature(document);
-		return nodeRef;
+
+		return document;
 	}
 
 	private String encodeFilename(String origin) {
