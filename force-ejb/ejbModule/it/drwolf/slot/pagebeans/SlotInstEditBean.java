@@ -45,6 +45,7 @@ import java.security.Security;
 import java.security.cert.CertStore;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,7 +60,9 @@ import javax.persistence.EntityManager;
 import org.alfresco.cmis.client.AlfrescoDocument;
 import org.alfresco.cmis.client.AlfrescoFolder;
 import org.apache.chemistry.opencmis.client.api.Folder;
+import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
+import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -201,6 +204,8 @@ public class SlotInstEditBean {
 								.getSession().getObject(nodeRef);
 						FileContainer container = buildFileContainer(
 								docDefCollection, document, true);
+						container.setSignatures(this
+								.retrieveSignatures(document));
 						this.datas.get(docDefCollection.getId()).add(container);
 					} catch (CmisObjectNotFoundException e) {
 						FacesMessages.instance().add(
@@ -1214,11 +1219,11 @@ public class SlotInstEditBean {
 					.getObject(signatureNodeRef);
 
 			Map<String, Object> props = new HashMap<String, Object>();
-			props.put("dw:validity", validity);
-			props.put("dw:expiry", Utils.dateToCalendar(notAfter));
-			props.put("dw:authority", authority);
-			props.put("dw:sign", mysign);
-			props.put("dw:cf", cf);
+			props.put(Signature.VALIDITY, validity);
+			props.put(Signature.EXPIRY, Utils.dateToCalendar(notAfter));
+			props.put(Signature.AUTHORITY, authority);
+			props.put(Signature.SIGN, mysign);
+			props.put(Signature.CF, cf);
 
 			signatureDoc.updateProperties(props);
 
@@ -1240,6 +1245,35 @@ public class SlotInstEditBean {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private List<Signature> retrieveSignatures(AlfrescoDocument document) {
+		List<Signature> signatures = new ArrayList<Signature>();
+		ItemIterable<QueryResult> results = alfrescoUserIdentity.getSession()
+				.query("SELECT cmis:objectId," + Signature.VALIDITY + ","
+						+ Signature.EXPIRY + "," + Signature.AUTHORITY + ","
+						+ Signature.SIGN + "," + Signature.CF
+						+ " from dw:signature WHERE IN_TREE('"
+						+ document.getId() + "')", true);
+		if (results.getTotalNumItems() != 0) {
+			Iterator<QueryResult> iterator = results.iterator();
+			while (iterator.hasNext()) {
+				QueryResult result = iterator.next();
+				String nodeRef = result.getPropertyValueById("cmis:objectId");
+				Boolean validity = result
+						.getPropertyValueById(Signature.VALIDITY);
+				Calendar expiry = result.getPropertyValueById(Signature.EXPIRY);
+				String authority = result
+						.getPropertyValueById(Signature.AUTHORITY);
+				String sign = result.getPropertyValueById(Signature.SIGN);
+				String cf = result.getPropertyValueById(Signature.CF);
+
+				Signature signature = new Signature(validity, expiry.getTime(),
+						authority, sign, cf, nodeRef);
+				signatures.add(signature);
+			}
+		}
+		return signatures;
 	}
 
 	private void addMainMessage(VerifierMessage message) {

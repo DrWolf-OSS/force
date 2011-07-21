@@ -4,6 +4,12 @@ import java.util.Date;
 
 public class Signature {
 
+	public static final String VALIDITY = "dw:validity";
+	public static final String EXPIRY = "dw:expiry";
+	public static final String AUTHORITY = "dw:authority";
+	public static final String SIGN = "dw:sign";
+	public static final String CF = "dw:cf";
+
 	private boolean validity;
 	private Date expiry;
 	private String authority;
@@ -11,6 +17,20 @@ public class Signature {
 	private String cf;
 
 	private String nodeRef;
+
+	public Signature() {
+	}
+
+	public Signature(boolean validity, Date expiry, String authority,
+			String sign, String cf, String nodeRef) {
+		super();
+		this.validity = validity;
+		this.expiry = expiry;
+		this.authority = authority;
+		this.sign = sign;
+		this.cf = cf;
+		this.nodeRef = nodeRef;
+	}
 
 	public boolean isValidity() {
 		return validity;
