@@ -42,5 +42,10 @@ a:HOVER {
 	margin-right: 0px;
 }
 
+.tooltipSeparator.rich-separator{
+	background-image: none !important;
+	background-color: #E5973E;
+}
+
 .modal{
 }

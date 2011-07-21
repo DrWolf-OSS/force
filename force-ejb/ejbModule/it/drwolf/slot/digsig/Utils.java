@@ -41,7 +41,6 @@ public class Utils {
 			for (int i = 0; i < messageDigest.length; i++) {
 				hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
 			}
-			System.out.println("---> MD5: " + hexString.toString());
 			return hexString.toString();
 
 		} catch (NoSuchAlgorithmException e) {
@@ -52,7 +51,6 @@ public class Utils {
 	}
 
 	public static Calendar dateToCalendar(Date date) {
-		Date d = new Date();
 		Calendar c = new GregorianCalendar();
 		c.setTime(date);
 		return c;

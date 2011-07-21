@@ -7,6 +7,7 @@ import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.digsig.CertsController;
+import it.drwolf.slot.digsig.Signature;
 import it.drwolf.slot.digsig.Utils;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInst;
@@ -611,9 +612,7 @@ public class SlotInstEditBean {
 				DocInstCollection instCollection = findInstCollection(activeCollectionId);
 				AlfrescoFolder slotFolder = retrieveSlotFolder();
 				// String refId;
-				AlfrescoDocument document = storeOnAlfresco(
-						activeFileContainer.getUploadItem(), instCollection,
-						activeFileContainer.getEmbeddedProperties(), slotFolder);
+				storeOnAlfresco(activeFileContainer, instCollection, slotFolder);
 				// Session session = alfrescoUserIdentity.getSession();
 				// AlfrescoDocument document = (AlfrescoDocument) session
 				// .getObject(refId);
@@ -622,7 +621,7 @@ public class SlotInstEditBean {
 				// document.addAspect("P:util:tmp");
 				//
 
-				activeFileContainer.setDocument(document);
+				// activeFileContainer.setDocument(document);
 
 				datas.get(this.activeCollectionId)
 						.add(this.activeFileContainer);
@@ -648,11 +647,10 @@ public class SlotInstEditBean {
 		}
 	}
 
-	private AlfrescoDocument storeOnAlfresco(UploadItem item,
-			DocInstCollection instCollection,
-			List<DocumentPropertyInst> embeddedProperties, Folder slotFolder)
+	private AlfrescoDocument storeOnAlfresco(FileContainer fileContainer,
+			DocInstCollection instCollection, Folder slotFolder)
 			throws Exception {
-
+		UploadItem item = fileContainer.getUploadItem();
 		Session session = alfrescoUserIdentity.getSession();
 
 		String fileName = item.getFileName();
@@ -688,8 +686,10 @@ public class SlotInstEditBean {
 		}
 
 		// poi si aggiungono i valori delle relative properties
-		updateProperties(document, embeddedProperties);
-		verifySignature(document);
+		updateProperties(document, fileContainer.getEmbeddedProperties());
+		List<Signature> signatures = verifySignature(document);
+		fileContainer.setSignatures(signatures);
+		fileContainer.setDocument(document);
 
 		return document;
 	}
@@ -1136,7 +1136,7 @@ public class SlotInstEditBean {
 
 	}
 
-	private void verifySignature(AlfrescoDocument document) {
+	private List<Signature> verifySignature(AlfrescoDocument document) {
 		try {
 			BouncyCastleProvider bcProv = new BouncyCastleProvider();
 			Security.addProvider(bcProv);
@@ -1155,6 +1155,8 @@ public class SlotInstEditBean {
 
 			// per ogni signer ottiene l'insieme dei certificati
 			Collection<SignerInformation> signers = infos.getSigners();
+
+			List<Signature> signatures = new ArrayList<Signature>();
 			for (SignerInformation info : signers) {
 
 				SignerId sid = info.getSID();
@@ -1168,18 +1170,23 @@ public class SlotInstEditBean {
 
 					if (validCert != null) {
 						System.out.println("----> certificato trovato!");
-						addSignature(document, x509Certificate, validCert);
+						Signature signature = addSignature(document,
+								x509Certificate, validCert);
+						signatures.add(signature);
 					}
 				}
 			}
+			return signatures;
+
 		} catch (Exception e) {
 			System.out.println(document.getName()
 					+ " non è firmato digitalmente");
 			// e.printStackTrace();
 		}
+		return null;
 	}
 
-	private void addSignature(AlfrescoDocument document,
+	private Signature addSignature(AlfrescoDocument document,
 			X509Certificate x509Certificate, X509CertificateObject validCert) {
 		try {
 			Principal subjectDN = x509Certificate.getSubjectDN();
@@ -1188,6 +1195,7 @@ public class SlotInstEditBean {
 			String cf = Utils.getCF(subjectDN.toString());
 			Date notAfter = x509Certificate.getNotAfter();
 			String authority = Utils.getCN(validCert.getIssuerDN().toString());
+			Boolean validity = Boolean.TRUE;
 
 			String username = alfrescoUserIdentity.getUsername();
 			String password = alfrescoUserIdentity.getPassword();
@@ -1202,24 +1210,36 @@ public class SlotInstEditBean {
 					"sign_" + Utils.md5Encode(x509Certificate.getSignature()));
 
 			Session session = alfrescoUserIdentity.getSession();
-			AlfrescoDocument signature = (AlfrescoDocument) session
+			AlfrescoDocument signatureDoc = (AlfrescoDocument) session
 					.getObject(signatureNodeRef);
 
 			Map<String, Object> props = new HashMap<String, Object>();
-			props.put("dw:validity", Boolean.TRUE);
+			props.put("dw:validity", validity);
 			props.put("dw:expiry", Utils.dateToCalendar(notAfter));
 			props.put("dw:authority", authority);
 			props.put("dw:sign", mysign);
 			props.put("dw:cf", cf);
 
-			signature.updateProperties(props);
+			signatureDoc.updateProperties(props);
+
+			Signature signature = new Signature();
+			signature.setAuthority(authority);
+			signature.setCf(cf);
+			signature.setExpiry(notAfter);
+			signature.setSign(mysign);
+			signature.setValidity(validity);
+			signature.setNodeRef(signatureNodeRef);
+
 			System.out.println("-> Signature added to " + document.getName());
+			return signature;
+
 		} catch (Exception e) {
 			System.out
 					.println("---> Errore nell aggiungere una firma al documento "
 							+ document.getName());
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 	private void addMainMessage(VerifierMessage message) {

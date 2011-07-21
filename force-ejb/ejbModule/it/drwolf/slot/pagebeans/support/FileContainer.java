@@ -2,6 +2,7 @@ package it.drwolf.slot.pagebeans.support;
 
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
+import it.drwolf.slot.digsig.Signature;
 import it.drwolf.utils.mimetypes.Resolver;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class FileContainer {
 	private List<DocumentPropertyInst> embeddedProperties = new ArrayList<DocumentPropertyInst>();
 	private boolean editable = true;
 	private String id = UUID.randomUUID().toString();
+	private List<Signature> signatures;
 
 	public FileContainer(AlfrescoDocument alfrescoDocument) {
 		super();
@@ -145,6 +147,14 @@ public class FileContainer {
 
 	public void setEditable(boolean editable) {
 		this.editable = editable;
+	}
+
+	public List<Signature> getSignatures() {
+		return signatures;
+	}
+
+	public void setSignatures(List<Signature> signatures) {
+		this.signatures = signatures;
 	}
 
 }
