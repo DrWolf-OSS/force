@@ -27,23 +27,32 @@ public class FileContainer {
 	private String id = UUID.randomUUID().toString();
 	private List<Signature> signatures;
 
-	public FileContainer(AlfrescoDocument alfrescoDocument) {
+	public FileContainer(AlfrescoDocument alfrescoDocument,
+			Set<Property> properties, boolean editable) {
 		super();
 		this.document = alfrescoDocument;
+		this.editable = editable;
 		retrieveSignatures();
+		buildPropertyInsts(properties);
 	}
 
-	public FileContainer(UploadItem uploadItem) {
+	public FileContainer(UploadItem uploadItem, Set<Property> properties,
+			boolean editable) {
 		super();
 		this.uploadItem = uploadItem;
+		this.editable = editable;
+		buildPropertyInsts(properties);
 	}
 
-	public FileContainer(Object item) {
+	public FileContainer(Object item, Set<Property> properties, boolean editable) {
 		if (item instanceof AlfrescoDocument) {
 			this.document = (AlfrescoDocument) item;
 			retrieveSignatures();
-		} else if (item instanceof UploadItem)
+		} else if (item instanceof UploadItem) {
 			this.uploadItem = (UploadItem) item;
+		}
+		this.editable = editable;
+		buildPropertyInsts(properties);
 	}
 
 	public UploadItem getUploadItem() {
@@ -161,30 +170,27 @@ public class FileContainer {
 		}
 	}
 
-	private void buildPropertyInsts(Set<Property> properties, Object item,
-			boolean editables) {
+	private void buildPropertyInsts(Set<Property> properties) {
 		// Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
 		// Set<Property> properties = customModelController
 		// .getProperties(aspectIds);
 
 		List<DocumentPropertyInst> fileProperties = new ArrayList<DocumentPropertyInst>();
 		for (Property p : properties) {
-			DocumentPropertyInst documentPropertyInst = buildValorisedDocumentPropertyInst(
-					item, editables, p);
+			DocumentPropertyInst documentPropertyInst = buildValorisedDocumentPropertyInst(p);
 			fileProperties.add(documentPropertyInst);
 		}
 
 		// FileContainer container = new FileContainer(item);
-		this.editable = editables;
+		// this.editable = editables;
 		this.setEmbeddedProperties(fileProperties);
 		// return container;
+		this.embeddedProperties = fileProperties;
 	}
 
-	private DocumentPropertyInst buildValorisedDocumentPropertyInst(
-			Object item, boolean editables, Property p) {
+	private DocumentPropertyInst buildValorisedDocumentPropertyInst(Property p) {
 		DocumentPropertyInst embeddedPropertyInst = new DocumentPropertyInst(p);
-		if (item instanceof AlfrescoDocument) {
-			// AlfrescoDocument document = (AlfrescoDocument) item;
+		if (this.document != null) {
 			Object propertyValue = document.getPropertyValue(p.getName());
 			embeddedPropertyInst.setValue(propertyValue);
 		}
