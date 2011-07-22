@@ -180,6 +180,18 @@ public class CustomModelController {
 		return this.propertiesMap.get(aspectId);
 	}
 
+	public Set<Property> getProperties(Set<String> aspectIds) {
+		Set<Property> properties = new HashSet<Property>();
+		// Recupero tutte le properties.
+		// Essendo un set anche se un aspect è applicato più volte (essendo
+		// settato come mandatory su un altro) le sue properties vengono
+		// aggiunte una volta sola
+		for (String aspectId : aspectIds) {
+			properties.addAll(this.getProperties(aspectId));
+		}
+		return properties;
+	}
+
 	private void initMap() {
 		List<Aspect> aspects = this.getSlotModel().getAspects();
 		for (Aspect aspect : aspects) {

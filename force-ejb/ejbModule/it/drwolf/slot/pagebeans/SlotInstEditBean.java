@@ -177,9 +177,13 @@ public class SlotInstEditBean {
 				List<AlfrescoDocument> collPrimaryDocs = this
 						.retrievePrimaryDocs(defCollection.getDocDef().getId());
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
+				Set<String> aspectIds = defCollection.getDocDef()
+						.getAspectIds();
+				Set<Property> properties = customModelController
+						.getProperties(aspectIds);
 				for (AlfrescoDocument document : collPrimaryDocs) {
 					FileContainer fileContainer = buildFileContainer(
-							defCollection, document, false);
+							properties, document, false);
 					fileContainers.add(fileContainer);
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
@@ -197,15 +201,23 @@ public class SlotInstEditBean {
 				this.datas.put(docDefCollection.getId(),
 						new ArrayList<FileContainer>());
 				Set<DocInst> docInsts = instCollection.getDocInsts();
+				Set<String> aspectIds = docDefCollection.getDocDef()
+						.getAspectIds();
+				Set<Property> properties = customModelController
+						.getProperties(aspectIds);
 				for (DocInst docInst : docInsts) {
 					try {
 						String nodeRef = docInst.getNodeRef();
 						AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
 								.getSession().getObject(nodeRef);
 						FileContainer container = buildFileContainer(
-								docDefCollection, document, true);
-						container.setSignatures(this
-								.retrieveSignatures(document));
+								properties, document, true);
+
+						//
+						// container.setSignatures(this
+						// .retrieveSignatures(document));
+						//
+
 						this.datas.get(docDefCollection.getId()).add(container);
 					} catch (CmisObjectNotFoundException e) {
 						FacesMessages.instance().add(
@@ -219,12 +231,16 @@ public class SlotInstEditBean {
 					.getDocDefCollections()) {
 				List<AlfrescoDocument> collPrimaryDocs = this
 						.retrievePrimaryDocs(defCollection.getDocDef().getId());
+				Set<String> aspectIds = defCollection.getDocDef()
+						.getAspectIds();
+				Set<Property> properties = customModelController
+						.getProperties(aspectIds);
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				for (AlfrescoDocument document : collPrimaryDocs) {
 					// FileContainer fileContainer = new
 					// FileContainer(document);
 					FileContainer fileContainer = buildFileContainer(
-							defCollection, document, false);
+							properties, document, false);
 					fileContainers.add(fileContainer);
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
@@ -235,25 +251,19 @@ public class SlotInstEditBean {
 
 	}
 
-	private FileContainer buildFileContainer(DocDefCollection docDefCollection,
+	private FileContainer buildFileContainer(Set<Property> properties,
 			Object item, boolean editables) {
+		// Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
+		// Set<Property> properties = customModelController
+		// .getProperties(aspectIds);
+
 		List<DocumentPropertyInst> fileProperties = new ArrayList<DocumentPropertyInst>();
-		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
-		Set<Property> properties = new HashSet<Property>();
-		// Recupero tutte le properties.
-		// Essendo un set anche se un aspect è applicato più volte (essendo
-		// settato come mandatory su un altro) le sue properties vengono
-		// aggiunte una volta sola
-		for (String aspectId : aspectIds) {
-			properties.addAll(customModelController.getProperties(aspectId));
+		for (Property p : properties) {
+			DocumentPropertyInst documentPropertyInst = buildValorisedDocumentPropertyInst(
+					item, editables, p);
+			fileProperties.add(documentPropertyInst);
 		}
-		if (properties != null) {
-			for (Property p : properties) {
-				DocumentPropertyInst documentPropertyInst = buildValorisedDocumentPropertyInst(
-						item, editables, p);
-				fileProperties.add(documentPropertyInst);
-			}
-		}
+
 		FileContainer container = new FileContainer(item);
 		container.setEditable(editables);
 		container.setEmbeddedProperties(fileProperties);
@@ -603,8 +613,10 @@ public class SlotInstEditBean {
 		System.out.println("-> " + fileName + " successfully uploaded");
 		DocDefCollection docDefCollection = entityManager.find(
 				DocDefCollection.class, docDefCollectionId);
-		FileContainer container = buildFileContainer(docDefCollection, item,
-				true);
+		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
+		Set<Property> properties = customModelController
+				.getProperties(aspectIds);
+		FileContainer container = buildFileContainer(properties, item, true);
 		//
 		this.activeFileContainer = container;
 		//
