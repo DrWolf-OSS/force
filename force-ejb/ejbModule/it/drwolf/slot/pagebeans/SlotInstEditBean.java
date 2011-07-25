@@ -750,6 +750,7 @@ public class SlotInstEditBean {
 
 		// poi si aggiungono i valori delle relative properties
 		updateProperties(documentCopy, embeddedProperties);
+		verifySignature(documentCopy);
 		nodeRef = objectId.getId();
 
 		return nodeRef;
