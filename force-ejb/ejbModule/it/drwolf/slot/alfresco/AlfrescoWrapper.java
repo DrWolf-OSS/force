@@ -1,5 +1,7 @@
 package it.drwolf.slot.alfresco;
 
+import it.drwolf.slot.digsig.Signature;
+import it.drwolf.slot.digsig.Utils;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
@@ -10,6 +12,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.faces.context.ExternalContext;
@@ -17,11 +20,14 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.cmis.client.AlfrescoDocument;
 import org.alfresco.cmis.client.AlfrescoFolder;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
+import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.OperationContext;
+import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Rendition;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
@@ -161,8 +167,35 @@ public class AlfrescoWrapper {
 
 				context.setRenditionFilterString("*");
 
-				Document doc = (Document) session.getObject(
+				AlfrescoDocument doc = (AlfrescoDocument) session.getObject(
 						AlfrescoWrapper.ref2id(id), context);
+
+				if (doc.hasAspect(Signature.ASPECT_SIGNED)) {
+					ItemIterable<QueryResult> results = session.query(
+							"SELECT cmis:objectId, cmis:name FROM cmis:document WHERE IN_TREE('"
+									+ doc.getId() + "')", true);
+					if (results.getTotalNumItems() != 0) {
+						Iterator<QueryResult> iterator = results.iterator();
+						while (iterator.hasNext()) {
+							QueryResult result = iterator.next();
+							String cmisName = result
+									.getPropertyValueById("cmis:name");
+							if (cmisName.equals(retrieveContentFileName(doc
+									.getName()))) {
+								String contentNodeRef = result
+										.getPropertyValueById("cmis:objectId");
+								doc = (AlfrescoDocument) session.getObject(
+										contentNodeRef, context);
+							}
+							// System.out.println("---> content id: "
+							// + contentNodeRef);
+							// System.out.println("---> cmis:name: " +
+							// cmisName);
+							// doc = (AlfrescoDocument) session.getObject(
+							// contentNodeRef, context);
+						}
+					}
+				}
 
 				for (Rendition r : doc.getRenditions()) {
 					if (name.equals(r.getTitle())) {
@@ -177,6 +210,19 @@ public class AlfrescoWrapper {
 			}
 		}
 		return null;
+	}
+
+	private String retrieveContentFileName(String encodedArchiveFileName) {
+		String archiveFileName = Utils
+				.decodeDocumentFileName(encodedArchiveFileName);
+		int dotIndex = archiveFileName.lastIndexOf(".");
+		String name = archiveFileName;
+		// String extension = "";
+		if (dotIndex > 0) {
+			name = archiveFileName.substring(0, dotIndex);
+			// extension = archiveFileName.substring(dotIndex);
+		}
+		return name;
 	}
 
 	public AlfrescoFolder retrieveGroupFolder(String path, String shortName) {

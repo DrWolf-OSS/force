@@ -134,7 +134,7 @@ public class FileContainer {
 		return id;
 	}
 
-	public void retrieveSignatures() {
+	private void retrieveSignatures() {
 		this.signatures = new ArrayList<Signature>();
 		if (this.document != null) {
 			AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component

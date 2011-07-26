@@ -38,9 +38,11 @@ import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
+import org.apache.chemistry.opencmis.client.api.OperationContext;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Relationship;
+import org.apache.chemistry.opencmis.client.api.Rendition;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
@@ -497,6 +499,27 @@ public class TestBean {
 		// nodeService.setProperty(childRef, ContentModel.PROP_LINK_DESTINATION,
 		// destRef);
 
+	}
+
+	public void addRendition() {
+		Session session = alfrescoAdminIdentity.getSession();
+		OperationContext context = session.createOperationContext();
+		context.setRenditionFilterString("*");
+
+		AlfrescoDocument source = (AlfrescoDocument) session.getObject(
+				"workspace://SpacesStore/067ee088-8d3b-4cea-bf0b-cae89806e22b",
+				context);
+		AlfrescoDocument target = (AlfrescoDocument) session.getObject(
+				"workspace://SpacesStore/b28ee78b-c34f-4fc4-914a-701deb08aa12",
+				context);
+
+		List<Rendition> renditions = source.getRenditions();
+		for (Rendition r : renditions) {
+			String title = r.getTitle();
+			if (title != null && title.equals("imgpreview")) {
+				target.getRenditions().add(r);
+			}
+		}
 	}
 
 }
