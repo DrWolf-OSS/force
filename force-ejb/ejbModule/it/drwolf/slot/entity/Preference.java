@@ -41,6 +41,9 @@ public class Preference implements Serializable {
 			PreferenceKey.FORCE_ADMIN.name(), "CNA");
 	private static Preference FORCE_USER_GROUP = new Preference(
 			PreferenceKey.FORCE_USER_GROUP.name(), "aziende");
+	private static Preference CERTS_LIST_REF = new Preference(
+			PreferenceKey.CERTS_LIST_REF.name(),
+			"sostituire con LISTACER.zip.p7m nodeRef");
 
 	public static Preference[] defaults = new Preference[] {
 			Preference.ALFRESCO_LOCATION, Preference.ALFRESCO_ADMIN_USER,
@@ -49,7 +52,7 @@ public class Preference implements Serializable {
 			Preference.CUSTOM_MODEL_XML_PATH_IN_JAR,
 			Preference.CUSTOM_MODEL_XML_PATH, Preference.CUSTOM_MODEL_XML_NAME,
 			Preference.FORCE_GROUPS_PATH, Preference.FORCE_ADMIN,
-			Preference.FORCE_USER_GROUP };
+			Preference.FORCE_USER_GROUP, Preference.CERTS_LIST_REF };
 
 	private Integer id;
 	private String keyValue;

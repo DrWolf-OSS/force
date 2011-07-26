@@ -4,7 +4,11 @@ import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
+import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.application.CustomModelController;
+import it.drwolf.slot.digsig.CertsController;
+import it.drwolf.slot.digsig.Signature;
+import it.drwolf.slot.digsig.Utils;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
@@ -34,8 +38,15 @@ import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.Principal;
+import java.security.Security;
+import java.security.cert.CertStore;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
@@ -57,6 +67,13 @@ import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSTypedStream;
+import org.bouncycastle.cms.SignerId;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -125,6 +142,9 @@ public class SlotInstEditBean {
 	@In(create = true)
 	private ValueChangeListener valueChangeListener;
 
+	@In(create = true)
+	private CertsController certsController;
+
 	private void resetFlags() {
 		verifiable = true;
 		failAllowed = false;
@@ -154,9 +174,15 @@ public class SlotInstEditBean {
 				List<AlfrescoDocument> collPrimaryDocs = this
 						.retrievePrimaryDocs(defCollection.getDocDef().getId());
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
+				Set<String> aspectIds = defCollection.getDocDef()
+						.getAspectIds();
+				Set<Property> properties = customModelController
+						.getProperties(aspectIds);
 				for (AlfrescoDocument document : collPrimaryDocs) {
-					FileContainer fileContainer = buildFileContainer(
-							defCollection, document, false);
+					FileContainer fileContainer = new FileContainer(document,
+							properties, false);
+					// FileContainer fileContainer = buildFileContainer(
+					// properties, document, false);
 					fileContainers.add(fileContainer);
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
@@ -174,13 +200,25 @@ public class SlotInstEditBean {
 				this.datas.put(docDefCollection.getId(),
 						new ArrayList<FileContainer>());
 				Set<DocInst> docInsts = instCollection.getDocInsts();
+				Set<String> aspectIds = docDefCollection.getDocDef()
+						.getAspectIds();
+				Set<Property> properties = customModelController
+						.getProperties(aspectIds);
 				for (DocInst docInst : docInsts) {
 					try {
 						String nodeRef = docInst.getNodeRef();
 						AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
 								.getSession().getObject(nodeRef);
-						FileContainer container = buildFileContainer(
-								docDefCollection, document, true);
+						// FileContainer container = buildFileContainer(
+						// properties, document, true);
+						FileContainer container = new FileContainer(document,
+								properties, true);
+
+						//
+						// container.setSignatures(this
+						// .retrieveSignatures(document));
+						//
+
 						this.datas.get(docDefCollection.getId()).add(container);
 					} catch (CmisObjectNotFoundException e) {
 						FacesMessages.instance().add(
@@ -194,13 +232,19 @@ public class SlotInstEditBean {
 					.getDocDefCollections()) {
 				List<AlfrescoDocument> collPrimaryDocs = this
 						.retrievePrimaryDocs(defCollection.getDocDef().getId());
+				Set<String> aspectIds = defCollection.getDocDef()
+						.getAspectIds();
+				Set<Property> properties = customModelController
+						.getProperties(aspectIds);
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				for (AlfrescoDocument document : collPrimaryDocs) {
 					// FileContainer fileContainer = new
 					// FileContainer(document);
-					FileContainer fileContainer = buildFileContainer(
-							defCollection, document, false);
-					fileContainers.add(fileContainer);
+					// FileContainer fileContainer = buildFileContainer(
+					// properties, document, false);
+					FileContainer container = new FileContainer(document,
+							properties, false);
+					fileContainers.add(container);
 				}
 				primaryDocs.put(defCollection.getId(), fileContainers);
 			}
@@ -210,42 +254,38 @@ public class SlotInstEditBean {
 
 	}
 
-	private FileContainer buildFileContainer(DocDefCollection docDefCollection,
-			Object item, boolean editables) {
-		List<DocumentPropertyInst> fileProperties = new ArrayList<DocumentPropertyInst>();
-		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
-		Set<Property> properties = new HashSet<Property>();
-		// Recupero tutte le properties.
-		// Essendo un set anche se un aspect è applicato più volte (essendo
-		// settato come mandatory su un altro) le sue properties vengono
-		// aggiunte una volta sola
-		for (String aspectId : aspectIds) {
-			properties.addAll(customModelController.getProperties(aspectId));
-		}
-		if (properties != null) {
-			for (Property p : properties) {
-				DocumentPropertyInst documentPropertyInst = buildValorisedDocumentPropertyInst(
-						item, editables, p);
-				fileProperties.add(documentPropertyInst);
-			}
-		}
-		FileContainer container = new FileContainer(item);
-		container.setEditable(editables);
-		container.setEmbeddedProperties(fileProperties);
-		return container;
-	}
+	// private FileContainer buildFileContainer(Set<Property> properties,
+	// Object item, boolean editables) {
+	// // Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
+	// // Set<Property> properties = customModelController
+	// // .getProperties(aspectIds);
+	//
+	// List<DocumentPropertyInst> fileProperties = new
+	// ArrayList<DocumentPropertyInst>();
+	// for (Property p : properties) {
+	// DocumentPropertyInst documentPropertyInst =
+	// buildValorisedDocumentPropertyInst(
+	// item, editables, p);
+	// fileProperties.add(documentPropertyInst);
+	// }
+	//
+	// FileContainer container = new FileContainer(item);
+	// container.setEditable(editables);
+	// container.setEmbeddedProperties(fileProperties);
+	// return container;
+	// }
 
-	private DocumentPropertyInst buildValorisedDocumentPropertyInst(
-			Object item, boolean editables, Property p) {
-		DocumentPropertyInst embeddedPropertyInst = new DocumentPropertyInst(p);
-		if (item instanceof AlfrescoDocument) {
-			AlfrescoDocument document = (AlfrescoDocument) item;
-			Object propertyValue = document.getPropertyValue(p.getName());
-			embeddedPropertyInst.setValue(propertyValue);
-		}
-		embeddedPropertyInst.setEditable(editables);
-		return embeddedPropertyInst;
-	}
+	// private DocumentPropertyInst buildValorisedDocumentPropertyInst(
+	// Object item, boolean editables, Property p) {
+	// DocumentPropertyInst embeddedPropertyInst = new DocumentPropertyInst(p);
+	// if (item instanceof AlfrescoDocument) {
+	// AlfrescoDocument document = (AlfrescoDocument) item;
+	// Object propertyValue = document.getPropertyValue(p.getName());
+	// embeddedPropertyInst.setValue(propertyValue);
+	// }
+	// embeddedPropertyInst.setEditable(editables);
+	// return embeddedPropertyInst;
+	// }
 
 	private void cleanMessages() {
 		Set<String> filesKeys = filesMessages.keySet();
@@ -578,8 +618,11 @@ public class SlotInstEditBean {
 		System.out.println("-> " + fileName + " successfully uploaded");
 		DocDefCollection docDefCollection = entityManager.find(
 				DocDefCollection.class, docDefCollectionId);
-		FileContainer container = buildFileContainer(docDefCollection, item,
-				true);
+		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
+		Set<Property> properties = customModelController
+				.getProperties(aspectIds);
+		// FileContainer container = buildFileContainer(properties, item, true);
+		FileContainer container = new FileContainer(item, properties, true);
 		//
 		this.activeFileContainer = container;
 		//
@@ -591,20 +634,7 @@ public class SlotInstEditBean {
 			try {
 				DocInstCollection instCollection = findInstCollection(activeCollectionId);
 				AlfrescoFolder slotFolder = retrieveSlotFolder();
-				String refId;
-				refId = storeOnAlfresco(activeFileContainer.getUploadItem(),
-						instCollection,
-						activeFileContainer.getEmbeddedProperties(), slotFolder);
-				Session session = alfrescoUserIdentity.getSession();
-				AlfrescoDocument document = (AlfrescoDocument) session
-						.getObject(refId);
-
-				//
-				// document.addAspect("P:util:tmp");
-				//
-
-				activeFileContainer.setDocument(document);
-
+				storeOnAlfresco(activeFileContainer, instCollection, slotFolder);
 				datas.get(this.activeCollectionId)
 						.add(this.activeFileContainer);
 			} catch (Exception e) {
@@ -629,28 +659,18 @@ public class SlotInstEditBean {
 		}
 	}
 
-	private String storeOnAlfresco(UploadItem item,
-			DocInstCollection instCollection,
-			List<DocumentPropertyInst> embeddedProperties, Folder slotFolder)
+	private AlfrescoDocument storeOnAlfresco(FileContainer fileContainer,
+			DocInstCollection instCollection, Folder slotFolder)
 			throws Exception {
-		String nodeRef = "";
+		UploadItem item = fileContainer.getUploadItem();
 		Session session = alfrescoUserIdentity.getSession();
 
 		String fileName = item.getFileName();
-		// int dotIndex = fileName.lastIndexOf(".");
-		// String extension = fileName.substring(dotIndex + 1);
-		// String mimetype = Resolver.mimetypeForExtension(extension);
-		// if (mimetype == null)
-		// mimetype = "application/octet-stream";
-		// System.out.println("---> \"" + fileName + " MIME Type of \" : "
-		// + mimetype);
 
 		// Metto un mimetype generico, ci pensa Alfresco a mettere il mimetype
 		// giusto tramite l'esecuzione di uno script
 		String mimetype = "application/octet-stream";
 
-		// String contentType = new
-		// MimetypesFileTypeMap().getContentType(fileName);
 		ContentStreamImpl contentStreamImpl = new ContentStreamImpl(fileName,
 				new BigInteger("" + item.getFile().length()), mimetype,
 				new FileInputStream(item.getFile()));
@@ -665,18 +685,12 @@ public class SlotInstEditBean {
 
 		ObjectId objectId = session.createDocument(properties, slotFolder,
 				contentStreamImpl, VersioningState.NONE, null, null, null);
-		System.out.println(objectId);
+		// System.out.println(objectId);
 
 		AlfrescoDocument document = (AlfrescoDocument) session
 				.getObject(objectId);
 		//
 		document.addAspect("P:util:tmp");
-
-		// Map<String, Object> aspectsProperties = new HashMap<String,
-		// Object>();
-		// aspectsProperties.put(key, value)
-		// document
-		//
 
 		// prima si aggiungono gli aspect
 		for (String aspect : aspectIds) {
@@ -684,9 +698,12 @@ public class SlotInstEditBean {
 		}
 
 		// poi si aggiungono i valori delle relative properties
-		updateProperties(document, embeddedProperties);
-		nodeRef = objectId.getId();
-		return nodeRef;
+		updateProperties(document, fileContainer.getEmbeddedProperties());
+		List<Signature> signatures = verifySignature(document);
+		fileContainer.setSignatures(signatures);
+		fileContainer.setDocument(document);
+
+		return document;
 	}
 
 	private String encodeFilename(String origin) {
@@ -712,14 +729,14 @@ public class SlotInstEditBean {
 		ContentStream contentStream = document.getContentStream();
 		Set<String> aspects = instCollection.getDocDefCollection().getDocDef()
 				.getAspectIds();
+		Set<Property> properties = customModelController.getProperties(aspects);
 
-		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put(PropertyIds.NAME, encodeFilename(new FileContainer(
-				document).getFileName()));
-		properties.put(PropertyIds.OBJECT_TYPE_ID,
-				BaseTypeId.CMIS_DOCUMENT.value());
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put(PropertyIds.NAME, encodeFilename(new FileContainer(document,
+				properties, true).getFileName()));
+		props.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
 
-		ObjectId objectId = session.createDocument(properties, slotFolder,
+		ObjectId objectId = session.createDocument(props, slotFolder,
 				contentStream, VersioningState.NONE, null, null, null);
 		System.out.println(objectId);
 
@@ -733,6 +750,7 @@ public class SlotInstEditBean {
 
 		// poi si aggiungono i valori delle relative properties
 		updateProperties(documentCopy, embeddedProperties);
+		verifySignature(documentCopy);
 		nodeRef = objectId.getId();
 
 		return nodeRef;
@@ -1131,9 +1149,140 @@ public class SlotInstEditBean {
 
 	}
 
-	// prova..
-	public void valueChangeListener(ValueChangeEvent value) {
+	private List<Signature> verifySignature(AlfrescoDocument document) {
+		try {
+			BouncyCastleProvider bcProv = new BouncyCastleProvider();
+			Security.addProvider(bcProv);
+			InputStream contentInputStream = document.getContentStream()
+					.getStream();
+			CMSSignedData cms = new CMSSignedData(contentInputStream);
+
+			CMSTypedStream typedStream = new CMSTypedStream(contentInputStream);
+			String type = typedStream.getContentType();
+
+			CertStore certStore = cms
+					.getCertificatesAndCRLs("Collection", "BC");
+
+			// ottenimento delle firme
+			SignerInformationStore infos = cms.getSignerInfos();
+
+			// per ogni signer ottiene l'insieme dei certificati
+			Collection<SignerInformation> signers = infos.getSigners();
+
+			List<Signature> signatures = new ArrayList<Signature>();
+			for (SignerInformation info : signers) {
+
+				SignerId sid = info.getSID();
+
+				Collection<X509Certificate> certsCollection = (Collection<X509Certificate>) certStore
+						.getCertificates(sid);
+
+				for (X509Certificate x509Certificate : certsCollection) {
+					X509CertificateObject validCert = certsController
+							.getCerts().match(x509Certificate);
+
+					if (validCert != null) {
+						System.out.println("----> certificato trovato!");
+						Signature signature = addSignature(document,
+								x509Certificate, validCert);
+						signatures.add(signature);
+					}
+				}
+			}
+			return signatures;
+
+		} catch (Exception e) {
+			System.out.println(document.getName()
+					+ " non è firmato digitalmente");
+			// e.printStackTrace();
+		}
+		return null;
 	}
+
+	private Signature addSignature(AlfrescoDocument document,
+			X509Certificate x509Certificate, X509CertificateObject validCert) {
+		try {
+			Principal subjectDN = x509Certificate.getSubjectDN();
+
+			String mysign = Utils.getCN(subjectDN.toString());
+			String cf = Utils.getCF(subjectDN.toString());
+			Date notAfter = x509Certificate.getNotAfter();
+			String authority = Utils.getCN(validCert.getIssuerDN().toString());
+			Boolean validity = Boolean.TRUE;
+
+			String username = alfrescoUserIdentity.getUsername();
+			String password = alfrescoUserIdentity.getPassword();
+			String url = alfrescoUserIdentity.getUrl();
+			AlfrescoWebScriptClient webScriptClient = new AlfrescoWebScriptClient(
+					username, password, url);
+
+			document.addAspect("P:dw:signed");
+
+			String signatureNodeRef = webScriptClient.addSignature(
+					document.getId(),
+					"sign_" + Utils.md5Encode(x509Certificate.getSignature()));
+
+			Session session = alfrescoUserIdentity.getSession();
+			AlfrescoDocument signatureDoc = (AlfrescoDocument) session
+					.getObject(signatureNodeRef);
+
+			Map<String, Object> props = new HashMap<String, Object>();
+			props.put(Signature.VALIDITY, validity);
+			props.put(Signature.EXPIRY, Utils.dateToCalendar(notAfter));
+			props.put(Signature.AUTHORITY, authority);
+			props.put(Signature.SIGN, mysign);
+			props.put(Signature.CF, cf);
+
+			signatureDoc.updateProperties(props);
+
+			Signature signature = new Signature();
+			signature.setAuthority(authority);
+			signature.setCf(cf);
+			signature.setExpiry(notAfter);
+			signature.setSign(mysign);
+			signature.setValidity(validity);
+			signature.setNodeRef(signatureNodeRef);
+
+			System.out.println("-> Signature added to " + document.getName());
+			return signature;
+
+		} catch (Exception e) {
+			System.out
+					.println("---> Errore nell aggiungere una firma al documento "
+							+ document.getName());
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	// private List<Signature> retrieveSignatures(AlfrescoDocument document) {
+	// List<Signature> signatures = new ArrayList<Signature>();
+	// ItemIterable<QueryResult> results = alfrescoUserIdentity.getSession()
+	// .query("SELECT cmis:objectId," + Signature.VALIDITY + ","
+	// + Signature.EXPIRY + "," + Signature.AUTHORITY + ","
+	// + Signature.SIGN + "," + Signature.CF
+	// + " from dw:signature WHERE IN_TREE('"
+	// + document.getId() + "')", true);
+	// if (results.getTotalNumItems() != 0) {
+	// Iterator<QueryResult> iterator = results.iterator();
+	// while (iterator.hasNext()) {
+	// QueryResult result = iterator.next();
+	// String nodeRef = result.getPropertyValueById("cmis:objectId");
+	// Boolean validity = result
+	// .getPropertyValueById(Signature.VALIDITY);
+	// Calendar expiry = result.getPropertyValueById(Signature.EXPIRY);
+	// String authority = result
+	// .getPropertyValueById(Signature.AUTHORITY);
+	// String sign = result.getPropertyValueById(Signature.SIGN);
+	// String cf = result.getPropertyValueById(Signature.CF);
+	//
+	// Signature signature = new Signature(validity, expiry.getTime(),
+	// authority, sign, cf, nodeRef);
+	// signatures.add(signature);
+	// }
+	// }
+	// return signatures;
+	// }
 
 	private void addMainMessage(VerifierMessage message) {
 		slotMessages.add(message);

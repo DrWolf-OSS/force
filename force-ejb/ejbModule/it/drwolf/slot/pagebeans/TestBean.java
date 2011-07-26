@@ -4,6 +4,7 @@ import it.drwolf.slot.alfresco.AlfrescoAdminIdentity;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.custom.model.SlotModel;
+import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.digsig.AlfrescoNodeCertsProvider;
 import it.drwolf.slot.digsig.Certs;
 import it.drwolf.slot.digsig.Utils;
@@ -182,6 +183,51 @@ public class TestBean {
 		System.out.println("---> debug");
 	}
 
+	public void executeTest() {
+		try {
+			String username = alfrescoUserIdentity.getUsername();
+			String password = alfrescoUserIdentity.getPassword();
+			String url = alfrescoUserIdentity.getUrl();
+			AlfrescoWebScriptClient webScriptClient = new AlfrescoWebScriptClient(
+					username, password, url);
+
+			AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
+					.getSession()
+					.getObject(
+							"workspace://SpacesStore/fc318402-3748-4042-9627-12057a434191");
+
+			document.addAspect("P:dw:signed");
+
+			String signatureNodeRef = webScriptClient
+					.addSignature(
+							"workspace://SpacesStore/fc318402-3748-4042-9627-12057a434191",
+							"firma3");
+			System.out.println("---> signature: " + signatureNodeRef);
+
+			Session session = alfrescoUserIdentity.getSession();
+			AlfrescoDocument signature = (AlfrescoDocument) session
+					.getObject(signatureNodeRef);
+
+			Date d = new Date();
+			Calendar c = new GregorianCalendar();
+			c.setTime(d);
+
+			Map<String, Object> props = new HashMap<String, Object>();
+			props.put("dw:validity", Boolean.TRUE);
+			props.put("dw:expiry", c);
+			props.put("dw:authority", "Authority Value");
+			props.put("dw:sign", "Massimo Torelli");
+			props.put("dw:cf", "massimotorellicf");
+
+			signature.updateProperties(props);
+
+			System.out.println("---> debug");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public void retrieveChildren() {
 		Session session = alfrescoAdminIdentity.getSession();
 		AlfrescoDocument doc = (AlfrescoDocument) session
@@ -259,7 +305,6 @@ public class TestBean {
 					.getCertificatesAndCRLs("Collection", "BC");
 
 			// ottenimento delle firme
-
 			SignerInformationStore infos = cms.getSignerInfos();
 
 			// per ogni signer ottiene l'insieme dei certificati

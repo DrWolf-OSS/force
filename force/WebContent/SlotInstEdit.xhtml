@@ -218,9 +218,50 @@
 																	and not item.mimetype.contains('excel') and not item.mimetype.contains('opendocument.spreadsheet') and not item.mimetype.contains('image') 
 																	and not item.mimetype.contains('text') and not item.mimetype.contains('rtf')}" 
 														styleClass="fileIcon"/>
+										<h:graphicImage value="/img/tick-small.png" rendered="#{item.document.hasAspect('P:dw:signed')}" style="margin-left:-6px" />
 										<a href="/force/download/#{item.fileName}?ref=#{item.document.id}">
 										<h:outputText value="#{item.fileName}" />
 										</a>
+									</s:decorate>
+									<s:decorate template="/layout/display.xhtml">
+										<ui:define name="label">
+											<h:outputText value="Signed" />
+										</ui:define>
+										<h:outputText value="#{item.document.hasAspect('P:dw:signed') ? 'Yes' : 'No'}"/>
+										<rich:toolTip mode="client" rendered="#{item.document.hasAspect('P:dw:signed')}">
+											<s:span>
+												<a:repeat var="sign" value="#{item.signatures}" rowKeyVar="key">										
+													<s:decorate template="/layout/display.xhtml">
+														<ui:define name="label">
+															<h:outputText value="Authority" />
+														</ui:define>
+														<h:outputText value="#{sign.authority}" />
+													</s:decorate>
+													<s:decorate template="/layout/display.xhtml">
+														<ui:define name="label">
+															<h:outputText value="Signature" />
+														</ui:define>
+														<h:outputText value="#{sign.sign}" />
+													</s:decorate>
+													<s:decorate template="/layout/display.xhtml">
+														<ui:define name="label">
+															<h:outputText value="Codice Fiscale" />
+														</ui:define>
+														<h:outputText value="#{sign.cf}" />
+													</s:decorate>
+													<s:decorate template="/layout/display.xhtml">
+														<ui:define name="label">
+															<h:outputText value="Expiration date" />
+														</ui:define>
+														<h:outputText value="#{sign.expiry}" >
+															<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+														</h:outputText>
+													</s:decorate>
+													<div style="clear: both" />
+													<rich:separator styleClass="tooltipSeparator" height="1" rendered="#{key ge 1}"/>
+												</a:repeat>
+											</s:span>
+										</rich:toolTip>
 									</s:decorate>
 
 									<ui:repeat var="dataInstance" value="#{item.embeddedProperties}">
@@ -241,6 +282,8 @@
 											</h:outputText>
 										</s:decorate>
 									</ui:repeat>
+									
+									
 									<div style="clear: both" />
 									<a:region>
 										<a:commandButton value="Remove"
