@@ -1,0 +1,50 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:a4j="http://richfaces.org/a4j"
+    template="/layout/template.xhtml">
+
+<ui:define name="body">
+<style>
+        .top{
+            vertical-align:top;
+        }
+        .pbody{
+            padding:0px;
+            height:150px; 
+            width:350px;
+            overflow:auto;
+        }
+    </style>
+<h:form id="CatMerEdit" styleClass="edit">
+	<rich:panel>
+	   <f:facet name="header">Gestisci le Categorie Merceologiche </f:facet>
+	   <h:panelGrid columns="2" columnClasses="top, top">
+	        <rich:pickList value="#{aziendaHome.instance.categorieMerceologicheAsList}" sourceListWidth="300" targetListWidth="300" listsHeight="400"> 
+                <s:selectItems value="#{categoriaMerceologicaList.resultList}" var="cm" label="#{cm.categoria}"/>
+                <s:convertEntity />
+                <a4j:support event="onlistchanged" reRender="result"/>
+        </rich:pickList>
+	   </h:panelGrid>
+	
+	
+	</rich:panel>
+	<div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Salva"
+                         action="#{aziendaHome.persist()}"
+                         />
+            <s:button id="cancelEdit"
+                   value="Fatto"
+                    view="/home.xhtml"/>
+        </div>
+</h:form>
+
+</ui:define>
+</ui:composition>

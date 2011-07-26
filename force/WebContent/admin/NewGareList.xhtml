@@ -1,0 +1,85 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="/layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="gareNuove" >
+    <rich:panel>
+        <f:facet name="header">Elenco delle nuove gare inserite nell'osservatorio'</f:facet>
+    <div class="results" id="newGareList">
+
+    <h:outputText value="La ricerca non ha prodotto nessun risultato."
+               rendered="#{empty garaList.garaNuove}"/>
+
+    <rich:dataTable id="newGareList"
+                var="_gara"
+              value="#{garaList.garaNuove}"
+           rendered="#{not empty garaList.garaNuove}">
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{garaList}"/>
+                    <ui:param name="propertyLabel" value="Oggetto"/>
+                    <ui:param name="propertyPath" value="gara.oggetto"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_gara.oggetto}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{garaList}"/>
+                    <ui:param name="propertyLabel" value="Importo"/>
+                    <ui:param name="propertyPath" value="gara.importo"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_gara.importo} €"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{garaList}"/>
+                    <ui:param name="propertyLabel" value="Data Pubblicazione"/>
+                    <ui:param name="propertyPath" value="gara.dataPubblicazione"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_gara.dataPubblicazione}"/>
+        </h:column>
+        <rich:column styleClass="action">
+            <f:facet name="header">Action</f:facet>
+            <s:link view="/admin/#{empty from ? 'Gara' : from}.xhtml"
+                   value="#{empty from ? 'Vedi' : 'Select'}"
+             propagation="#{empty from ? 'none' : 'default'}"
+                      id="garaViewId">
+                <f:param name="garaId"
+                        value="#{_gara.id}"/>
+            </s:link>
+            #{' '}
+            <s:link view="/admin/GaraEdit.xhtml"
+                   value="Gestisci"
+             propagation="none"
+                      id="garaEdit"
+                rendered="#{empty from}">
+                <f:param name="garaId"
+                        value="#{_gara.id}"/>
+            </s:link>
+             #{' '}
+             
+        </rich:column>
+    </rich:dataTable>
+
+    </div>
+    </rich:panel>
+    </h:form>
+    
+
+</ui:define>
+
+</ui:composition>

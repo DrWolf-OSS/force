@@ -95,10 +95,9 @@ public class AlfrescoWrapper {
 			session = this.alfrescoAdminIdentity.getSession();
 		}
 		try {
-
 			Ace ace = new AccessControlEntryImpl(
 					new AccessControlPrincipalDataImpl(groupName),
-					Arrays.asList("cmis:read", " cmis:write"));
+					Arrays.asList("cmis:read", " cmis:write", "cmis:all"));
 
 			folder.applyAcl(Arrays.asList(ace), new ArrayList<Ace>(),
 					AclPropagation.PROPAGATE);

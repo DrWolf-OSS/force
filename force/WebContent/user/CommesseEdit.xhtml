@@ -1,0 +1,131 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:a4j="http://richfaces.org/a4j"
+    template="/layout/template.xhtml">
+
+<ui:define name="body">
+<h:form id="CommesseEdit" styleClass="edit">
+    <rich:panel>
+        <f:facet name="header">Elenco delle commesse </f:facet>
+    <div class="results" id="commessaList">    
+         <h:outputText value="Non ci sono commesse inserite."
+               rendered="#{empty commessaList.commesseForAzienda}"/>
+               
+        <rich:dataTable id="commessaList"
+                var="_commessa"
+              value="#{commessaList.commesseForAzienda}"
+           rendered="#{not empty commessaList.commesseForAzienda}">
+           <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{commessaList}"/>
+                    <ui:param name="propertyLabel" value="Descrizione"/>
+                    <ui:param name="propertyPath" value="commessa.descrizione"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_commessa.descrizione}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{commessaList}"/>
+                    <ui:param name="propertyLabel" value="Importo"/>
+                    <ui:param name="propertyPath" value="commessa.importo"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_commessa.importo} €"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{commessaList}"/>
+                    <ui:param name="propertyLabel" value="Data commessa"/>
+                    <ui:param name="propertyPath" value="commessa.dataCommessa"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_commessa.dataCommessa}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{commessaList}"/>
+                    <ui:param name="propertyLabel" value="Categorie Merceologiche"/>
+                    <ui:param name="propertyPath" value="commessa.categorieMerceologiche"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_commessa.categorieMerceologicheAsString}"/>
+        </h:column>        </rich:dataTable>           
+    </div>
+    </rich:panel>
+    <div class="actionButtons">
+        <s:button value="Nuova Commessa" id="link" onclick="Richfaces.showModalPanel('nuovaCommesaPanelId'); return 0;">
+        </s:button>
+            <h:commandButton id="save"
+                          value="Salva"
+                         action="#{aziendaHome.persist()}"
+                         />
+            <s:button id="cancelEdit"
+                   value="Fatto"
+                    view="/home.xhtml"/>
+        </div>
+</h:form>
+    <rich:modalPanel id="nuovaCommesaPanelId" styleClass="reportPanel borderless"  width="600" height="500">
+                     <f:facet name="header">Dati nuova commessa</f:facet>
+                    <a4j:form>
+                        <table>
+                     <tbody>
+                        <s:decorate id="descrizioneField" template="/layout/trEdit.xhtml">
+                            <ui:define name="label">Descrizione commessa</ui:define>
+                            <h:inputTextarea id="descrizioneCommessa"
+                                           cols="50"
+                                           rows="3"
+                                           required="true"
+                                          value="#{commessaHome.instance.descrizione}"/>
+                        </s:decorate>
+                        <s:decorate id="importoField" template="/layout/trEdit.xhtml">
+                            <ui:define name="label">Importo commessa</ui:define>
+                            <h:inputText id="importoCommessa"
+                                           cols="50"
+                                           required="true"
+                                          value="#{commessaHome.instance.importo}"/>
+                        </s:decorate>
+                        <s:decorate id="committenteField" template="/layout/trEdit.xhtml">
+                            <ui:define name="label">Committente</ui:define>
+                            <h:inputText id="committente"
+                                           cols="50"
+                                           required="true"
+                                          value="#{commessaHome.instance.committente}"/>
+                        </s:decorate>
+                        <s:decorate id="dataCommessaField" template="/layout/trEdit.xhtml">
+                            <ui:define name="label">Data Commessa</ui:define>
+                            <rich:calendar id="dataC"
+                                        required="true"
+                                        value="#{commessaHome.instance.dataCommessa}">
+                            </rich:calendar>
+                        </s:decorate>
+                        <s:decorate id="categorieMField" template="/layout/trEdit.xhtml">
+                            <ui:define name="label">Categorie Merceologiche</ui:define>
+                                <rich:pickList value="#{commessaHome.instance.categorieMerceologicheAsList}" sourceListWidth="150" targetListWidth="150" listsHeight="200"> 
+                                    <s:selectItems value="#{aziendaHome.instance.categorieMerceologicheAsList}" var="cm" label="#{cm.categoria}"/>
+                                    <s:convertEntity />
+                                    <a4j:support event="onlistchanged" reRender="result"/>
+                                </rich:pickList>
+                        </s:decorate>
+                        </tbody>
+                        </table>
+                     <a4j:commandButton value="Salva" action="#{commessaHome.persist()}" oncomplete="Richfaces.hideModalPanel('nuovaCommesaPanelId'); return 0;" reRender="commessaList"/>
+  
+                <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>                
+            </a4j:form>
+        </rich:modalPanel> 
+</ui:define>
+</ui:composition>

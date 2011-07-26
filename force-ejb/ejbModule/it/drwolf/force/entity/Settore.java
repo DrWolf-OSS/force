@@ -3,12 +3,14 @@ package it.drwolf.force.entity;
 import it.drwolf.slot.entity.SlotDef;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.validator.NotNull;
@@ -56,6 +58,12 @@ public class Settore implements Serializable {
 	private Integer id;
 	private String nome;
 	private SlotDef slotDef;
+	private Set<Gara> gare;
+
+	@OneToMany(mappedBy = "settore")
+	public Set<Gara> getGare() {
+		return this.gare;
+	}
 
 	@Id
 	public Integer getId() {
@@ -72,6 +80,10 @@ public class Settore implements Serializable {
 	@JoinColumn(name = "SlotDef")
 	public SlotDef getSlotDef() {
 		return this.slotDef;
+	}
+
+	public void setGare(Set<Gara> gare) {
+		this.gare = gare;
 	}
 
 	public void setId(Integer id) {

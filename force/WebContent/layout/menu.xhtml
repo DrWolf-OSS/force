@@ -115,29 +115,63 @@
         </rich:menuItem>
     </rich:dropDownMenu>
     <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('ADMIN')}">
-        <f:facet name="label">Gestione Bandi</f:facet>
+        <f:facet name="label">Gestione Gare</f:facet>
         <rich:menuItem>
-            <s:link view="/admin/AziendaList.xhtml"
-                value="Da definire"
-                id="tobedefined"
+            <s:link view="/admin/NewGareList.xhtml"
+                value="Nuove Gare"
+                id="newGare"
+                includePageParams="false"
+                propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem>
+            <s:link view="/admin/ActiveGareList.xhtml"
+                value="Gare Attive"
+                id="actGare"
                 includePageParams="false"
                 propagation="none"/>
         </rich:menuItem>
     </rich:dropDownMenu>
     <!-- @newMenuItem@ -->
     <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('AZIENDE')}">
-        <f:facet name="label">Gestione Bandi</f:facet>
+        <f:facet name="label">Gestione</f:facet>
         <rich:menuItem>
-            <s:link view="/admin/AziendaList.xhtml"
-                value="Da definire"
-                id="tobedefined2"
+            <s:link view="/user/CatMerEdit.xhtml"
+                value="Gestisci Categorie Merceologiche"
+                id="CatMer"
+                includePageParams="false"
+                propagation="none">
+                <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+           </s:link>
+        </rich:menuItem>
+        <rich:menuItem rendered="#{userSession.llpp}">
+            <s:link view="/user/SOAEdit.xhtml"
+                value="Gestisci SOA"
+                id="SOA"
+                includePageParams="false"
+                propagation="none">
+                <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+           </s:link>
+        </rich:menuItem>
+        <rich:menuItem>
+            <s:link view="/user/CommesseEdit.xhtml"
+                value="Gestione Archivio Commesse"
+                id="tobed"
+                includePageParams="false"
+                propagation="none">
+                <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+            </s:link>
+        </rich:menuItem>
+        <rich:menuItem>
+            <s:link view="/user/GareList.xhtml"
+                value="Gestione Gare"
+                id="gareList"
                 includePageParams="false"
                 propagation="none"/>
         </rich:menuItem>
     </rich:dropDownMenu>
     <!-- @newMenuItem@ -->
     <rich:toolBarGroup location="right">
-        <h:outputText id="menuWelcomeId" value="signed in as: #{credentials.username}" rendered="#{identity.loggedIn}"/>
+        <h:outputText id="menuWelcomeId" value="Autenticato come: #{credentials.username} " rendered="#{identity.loggedIn}"/>
         <s:link id="menuAddId" view="/AddAzienda.xhtml" value="Registrati" rendered="#{not identity.loggedIn}" propagation="none"/>
         <s:link id="menuLoginId" view="/login.xhtml" value="Login" rendered="#{not identity.loggedIn}" propagation="none"/>
         <s:link id="menuLogoutId" view="/home.xhtml" action="#{identity.logout}" value="Logout" rendered="#{identity.loggedIn}" propagation="none"/>

@@ -12,19 +12,25 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "CategoriaMerceologica")
-public class CategoriaMerceologica implements Serializable {
+@Table(name = "SOA")
+public class SOA implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -3573580041171154090L;
+	private static final long serialVersionUID = 5215308627496638215L;
 
 	private Integer id;
 
-	private String categoria;
+	private String codice;
+
+	private String nome;
+
+	private String descrizione;
 
 	private String type;
+
+	private Boolean qualifica;
 
 	private Set<Azienda> aziende;
 
@@ -41,7 +47,7 @@ public class CategoriaMerceologica implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		CategoriaMerceologica other = (CategoriaMerceologica) obj;
+		SOA other = (SOA) obj;
 		if (this.id == null) {
 			if (other.id != null) {
 				return false;
@@ -52,17 +58,21 @@ public class CategoriaMerceologica implements Serializable {
 		return true;
 	}
 
-	@ManyToMany(mappedBy = "categorieMerceologiche")
+	@ManyToMany(mappedBy = "SOA")
 	public Set<Azienda> getAziende() {
 		return this.aziende;
 	}
 
 	@Column
-	public String getCategoria() {
-		return this.categoria;
+	public String getCodice() {
+		return this.codice;
 	}
 
-	@ManyToMany(mappedBy = "categorieMerceologiche")
+	public String getDescrizione() {
+		return this.descrizione;
+	}
+
+	@ManyToMany(mappedBy = "SOA")
 	public Set<Gara> getGare() {
 		return this.gare;
 	}
@@ -74,13 +84,23 @@ public class CategoriaMerceologica implements Serializable {
 	}
 
 	@Column
+	public String getNome() {
+		return this.nome;
+	}
+
+	@Column
+	public Boolean getQualifica() {
+		return this.qualifica;
+	}
+
+	@Column
 	public String getType() {
 		return this.type;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 113;
+		final int prime = 383;
 		int result = 1;
 		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
 		return result;
@@ -90,8 +110,12 @@ public class CategoriaMerceologica implements Serializable {
 		this.aziende = aziende;
 	}
 
-	public void setCategoria(String categoria) {
-		this.categoria = categoria;
+	public void setCodice(String og) {
+		this.codice = og;
+	}
+
+	public void setDescrizione(String descrizione) {
+		this.descrizione = descrizione;
 	}
 
 	public void setGare(Set<Gara> gare) {
@@ -100,6 +124,14 @@ public class CategoriaMerceologica implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public void setQualifica(Boolean qualifica) {
+		this.qualifica = qualifica;
 	}
 
 	public void setType(String type) {

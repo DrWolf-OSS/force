@@ -11,6 +11,11 @@ import org.jboss.seam.framework.EntityQuery;
 @Name("revokedAziendaList")
 public class RevokedAziendaList extends EntityQuery<Azienda> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5798978382991605299L;
+
 	private static final String EJBQL = "select azienda from Azienda azienda";
 
 	private static final String[] RESTRICTIONS = {

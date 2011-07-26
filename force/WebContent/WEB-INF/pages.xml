@@ -14,14 +14,6 @@
         </navigation>
     </page>
     
-    <exception class="it.drwolf.slot.exceptions.FailedRuleException">   
-        <redirect view-id="/SlotInstEdit.xhtml">
-        	<param name="slotInstId" value="#{slotInstHome.id}"/>
-        	<param name="slotDefId" value="#{slotDefHome.id}"/>
-            <message severity="warn">Fallimento in update</message>
-        </redirect>
-    </exception>
-
     <exception class="org.jboss.seam.framework.EntityNotFoundException">    
         <redirect view-id="/error.xhtml">
             <message severity="warn">Record not found</message>

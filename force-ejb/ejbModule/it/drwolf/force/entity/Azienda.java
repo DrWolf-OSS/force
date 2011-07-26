@@ -1,6 +1,10 @@
 package it.drwolf.force.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,8 +13,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.validator.NotNull;
@@ -35,7 +42,9 @@ public class Azienda implements Serializable {
 	private String cap;
 
 	private String partitaIva;
+	private String codiceFiscale;
 	private String email;
+
 	private String emailCertificata;
 
 	// Referente
@@ -44,18 +53,46 @@ public class Azienda implements Serializable {
 
 	private String emailReferente;
 	private String telefono;
+
 	private String fax;
 	private String cellulare;
 	private FormaGiuridica formaGiuridica;
 	private Settore settore;
-
 	private String posizioneCNA;
 	private String stato;
 
 	// per Alfresco
 	private String alfrescoGroupId;
 
+	private Set<CategoriaMerceologica> categorieMerceologiche;
+
+	private Set<SOA> SOA;
+
+	private Set<Commessa> commesse;
+
 	public Azienda() {
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		Azienda other = (Azienda) obj;
+		if (this.id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!this.id.equals(other.id)) {
+			return false;
+		}
+		return true;
 	}
 
 	public String getAlfrescoGroupId() {
@@ -68,15 +105,37 @@ public class Azienda implements Serializable {
 		return this.cap;
 	}
 
+	@ManyToMany
+	public Set<CategoriaMerceologica> getCategorieMerceologiche() {
+		return this.categorieMerceologiche;
+	}
+
+	@Transient
+	public List<CategoriaMerceologica> getCategorieMerceologicheAsList() {
+		return new ArrayList<CategoriaMerceologica>(
+				this.getCategorieMerceologiche());
+
+	}
+
 	@Column(nullable = true)
 	public String getCellulare() {
 		return this.cellulare;
+	}
+
+	@Column
+	public String getCodiceFiscale() {
+		return this.codiceFiscale;
 	}
 
 	@Column(nullable = false)
 	@NotNull
 	public String getCognome() {
 		return this.cognome;
+	}
+
+	@OneToMany(mappedBy = "azienda")
+	public Set<Commessa> getCommesse() {
+		return this.commesse;
 	}
 
 	@Column(nullable = false)
@@ -159,11 +218,27 @@ public class Azienda implements Serializable {
 		return this.ragioneSociale;
 	}
 
+	@Transient
+	public String getReferente() {
+		return this.getNome() + " " + this.getCognome();
+	}
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(nullable = false)
 	@NotNull
 	public Settore getSettore() {
 		return this.settore;
+	}
+
+	@ManyToMany
+	public Set<SOA> getSOA() {
+		return this.SOA;
+	}
+
+	@Transient
+	public List<SOA> getSOAAsList() {
+		return new ArrayList<SOA>(this.getSOA());
+
 	}
 
 	@Column(nullable = false)
@@ -177,6 +252,14 @@ public class Azienda implements Serializable {
 		return this.telefono;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 89;
+		int result = 1;
+		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
+		return result;
+	}
+
 	public void setAlfrescoGroupId(String alfrescoGroupId) {
 		this.alfrescoGroupId = alfrescoGroupId;
 	}
@@ -185,12 +268,31 @@ public class Azienda implements Serializable {
 		this.cap = cap;
 	}
 
+	public void setCategorieMerceologiche(
+			Set<CategoriaMerceologica> categorieMerceologiche) {
+		this.categorieMerceologiche = categorieMerceologiche;
+	}
+
+	@Transient
+	public void setCategorieMerceologicheAsList(
+			List<CategoriaMerceologica> lista) {
+		this.setCategorieMerceologiche(new HashSet<CategoriaMerceologica>(lista));
+	}
+
 	public void setCellulare(String cellulare) {
 		this.cellulare = cellulare;
 	}
 
+	public void setCodiceFiscale(String codiceFiscale) {
+		this.codiceFiscale = codiceFiscale;
+	}
+
 	public void setCognome(String cognome) {
 		this.cognome = cognome;
+	}
+
+	public void setCommesse(Set<Commessa> commesse) {
+		this.commesse = commesse;
 	}
 
 	public void setComune(String comune) {
@@ -251,6 +353,15 @@ public class Azienda implements Serializable {
 
 	public void setSettore(Settore settore) {
 		this.settore = settore;
+	}
+
+	public void setSOA(Set<SOA> categoriaOpereGenerali) {
+		this.SOA = categoriaOpereGenerali;
+	}
+
+	@Transient
+	public void setSOAAsList(List<SOA> lista) {
+		this.setSOA(new HashSet<SOA>(lista));
 	}
 
 	public void setStato(String stato) {

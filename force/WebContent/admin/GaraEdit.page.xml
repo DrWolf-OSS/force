@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns="http://jboss.com/products/seam/pages"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+      no-conversation-view-id="/AziendaList.xhtml"
+      login-required="true">
+
+   <begin-conversation join="true" flush-mode="MANUAL"/>
+
+   <action execute="#{garaHome.wire}"/>
+
+   <param name="garaFrom"/>
+   <param name="garaId" value="#{garaHome.garaId}"/>
+
+<navigation from-action="#{garaHome.attivaGara()}">
+      <rule if-outcome="OK">
+         <end-conversation/>
+         <redirect view-id="/admin/ActiveGareList.xhtml"/>
+      </rule>
+   </navigation>
+</page>

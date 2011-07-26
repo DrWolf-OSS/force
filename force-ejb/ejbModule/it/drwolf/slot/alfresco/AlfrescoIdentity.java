@@ -33,30 +33,35 @@ public abstract class AlfrescoIdentity {
 		this.url = url;
 		this.username = username;
 		this.password = password;
+		try {
 
-		SessionFactory f = SessionFactoryImpl.newInstance();
-		Map<String, String> parameter = new HashMap<String, String>();
+			SessionFactory f = SessionFactoryImpl.newInstance();
+			Map<String, String> parameter = new HashMap<String, String>();
 
-		// user credentials
-		parameter.put(SessionParameter.USER, username);
-		parameter.put(SessionParameter.PASSWORD, password);
+			// user credentials
+			parameter.put(SessionParameter.USER, username);
+			parameter.put(SessionParameter.PASSWORD, password);
 
-		url += "/s/cmis";
+			url += "/s/cmis";
 
-		// connection settings
-		parameter.put(SessionParameter.ATOMPUB_URL, url);
-		parameter.put(SessionParameter.BINDING_TYPE,
-				BindingType.ATOMPUB.value());
-		//
-		Repository r = f.getRepositories(parameter).get(0);
+			// connection settings
+			parameter.put(SessionParameter.ATOMPUB_URL, url);
+			parameter.put(SessionParameter.BINDING_TYPE,
+					BindingType.ATOMPUB.value());
+			//
+			Repository r = f.getRepositories(parameter).get(0);
 
-		parameter.put(SessionParameter.REPOSITORY_ID, r.getId());
+			parameter.put(SessionParameter.REPOSITORY_ID, r.getId());
 
-		// Alfresco object factory
-		parameter.put(SessionParameter.OBJECT_FACTORY_CLASS,
-				"org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl");
+			// Alfresco object factory
+			parameter.put(SessionParameter.OBJECT_FACTORY_CLASS,
+					"org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl");
 
-		this.session = new SynchSession(f.createSession(parameter));
+			this.session = new SynchSession(f.createSession(parameter));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 
 		return true;
 	}
