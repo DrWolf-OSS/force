@@ -56,24 +56,24 @@ public class Utils {
 		return c;
 	}
 
-	public static String decodeDocumentFileName(String encoded) {
-		// String encoded = getRealFileName();
-		String name = encoded;
-		String extension = "";
-		int dotIndex = encoded.lastIndexOf(".");
-		if (dotIndex != -1) {
-			extension = encoded.substring(dotIndex);
-			name = encoded.substring(0, dotIndex);
-		}
-
-		int underscoreIndex = encoded.lastIndexOf("_");
-		String fileName = encoded;
-		if (underscoreIndex != -1) {
-			fileName = encoded.substring(0, underscoreIndex);
-		} else {
-			fileName = name;
-		}
-		return fileName.concat(extension);
-	}
+	// public static String decodeDocumentFileName(String encoded) {
+	// // String encoded = getRealFileName();
+	// String name = encoded;
+	// String extension = "";
+	// int dotIndex = encoded.lastIndexOf(".");
+	// if (dotIndex != -1) {
+	// extension = encoded.substring(dotIndex);
+	// name = encoded.substring(0, dotIndex);
+	// }
+	//
+	// int underscoreIndex = encoded.lastIndexOf("_");
+	// String fileName = encoded;
+	// if (underscoreIndex != -1) {
+	// fileName = encoded.substring(0, underscoreIndex);
+	// } else {
+	// fileName = name;
+	// }
+	// return fileName.concat(extension);
+	// }
 
 }

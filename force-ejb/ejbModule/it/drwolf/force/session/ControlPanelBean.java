@@ -34,7 +34,7 @@ public class ControlPanelBean {
 	AlfrescoUserIdentity alfrescoUserIdentity;
 
 	public List<DocInstCollection> getDocInstCollections() {
-		return this.slotInstEditBean.getDocInstCollections().subList(0, 2);
+		return this.slotInstEditBean.getDocInstCollections();
 	}
 
 	public List<Gara> getSelectedGare() {

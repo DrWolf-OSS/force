@@ -37,6 +37,7 @@ import it.drwolf.slot.ruleverifier.VerifierResult;
 import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -67,6 +68,7 @@ import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import org.bouncycastle.cms.CMSProcessable;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSTypedStream;
 import org.bouncycastle.cms.SignerId;
@@ -679,7 +681,8 @@ public class SlotInstEditBean {
 				.getDocDef().getAspectIds();
 
 		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put(PropertyIds.NAME, this.encodeFilename(fileName));
+		properties
+				.put(PropertyIds.NAME, FileContainer.encodeFilename(fileName));
 		properties.put(PropertyIds.OBJECT_TYPE_ID,
 				BaseTypeId.CMIS_DOCUMENT.value());
 
@@ -706,17 +709,17 @@ public class SlotInstEditBean {
 		return document;
 	}
 
-	private String encodeFilename(String origin) {
-		int dotIndex = origin.lastIndexOf(".");
-		String name = origin;
-		String extension = "";
-		if (dotIndex > 0) {
-			name = origin.substring(0, dotIndex);
-			extension = origin.substring(dotIndex);
-		}
-		String newName = name + "_" + System.currentTimeMillis() + extension;
-		return newName;
-	}
+	// private String encodeFilename(String origin) {
+	// int dotIndex = origin.lastIndexOf(".");
+	// String name = origin;
+	// String extension = "";
+	// if (dotIndex > 0) {
+	// name = origin.substring(0, dotIndex);
+	// extension = origin.substring(dotIndex);
+	// }
+	// String newName = name + "_" + System.currentTimeMillis() + extension;
+	// return newName;
+	// }
 
 	private String copyDocumentOnAlfresco(AlfrescoDocument document,
 			DocInstCollection instCollection,
@@ -729,11 +732,12 @@ public class SlotInstEditBean {
 		ContentStream contentStream = document.getContentStream();
 		Set<String> aspects = instCollection.getDocDefCollection().getDocDef()
 				.getAspectIds();
-		Set<Property> properties = customModelController.getProperties(aspects);
+		// Set<Property> properties =
+		// customModelController.getProperties(aspects);
 
 		Map<String, Object> props = new HashMap<String, Object>();
-		props.put(PropertyIds.NAME, encodeFilename(new FileContainer(document,
-				properties, true).getFileName()));
+		props.put(PropertyIds.NAME, FileContainer.encodeFilename(FileContainer
+				.decodeFilename(document.getName())));
 		props.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
 
 		ObjectId objectId = session.createDocument(props, slotFolder,
@@ -1189,6 +1193,8 @@ public class SlotInstEditBean {
 					}
 				}
 			}
+			String contentRef = extractContent(document, cms);
+			System.out.println("---> ContentRef: " + contentRef);
 			return signatures;
 
 		} catch (Exception e) {
@@ -1255,34 +1261,58 @@ public class SlotInstEditBean {
 		return null;
 	}
 
-	// private List<Signature> retrieveSignatures(AlfrescoDocument document) {
-	// List<Signature> signatures = new ArrayList<Signature>();
-	// ItemIterable<QueryResult> results = alfrescoUserIdentity.getSession()
-	// .query("SELECT cmis:objectId," + Signature.VALIDITY + ","
-	// + Signature.EXPIRY + "," + Signature.AUTHORITY + ","
-	// + Signature.SIGN + "," + Signature.CF
-	// + " from dw:signature WHERE IN_TREE('"
-	// + document.getId() + "')", true);
-	// if (results.getTotalNumItems() != 0) {
-	// Iterator<QueryResult> iterator = results.iterator();
-	// while (iterator.hasNext()) {
-	// QueryResult result = iterator.next();
-	// String nodeRef = result.getPropertyValueById("cmis:objectId");
-	// Boolean validity = result
-	// .getPropertyValueById(Signature.VALIDITY);
-	// Calendar expiry = result.getPropertyValueById(Signature.EXPIRY);
-	// String authority = result
-	// .getPropertyValueById(Signature.AUTHORITY);
-	// String sign = result.getPropertyValueById(Signature.SIGN);
-	// String cf = result.getPropertyValueById(Signature.CF);
-	//
-	// Signature signature = new Signature(validity, expiry.getTime(),
-	// authority, sign, cf, nodeRef);
-	// signatures.add(signature);
-	// }
-	// }
-	// return signatures;
-	// }
+	private String extractContent(AlfrescoDocument document, CMSSignedData cms) {
+
+		try {
+			CMSProcessable signedContent = cms.getSignedContent();
+			final byte[] content = (byte[]) signedContent.getContent();
+
+			ByteArrayInputStream baip = new ByteArrayInputStream(content);
+
+			String contentFilename = FileContainer
+					.retrieveContentFilename(document.getName());
+			String encodedContentFilename = FileContainer
+					.encodeFilename(contentFilename);
+			//
+			String mimetype = "application/octet-stream";
+			ContentStreamImpl contentStreamImpl = new ContentStreamImpl(
+					encodedContentFilename,
+					new BigInteger("" + content.length), mimetype, baip);
+
+			Map<String, Object> properties = new HashMap<String, Object>();
+			properties.put(PropertyIds.NAME, encodedContentFilename);
+			properties.put(PropertyIds.OBJECT_TYPE_ID,
+					BaseTypeId.CMIS_DOCUMENT.value());
+
+			List<Folder> parents = document.getParents();
+			Folder folder = parents.get(0);
+
+			ObjectId objectId = alfrescoUserIdentity.getSession()
+					.createDocument(properties, folder, contentStreamImpl,
+							VersioningState.NONE, null, null, null);
+			AlfrescoDocument contentDoc = (AlfrescoDocument) alfrescoUserIdentity
+					.getSession().getObject(objectId.getId());
+			contentDoc.addAspect("P:util:tmp");
+
+			//
+			String username = alfrescoUserIdentity.getUsername();
+			String password = alfrescoUserIdentity.getPassword();
+			String url = alfrescoUserIdentity.getUrl();
+			AlfrescoWebScriptClient webScriptClient = new AlfrescoWebScriptClient(
+					username, password, url);
+			webScriptClient.embedContentToSignedDoc(document.getId(),
+					contentDoc.getId(),
+					FileContainer.retrieveContentFilename(document.getName()));
+			//
+			// eliminare il file del contenuto da alfresco
+			//
+			return objectId.getId();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	private void addMainMessage(VerifierMessage message) {
 		slotMessages.add(message);

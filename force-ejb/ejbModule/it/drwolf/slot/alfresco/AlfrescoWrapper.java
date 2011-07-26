@@ -1,7 +1,7 @@
 package it.drwolf.slot.alfresco;
 
 import it.drwolf.slot.digsig.Signature;
-import it.drwolf.slot.digsig.Utils;
+import it.drwolf.slot.pagebeans.support.FileContainer;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
@@ -179,8 +179,8 @@ public class AlfrescoWrapper {
 							QueryResult result = iterator.next();
 							String cmisName = result
 									.getPropertyValueById("cmis:name");
-							if (cmisName.equals(retrieveContentFileName(doc
-									.getName()))) {
+							if (cmisName.equals(FileContainer
+									.retrieveContentFilename(doc.getName()))) {
 								String contentNodeRef = result
 										.getPropertyValueById("cmis:objectId");
 								doc = (AlfrescoDocument) session.getObject(
@@ -211,18 +211,18 @@ public class AlfrescoWrapper {
 		return null;
 	}
 
-	private String retrieveContentFileName(String encodedArchiveFileName) {
-		String archiveFileName = Utils
-				.decodeDocumentFileName(encodedArchiveFileName);
-		int dotIndex = archiveFileName.lastIndexOf(".");
-		String name = archiveFileName;
-		// String extension = "";
-		if (dotIndex > 0) {
-			name = archiveFileName.substring(0, dotIndex);
-			// extension = archiveFileName.substring(dotIndex);
-		}
-		return name;
-	}
+	// private String retrieveContentFileName(String encodedArchiveFileName) {
+	// String archiveFileName = FileContainer
+	// .decodeFilename(encodedArchiveFileName);
+	// int dotIndex = archiveFileName.lastIndexOf(".");
+	// String name = archiveFileName;
+	// // String extension = "";
+	// if (dotIndex > 0) {
+	// name = archiveFileName.substring(0, dotIndex);
+	// // extension = archiveFileName.substring(dotIndex);
+	// }
+	// return name;
+	// }
 
 	public AlfrescoFolder retrieveGroupFolder(String path, String shortName) {
 		return (AlfrescoFolder) this.alfrescoUserIdentity.getSession()

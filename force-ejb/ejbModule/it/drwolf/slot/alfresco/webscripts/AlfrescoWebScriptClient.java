@@ -242,4 +242,18 @@ public class AlfrescoWebScriptClient {
 		}
 		return null;
 	}
+
+	public void embedContentToSignedDoc(String target, String content,
+			String name) {
+		try {
+			String serviceLocation = "/service/embedContent";
+			String uri = this.repositoryUri + serviceLocation + "?target="
+					+ target + "&content=" + content + "&name=" + name;
+			// System.out.println(uri);
+			openGetRequest(uri);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

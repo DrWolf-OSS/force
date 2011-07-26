@@ -27,6 +27,50 @@ public class FileContainer {
 	private String id = UUID.randomUUID().toString();
 	private List<Signature> signatures;
 
+	public final static String decodeFilename(String encoded) {
+		// String encoded = getRealFileName();
+		String name = encoded;
+		String extension = "";
+		int dotIndex = encoded.lastIndexOf(".");
+		if (dotIndex != -1) {
+			extension = encoded.substring(dotIndex);
+			name = encoded.substring(0, dotIndex);
+		}
+
+		int underscoreIndex = encoded.lastIndexOf("_");
+		String fileName = encoded;
+		if (underscoreIndex != -1) {
+			fileName = encoded.substring(0, underscoreIndex);
+		} else {
+			fileName = name;
+		}
+		return fileName.concat(extension);
+	}
+
+	public final static String encodeFilename(String origin) {
+		int dotIndex = origin.lastIndexOf(".");
+		String name = origin;
+		String extension = "";
+		if (dotIndex > 0) {
+			name = origin.substring(0, dotIndex);
+			extension = origin.substring(dotIndex);
+		}
+		String newName = name + "_" + System.currentTimeMillis() + extension;
+		return newName;
+	}
+
+	public final static String retrieveContentFilename(
+			String encodedArchiveFilename) {
+		String archiveFileName = FileContainer
+				.decodeFilename(encodedArchiveFilename);
+		int dotIndex = archiveFileName.lastIndexOf(".");
+		String name = archiveFileName;
+		if (dotIndex > 0) {
+			name = archiveFileName.substring(0, dotIndex);
+		}
+		return name;
+	}
+
 	public FileContainer(AlfrescoDocument alfrescoDocument,
 			Set<Property> properties, boolean editable) {
 		super();
@@ -81,23 +125,24 @@ public class FileContainer {
 	}
 
 	public String getFileName() {
-		String realFileName = getRealFileName();
-		String name = realFileName;
-		String extension = "";
-		int dotIndex = realFileName.lastIndexOf(".");
-		if (dotIndex != -1) {
-			extension = realFileName.substring(dotIndex);
-			name = realFileName.substring(0, dotIndex);
-		}
-
-		int underscoreIndex = realFileName.lastIndexOf("_");
-		String fileName = realFileName;
-		if (underscoreIndex != -1) {
-			fileName = realFileName.substring(0, underscoreIndex);
-		} else {
-			fileName = name;
-		}
-		return fileName.concat(extension);
+		return FileContainer.decodeFilename(this.getRealFileName());
+		// String realFileName = getRealFileName();
+		// String name = realFileName;
+		// String extension = "";
+		// int dotIndex = realFileName.lastIndexOf(".");
+		// if (dotIndex != -1) {
+		// extension = realFileName.substring(dotIndex);
+		// name = realFileName.substring(0, dotIndex);
+		// }
+		//
+		// int underscoreIndex = realFileName.lastIndexOf("_");
+		// String fileName = realFileName;
+		// if (underscoreIndex != -1) {
+		// fileName = realFileName.substring(0, underscoreIndex);
+		// } else {
+		// fileName = name;
+		// }
+		// return fileName.concat(extension);
 	}
 
 	public String getNodeRef() {
