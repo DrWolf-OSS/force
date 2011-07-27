@@ -28,7 +28,6 @@ public class FileContainer {
 	private List<Signature> signatures;
 
 	public final static String decodeFilename(String encoded) {
-		// String encoded = getRealFileName();
 		String name = encoded;
 		String extension = "";
 		int dotIndex = encoded.lastIndexOf(".");
@@ -113,6 +112,7 @@ public class FileContainer {
 
 	public void setDocument(AlfrescoDocument alfrescoDocument) {
 		this.document = alfrescoDocument;
+		retrieveSignatures();
 	}
 
 	public String getRealFileName() {
@@ -126,23 +126,6 @@ public class FileContainer {
 
 	public String getFileName() {
 		return FileContainer.decodeFilename(this.getRealFileName());
-		// String realFileName = getRealFileName();
-		// String name = realFileName;
-		// String extension = "";
-		// int dotIndex = realFileName.lastIndexOf(".");
-		// if (dotIndex != -1) {
-		// extension = realFileName.substring(dotIndex);
-		// name = realFileName.substring(0, dotIndex);
-		// }
-		//
-		// int underscoreIndex = realFileName.lastIndexOf("_");
-		// String fileName = realFileName;
-		// if (underscoreIndex != -1) {
-		// fileName = realFileName.substring(0, underscoreIndex);
-		// } else {
-		// fileName = name;
-		// }
-		// return fileName.concat(extension);
 	}
 
 	public String getNodeRef() {
@@ -160,7 +143,32 @@ public class FileContainer {
 
 	public String getMimetype() {
 		try {
+			if (document.hasAspect(Signature.ASPECT_SIGNED)) {
+				AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
+						.getInstance("alfrescoUserIdentity");
+				ItemIterable<QueryResult> results = alfrescoUserIdentity
+						.getSession().query(
+								"SELECT cmis:objectId, cmis:name FROM cmis:document WHERE IN_TREE('"
+										+ document.getId() + "')", true);
+				if (results.getTotalNumItems() != 0) {
+					Iterator<QueryResult> iterator = results.iterator();
+					while (iterator.hasNext()) {
+						QueryResult result = iterator.next();
+						String cmisName = result
+								.getPropertyValueById("cmis:name");
+						if (cmisName.equals(FileContainer
+								.retrieveContentFilename(document.getName()))) {
+							String contentNodeRef = result
+									.getPropertyValueById("cmis:objectId");
+							AlfrescoDocument content = (AlfrescoDocument) alfrescoUserIdentity
+									.getSession().getObject(contentNodeRef);
+							return content.getContentStreamMimeType();
+						}
+					}
+				}
+			}
 			return this.document.getContentStreamMimeType();
+
 		} catch (Exception e) {
 			return Resolver.mimetypeForExtension(this.getExtension());
 		}
@@ -216,20 +224,12 @@ public class FileContainer {
 	}
 
 	private void buildPropertyInsts(Set<Property> properties) {
-		// Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
-		// Set<Property> properties = customModelController
-		// .getProperties(aspectIds);
-
 		List<DocumentPropertyInst> fileProperties = new ArrayList<DocumentPropertyInst>();
 		for (Property p : properties) {
 			DocumentPropertyInst documentPropertyInst = buildValorisedDocumentPropertyInst(p);
 			fileProperties.add(documentPropertyInst);
 		}
-
-		// FileContainer container = new FileContainer(item);
-		// this.editable = editables;
 		this.setEmbeddedProperties(fileProperties);
-		// return container;
 		this.embeddedProperties = fileProperties;
 	}
 
@@ -280,8 +280,8 @@ public class FileContainer {
 		return signatures;
 	}
 
-	public void setSignatures(List<Signature> signatures) {
-		this.signatures = signatures;
-	}
+	// public void setSignatures(List<Signature> signatures) {
+	// this.signatures = signatures;
+	// }
 
 }

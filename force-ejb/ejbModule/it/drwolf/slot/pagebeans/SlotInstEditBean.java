@@ -702,8 +702,12 @@ public class SlotInstEditBean {
 
 		// poi si aggiungono i valori delle relative properties
 		updateProperties(document, fileContainer.getEmbeddedProperties());
-		List<Signature> signatures = verifySignature(document);
-		fileContainer.setSignatures(signatures);
+		// List<Signature> signatures = verifySignature(document);
+		// fileContainer.setSignatures(signatures);
+		// fileContainer.setDocument(document);
+
+		verifySignature(document);
+		// fileContainer.setSignatures(signatures);
 		fileContainer.setDocument(document);
 
 		return document;
@@ -1193,8 +1197,7 @@ public class SlotInstEditBean {
 					}
 				}
 			}
-			String contentRef = extractContent(document, cms);
-			System.out.println("---> ContentRef: " + contentRef);
+			extractAndEmbedContent(document, cms);
 			return signatures;
 
 		} catch (Exception e) {
@@ -1222,7 +1225,7 @@ public class SlotInstEditBean {
 			AlfrescoWebScriptClient webScriptClient = new AlfrescoWebScriptClient(
 					username, password, url);
 
-			document.addAspect("P:dw:signed");
+			document.addAspect(Signature.ASPECT_SIGNED);
 
 			String signatureNodeRef = webScriptClient.addSignature(
 					document.getId(),
@@ -1261,7 +1264,7 @@ public class SlotInstEditBean {
 		return null;
 	}
 
-	private String extractContent(AlfrescoDocument document, CMSSignedData cms) {
+	private void extractAndEmbedContent(AlfrescoDocument document, CMSSignedData cms) {
 
 		try {
 			CMSProcessable signedContent = cms.getSignedContent();
@@ -1304,14 +1307,12 @@ public class SlotInstEditBean {
 					contentDoc.getId(),
 					FileContainer.retrieveContentFilename(document.getName()));
 			//
-			// eliminare il file del contenuto da alfresco
+			contentDoc.deleteAllVersions();
 			//
-			return objectId.getId();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
 	}
 
 	private void addMainMessage(VerifierMessage message) {

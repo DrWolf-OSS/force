@@ -186,12 +186,6 @@ public class AlfrescoWrapper {
 								doc = (AlfrescoDocument) session.getObject(
 										contentNodeRef, context);
 							}
-							// System.out.println("---> content id: "
-							// + contentNodeRef);
-							// System.out.println("---> cmis:name: " +
-							// cmisName);
-							// doc = (AlfrescoDocument) session.getObject(
-							// contentNodeRef, context);
 						}
 					}
 				}
@@ -210,19 +204,6 @@ public class AlfrescoWrapper {
 		}
 		return null;
 	}
-
-	// private String retrieveContentFileName(String encodedArchiveFileName) {
-	// String archiveFileName = FileContainer
-	// .decodeFilename(encodedArchiveFileName);
-	// int dotIndex = archiveFileName.lastIndexOf(".");
-	// String name = archiveFileName;
-	// // String extension = "";
-	// if (dotIndex > 0) {
-	// name = archiveFileName.substring(0, dotIndex);
-	// // extension = archiveFileName.substring(dotIndex);
-	// }
-	// return name;
-	// }
 
 	public AlfrescoFolder retrieveGroupFolder(String path, String shortName) {
 		return (AlfrescoFolder) this.alfrescoUserIdentity.getSession()
@@ -281,44 +262,5 @@ public class AlfrescoWrapper {
 			e.printStackTrace();
 		}
 	}
-
-	// private JsonElement openJsonWebScript(String url)
-	// throws MalformedURLException, IOException,
-	// UnsupportedEncodingException {
-	// URL peopleServiceUrl = new URL(url);
-	// URLConnection conn = peopleServiceUrl.openConnection();
-	// String auth = "Basic "
-	// + Base64.encodeBase64String((identity.getCredentials()
-	// .getUsername() + ":" + identity.getCredentials()
-	// .getPassword()).getBytes());
-	// conn.setRequestProperty("Authorization", auth);
-	// conn.connect();
-	//
-	// InputStream is = conn.getInputStream();
-	//
-	// JsonElement parsed = new JsonParser().parse(new JsonReader(
-	// new InputStreamReader(is, "UTF-8")));
-	//
-	// return parsed;
-	// }
-	//
-	// public List<Authority> getAlfrescoGroups() {
-	// Gson gson = new Gson();
-	// List<Authority> authGroups = new ArrayList<Authority>();
-	// try {
-	// JsonElement parsed = openJsonWebScript(alfrescoInfo
-	// .getRepositoryUri()
-	// + "/service/api/groups?shortNameFilter=*");
-	// JsonObject groups = parsed.getAsJsonObject();
-	// JsonArray list = groups.getAsJsonArray("data");
-	// for (JsonElement e : list) {
-	// Authority fromJson = gson.fromJson(e, Authority.class);
-	// authGroups.add(fromJson);
-	// }
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	// return authGroups;
-	// }
 
 }
