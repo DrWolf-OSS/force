@@ -256,39 +256,6 @@ public class SlotInstEditBean {
 
 	}
 
-	// private FileContainer buildFileContainer(Set<Property> properties,
-	// Object item, boolean editables) {
-	// // Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
-	// // Set<Property> properties = customModelController
-	// // .getProperties(aspectIds);
-	//
-	// List<DocumentPropertyInst> fileProperties = new
-	// ArrayList<DocumentPropertyInst>();
-	// for (Property p : properties) {
-	// DocumentPropertyInst documentPropertyInst =
-	// buildValorisedDocumentPropertyInst(
-	// item, editables, p);
-	// fileProperties.add(documentPropertyInst);
-	// }
-	//
-	// FileContainer container = new FileContainer(item);
-	// container.setEditable(editables);
-	// container.setEmbeddedProperties(fileProperties);
-	// return container;
-	// }
-
-	// private DocumentPropertyInst buildValorisedDocumentPropertyInst(
-	// Object item, boolean editables, Property p) {
-	// DocumentPropertyInst embeddedPropertyInst = new DocumentPropertyInst(p);
-	// if (item instanceof AlfrescoDocument) {
-	// AlfrescoDocument document = (AlfrescoDocument) item;
-	// Object propertyValue = document.getPropertyValue(p.getName());
-	// embeddedPropertyInst.setValue(propertyValue);
-	// }
-	// embeddedPropertyInst.setEditable(editables);
-	// return embeddedPropertyInst;
-	// }
-
 	private void cleanMessages() {
 		Set<String> filesKeys = filesMessages.keySet();
 		for (String key : filesKeys) {
@@ -336,52 +303,12 @@ public class SlotInstEditBean {
 
 		Set<Long> keySet = datas.keySet();
 		for (Long key : keySet) {
-			// DocInstCollection instCollection = null;
-			// // controllo se c'è una collection che corrisponde a quell'id (ed
-			// è
-			// // la destinataria dei files uploadati)
-			// boolean found = false;
-			// Iterator<DocInstCollection> instCollIterator = docInstCollections
-			// .iterator();
-			// while (instCollIterator.hasNext() && found == false) {
-			// instCollection = instCollIterator.next();
-			// if (instCollection.getDocDefCollection().getId().equals(key)) {
-			// found = true;
-			// }
-			// }
 			DocInstCollection instCollection = findInstCollection(key);
 			if (instCollection != null) {
 				try {
 
 					addCollectionsNewDocumentsToSlot(slotFolder, instCollection);
 
-					// List<FileContainer> containers = datas.get(key);
-					// if (containers != null) {
-					// for (FileContainer container : containers) {
-					// if (container.getDocument().hasAspect("P:util:tmp")) {
-					// // String storedRef = storeOnAlfresco(
-					// // container.getUploadItem(), instCollection,
-					// // container.getEmbeddedProperties(),
-					// // slotFolder);
-					// container.getDocument().removeAspect(
-					// "P:util:tmp");
-					// DocInst docInst = new DocInst(instCollection,
-					// container.getDocument().getId());
-					// instCollection.getDocInsts().add(docInst);
-					// } else {
-					// System.out.println("si deve copiare "
-					// + container.getDocument().getName());
-					// String storedRef = copyDocumentOnAlfresco(
-					// container.getDocument(),
-					// instCollection,
-					// container.getEmbeddedProperties(),
-					// slotFolder);
-					// DocInst docInst = new DocInst(instCollection,
-					// storedRef);
-					// instCollection.getDocInsts().add(docInst);
-					// }
-					// }
-					// }
 				} catch (Exception e) {
 					FacesMessages.instance().add(
 							"Errors in Alfresco storage process");
@@ -712,18 +639,6 @@ public class SlotInstEditBean {
 
 		return document;
 	}
-
-	// private String encodeFilename(String origin) {
-	// int dotIndex = origin.lastIndexOf(".");
-	// String name = origin;
-	// String extension = "";
-	// if (dotIndex > 0) {
-	// name = origin.substring(0, dotIndex);
-	// extension = origin.substring(dotIndex);
-	// }
-	// String newName = name + "_" + System.currentTimeMillis() + extension;
-	// return newName;
-	// }
 
 	private String copyDocumentOnAlfresco(AlfrescoDocument document,
 			DocInstCollection instCollection,
@@ -1157,7 +1072,7 @@ public class SlotInstEditBean {
 
 	}
 
-	private List<Signature> verifySignature(AlfrescoDocument document) {
+	private void verifySignature(AlfrescoDocument document) {
 		try {
 			BouncyCastleProvider bcProv = new BouncyCastleProvider();
 			Security.addProvider(bcProv);
@@ -1177,7 +1092,7 @@ public class SlotInstEditBean {
 			// per ogni signer ottiene l'insieme dei certificati
 			Collection<SignerInformation> signers = infos.getSigners();
 
-			List<Signature> signatures = new ArrayList<Signature>();
+			// List<Signature> signatures = new ArrayList<Signature>();
 			for (SignerInformation info : signers) {
 
 				SignerId sid = info.getSID();
@@ -1191,24 +1106,23 @@ public class SlotInstEditBean {
 
 					if (validCert != null) {
 						System.out.println("----> certificato trovato!");
-						Signature signature = addSignature(document,
-								x509Certificate, validCert);
-						signatures.add(signature);
+						addSignature(document, x509Certificate, validCert);
+						// signatures.add(signature);
 					}
 				}
 			}
 			extractAndEmbedContent(document, cms);
-			return signatures;
+			// return signatures;
 
 		} catch (Exception e) {
 			System.out.println(document.getName()
 					+ " non è firmato digitalmente");
 			// e.printStackTrace();
 		}
-		return null;
+		// return null;
 	}
 
-	private Signature addSignature(AlfrescoDocument document,
+	private void addSignature(AlfrescoDocument document,
 			X509Certificate x509Certificate, X509CertificateObject validCert) {
 		try {
 			Principal subjectDN = x509Certificate.getSubjectDN();
@@ -1244,16 +1158,16 @@ public class SlotInstEditBean {
 
 			signatureDoc.updateProperties(props);
 
-			Signature signature = new Signature();
-			signature.setAuthority(authority);
-			signature.setCf(cf);
-			signature.setExpiry(notAfter);
-			signature.setSign(mysign);
-			signature.setValidity(validity);
-			signature.setNodeRef(signatureNodeRef);
+			// Signature signature = new Signature();
+			// signature.setAuthority(authority);
+			// signature.setCf(cf);
+			// signature.setExpiry(notAfter);
+			// signature.setSign(mysign);
+			// signature.setValidity(validity);
+			// signature.setNodeRef(signatureNodeRef);
 
 			System.out.println("-> Signature added to " + document.getName());
-			return signature;
+			// return signature;
 
 		} catch (Exception e) {
 			System.out
@@ -1261,10 +1175,11 @@ public class SlotInstEditBean {
 							+ document.getName());
 			e.printStackTrace();
 		}
-		return null;
+		// return null;
 	}
 
-	private void extractAndEmbedContent(AlfrescoDocument document, CMSSignedData cms) {
+	private void extractAndEmbedContent(AlfrescoDocument document,
+			CMSSignedData cms) {
 
 		try {
 			CMSProcessable signedContent = cms.getSignedContent();

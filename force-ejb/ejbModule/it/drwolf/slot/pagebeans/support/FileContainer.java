@@ -189,7 +189,7 @@ public class FileContainer {
 
 	private void retrieveSignatures() {
 		this.signatures = new ArrayList<Signature>();
-		if (this.document != null) {
+		if (this.document != null && this.document.hasAspect("P:dw:signed")) {
 			AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
 					.getInstance("alfrescoUserIdentity");
 			ItemIterable<QueryResult> results = alfrescoUserIdentity
@@ -198,8 +198,9 @@ public class FileContainer {
 									+ Signature.EXPIRY + ","
 									+ Signature.AUTHORITY + ","
 									+ Signature.SIGN + "," + Signature.CF
-									+ " from dw:signature WHERE IN_TREE('"
-									+ document.getId() + "')", true);
+									+ " from " + Signature.SIGNATURE_TYPE
+									+ " WHERE IN_TREE('" + document.getId()
+									+ "')", true);
 			if (results.getTotalNumItems() != 0) {
 				Iterator<QueryResult> iterator = results.iterator();
 				while (iterator.hasNext()) {

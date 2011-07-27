@@ -6,6 +6,7 @@ public class Signature {
 
 	public static final String ASPECT_SIGNED = "P:dw:signed";
 
+	public static final String SIGNATURE_TYPE = "dw:signature";
 	public static final String VALIDITY = "dw:validity";
 	public static final String EXPIRY = "dw:expiry";
 	public static final String AUTHORITY = "dw:authority";

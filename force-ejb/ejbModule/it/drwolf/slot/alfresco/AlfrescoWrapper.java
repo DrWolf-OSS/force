@@ -75,7 +75,7 @@ public class AlfrescoWrapper {
 	@In
 	private AlfrescoAdminIdentity alfrescoAdminIdentity;
 
-	@In
+	@In(create = true)
 	private AlfrescoUserIdentity alfrescoUserIdentity;
 
 	@In(create = true)
