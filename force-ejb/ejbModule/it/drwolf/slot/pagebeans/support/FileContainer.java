@@ -126,7 +126,10 @@ public class FileContainer {
 	}
 
 	public String getFileName() {
-		return FileContainer.decodeFilename(this.getRealFileName());
+		if (document != null)
+			return FileContainer.decodeFilename(this.getRealFileName());
+		else
+			return this.getRealFileName();
 	}
 
 	public String getNodeRef() {
