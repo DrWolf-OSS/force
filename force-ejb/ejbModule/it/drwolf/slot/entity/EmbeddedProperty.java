@@ -114,6 +114,8 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 			return this.getDateValue();
 		else if (this.getType().equals(DataType.BOOLEAN))
 			return this.getBooleanValue();
+		else if (this.getType().equals(DataType.LINK))
+			return this.getStringValue();
 		else
 			return null;
 	}

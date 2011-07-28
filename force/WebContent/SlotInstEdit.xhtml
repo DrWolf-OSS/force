@@ -25,8 +25,7 @@
 				</ui:repeat>
 
 				<s:div id="embeddedProperties">
-					<c:forEach var="dataInstance"
-						items="#{slotInstEditBean.embeddedProperties}">
+					<c:forEach var="dataInstance" items="#{slotInstEditBean.embeddedProperties}">
 					<s:decorate template="/layout/display.xhtml">
 						<ui:define name="label">
 							<h:outputText value="#{dataInstance.dataDefinition.label}" />
@@ -42,6 +41,9 @@
 							<s:convertDateTime type="date" dateStyle="short"
 								pattern="dd/MM/yyyy" />
 						</h:outputText>
+						<s:span rendered="#{dataInstance.dataDefinition.dataType == 'LINK'}">
+							<a href="#{dataInstance.stringValue}" target="blank">#{dataInstance.stringValue}</a>
+						</s:span>
 					</s:decorate>
 					</c:forEach>
 				</s:div>

@@ -38,7 +38,7 @@
 						<h:outputText value="#{dataInstance.dataDefinition.label}" />
 					</ui:define>
 					<h:outputText value="#{dataInstance.stringValue}"
-						rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"/>
+						rendered="#{dataInstance.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
 					<h:outputText value="#{dataInstance.integerValue}"
 						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER'}" />
 					<h:outputText value="#{dataInstance.booleanValue ? 'true' : 'false'}"
@@ -48,8 +48,8 @@
 						<s:convertDateTime type="date" dateStyle="short"
 							pattern="dd/MM/yyyy" />
 					</h:outputText>
-            		<a:commandButton value="remove" action="#{slotDefEditBean.removeEmbeddedProp(embeddedProp)}" reRender="embeddedProperties"/>
-		            <a:commandButton value="edit" action="#{slotDefEditBean.editEmbeddedProp(embeddedProp)}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel"/>
+            		<a:commandButton value="remove" action="#{slotDefEditBean.removeEmbeddedProp(dataInstance)}" reRender="embeddedProperties"/>
+		            <a:commandButton value="edit" action="#{slotDefEditBean.editEmbeddedProp(dataInstance)}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel"/>
 				</s:decorate>
 		
 			</c:forEach>
@@ -339,7 +339,7 @@
 		                <ui:define name="label">
 		                	<h:outputText value="Value" />
 						</ui:define>
-						<h:inputText value="#{slotDefEditBean.embeddedProperty.stringValue}" rendered="#{slotDefEditBean.embeddedProperty.type == 'STRING'}"/>
+						<h:inputText value="#{slotDefEditBean.embeddedProperty.stringValue}" rendered="#{slotDefEditBean.embeddedProperty.type == 'STRING' or slotDefEditBean.embeddedProperty.type == 'LINK'}"/>
 						<h:inputText value="#{slotDefEditBean.embeddedProperty.integerValue}" rendered="#{slotDefEditBean.embeddedProperty.type == 'INTEGER'}"/>
 						<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.booleanValue}" rendered="#{slotDefEditBean.embeddedProperty.type == 'BOOLEAN'}"/>
 						<rich:calendar id="subscriptionDate" mode="client"
@@ -351,7 +351,9 @@
 	        </s:div>
 	        <div style="clear:both"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addEmbeddedProperty()}" onclick="#{rich:component('embeddedPropPanel')}.hide()" reRender="embeddedProperties,propPanel,embeddedPropPanel"/>
+			<a:region>
 			<a:commandButton value="Cancel" onclick="#{rich:component('embeddedPropPanel')}.hide()"/>
+			</a:region>
 			</a:form>
 		</rich:modalPanel>
 		
