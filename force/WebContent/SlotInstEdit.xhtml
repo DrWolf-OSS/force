@@ -55,7 +55,7 @@
 								<h:outputText value="#{dataInstance.dataDefinition.label}" />
 							</ui:define>
 							<h:inputText value="#{dataInstance.stringValue}"
-								rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues == null}"
+								rendered="#{dataInstance.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
 								disabled="#{not dataInstance.dataDefinition.editable}" />
 							<h:inputText value="#{dataInstance.integerValue}"
