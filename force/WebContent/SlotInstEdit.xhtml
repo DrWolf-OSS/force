@@ -267,7 +267,7 @@
 										</rich:toolTip>
 									</s:decorate>
 
-									<ui:repeat var="dataInstance" value="#{item.embeddedProperties}">
+									<ui:repeat var="dataInstance" value="#{item.singleProperties}">
 										<s:decorate template="/layout/display.xhtml">
 											<ui:define name="label">
 												<h:outputText value="#{dataInstance.dataDefinition.label}" />
@@ -285,6 +285,15 @@
 											</h:outputText>
 										</s:decorate>
 									</ui:repeat>
+									
+									<a:repeat var="dataInstance" value="#{item.multipleProperties}">
+										<s:decorate template="/layout/display.xhtml">
+											<ui:define name="label">
+												<h:outputText value="#{dataInstance.dataDefinition.label}" />
+											</ui:define>
+											<h:outputText value="#{dataInstance.values.toString()}"/>
+										</s:decorate>
+									</a:repeat>
 									
 									
 									<div style="clear: both" />
@@ -425,7 +434,7 @@
 				onclick="#{rich:component('uploadPanel')}.hide()" />
 		</rich:modalPanel>
 
-		<rich:modalPanel id="editPanel" autosized="true" minWidth="450">
+		<rich:modalPanel id="editPanel" autosized="true" minWidth="550">
 			<f:facet name="header">
 				<h:outputText value="Edit dialog" />
 			</f:facet>
@@ -439,12 +448,11 @@
 					<ui:define name="label">
 						<h:outputText value="File Name" />
 					</ui:define>
-					<h:outputText
-						value="#{slotInstEditBean.activeFileContainer.fileName}" />
+					<h:outputText value="#{slotInstEditBean.activeFileContainer.fileName}" />
 				</s:decorate>
 
 				<ui:repeat var="dataInstance"
-					value="#{slotInstEditBean.activeFileContainer.embeddedProperties}">
+					value="#{slotInstEditBean.activeFileContainer.singleProperties}">
 					
 					<s:decorate template="/layout/edit.xhtml">
 					<ui:param name="prefix" value="epf" />
@@ -488,6 +496,18 @@
              			
 					</s:decorate>
 				</ui:repeat>
+				<a:repeat var="multipleDataInstance" value="#{slotInstEditBean.activeFileContainer.multipleProperties}">
+					<s:decorate template="/layout/edit.xhtml">
+						<ui:param name="prefix" value="epf" />
+						<ui:define name="label">
+							<h:outputText value="#{multipleDataInstance.dataDefinition.label}" />
+						</ui:define>
+						<rich:pickList value="#{multipleDataInstance.values}" required="#{multipleDataInstance.dataDefinition.required}">
+							<s:selectItems value="#{multipleDataInstance.dataDefinition.dictionaryValues}" var="value" label="#{value}" />
+						</rich:pickList>
+					</s:decorate>
+				</a:repeat>
+				
 				<div style="clear: both" />
 				<a:commandButton value="Confirm"
 					action="#{slotInstEditBean.addActiveItemToDatas}"

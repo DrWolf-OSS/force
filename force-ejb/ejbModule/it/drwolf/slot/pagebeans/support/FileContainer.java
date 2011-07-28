@@ -4,9 +4,12 @@ import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
+import it.drwolf.slot.alfresco.custom.support.MultipleDocumentPropertyInst;
 import it.drwolf.slot.digsig.Signature;
+import it.drwolf.slot.enums.DataType;
 import it.drwolf.utils.mimetypes.Resolver;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -22,7 +25,8 @@ import org.richfaces.model.UploadItem;
 public class FileContainer {
 	private UploadItem uploadItem;
 	private AlfrescoDocument document;
-	private List<DocumentPropertyInst> embeddedProperties = new ArrayList<DocumentPropertyInst>();
+	private List<DocumentPropertyInst> singleProperties = new ArrayList<DocumentPropertyInst>();
+	private List<MultipleDocumentPropertyInst> multipleProperties = new ArrayList<MultipleDocumentPropertyInst>();
 	private boolean editable = true;
 	private String id = UUID.randomUUID().toString();
 	private List<Signature> signatures;
@@ -117,10 +121,10 @@ public class FileContainer {
 	}
 
 	public String getRealFileName() {
-		if (uploadItem != null && !uploadItem.getFileName().equals("")) {
-			return uploadItem.getFileName();
-		} else if (document != null && !document.getName().equals("")) {
+		if (document != null && !document.getName().equals("")) {
 			return document.getName();
+		} else if (uploadItem != null && !uploadItem.getFileName().equals("")) {
+			return uploadItem.getFileName();
 		}
 		return "";
 	}
@@ -128,8 +132,10 @@ public class FileContainer {
 	public String getFileName() {
 		if (document != null)
 			return FileContainer.decodeFilename(this.getRealFileName());
-		else
-			return this.getRealFileName();
+		else if (uploadItem != null) {
+			return uploadItem.getFileName();
+		}
+		return "";
 	}
 
 	public String getNodeRef() {
@@ -185,13 +191,13 @@ public class FileContainer {
 		}
 	}
 
-	public List<DocumentPropertyInst> getEmbeddedProperties() {
-		return embeddedProperties;
+	public List<DocumentPropertyInst> getSingleProperties() {
+		return singleProperties;
 	}
 
-	public void setEmbeddedProperties(
+	public void setSingleProperties(
 			List<DocumentPropertyInst> embeddedProperties) {
-		this.embeddedProperties = embeddedProperties;
+		this.singleProperties = embeddedProperties;
 	}
 
 	public String getId() {
@@ -236,13 +242,15 @@ public class FileContainer {
 	}
 
 	private void buildPropertyInsts(Set<Property> properties) {
-		List<DocumentPropertyInst> fileProperties = new ArrayList<DocumentPropertyInst>();
 		for (Property p : properties) {
-			DocumentPropertyInst documentPropertyInst = buildValorisedDocumentPropertyInst(p);
-			fileProperties.add(documentPropertyInst);
+			if (!p.isMultiple()) {
+				DocumentPropertyInst singlePropertyInst = buildValorisedDocumentPropertyInst(p);
+				singleProperties.add(singlePropertyInst);
+			} else if (p.isMultiple()) {
+				MultipleDocumentPropertyInst multiplePropertyInst = buildValorisedMultipleDocumentPropertyInst(p);
+				multipleProperties.add(multiplePropertyInst);
+			}
 		}
-		this.setEmbeddedProperties(fileProperties);
-		this.embeddedProperties = fileProperties;
 	}
 
 	private DocumentPropertyInst buildValorisedDocumentPropertyInst(Property p) {
@@ -253,6 +261,31 @@ public class FileContainer {
 		}
 		embeddedPropertyInst.setEditable(this.editable);
 		return embeddedPropertyInst;
+	}
+
+	private MultipleDocumentPropertyInst buildValorisedMultipleDocumentPropertyInst(
+			Property p) {
+		MultipleDocumentPropertyInst multiplePropertyInst = new MultipleDocumentPropertyInst(
+				p);
+		if (this.document != null) {
+			List<Object> objValues = document.getPropertyValue(p.getName());
+			List<String> stringValues = new ArrayList<String>();
+			if (p.getDataType().equals(DataType.STRING)) {
+				for (Object obj : objValues) {
+					String value = ((String) obj).toString();
+					stringValues.add(value);
+				}
+			}
+			if (p.getDataType().equals(DataType.INTEGER)) {
+				for (Object obj : objValues) {
+					String value = ((BigInteger) obj).toString();
+					stringValues.add(value);
+				}
+			}
+			multiplePropertyInst.setValues(stringValues);
+		}
+		multiplePropertyInst.setEditable(this.editable);
+		return multiplePropertyInst;
 	}
 
 	@Override
@@ -290,6 +323,15 @@ public class FileContainer {
 
 	public List<Signature> getSignatures() {
 		return signatures;
+	}
+
+	public List<MultipleDocumentPropertyInst> getMultipleProperties() {
+		return multipleProperties;
+	}
+
+	public void setMultipleProperties(
+			List<MultipleDocumentPropertyInst> multipleProperties) {
+		this.multipleProperties = multipleProperties;
 	}
 
 	// public void setSignatures(List<Signature> signatures) {

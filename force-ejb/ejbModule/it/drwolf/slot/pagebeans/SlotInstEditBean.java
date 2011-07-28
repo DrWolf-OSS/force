@@ -4,6 +4,7 @@ import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
+import it.drwolf.slot.alfresco.custom.support.MultipleDocumentPropertyInst;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.digsig.CertsController;
@@ -465,7 +466,8 @@ public class SlotInstEditBean {
 					System.out.println("Doc " + document.getName()
 							+ " da aggiornare");
 					updateProperties(document,
-							itemContained.getEmbeddedProperties());
+							itemContained.getSingleProperties(),
+							itemContained.getMultipleProperties());
 				}
 			}
 
@@ -508,7 +510,8 @@ public class SlotInstEditBean {
 							+ container.getDocument().getName());
 					String storedRef = copyDocumentOnAlfresco(
 							container.getDocument(), instCollection,
-							container.getEmbeddedProperties(), slotFolder);
+							container.getSingleProperties(),
+							container.getMultipleProperties(), slotFolder);
 					DocInst docInst = new DocInst(instCollection, storedRef);
 					instCollection.getDocInsts().add(docInst);
 				}
@@ -628,7 +631,8 @@ public class SlotInstEditBean {
 		}
 
 		// poi si aggiungono i valori delle relative properties
-		updateProperties(document, fileContainer.getEmbeddedProperties());
+		updateProperties(document, fileContainer.getSingleProperties(),
+				fileContainer.getMultipleProperties());
 		// List<Signature> signatures = verifySignature(document);
 		// fileContainer.setSignatures(signatures);
 		// fileContainer.setDocument(document);
@@ -642,7 +646,9 @@ public class SlotInstEditBean {
 
 	private String copyDocumentOnAlfresco(AlfrescoDocument document,
 			DocInstCollection instCollection,
-			List<DocumentPropertyInst> embeddedProperties, Folder slotFolder) {
+			List<DocumentPropertyInst> singleProperties,
+			List<MultipleDocumentPropertyInst> multipleProperties,
+			Folder slotFolder) {
 		String nodeRef = "";
 
 		Session session = alfrescoUserIdentity.getSession();
@@ -672,7 +678,7 @@ public class SlotInstEditBean {
 		}
 
 		// poi si aggiungono i valori delle relative properties
-		updateProperties(documentCopy, embeddedProperties);
+		updateProperties(documentCopy, singleProperties, multipleProperties);
 		verifySignature(documentCopy);
 		nodeRef = objectId.getId();
 
@@ -680,12 +686,19 @@ public class SlotInstEditBean {
 	}
 
 	private void updateProperties(AlfrescoDocument document,
-			List<DocumentPropertyInst> embeddedProperties) {
+			List<DocumentPropertyInst> singleProperties,
+			List<MultipleDocumentPropertyInst> multipleProperties) {
 		Map<String, Object> aspectsProperties = new HashMap<String, Object>();
-		for (DocumentPropertyInst embeddedPropertyInst : embeddedProperties) {
-			if (embeddedPropertyInst.getValue() != null) {
-				aspectsProperties.put(embeddedPropertyInst.getProperty()
-						.getName(), embeddedPropertyInst.getValue());
+		for (DocumentPropertyInst singlePropertyInst : singleProperties) {
+			if (singlePropertyInst.getValue() != null) {
+				aspectsProperties.put(singlePropertyInst.getProperty()
+						.getName(), singlePropertyInst.getValue());
+			}
+		}
+		for (MultipleDocumentPropertyInst multiplePropertyInst : multipleProperties) {
+			if (multiplePropertyInst.getValue() != null) {
+				aspectsProperties.put(multiplePropertyInst.getProperty()
+						.getName(), multiplePropertyInst.getValue());
 			}
 		}
 		document.updateProperties(aspectsProperties);
@@ -875,7 +888,7 @@ public class SlotInstEditBean {
 			if (list != null && !list.isEmpty()) {
 				for (FileContainer fileContainer : list) {
 					List<DocumentPropertyInst> embeddedProperties = fileContainer
-							.getEmbeddedProperties();
+							.getSingleProperties();
 					Iterator<DocumentPropertyInst> iterator = embeddedProperties
 							.iterator();
 					boolean found = false;
