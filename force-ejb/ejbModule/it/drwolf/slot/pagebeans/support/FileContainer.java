@@ -26,6 +26,7 @@ public class FileContainer {
 	private boolean editable = true;
 	private String id = UUID.randomUUID().toString();
 	private List<Signature> signatures;
+	private String mimetype;
 
 	public final static String decodeFilename(String encoded) {
 		String name = encoded;
@@ -142,6 +143,13 @@ public class FileContainer {
 	}
 
 	public String getMimetype() {
+		if (mimetype == null) {
+			mimetype = retrieveContentMimetype();
+		}
+		return this.mimetype;
+	}
+
+	private String retrieveContentMimetype() {
 		try {
 			if (document.hasAspect(Signature.ASPECT_SIGNED)) {
 				AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
