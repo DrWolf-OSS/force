@@ -216,10 +216,11 @@
 										<h:graphicImage value="/img/mimetype/document-image.png" rendered="#{item.mimetype.contains('image')}" styleClass="fileIcon"/>
 										<h:graphicImage value="/img/mimetype/document-text.png" rendered="#{item.mimetype.contains('text') or item.mimetype.contains('rtf')}"
 														styleClass="fileIcon"/>
+										<h:graphicImage value="/img/mimetype/vise-drawer.png" rendered="#{item.mimetype.contains('zip')}" styleClass="fileIcon"/>
 										<h:graphicImage value="/img/mimetype/document.png" 
 														rendered="#{not item.mimetype.contains('pdf') and not item.mimetype.contains('word') and not item.mimetype.contains('powerpoint')
 																	and not item.mimetype.contains('excel') and not item.mimetype.contains('opendocument.spreadsheet') and not item.mimetype.contains('image') 
-																	and not item.mimetype.contains('text') and not item.mimetype.contains('rtf')}" 
+																	and not item.mimetype.contains('text') and not item.mimetype.contains('rtf') and not item.mimetype.contains('zip')}" 
 														styleClass="fileIcon"/>
 										<h:graphicImage value="/img/tick-small.png" rendered="#{item.document.hasAspect('P:dw:signed')}" style="margin-left:-6px" />
 										<a href="/force/download/#{item.fileName}?ref=#{item.document.id}">
