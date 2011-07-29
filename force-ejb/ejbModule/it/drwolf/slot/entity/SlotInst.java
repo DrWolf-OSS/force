@@ -22,6 +22,8 @@ public class SlotInst {
 
 	private Set<PropertyInst> propertyInsts = new HashSet<PropertyInst>();
 
+	private Set<MultiplePropertyInst> multiPropertyInsts = new HashSet<MultiplePropertyInst>();
+
 	private String ownerId;
 
 	@Id
@@ -69,6 +71,17 @@ public class SlotInst {
 
 	public void setOwnerId(String owner) {
 		this.ownerId = owner;
+	}
+
+	@OrderBy("propertyDef")
+	@OneToMany(mappedBy = "slotInst", cascade = CascadeType.ALL)
+	public Set<MultiplePropertyInst> getMultiPropertyInsts() {
+		return multiPropertyInsts;
+	}
+
+	public void setMultiPropertyInsts(
+			Set<MultiplePropertyInst> multiPropertyInsts) {
+		this.multiPropertyInsts = multiPropertyInsts;
 	}
 
 }

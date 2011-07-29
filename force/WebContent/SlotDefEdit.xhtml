@@ -274,8 +274,8 @@
 					</ui:define>
 					<h:inputText value="#{slotDefEditBean.propertyDef.name}" required="true"/>
 	            </s:decorate>
+	            
 	            <s:decorate template="/layout/edit.xhtml">
-
 	                <ui:define name="label">
 	                	<h:outputText value="Property Data Type" />
 					</ui:define>
@@ -284,17 +284,30 @@
 					<a:support event="onchange" reRender="pf"/>
              		</h:selectOneMenu>
 	            </s:decorate>
+	            
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Required" />
 					</ui:define>
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.required}" />
 	            </s:decorate>
+	            
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Multiple" />
+					</ui:define>
+					<a:region>
+					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.multiple}" >
+						<a:support event="onchange" reRender="pf"/>
+					</h:selectBooleanCheckbox>
+					</a:region>
+	            </s:decorate>
+	            
 	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.type != 'BOOLEAN'}">
 	                <ui:define name="label">
 	                	<h:outputText value="Dictionary" />
 					</ui:define>
-					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}">
+					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}" required="#{slotDefEditBean.propertyDef.multiple}">
                     		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.propertyDef.type)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- select a dictionary --"/>
 							<s:convertEntity/>

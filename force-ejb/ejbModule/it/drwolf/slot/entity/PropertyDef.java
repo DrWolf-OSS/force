@@ -26,6 +26,8 @@ public class PropertyDef implements DataDefinition {
 
 	private Dictionary dictionary;
 
+	private boolean multiple = Boolean.FALSE;
+
 	public PropertyDef(String name, DataType type) {
 		super();
 		this.name = name;
@@ -143,6 +145,14 @@ public class PropertyDef implements DataDefinition {
 
 	public void setDictionary(Dictionary dictionary) {
 		this.dictionary = dictionary;
+	}
+
+	public boolean isMultiple() {
+		return multiple;
+	}
+
+	public void setMultiple(boolean multiple) {
+		this.multiple = multiple;
 	}
 
 }
