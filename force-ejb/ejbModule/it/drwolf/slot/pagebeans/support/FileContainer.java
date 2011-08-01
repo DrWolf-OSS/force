@@ -4,7 +4,8 @@ import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
-import it.drwolf.slot.alfresco.custom.support.MultipleDocumentPropertyInst;
+import it.drwolf.slot.alfresco.custom.support.DocumentMultiplePropertyInst;
+import it.drwolf.slot.alfresco.custom.support.DocumentSinglePropertyInst;
 import it.drwolf.slot.digsig.Signature;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.utils.mimetypes.Resolver;
@@ -25,8 +26,8 @@ import org.richfaces.model.UploadItem;
 public class FileContainer {
 	private UploadItem uploadItem;
 	private AlfrescoDocument document;
-	private List<DocumentPropertyInst> singleProperties = new ArrayList<DocumentPropertyInst>();
-	private List<MultipleDocumentPropertyInst> multipleProperties = new ArrayList<MultipleDocumentPropertyInst>();
+	private List<DocumentSinglePropertyInst> singleProperties = new ArrayList<DocumentSinglePropertyInst>();
+	private List<DocumentMultiplePropertyInst> multipleProperties = new ArrayList<DocumentMultiplePropertyInst>();
 	private boolean editable = true;
 	private String id = UUID.randomUUID().toString();
 	private List<Signature> signatures;
@@ -191,13 +192,13 @@ public class FileContainer {
 		}
 	}
 
-	public List<DocumentPropertyInst> getSingleProperties() {
+	public List<DocumentSinglePropertyInst> getSingleProperties() {
 		return singleProperties;
 	}
 
 	public void setSingleProperties(
-			List<DocumentPropertyInst> embeddedProperties) {
-		this.singleProperties = embeddedProperties;
+			List<DocumentSinglePropertyInst> singleProperties) {
+		this.singleProperties = singleProperties;
 	}
 
 	public String getId() {
@@ -244,28 +245,30 @@ public class FileContainer {
 	private void buildPropertyInsts(Set<Property> properties) {
 		for (Property p : properties) {
 			if (!p.isMultiple()) {
-				DocumentPropertyInst singlePropertyInst = buildValorisedDocumentPropertyInst(p);
+				DocumentSinglePropertyInst singlePropertyInst = buildValorisedSingleDocumentPropertyInst(p);
 				singleProperties.add(singlePropertyInst);
 			} else if (p.isMultiple()) {
-				MultipleDocumentPropertyInst multiplePropertyInst = buildValorisedMultipleDocumentPropertyInst(p);
+				DocumentMultiplePropertyInst multiplePropertyInst = buildValorisedMultipleDocumentPropertyInst(p);
 				multipleProperties.add(multiplePropertyInst);
 			}
 		}
 	}
 
-	private DocumentPropertyInst buildValorisedDocumentPropertyInst(Property p) {
-		DocumentPropertyInst embeddedPropertyInst = new DocumentPropertyInst(p);
+	private DocumentSinglePropertyInst buildValorisedSingleDocumentPropertyInst(
+			Property p) {
+		DocumentSinglePropertyInst singlePropertyInst = new DocumentSinglePropertyInst(
+				p);
 		if (this.document != null) {
 			Object propertyValue = document.getPropertyValue(p.getName());
-			embeddedPropertyInst.setValue(propertyValue);
+			singlePropertyInst.setValue(propertyValue);
 		}
-		embeddedPropertyInst.setEditable(this.editable);
-		return embeddedPropertyInst;
+		singlePropertyInst.setEditable(this.editable);
+		return singlePropertyInst;
 	}
 
-	private MultipleDocumentPropertyInst buildValorisedMultipleDocumentPropertyInst(
+	private DocumentMultiplePropertyInst buildValorisedMultipleDocumentPropertyInst(
 			Property p) {
-		MultipleDocumentPropertyInst multiplePropertyInst = new MultipleDocumentPropertyInst(
+		DocumentMultiplePropertyInst multiplePropertyInst = new DocumentMultiplePropertyInst(
 				p);
 		if (this.document != null) {
 			List<Object> objValues = document.getPropertyValue(p.getName());
@@ -325,13 +328,20 @@ public class FileContainer {
 		return signatures;
 	}
 
-	public List<MultipleDocumentPropertyInst> getMultipleProperties() {
+	public List<DocumentMultiplePropertyInst> getMultipleProperties() {
 		return multipleProperties;
 	}
 
 	public void setMultipleProperties(
-			List<MultipleDocumentPropertyInst> multipleProperties) {
+			List<DocumentMultiplePropertyInst> multipleProperties) {
 		this.multipleProperties = multipleProperties;
+	}
+
+	public List<DocumentPropertyInst> getAllPropertyInsts() {
+		List<DocumentPropertyInst> allProperties = new ArrayList<DocumentPropertyInst>();
+		allProperties.addAll(this.singleProperties);
+		allProperties.addAll(this.multipleProperties);
+		return allProperties;
 	}
 
 	// public void setSignatures(List<Signature> signatures) {

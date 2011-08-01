@@ -4,7 +4,8 @@ import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
-import it.drwolf.slot.alfresco.custom.support.MultipleDocumentPropertyInst;
+import it.drwolf.slot.alfresco.custom.support.DocumentMultiplePropertyInst;
+import it.drwolf.slot.alfresco.custom.support.DocumentSinglePropertyInst;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.digsig.CertsController;
@@ -671,8 +672,8 @@ public class SlotInstEditBean {
 
 	private String copyDocumentOnAlfresco(AlfrescoDocument document,
 			DocInstCollection instCollection,
-			List<DocumentPropertyInst> singleProperties,
-			List<MultipleDocumentPropertyInst> multipleProperties,
+			List<DocumentSinglePropertyInst> singleProperties,
+			List<DocumentMultiplePropertyInst> multipleProperties,
 			Folder slotFolder) {
 		String nodeRef = "";
 
@@ -711,16 +712,16 @@ public class SlotInstEditBean {
 	}
 
 	private void updateProperties(AlfrescoDocument document,
-			List<DocumentPropertyInst> singleProperties,
-			List<MultipleDocumentPropertyInst> multipleProperties) {
+			List<DocumentSinglePropertyInst> singleProperties,
+			List<DocumentMultiplePropertyInst> multipleProperties) {
 		Map<String, Object> aspectsProperties = new HashMap<String, Object>();
-		for (DocumentPropertyInst singlePropertyInst : singleProperties) {
+		for (DocumentSinglePropertyInst singlePropertyInst : singleProperties) {
 			if (singlePropertyInst.getValue() != null) {
 				aspectsProperties.put(singlePropertyInst.getProperty()
 						.getName(), singlePropertyInst.getValue());
 			}
 		}
-		for (MultipleDocumentPropertyInst multiplePropertyInst : multipleProperties) {
+		for (DocumentMultiplePropertyInst multiplePropertyInst : multipleProperties) {
 			if (multiplePropertyInst.getValue() != null) {
 				aspectsProperties.put(multiplePropertyInst.getProperty()
 						.getName(), multiplePropertyInst.getValue());
@@ -912,9 +913,11 @@ public class SlotInstEditBean {
 			List<FileContainer> list = datas.get(docDefCollection.getId());
 			if (list != null && !list.isEmpty()) {
 				for (FileContainer fileContainer : list) {
-					List<DocumentPropertyInst> embeddedProperties = fileContainer
-							.getSingleProperties();
-					Iterator<DocumentPropertyInst> iterator = embeddedProperties
+					//
+					List<DocumentPropertyInst> allProperties = fileContainer
+							.getAllPropertyInsts();
+					//
+					Iterator<DocumentPropertyInst> iterator = allProperties
 							.iterator();
 					boolean found = false;
 					while (iterator.hasNext() && found == false) {
