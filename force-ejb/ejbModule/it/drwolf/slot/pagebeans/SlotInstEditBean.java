@@ -19,6 +19,7 @@ import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.RuleParameterInst;
+import it.drwolf.slot.entity.SinglePropertyInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.enums.DataType;
@@ -149,7 +150,7 @@ public class SlotInstEditBean {
 	@In(create = true)
 	private CertsController certsController;
 
-	private List<MultiplePropertyInst> multiplePropertyInsts;
+	// private List<MultiplePropertyInst> multiplePropertyInsts;
 
 	private void resetFlags() {
 		verifiable = true;
@@ -162,18 +163,20 @@ public class SlotInstEditBean {
 		if (slotInstHome.getId() == null) {
 			this.propertyInsts = new ArrayList<PropertyInst>();
 			//
-			this.multiplePropertyInsts = new ArrayList<MultiplePropertyInst>();
+			// this.multiplePropertyInsts = new
+			// ArrayList<MultiplePropertyInst>();
 			for (PropertyDef propertyDef : slotDefHome.getInstance()
 					.getPropertyDefs()) {
+				PropertyInst propertyInst = null;
 				if (!propertyDef.isMultiple()) {
-					PropertyInst propertyInst = new PropertyInst(propertyDef,
+					propertyInst = new SinglePropertyInst(propertyDef,
 							slotInstHome.getInstance());
-					propertyInsts.add(propertyInst);
 				} else {
-					MultiplePropertyInst multiplePropertyInst = new MultiplePropertyInst(
-							propertyDef, slotInstHome.getInstance());
-					multiplePropertyInsts.add(multiplePropertyInst);
+					propertyInst = new MultiplePropertyInst(propertyDef,
+							slotInstHome.getInstance());
+					// multiplePropertyInsts.add(multiplePropertyInst);
 				}
+				propertyInsts.add(propertyInst);
 			}
 			// /
 
@@ -208,8 +211,8 @@ public class SlotInstEditBean {
 					.getInstance().getPropertyInsts());
 
 			//
-			this.multiplePropertyInsts = new ArrayList<MultiplePropertyInst>(
-					slotInstHome.getInstance().getMultiPropertyInsts());
+			// this.multiplePropertyInsts = new ArrayList<MultiplePropertyInst>(
+			// slotInstHome.getInstance().getMultiPropertyInsts());
 			//
 
 			this.docInstCollections = new ArrayList<DocInstCollection>(
@@ -318,8 +321,8 @@ public class SlotInstEditBean {
 				new HashSet<PropertyInst>(this.propertyInsts));
 
 		//
-		slotInstHome.getInstance().setMultiPropertyInsts(
-				new HashSet<MultiplePropertyInst>(this.multiplePropertyInsts));
+		// slotInstHome.getInstance().setMultiPropertyInsts(
+		// new HashSet<MultiplePropertyInst>(this.multiplePropertyInsts));
 		//
 		AlfrescoFolder slotFolder = retrieveSlotFolder();
 
@@ -1348,13 +1351,13 @@ public class SlotInstEditBean {
 		this.activeFileContainer = activeFileContainer;
 	}
 
-	public List<MultiplePropertyInst> getMultiplePropertyInsts() {
-		return multiplePropertyInsts;
-	}
-
-	public void setMultiplePropertyInsts(
-			List<MultiplePropertyInst> multiplePropertyInsts) {
-		this.multiplePropertyInsts = multiplePropertyInsts;
-	}
+	// public List<MultiplePropertyInst> getMultiplePropertyInsts() {
+	// return multiplePropertyInsts;
+	// }
+	//
+	// public void setMultiplePropertyInsts(
+	// List<MultiplePropertyInst> multiplePropertyInsts) {
+	// this.multiplePropertyInsts = multiplePropertyInsts;
+	// }
 
 }

@@ -3,7 +3,7 @@ package it.drwolf.slot.pagebeans;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
-import it.drwolf.slot.entity.PropertyInst;
+import it.drwolf.slot.entity.SinglePropertyInst;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.session.DocDefCollectionHome;
@@ -188,7 +188,7 @@ public class SlotDefEditBean {
 
 	public void conditionalPropertyListener(ActionEvent event) {
 		if (this.collection.getConditionalPropertyDef() != null) {
-			this.collection.setConditionalPropertyInst(new PropertyInst(
+			this.collection.setConditionalPropertyInst(new SinglePropertyInst(
 					this.collection.getConditionalPropertyDef()));
 		} else {
 			this.collection.setConditionalPropertyInst(null);

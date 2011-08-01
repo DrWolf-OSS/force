@@ -292,7 +292,7 @@
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.required}" />
 	            </s:decorate>
 	            
-	            <s:decorate template="/layout/edit.xhtml">
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.type != 'BOOLEAN'}">
 	                <ui:define name="label">
 	                	<h:outputText value="Multiple" />
 					</ui:define>

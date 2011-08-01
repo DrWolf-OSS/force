@@ -22,7 +22,8 @@ public class SlotInst {
 
 	private Set<PropertyInst> propertyInsts = new HashSet<PropertyInst>();
 
-	private Set<MultiplePropertyInst> multiPropertyInsts = new HashSet<MultiplePropertyInst>();
+	// private Set<MultiplePropertyInst> multiPropertyInsts = new
+	// HashSet<MultiplePropertyInst>();
 
 	private String ownerId;
 
@@ -73,15 +74,15 @@ public class SlotInst {
 		this.ownerId = owner;
 	}
 
-	@OrderBy("propertyDef")
-	@OneToMany(mappedBy = "slotInst", cascade = CascadeType.ALL)
-	public Set<MultiplePropertyInst> getMultiPropertyInsts() {
-		return multiPropertyInsts;
-	}
-
-	public void setMultiPropertyInsts(
-			Set<MultiplePropertyInst> multiPropertyInsts) {
-		this.multiPropertyInsts = multiPropertyInsts;
-	}
+	// @OrderBy("propertyDef")
+	// @OneToMany(mappedBy = "slotInst", cascade = CascadeType.ALL)
+	// public Set<MultiplePropertyInst> getMultiPropertyInsts() {
+	// return multiPropertyInsts;
+	// }
+	//
+	// public void setMultiPropertyInsts(
+	// Set<MultiplePropertyInst> multiPropertyInsts) {
+	// this.multiPropertyInsts = multiPropertyInsts;
+	// }
 
 }

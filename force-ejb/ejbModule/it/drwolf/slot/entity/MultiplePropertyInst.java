@@ -1,7 +1,7 @@
 package it.drwolf.slot.entity;
 
+import it.drwolf.slot.enums.DataInstanceMultiplicity;
 import it.drwolf.slot.interfaces.DataDefinition;
-import it.drwolf.slot.interfaces.DataInstance;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,60 +9,62 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
-public class MultiplePropertyInst implements DataInstance {
+public class MultiplePropertyInst extends PropertyInst {
 
-	private Long id;
+	// private Long id;
 
-	private PropertyDef propertyDef;
+	// private PropertyDef propertyDef;
 
-	private SlotInst slotInst;
+	// private SlotInst slotInst;
 
 	private Set<String> values = new HashSet<String>();
 
 	public MultiplePropertyInst() {
+		this.setMultiplicity(DataInstanceMultiplicity.MULTIPLE);
 	}
 
 	public MultiplePropertyInst(PropertyDef propertyDef, SlotInst slotInst) {
-		super();
-		this.propertyDef = propertyDef;
-		this.slotInst = slotInst;
+		super(propertyDef, slotInst);
+		this.setMultiplicity(DataInstanceMultiplicity.MULTIPLE);
 	}
 
-	@Id
-	@GeneratedValue
-	public Long getId() {
-		return id;
+	public MultiplePropertyInst(PropertyDef propertyDef) {
+		super(propertyDef);
+		this.setMultiplicity(DataInstanceMultiplicity.MULTIPLE);
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+	// @Id
+	// @GeneratedValue
+	// public Long getId() {
+	// return id;
+	// }
 
-	@ManyToOne
-	public PropertyDef getPropertyDef() {
-		return propertyDef;
-	}
-
-	public void setPropertyDef(PropertyDef propertyDef) {
-		this.propertyDef = propertyDef;
-	}
-
-	@ManyToOne
-	public SlotInst getSlotInst() {
-		return slotInst;
-	}
-
-	public void setSlotInst(SlotInst slotInst) {
-		this.slotInst = slotInst;
-	}
+	// public void setId(Long id) {
+	// this.id = id;
+	// }
+	//
+	// @ManyToOne
+	// public PropertyDef getPropertyDef() {
+	// return propertyDef;
+	// }
+	//
+	// public void setPropertyDef(PropertyDef propertyDef) {
+	// this.propertyDef = propertyDef;
+	// }
+	//
+	// @ManyToOne
+	// public SlotInst getSlotInst() {
+	// return slotInst;
+	// }
+	//
+	// public void setSlotInst(SlotInst slotInst) {
+	// this.slotInst = slotInst;
+	// }
 
 	@CollectionOfElements
 	public Set<String> getValues() {
@@ -91,6 +93,11 @@ public class MultiplePropertyInst implements DataInstance {
 	@Transient
 	public void setValuesAsList(List<String> valuesAsList) {
 		this.values = new HashSet<String>(valuesAsList);
+	}
+
+	@Transient
+	public void clean() {
+		this.getValues().clear();
 	}
 
 }
