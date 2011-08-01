@@ -37,6 +37,7 @@
 					<ui:define name="label">
 						<h:outputText value="#{dataInstance.dataDefinition.label}" />
 					</ui:define>
+					<s:fragment rendered="#{not dataInstance.multiple}">
 					<h:outputText value="#{dataInstance.stringValue}"
 						rendered="#{dataInstance.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
 					<h:outputText value="#{dataInstance.integerValue}"
@@ -48,6 +49,10 @@
 						<s:convertDateTime type="date" dateStyle="short"
 							pattern="dd/MM/yyyy" />
 					</h:outputText>
+					</s:fragment>
+					<s:fragment rendered="#{dataInstance.multiple}">
+						<h:outputText value="#{dataInstance.value}" />
+					</s:fragment>
             		<a:commandButton value="remove" action="#{slotDefEditBean.removeEmbeddedProp(dataInstance)}" reRender="embeddedProperties"/>
 		            <a:commandButton value="edit" action="#{slotDefEditBean.editEmbeddedProp(dataInstance)}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel"/>
 				</s:decorate>
@@ -323,47 +328,125 @@
 		</rich:modalPanel>
 		
 
-		<rich:modalPanel id="embeddedPropPanel" autosized="true" width="400" 
+		<rich:modalPanel id="embeddedPropPanel" autosized="true" minWidth="450"
 				resizeable="false">
 			<f:facet name="header">
 				<h:outputText value="Add Embedded Property" />
 			</f:facet>
 			<a:form id="epForm">
+				<script type="text/javascript">
+					var invalid = false;
+				</script>
 			<s:div id="embeddedPropValue">
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Property Name" />
 					</ui:define>
-					<h:inputText value="#{slotDefEditBean.embeddedProperty.name}" />
+					<h:inputText value="#{slotDefEditBean.embeddedProperty.name}" required="true"/>
 	            </s:decorate>
+	            
 	            <s:decorate template="/layout/display.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Property Data Type" />
 					</ui:define>
-					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.type}">
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.type}" required="true" >
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type}"
 							noSelectionLabel="-- select a type --"/>
 						<s:convertEnum/>
+					<a:support event="onchange" action="#{slotDefEditBean.embeddedPropertyListener}" reRender="epForm"/>
+             		</h:selectOneMenu>
+	            </s:decorate>
+	            
+				<a:region>
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.type != 'BOOLEAN'}">
+	                <ui:define name="label">
+	                	<h:outputText value="Multiple" />
+					</ui:define>
+					<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.multiple}" >
+						<a:support event="onchange" reRender="epForm"/>
+					</h:selectBooleanCheckbox>
+	            </s:decorate>
+				</a:region>
+				
+	            <a:region>
+	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.type != 'BOOLEAN'}">
+	                <ui:define name="label">
+	                	<h:outputText value="Dictionary" />
+					</ui:define>
+					<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dictionary}" required="#{slotDefEditBean.embeddedProperty.multiple}">
+                    		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.embeddedProperty.type)}" 
+											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- select a dictionary --"/>
+							<s:convertEntity/>
 					<a:support event="onchange" reRender="epForm"/>
              		</h:selectOneMenu>
 	            </s:decorate>
+	            </a:region>
+	            
 	            <s:div rendered="#{slotDefEditBean.embeddedProperty.type != null}">
 		            <s:decorate template="/layout/edit.xhtml">
 		                <ui:define name="label">
 		                	<h:outputText value="Value" />
 						</ui:define>
-						<h:inputText value="#{slotDefEditBean.embeddedProperty.stringValue}" rendered="#{slotDefEditBean.embeddedProperty.type == 'STRING' or slotDefEditBean.embeddedProperty.type == 'LINK'}"/>
-						<h:inputText value="#{slotDefEditBean.embeddedProperty.integerValue}" rendered="#{slotDefEditBean.embeddedProperty.type == 'INTEGER'}"/>
-						<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.booleanValue}" rendered="#{slotDefEditBean.embeddedProperty.type == 'BOOLEAN'}"/>
-						<rich:calendar id="subscriptionDate" mode="client"
-	                          value="#{slotDefEditBean.embeddedProperty.dateValue}"
-	                          datePattern="dd/MM/yyyy"
-	                          rendered="#{slotDefEditBean.embeddedProperty.type == 'DATE'}"/>
+							
+							<s:fragment rendered="#{not slotDefEditBean.embeddedProperty.multiple}">
+							<h:inputText value="#{slotDefEditBean.embeddedProperty.stringValue}"
+								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
+
+								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
+							<h:inputText value="#{slotDefEditBean.embeddedProperty.integerValue}"
+								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'INTEGER' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
+								
+								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
+							<a:region>
+							<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.booleanValue}"
+								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'BOOLEAN'}"
+								
+								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}">
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(slotDefEditBean.embeddedProperty)}" reRender="collections"/>
+							</h:selectBooleanCheckbox>
+							</a:region>
+							<rich:calendar id="subscriptionDate" mode="client"
+								value="#{slotDefEditBean.embeddedProperty.dateValue}" datePattern="dd/MM/yyyy"
+								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'DATE' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
+								
+								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
+							
+							<a:region>
+							<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.stringValue}" required="#{slotDefEditBean.embeddedProperty.dataDefinition.required}"
+										rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
+										valueChangeListener="#{valueChangeListener.listener}">
+	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
+												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+								<a:support event="onchange" reRender="collections"/>
+	             			</h:selectOneMenu>
+	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.integerValue}" required="#{slotDefEditBean.embeddedProperty.dataDefinition.required}"
+	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'INTEGER' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
+	             						valueChangeListener="#{valueChangeListener.listener}">
+	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
+												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+								<a:support event="onchange" reRender="collections"/>
+	             			</h:selectOneMenu>
+	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dateValue}"  required="#{slotDefEditBean.embeddedProperty.dataDefinition.required}"
+	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'DATE' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
+	             						valueChangeListener="#{valueChangeListener.listener}">
+	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
+												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+								<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+								<a:support event="onchange" reRender="collections"/>
+	             			</h:selectOneMenu>
+	             			</a:region>
+	             			</s:fragment>
+	             			
+	             			<s:fragment rendered="#{slotDefEditBean.embeddedProperty.multiple and slotDefEditBean.embeddedProperty.dictionary != null}">
+	             			<rich:pickList value="#{slotDefEditBean.embeddedProperty.valuesAsList}" >
+								<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" var="value" label="#{value}" />
+							</rich:pickList>
+							</s:fragment>
 		            </s:decorate>
 	            </s:div>
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addEmbeddedProperty()}" onclick="#{rich:component('embeddedPropPanel')}.hide()" reRender="embeddedProperties,propPanel,embeddedPropPanel"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addEmbeddedProperty()}" oncomplete="if(!invalid){#{rich:component('embeddedPropPanel')}.hide();}" reRender="epForm,embeddedProperties,propPanel"/>
 			<a:region>
 			<a:commandButton value="Cancel" onclick="#{rich:component('embeddedPropPanel')}.hide()"/>
 			</a:region>

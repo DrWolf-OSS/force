@@ -1,7 +1,6 @@
 package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataInstanceMultiplicity;
-import it.drwolf.slot.interfaces.DataDefinition;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -80,10 +79,10 @@ public class MultiplePropertyInst extends PropertyInst {
 		return this.getValues();
 	}
 
-	@Transient
-	public DataDefinition getDataDefinition() {
-		return this.getPropertyDef();
-	}
+	// @Transient
+	// public DataDefinition getDataDefinition() {
+	// return this.getPropertyDef();
+	// }
 
 	@Transient
 	public List<String> getValuesAsList() {

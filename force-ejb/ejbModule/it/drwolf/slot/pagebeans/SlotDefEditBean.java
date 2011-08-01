@@ -55,6 +55,8 @@ public class SlotDefEditBean {
 
 	private Map<String, PropertyDef> converterPropertyMap = new HashMap<String, PropertyDef>();
 
+	// private Dictionary tmpEmbeddedDictionary;
+
 	@Create
 	public void init() {
 		this.properties.addAll(slotDefHome.getInstance().getPropertyDefs());
@@ -268,5 +270,20 @@ public class SlotDefEditBean {
 			Map<String, PropertyDef> converterPropertyMap) {
 		this.converterPropertyMap = converterPropertyMap;
 	}
+
+	public void embeddedPropertyListener() {
+		// if (this.embeddedProperty.getType() == null) {
+		this.embeddedProperty.setDictionary(null);
+		this.embeddedProperty.clean();
+		// }
+	}
+
+	// public Dictionary getTmpEmbeddedDictionary() {
+	// return tmpEmbeddedDictionary;
+	// }
+	//
+	// public void setTmpEmbeddedDictionary(Dictionary tmpEmbeddedDictionary) {
+	// this.tmpEmbeddedDictionary = tmpEmbeddedDictionary;
+	// }
 
 }
