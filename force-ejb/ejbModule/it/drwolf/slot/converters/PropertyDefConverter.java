@@ -34,8 +34,8 @@ public class PropertyDefConverter implements Converter {
 			Map<String, PropertyDef> converterPropertyMap = slotDefEditBean
 					.getConverterPropertyMap();
 
-			String name = split[1];
-			propertyDef = converterPropertyMap.get(name);
+			String uuid = split[1];
+			propertyDef = converterPropertyMap.get(uuid);
 		}
 		return propertyDef;
 	}

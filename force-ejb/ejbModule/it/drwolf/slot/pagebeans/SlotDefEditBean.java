@@ -80,8 +80,8 @@ public class SlotDefEditBean {
 		if (!properties.contains(this.propertyDef)) {
 			properties.add(this.propertyDef);
 		}
-		if (converterPropertyMap.get(propertyDef.getName()) == null) {
-			converterPropertyMap.put(propertyDef.getName(), propertyDef);
+		if (converterPropertyMap.get(propertyDef.getUuid()) == null) {
+			converterPropertyMap.put(propertyDef.getUuid(), propertyDef);
 		}
 	}
 

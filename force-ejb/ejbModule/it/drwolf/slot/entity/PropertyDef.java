@@ -4,6 +4,7 @@ import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -27,6 +28,8 @@ public class PropertyDef implements DataDefinition {
 	private Dictionary dictionary;
 
 	private boolean multiple = Boolean.FALSE;
+
+	private String uuid = UUID.randomUUID().toString();
 
 	public PropertyDef(String name, DataType type) {
 		super();
@@ -153,6 +156,11 @@ public class PropertyDef implements DataDefinition {
 
 	public void setMultiple(boolean multiple) {
 		this.multiple = multiple;
+	}
+
+	@Transient
+	public String getUuid() {
+		return uuid;
 	}
 
 }
