@@ -344,12 +344,12 @@
 					</ui:define>
 					<h:inputText value="#{slotDefEditBean.embeddedProperty.name}" required="true"/>
 	            </s:decorate>
-	            
+
 	            <s:decorate template="/layout/display.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Property Data Type" />
 					</ui:define>
-					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.type}" required="true" >
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.type}">
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type}"
 							noSelectionLabel="-- select a type --"/>
 						<s:convertEnum/>
@@ -357,30 +357,26 @@
              		</h:selectOneMenu>
 	            </s:decorate>
 	            
-				<a:region>
 	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.type != 'BOOLEAN'}">
 	                <ui:define name="label">
 	                	<h:outputText value="Multiple" />
 					</ui:define>
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.multiple}" >
-						<a:support event="onchange" reRender="epForm"/>
+						<a:support event="onchange" action="#{slotDefEditBean.embeddedProperty.clean}" reRender="epForm"/>
 					</h:selectBooleanCheckbox>
 	            </s:decorate>
-				</a:region>
 				
-	            <a:region>
 	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.type != 'BOOLEAN'}">
 	                <ui:define name="label">
 	                	<h:outputText value="Dictionary" />
 					</ui:define>
-					<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dictionary}" required="#{slotDefEditBean.embeddedProperty.multiple}">
+					<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dictionary}">
                     		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.embeddedProperty.type)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- select a dictionary --"/>
 							<s:convertEntity/>
 					<a:support event="onchange" reRender="epForm"/>
              		</h:selectOneMenu>
 	            </s:decorate>
-	            </a:region>
 	            
 	            <s:div rendered="#{slotDefEditBean.embeddedProperty.type != null}">
 		            <s:decorate template="/layout/edit.xhtml">
@@ -412,21 +408,21 @@
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
 							
 							<a:region>
-							<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.stringValue}" required="#{slotDefEditBean.embeddedProperty.dataDefinition.required}"
+							<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.stringValue}"
 										rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 										valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
 								<a:support event="onchange" reRender="collections"/>
 	             			</h:selectOneMenu>
-	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.integerValue}" required="#{slotDefEditBean.embeddedProperty.dataDefinition.required}"
+	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.integerValue}" 
 	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'INTEGER' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
 								<a:support event="onchange" reRender="collections"/>
 	             			</h:selectOneMenu>
-	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dateValue}"  required="#{slotDefEditBean.embeddedProperty.dataDefinition.required}"
+	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dateValue}"  
 	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'DATE' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
