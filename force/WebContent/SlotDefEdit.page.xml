@@ -34,11 +34,28 @@
       </rule>
    </navigation>
    
+   <navigation from-action="#{slotDefEditBean.save()}">
+      <rule if-outcome="persisted">
+         <end-conversation/>
+         <redirect view-id="/SlotDef.xhtml"/>
+      </rule>
+      <rule if-outcome="failed">
+         <redirect/>
+      </rule>
+   </navigation>
+   
    <navigation from-action="#{slotDefEditBean.update()}">
+      <rule if-outcome="updated">
          <end-conversation before-redirect="true"/>
          <redirect view-id="/SlotDefEdit.xhtml">
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
          </redirect>
+      </rule>
+      <rule if-outcome="failed">
+         <redirect>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         </redirect>
+      </rule>
    </navigation>
 
 </page>

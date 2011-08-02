@@ -6,6 +6,7 @@ import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.SinglePropertyInst;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
+import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.session.DocDefCollectionHome;
 import it.drwolf.slot.session.PropertytDefHome;
 import it.drwolf.slot.session.SlotDefEmbeddedPropertyHome;
@@ -28,6 +29,8 @@ import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage.Severity;
 
 @Name("slotDefEditBean")
 @Scope(ScopeType.CONVERSATION)
@@ -117,73 +120,105 @@ public class SlotDefEditBean {
 		return Arrays.asList(SlotDefType.values());
 	}
 
-	public void save() {
-		slotDefHome.getInstance().setPropertyDefs(
-				new HashSet<PropertyDef>(properties));
-		slotDefHome.getInstance().setDocDefCollections(
-				new HashSet<DocDefCollection>(collections));
-		slotDefHome.getInstance().setEmbeddedProperties(
-				new HashSet<EmbeddedProperty>(embeddedProperties));
-		slotDefHome.persist();
+	private boolean checkNames() {
+		Set<String> differentNames = new HashSet<String>();
+		boolean result = true;
+
+		List<DataDefinition> allProperties = new ArrayList<DataDefinition>();
+		allProperties.addAll(this.properties);
+		allProperties.addAll(this.embeddedProperties);
+
+		for (DataDefinition p : allProperties) {
+			differentNames.add(p.getLabel());
+		}
+		if (differentNames.size() < allProperties.size()) {
+			result = false;
+			FacesMessages.instance().add(Severity.ERROR,
+					"Non possono esserci property con lo stesso nome");
+		}
+
+		differentNames.clear();
+		for (DocDefCollection d : this.collections) {
+			differentNames.add(d.getName());
+		}
+		if (differentNames.size() < this.collections.size()) {
+			result = false;
+			FacesMessages.instance().add(Severity.ERROR,
+					"Non possono esserci collections con lo stesso nome");
+		}
+
+		return result;
 	}
 
-	public void update() {
-		Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
-				.getDocDefCollections();
-		Iterator<DocDefCollection> iterator = docDefCollections.iterator();
-		while (iterator.hasNext()) {
-			DocDefCollection docDefCollection = iterator.next();
-			if (!this.collections.contains(docDefCollection)) {
-				iterator.remove();
-				docDefCollectionHome.setInstance(docDefCollection);
-				docDefCollectionHome.remove();
-			}
+	public String save() {
+		if (checkNames()) {
+			slotDefHome.getInstance().setPropertyDefs(
+					new HashSet<PropertyDef>(properties));
+			slotDefHome.getInstance().setDocDefCollections(
+					new HashSet<DocDefCollection>(collections));
+			slotDefHome.getInstance().setEmbeddedProperties(
+					new HashSet<EmbeddedProperty>(embeddedProperties));
+			return slotDefHome.persist();
+		} else {
+			return "failed";
 		}
+	}
 
-		Set<PropertyDef> propertyDefs = slotDefHome.getInstance()
-				.getPropertyDefs();
-		Iterator<PropertyDef> iterator2 = propertyDefs.iterator();
-		while (iterator2.hasNext()) {
-			PropertyDef propertyDef = iterator2.next();
-			if (!this.properties.contains(propertyDef)) {
-				iterator2.remove();
-				propertytDefHome.setInstance(propertyDef);
-				propertytDefHome.remove();
+	public String update() {
+		if (checkNames()) {
+			Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
+					.getDocDefCollections();
+			Iterator<DocDefCollection> iterator = docDefCollections.iterator();
+			while (iterator.hasNext()) {
+				DocDefCollection docDefCollection = iterator.next();
+				if (!this.collections.contains(docDefCollection)) {
+					iterator.remove();
+					docDefCollectionHome.setInstance(docDefCollection);
+					docDefCollectionHome.remove();
+				}
 			}
-		}
-
-		Set<EmbeddedProperty> slotDefEmbeddedProperties = slotDefHome
-				.getInstance().getEmbeddedProperties();
-		Iterator<EmbeddedProperty> iterator3 = slotDefEmbeddedProperties
-				.iterator();
-		while (iterator3.hasNext()) {
-			EmbeddedProperty embeddedProperty = iterator3.next();
-			if (!this.embeddedProperties.contains(embeddedProperty)) {
-				iterator3.remove();
-				slotDefEmbeddedPropertyHome.setInstance(embeddedProperty);
-				slotDefEmbeddedPropertyHome.remove();
+			Set<PropertyDef> propertyDefs = slotDefHome.getInstance()
+					.getPropertyDefs();
+			Iterator<PropertyDef> iterator2 = propertyDefs.iterator();
+			while (iterator2.hasNext()) {
+				PropertyDef propertyDef = iterator2.next();
+				if (!this.properties.contains(propertyDef)) {
+					iterator2.remove();
+					propertytDefHome.setInstance(propertyDef);
+					propertytDefHome.remove();
+				}
 			}
-		}
-
-		for (PropertyDef propertyDef : properties) {
-			if (!propertyDefs.contains(propertyDef)) {
-				propertyDefs.add(propertyDef);
+			Set<EmbeddedProperty> slotDefEmbeddedProperties = slotDefHome
+					.getInstance().getEmbeddedProperties();
+			Iterator<EmbeddedProperty> iterator3 = slotDefEmbeddedProperties
+					.iterator();
+			while (iterator3.hasNext()) {
+				EmbeddedProperty embeddedProperty = iterator3.next();
+				if (!this.embeddedProperties.contains(embeddedProperty)) {
+					iterator3.remove();
+					slotDefEmbeddedPropertyHome.setInstance(embeddedProperty);
+					slotDefEmbeddedPropertyHome.remove();
+				}
 			}
-		}
-
-		for (DocDefCollection collection : collections) {
-			if (!docDefCollections.contains(collection)) {
-				docDefCollections.add(collection);
+			for (PropertyDef propertyDef : properties) {
+				if (!propertyDefs.contains(propertyDef)) {
+					propertyDefs.add(propertyDef);
+				}
 			}
-		}
-
-		for (EmbeddedProperty embeddedProperty : embeddedProperties) {
-			if (!slotDefEmbeddedProperties.contains(embeddedProperty)) {
-				slotDefEmbeddedProperties.add(embeddedProperty);
+			for (DocDefCollection collection : collections) {
+				if (!docDefCollections.contains(collection)) {
+					docDefCollections.add(collection);
+				}
 			}
+			for (EmbeddedProperty embeddedProperty : embeddedProperties) {
+				if (!slotDefEmbeddedProperties.contains(embeddedProperty)) {
+					slotDefEmbeddedProperties.add(embeddedProperty);
+				}
+			}
+			return slotDefHome.update();
+		} else {
+			return "failed";
 		}
-
-		slotDefHome.update();
 	}
 
 	public void conditionalPropertyListener(ActionEvent event) {
