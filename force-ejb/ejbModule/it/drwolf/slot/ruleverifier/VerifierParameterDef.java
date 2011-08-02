@@ -12,15 +12,17 @@ public class VerifierParameterDef implements DataDefinition {
 	private String label;
 	private boolean optional;
 	private boolean ruleEmbedded;
+	private boolean multiple;
 
 	public VerifierParameterDef(String name, String label, DataType type,
-			boolean optional, boolean ruleEmbedded) {
+			boolean optional, boolean ruleEmbedded, boolean multiple) {
 		super();
 		this.name = name;
 		this.label = label;
 		this.type = type;
 		this.optional = optional;
 		this.ruleEmbedded = ruleEmbedded;
+		this.multiple = multiple;
 	}
 
 	public String getName() {
@@ -87,5 +89,13 @@ public class VerifierParameterDef implements DataDefinition {
 	public List<String> getDictionaryValues() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public boolean isMultiple() {
+		return multiple;
+	}
+
+	public void setMultiple(boolean multiple) {
+		this.multiple = multiple;
 	}
 }

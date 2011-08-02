@@ -30,6 +30,7 @@
 						<ui:define name="label">
 							<h:outputText value="#{dataInstance.dataDefinition.label}" />
 						</ui:define>
+						<s:fragment rendered="#{not dataInstance.multiple}">
 						<h:outputText value="#{dataInstance.stringValue}"
 							rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"/>
 						<h:outputText value="#{dataInstance.integerValue}"
@@ -44,6 +45,10 @@
 						<s:span rendered="#{dataInstance.dataDefinition.dataType == 'LINK'}">
 							<a href="#{dataInstance.stringValue}" target="blank">#{dataInstance.stringValue}</a>
 						</s:span>
+						</s:fragment>
+						<s:fragment rendered="#{dataInstance.multiple}">
+							<h:outputText value="#{dataInstance.value}" />
+						</s:fragment>
 					</s:decorate>
 					</c:forEach>
 				</s:div>
