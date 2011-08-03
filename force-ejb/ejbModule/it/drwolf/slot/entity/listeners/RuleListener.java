@@ -1,6 +1,7 @@
 package it.drwolf.slot.entity.listeners;
 
 import it.drwolf.slot.entity.Rule;
+import it.drwolf.slot.ruleverifier.InstantDateValidity;
 import it.drwolf.slot.ruleverifier.TimeValidity;
 
 import javax.persistence.PostLoad;
@@ -14,6 +15,10 @@ public class RuleListener {
 			switch (rule.getType()) {
 			case TIME_VALIDITY:
 				rule.setVerifier(new TimeValidity());
+				break;
+
+			case INSTANT_DATE_VALIDITY:
+				rule.setVerifier(new InstantDateValidity());
 				break;
 
 			default:

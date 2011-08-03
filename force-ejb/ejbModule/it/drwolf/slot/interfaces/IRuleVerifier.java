@@ -9,7 +9,8 @@ import java.util.Map;
 
 public interface IRuleVerifier {
 
-	public VerifierReport verify(Map<String, List<VerifierParameterInst>> params);
+	public VerifierReport verify(
+			Map<String, List<VerifierParameterInst>> parameterInsts);
 
 	public List<VerifierParameterDef> getInParams();
 

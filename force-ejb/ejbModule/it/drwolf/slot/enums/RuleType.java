@@ -2,7 +2,7 @@ package it.drwolf.slot.enums;
 
 public enum RuleType {
 
-	TIME_VALIDITY("TimeValidity");
+	TIME_VALIDITY("TimeValidity"), INSTANT_DATE_VALIDITY("InstantDateValidity");
 	private final String value;
 
 	RuleType(String value) {
