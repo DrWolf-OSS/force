@@ -6,6 +6,7 @@ import it.drwolf.slot.interfaces.DataDefinition;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -21,9 +22,9 @@ public class PropertyDef implements DataDefinition {
 
 	private String name;
 
-	private DataType type;
+	private DataType dataType;
 
-	private boolean required = false;
+	private boolean required = Boolean.FALSE;
 
 	private Dictionary dictionary;
 
@@ -34,7 +35,7 @@ public class PropertyDef implements DataDefinition {
 	public PropertyDef(String name, DataType type) {
 		super();
 		this.name = name;
-		this.type = type;
+		this.dataType = type;
 	}
 
 	public PropertyDef() {
@@ -59,17 +60,18 @@ public class PropertyDef implements DataDefinition {
 	}
 
 	@Enumerated(EnumType.STRING)
-	public DataType getType() {
-		return type;
+	@Column(name = "type")
+	public DataType getDataType() {
+		return dataType;
 	}
 
-	public void setType(DataType type) {
-		this.type = type;
+	public void setDataType(DataType type) {
+		this.dataType = type;
 	}
 
 	@Override
 	public String toString() {
-		return this.name + ":" + type;
+		return this.name + ":" + dataType;
 	}
 
 	@Override
@@ -80,8 +82,10 @@ public class PropertyDef implements DataDefinition {
 				+ ((this.getId() == null) ? 0 : this.getId().hashCode());
 		result = prime * result
 				+ ((this.getName() == null) ? 0 : this.getName().hashCode());
-		result = prime * result
-				+ ((this.getType() == null) ? 0 : this.getType().hashCode());
+		result = prime
+				* result
+				+ ((this.getDataType() == null) ? 0 : this.getDataType()
+						.hashCode());
 		return result;
 	}
 
@@ -104,7 +108,7 @@ public class PropertyDef implements DataDefinition {
 				return false;
 		} else if (!this.getName().equals(other.getName()))
 			return false;
-		if (this.getType() != other.getType())
+		if (this.getDataType() != other.getDataType())
 			return false;
 		return true;
 	}
@@ -120,11 +124,6 @@ public class PropertyDef implements DataDefinition {
 	@Transient
 	public String getLabel() {
 		return this.name;
-	}
-
-	@Transient
-	public DataType getDataType() {
-		return this.type;
 	}
 
 	@Transient

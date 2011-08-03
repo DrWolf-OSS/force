@@ -65,7 +65,7 @@ public class PropertyContainer {
 
 	public DataType getType() {
 		if (propertyDef != null) {
-			return propertyDef.getType();
+			return propertyDef.getDataType();
 		} else if (property != null) {
 			String type = property.getType();
 			if (type.equals("d:text"))
@@ -77,7 +77,7 @@ public class PropertyContainer {
 			else if (type.equals("d:date"))
 				return DataType.DATE;
 		} else if (embeddedProperty != null) {
-			return embeddedProperty.getType();
+			return embeddedProperty.getDataType();
 		}
 		return null;
 	}

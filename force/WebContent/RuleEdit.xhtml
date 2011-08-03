@@ -46,14 +46,14 @@
 		                <h:selectOneMenu value="#{ruleEditBean.targetPropertiesSourceMap[p.name]}" rendered="#{ruleEditBean.sourcePropertiesSourceMap[p.name] != null}">
 			            	<s:selectItems value="#{ruleEditBean.sourcePropertiesSourceMap[p.name]}"
 			            					var="sourceContainer" label="#{sourceContainer.label}" itemValue="#{sourceContainer}" 
-			            					disabled="#{not sourceContainer.hasPropertiesOfType(p.type)}" noSelectionLabel="-- select a collection or a slot --"/>
+			            					disabled="#{not sourceContainer.hasPropertiesOfType(p.dataType)}" noSelectionLabel="-- select a collection or a slot --"/>
 			            	<f:converter converterId="propertiesSourceContainerConverter"/>
 			            <a:support event="onchange" reRender="inParams"/>
 			            </h:selectOneMenu>
 			            &#160;
 			            <h:selectOneMenu value="#{ruleEditBean.targetPropertyMap[p.name]}" rendered="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties != null}">
 			            	<s:selectItems value="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties}"
-			            					var="prop" label="#{prop.label}" itemValue="#{prop}" disabled="#{prop.type != p.type}" />
+			            					var="prop" label="#{prop.label}" itemValue="#{prop}" disabled="#{prop.type != p.dataType}" />
 			            	<f:converter converterId="propertyContainerConverter"/>
 			            	<a:support event="onchange" reRender="inParams"/>
 			            </h:selectOneMenu>
@@ -71,17 +71,17 @@
 	            <s:decorate template="/layout/edit.xhtml">
 	           		<ui:define name="label">#{ep.verifierParameterDef.label}</ui:define>
 	           		<h:inputText value="#{ep.stringValue}"
-								rendered="#{ep.verifierParameterDef.type == 'STRING'}"
+								rendered="#{ep.verifierParameterDef.dataType == 'STRING'}"
 								required="#{not ep.verifierParameterDef.optional}" />
 					<h:inputText value="#{ep.integerValue}"
-								rendered="#{ep.verifierParameterDef.type == 'INTEGER'}"
+								rendered="#{ep.verifierParameterDef.dataType == 'INTEGER'}"
 								required="#{not ep.verifierParameterDef.optional}" />
 					<h:selectBooleanCheckbox value="#{ep.booleanValue}"
-								rendered="#{ep.verifierParameterDef.type == 'BOOLEAN'}"
+								rendered="#{ep.verifierParameterDef.dataType == 'BOOLEAN'}"
 								required="#{not ep.verifierParameterDef.optional}" />
 					<rich:calendar id="subscriptionDate" mode="client"
 								value="#{ep.dateValue}" datePattern="dd/MM/yyyy"
-								rendered="#{ep.verifierParameterDef.type == 'DATE'}"
+								rendered="#{ep.verifierParameterDef.dataType == 'DATE'}"
 								required="#{not ep.verifierParameterDef.optional}" />
 					&#160;
 					<a:region>

@@ -109,15 +109,15 @@ public class RuleParameterInst implements DataInstance {
 
 	@Transient
 	public Object getValue() {
-		if (this.getVerifierParameterDef().getType().equals(DataType.STRING))
+		if (this.getVerifierParameterDef().getDataType().equals(DataType.STRING))
 			return this.getStringValue();
-		else if (this.getVerifierParameterDef().getType()
+		else if (this.getVerifierParameterDef().getDataType()
 				.equals(DataType.INTEGER))
 			return this.getIntegerValue();
-		else if (this.getVerifierParameterDef().getType()
+		else if (this.getVerifierParameterDef().getDataType()
 				.equals(DataType.BOOLEAN))
 			return this.getBooleanValue();
-		else if (this.getVerifierParameterDef().getType().equals(DataType.DATE))
+		else if (this.getVerifierParameterDef().getDataType().equals(DataType.DATE))
 			return this.getDateValue();
 		else
 			return null;

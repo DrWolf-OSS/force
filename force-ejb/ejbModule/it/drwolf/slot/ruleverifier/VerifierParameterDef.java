@@ -8,7 +8,7 @@ import java.util.List;
 public class VerifierParameterDef implements DataDefinition {
 
 	private String name;
-	private DataType type;
+	private DataType dataType;
 	private String label;
 	private boolean optional;
 	private boolean ruleEmbedded;
@@ -19,7 +19,7 @@ public class VerifierParameterDef implements DataDefinition {
 		super();
 		this.name = name;
 		this.label = label;
-		this.type = type;
+		this.dataType = type;
 		this.optional = optional;
 		this.ruleEmbedded = ruleEmbedded;
 		this.multiple = multiple;
@@ -33,12 +33,12 @@ public class VerifierParameterDef implements DataDefinition {
 		this.name = name;
 	}
 
-	public DataType getType() {
-		return type;
+	public DataType getDataType() {
+		return dataType;
 	}
 
-	public void setType(DataType type) {
-		this.type = type;
+	public void setDataType(DataType type) {
+		this.dataType = type;
 	}
 
 	public String getLabel() {
@@ -71,11 +71,6 @@ public class VerifierParameterDef implements DataDefinition {
 
 	public void setRuleEmbedded(boolean ruleEmbedded) {
 		this.ruleEmbedded = ruleEmbedded;
-	}
-
-	//
-	public DataType getDataType() {
-		return this.type;
 	}
 
 	public boolean isRequired() {

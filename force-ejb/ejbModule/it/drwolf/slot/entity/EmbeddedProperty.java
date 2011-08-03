@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -28,7 +29,7 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 
 	private String name;
 
-	private DataType type;
+	private DataType dataType;
 
 	private String stringValue;
 
@@ -63,12 +64,13 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 	}
 
 	@Enumerated(EnumType.STRING)
-	public DataType getType() {
-		return type;
+	@Column(name = "type")
+	public DataType getDataType() {
+		return dataType;
 	}
 
-	public void setType(DataType type) {
-		this.type = type;
+	public void setDataType(DataType type) {
+		this.dataType = type;
 	}
 
 	public String getStringValue() {
@@ -107,15 +109,15 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 	@Transient
 	public Object getValue() {
 		if (!this.isMultiple()) {
-			if (this.getType().equals(DataType.STRING))
+			if (this.getDataType().equals(DataType.STRING))
 				return this.getStringValue();
-			else if (this.getType().equals(DataType.INTEGER))
+			else if (this.getDataType().equals(DataType.INTEGER))
 				return this.getIntegerValue();
-			else if (this.getType().equals(DataType.DATE))
+			else if (this.getDataType().equals(DataType.DATE))
 				return this.getDateValue();
-			else if (this.getType().equals(DataType.BOOLEAN))
+			else if (this.getDataType().equals(DataType.BOOLEAN))
 				return this.getBooleanValue();
-			else if (this.getType().equals(DataType.LINK))
+			else if (this.getDataType().equals(DataType.LINK))
 				return this.getStringValue();
 		} else {
 			return this.getValues();
@@ -126,16 +128,16 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 	@Transient
 	public void setValue(Object value) {
 		if (value instanceof String) {
-			this.setType(DataType.STRING);
+			this.setDataType(DataType.STRING);
 			this.setStringValue((String) value);
 		} else if (value instanceof Integer) {
-			this.setType(DataType.INTEGER);
+			this.setDataType(DataType.INTEGER);
 			this.setIntegerValue((Integer) value);
 		} else if (value instanceof Date) {
-			this.setType(DataType.DATE);
+			this.setDataType(DataType.DATE);
 			this.setDateValue((Date) value);
 		} else if (value instanceof Boolean) {
-			this.setType(DataType.BOOLEAN);
+			this.setDataType(DataType.BOOLEAN);
 			this.setBooleanValue((Boolean) value);
 		}
 	}
@@ -148,11 +150,6 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 	@Transient
 	public String getLabel() {
 		return this.name;
-	}
-
-	@Transient
-	public DataType getDataType() {
-		return this.type;
 	}
 
 	@Transient

@@ -70,13 +70,13 @@ public class SinglePropertyInst extends PropertyInst {
 
 	@Transient
 	public Object getValue() {
-		if (this.getPropertyDef().getType().equals(DataType.STRING))
+		if (this.getPropertyDef().getDataType().equals(DataType.STRING))
 			return this.getStringValue();
-		else if (this.getPropertyDef().getType().equals(DataType.INTEGER))
+		else if (this.getPropertyDef().getDataType().equals(DataType.INTEGER))
 			return this.getIntegerValue();
-		else if (this.getPropertyDef().getType().equals(DataType.DATE))
+		else if (this.getPropertyDef().getDataType().equals(DataType.DATE))
 			return this.getDateValue();
-		else if (this.getPropertyDef().getType().equals(DataType.BOOLEAN))
+		else if (this.getPropertyDef().getDataType().equals(DataType.BOOLEAN))
 			return this.getBooleanValue();
 		else
 			return null;
@@ -84,13 +84,13 @@ public class SinglePropertyInst extends PropertyInst {
 
 	@Transient
 	public void clean() {
-		if (this.getPropertyDef().getType().equals(DataType.STRING))
+		if (this.getPropertyDef().getDataType().equals(DataType.STRING))
 			this.setStringValue(null);
-		else if (this.getPropertyDef().getType().equals(DataType.INTEGER))
+		else if (this.getPropertyDef().getDataType().equals(DataType.INTEGER))
 			this.setIntegerValue(null);
-		else if (this.getPropertyDef().getType().equals(DataType.DATE))
+		else if (this.getPropertyDef().getDataType().equals(DataType.DATE))
 			this.setDateValue(null);
-		else if (this.getPropertyDef().getType().equals(DataType.BOOLEAN))
+		else if (this.getPropertyDef().getDataType().equals(DataType.BOOLEAN))
 			this.setBooleanValue(null);
 	}
 

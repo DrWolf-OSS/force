@@ -66,7 +66,7 @@
 		                <ui:define name="label">
 		                	<h:outputText value="#{prop.name}" />
 						</ui:define>
-		                <h:outputText value="#{prop.type}" />
+		                <h:outputText value="#{prop.dataType}" />
 		                <a:commandButton value="remove" action="#{slotDefEditBean.removeProp(prop)}" reRender="properties"/>
 		                <a:commandButton value="edit" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" reRender="propPanel"/>
 		            </s:decorate>			
@@ -203,9 +203,9 @@
                     <f:facet name="header">Name</f:facet>
                     <h:outputText value="#{_propertytDef.name}"/>
                 </rich:column>
-                <rich:column sortBy="#{_propertytDef.type}">
+                <rich:column sortBy="#{_propertytDef.dataType}">
                     <f:facet name="header">Type</f:facet>
-                    <h:outputText value="#{_propertytDef.type}"/>
+                    <h:outputText value="#{_propertytDef.dataType}"/>
                 </rich:column>
             </rich:dataTable>
 
@@ -285,7 +285,7 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Property Data Type" />
 					</ui:define>
-					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.propertyDef.type}" required="true">
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.propertyDef.dataType}" required="true">
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type}" noSelectionLabel="-- seleziona un tipo --"/>
 					<a:support event="onchange" reRender="pf"/>
              		</h:selectOneMenu>
@@ -299,7 +299,7 @@
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.required}" />
 	            </s:decorate>
 	            
-	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.type != 'BOOLEAN'}">
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
 	                	<h:outputText value="Multiple" />
 					</ui:define>
@@ -310,12 +310,12 @@
 					</a:region>
 	            </s:decorate>
 	            
-	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.type != 'BOOLEAN'}">
+	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
 	                	<h:outputText value="Dictionary" />
 					</ui:define>
 					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}" required="#{slotDefEditBean.propertyDef.multiple}">
-                    		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.propertyDef.type)}" 
+                    		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.propertyDef.dataType)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- select a dictionary --"/>
 							<s:convertEntity/>
              		</h:selectOneMenu>
@@ -354,7 +354,7 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Data Type" />
 					</ui:define>
-					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.type}">
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.dataType}">
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type}"
 							noSelectionLabel="-- select a type --"/>
 						<s:convertEnum/>
@@ -362,7 +362,7 @@
              		</h:selectOneMenu>
 	            </s:decorate>
 	            
-	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.type != 'BOOLEAN'}">
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
 	                	<h:outputText value="Multiple" />
 					</ui:define>
@@ -373,12 +373,12 @@
 	            </a:region>
 				
 				<a:region>
-	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.type != 'BOOLEAN'}">
+	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
 	                	<h:outputText value="Dictionary" />
 					</ui:define>
 					<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dictionary}" required="#{slotDefEditBean.embeddedProperty.multiple}">
-                    		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.embeddedProperty.type)}" 
+                    		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.embeddedProperty.dataType)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- select a dictionary --"/>
 							<s:convertEntity/>
 					<a:support event="onchange" action="#{slotDefEditBean.embeddedProperty.clean}" reRender="epForm"/>
@@ -386,7 +386,7 @@
 	            </s:decorate>
 	            </a:region>
 	            
-	            <s:div rendered="#{slotDefEditBean.embeddedProperty.type != null}">
+	            <s:div rendered="#{slotDefEditBean.embeddedProperty.dataType != null}">
 		            <s:decorate template="/layout/edit.xhtml">
 		                <ui:define name="label">
 		                	<h:outputText value="Value" />
