@@ -503,7 +503,7 @@
 					</ui:define>
 					<h:selectOneMenu id="condPD" value="#{slotDefEditBean.collection.conditionalPropertyDef}" converter="propertyDefConverter">
      					<s:selectItems value="#{slotDefEditBean.properties}" label="#{propertyDef.name}"
-									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}"/>
+									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" disabled="#{(not propertyDef.multiple) and (propertyDef.dataType != 'BOOLEAN')}"/>
 
 						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="cpf"/>
 					</h:selectOneMenu>
