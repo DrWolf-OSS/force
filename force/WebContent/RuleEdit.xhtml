@@ -16,7 +16,6 @@
         <rich:panel>
             <f:facet name="header">#{ruleHome.managed ? 'Edit' : 'Add'} Rule</f:facet>
  
- 		<a:region>
             <s:decorate id="description" template="/layout/display.xhtml">
                 <ui:define name="label">Description</ui:define>
                 <h:outputText value="#{ruleHome.instance.verifier.description}" rendered="#{ruleHome.instance.verifier != null}"/>
@@ -27,6 +26,7 @@
                 <h:selectBooleanCheckbox value="#{ruleHome.instance.mandatory}" />
             </s:decorate>
             
+ 		<a:region>
             <s:decorate id="typeField" template="/layout/edit.xhtml">
                 <ui:define name="label">Type</ui:define>
                 <h:selectOneMenu id="ruleType" value="#{ruleHome.instance.type}">
@@ -71,25 +71,48 @@
 	            <s:decorate template="/layout/edit.xhtml">
 	           		<ui:define name="label">#{ep.verifierParameterDef.label}</ui:define>
 	           		<h:inputText value="#{ep.stringValue}"
-								rendered="#{ep.verifierParameterDef.dataType == 'STRING'}"
+								rendered="#{ep.verifierParameterDef.dataType == 'STRING' and ep.dataDefinition.dictionaryValues == null}"
 								required="#{not ep.verifierParameterDef.optional}" />
 					<h:inputText value="#{ep.integerValue}"
-								rendered="#{ep.verifierParameterDef.dataType == 'INTEGER'}"
+								rendered="#{ep.verifierParameterDef.dataType == 'INTEGER' and ep.dataDefinition.dictionaryValues == null}"
 								required="#{not ep.verifierParameterDef.optional}" />
 					<h:selectBooleanCheckbox value="#{ep.booleanValue}"
 								rendered="#{ep.verifierParameterDef.dataType == 'BOOLEAN'}"
 								required="#{not ep.verifierParameterDef.optional}" />
 					<rich:calendar id="subscriptionDate" mode="client"
 								value="#{ep.dateValue}" datePattern="dd/MM/yyyy"
-								rendered="#{ep.verifierParameterDef.dataType == 'DATE'}"
+								rendered="#{ep.verifierParameterDef.dataType == 'DATE' and ep.dataDefinition.dictionaryValues == null}"
 								required="#{not ep.verifierParameterDef.optional}" />
+								
+					<h:selectOneMenu value="#{ep.stringValue}" required="#{ep.dataDefinition.required}"
+								rendered="#{ep.dataDefinition.dataType == 'STRING' and ep.dataDefinition.dictionaryValues != null}"
+								valueChangeListener="#{valueChangeListener.listener}">
+	                  	<s:selectItems value="#{ep.dataDefinition.dictionaryValues}" 
+										var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+						<a:support event="onchange" reRender="epf"/>
+	           		</h:selectOneMenu>
+	        		<h:selectOneMenu value="#{ep.integerValue}" required="#{ep.dataDefinition.required}"
+	        					rendered="#{ep.dataDefinition.dataType == 'INTEGER' and ep.dataDefinition.dictionaryValues != null}"
+	        					valueChangeListener="#{valueChangeListener.listener}">
+	                  	<s:selectItems value="#{ep.dataDefinition.dictionaryValues}" 
+										var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+						<a:support event="onchange" reRender="epf"/>
+	           		</h:selectOneMenu>
+	           		<h:selectOneMenu value="#{ep.dateValue}"  required="#{ep.dataDefinition.required}"
+	           						rendered="#{ep.dataDefinition.dataType == 'DATE' and ep.dataDefinition.dictionaryValues != null}"
+	           						valueChangeListener="#{valueChangeListener.listener}" >
+	                  	<s:selectItems value="#{ep.dataDefinition.dictionaryValues}" 
+										var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+						<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+						<a:support event="onchange" reRender="epf"/>
+	           		</h:selectOneMenu>
 					&#160;
-					<a:region>
+					
 					<a:commandButton value="-" action="#{ruleEditBean.removeEmbeddedParameter(ep)}"
-								rendered="#{not ep.verifierParameterDef.ruleEmbedded}" reRender="embeddedParameters,inParams,rule">
+								rendered="#{not ep.verifierParameterDef.ruleEmbedded}" reRender="embeddedParameters,inParams,rule" immediate="true">
 					<a:support event="oncomplete" reRender="embeddedParameters,inParams,rule" />
 					</a:commandButton>
-					</a:region>
+					
 	            </s:decorate>
             </a:repeat>
             </s:div>
@@ -190,22 +213,52 @@
 			<f:facet name="header">
 				<h:outputText value="Add Embedded Property" />
 			</f:facet>
-			<a:form>
+			<a:form id="epf">
 			<s:decorate template="/layout/display.xhtml">
                 <ui:define name="label">
                 	<h:outputText value="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.label}" />
 				</ui:define>
-				<h:inputText value="#{ruleEditBean.activeEmbeddedParameter.stringValue}" rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'STRING'}"/>
-				<h:inputText value="#{ruleEditBean.activeEmbeddedParameter.integerValue}" rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'INTEGER'}"/>
+				<h:inputText value="#{ruleEditBean.activeEmbeddedParameter.stringValue}" 
+						rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'STRING' and ruleEditBean.activeEmbeddedParameter.dataDefinition.dictionaryValues == null}"
+						required="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.required}"/>
+				<h:inputText value="#{ruleEditBean.activeEmbeddedParameter.integerValue}" 
+						rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'INTEGER' and ruleEditBean.activeEmbeddedParameter.dataDefinition.dictionaryValues == null}"
+						required="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.required}"/>
 				<h:selectBooleanCheckbox value="#{ruleEditBean.activeEmbeddedParameter.booleanValue}" rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'BOOLEAN'}"/>
 				<rich:calendar mode="client"
                          value="#{ruleEditBean.activeEmbeddedParameter.dateValue}"
                          datePattern="dd/MM/yyyy"
-                         rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'DATE'}"/>
+                         rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'DATE' and ruleEditBean.activeEmbeddedParameter.dataDefinition.dictionaryValues == null}"
+                         required="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.required}"/>
+                         
+				<h:selectOneMenu value="#{ruleEditBean.activeEmbeddedParameter.stringValue}" required="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.required}"
+							rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'STRING' and ruleEditBean.activeEmbeddedParameter.dataDefinition.dictionaryValues != null}"
+							valueChangeListener="#{valueChangeListener.listener}">
+                  	<s:selectItems value="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dictionaryValues}" 
+									var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+					<a:support event="onchange" reRender="epf"/>
+           		</h:selectOneMenu>
+        		<h:selectOneMenu value="#{ruleEditBean.activeEmbeddedParameter.integerValue}" required="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.required}"
+        					rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'INTEGER' and ruleEditBean.activeEmbeddedParameter.dataDefinition.dictionaryValues != null}"
+        					valueChangeListener="#{valueChangeListener.listener}">
+                  	<s:selectItems value="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dictionaryValues}" 
+									var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+					<a:support event="onchange" reRender="epf"/>
+           		</h:selectOneMenu>
+           		<h:selectOneMenu value="#{ruleEditBean.activeEmbeddedParameter.dateValue}"  required="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.required}"
+           						rendered="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dataType == 'DATE' and ruleEditBean.activeEmbeddedParameter.dataDefinition.dictionaryValues != null}"
+           						valueChangeListener="#{valueChangeListener.listener}">
+                  	<s:selectItems value="#{ruleEditBean.activeEmbeddedParameter.dataDefinition.dictionaryValues}" 
+									var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+					<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+					<a:support event="onchange" reRender="epf"/>
+           		</h:selectOneMenu>
             </s:decorate>
             <div style="clear:both"/>
 			<a:commandButton value="Ok" action="#{ruleEditBean.addEmbeddedParameter()}" oncomplete="#{rich:component('embeddedParameterPanel')}.hide()" reRender="embeddedParameterPanel,embeddedParameters,inParams" />
+			<a:region>
 			<a:commandButton value="Cancel" onclick="#{rich:component('embeddedParameterPanel')}.hide()"/>
+			</a:region>
 			</a:form>
 		</rich:modalPanel>
 

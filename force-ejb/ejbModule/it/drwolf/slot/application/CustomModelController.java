@@ -2,8 +2,11 @@ package it.drwolf.slot.application;
 
 import it.drwolf.slot.alfresco.AlfrescoAdminIdentity;
 import it.drwolf.slot.alfresco.custom.model.Aspect;
+import it.drwolf.slot.alfresco.custom.model.Constraint;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.model.SlotModel;
+import it.drwolf.slot.entity.Dictionary;
+import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
@@ -213,6 +216,25 @@ public class CustomModelController {
 			}
 		}
 		return properties;
+	}
+
+	// il DataType dev'essere passato perche' nell'xml del modello un costrait
+	// non e' associato esplicitamente a nessun DataType
+	public Dictionary makeDictionaryFromConstraint(String constraintName,
+			DataType dataType) {
+		List<Constraint> constraints = slotModel.getConstraints();
+		if (constraints != null) {
+			Iterator<Constraint> iterator = constraints.iterator();
+			while (iterator.hasNext()) {
+				Constraint constraint = iterator.next();
+				if (constraint.getType().equals(Constraint.LIST)
+						&& constraint.getName().equals(constraintName)) {
+					return new Dictionary(constraintName, constraint.getParameter()
+							.getList(), dataType);
+				}
+			}
+		}
+		return null;
 	}
 
 }

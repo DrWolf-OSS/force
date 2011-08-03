@@ -1,5 +1,7 @@
 package it.drwolf.slot.ruleverifier;
 
+import it.drwolf.slot.application.CustomModelController;
+import it.drwolf.slot.entity.Dictionary;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 
@@ -8,6 +10,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.persistence.EntityManager;
 
 import org.apache.commons.lang.time.DateUtils;
 
@@ -184,6 +188,28 @@ public class TimeValidity implements IRuleVerifier {
 
 	public String getDescription() {
 		return this.DESCRIPTION;
+	}
+
+	// Metodi di test per recuperare un Dictionary da associare
+	@SuppressWarnings("unchecked")
+	private Dictionary findDateListFromDB() {
+		EntityManager entityManager = (EntityManager) org.jboss.seam.Component
+				.getInstance("entityManager");
+		List<Dictionary> resultList = entityManager
+				.createQuery("from Dictionary d where d.name=:name")
+				.setParameter("name", "dizionario di date 2").getResultList();
+		if (resultList != null && !resultList.isEmpty()) {
+			return resultList.get(0);
+		}
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Dictionary findDateListFromModel() {
+		CustomModelController customModelController = (CustomModelController) org.jboss.seam.Component
+				.getInstance("customModelController");
+		return customModelController.makeDictionaryFromConstraint(
+				"slot:DATEList", DataType.DATE);
 	}
 
 }

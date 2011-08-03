@@ -53,11 +53,6 @@ public class RuleEditBean {
 	private HashMap<String, PropertiesSourceContainer> targetPropertiesSourceMap = new HashMap<String, PropertiesSourceContainer>();
 	private HashMap<String, PropertyContainer> targetPropertyMap = new HashMap<String, PropertyContainer>();
 
-	// private VerifierMessage errorMessage = new VerifierMessage("",
-	// VerifierMessageType.ERROR);
-	// private VerifierMessage warningMessage = new VerifierMessage("",
-	// VerifierMessageType.WARNING);
-
 	private List<VerifierParameterDef> normalParameters = new ArrayList<VerifierParameterDef>();
 
 	private List<RuleParameterInst> embeddedParameters = new ArrayList<RuleParameterInst>();
@@ -204,9 +199,9 @@ public class RuleEditBean {
 			// this.embeddedParameters));
 			for (RuleParameterInst embeddedParameter : embeddedParameters) {
 				embeddedParameter.setRule(rule);
-				rule.getEmbeddedParametersMap()
-						.put(embeddedParameter.getParameterName(),
-								embeddedParameter);
+				rule.getEmbeddedParametersMap().put(
+						embeddedParameter.getVerifierParameterDef().getName(),
+						embeddedParameter);
 			}
 		} else {
 			error = true;
@@ -279,22 +274,6 @@ public class RuleEditBean {
 		this.targetPropertyMap = targetPropertyMap;
 	}
 
-	// public VerifierMessage getErrorMessage() {
-	// return errorMessage;
-	// }
-	//
-	// public void setErrorMessage(VerifierMessage errorMessage) {
-	// this.errorMessage = errorMessage;
-	// }
-	//
-	// public VerifierMessage getWarningMessage() {
-	// return warningMessage;
-	// }
-	//
-	// public void setWarningMessage(VerifierMessage warningMessage) {
-	// this.warningMessage = warningMessage;
-	// }
-
 	public List<VerifierParameterDef> getNormalParameters() {
 		return normalParameters;
 	}
@@ -319,14 +298,5 @@ public class RuleEditBean {
 			RuleParameterInst activeEmbeddedParameter) {
 		this.activeEmbeddedParameter = activeEmbeddedParameter;
 	}
-
-	// public List<VerifierParameterDef> getEmbeddedParameters() {
-	// return embeddedParameters;
-	// }
-	//
-	// public void setEmbeddedParameters(
-	// List<VerifierParameterDef> embeddedParameters) {
-	// this.embeddedParameters = embeddedParameters;
-	// }
 
 }

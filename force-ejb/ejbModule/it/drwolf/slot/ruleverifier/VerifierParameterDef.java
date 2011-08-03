@@ -1,5 +1,6 @@
 package it.drwolf.slot.ruleverifier;
 
+import it.drwolf.slot.entity.Dictionary;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
 
@@ -14,6 +15,8 @@ public class VerifierParameterDef implements DataDefinition {
 	private boolean ruleEmbedded;
 	private boolean multiple;
 
+	private Dictionary dictionary;
+
 	public VerifierParameterDef(String name, String label, DataType type,
 			boolean optional, boolean ruleEmbedded, boolean multiple) {
 		super();
@@ -23,6 +26,19 @@ public class VerifierParameterDef implements DataDefinition {
 		this.optional = optional;
 		this.ruleEmbedded = ruleEmbedded;
 		this.multiple = multiple;
+	}
+
+	public VerifierParameterDef(String name, String label, DataType type,
+			boolean optional, boolean ruleEmbedded, boolean multiple,
+			Dictionary dictionary) {
+		super();
+		this.name = name;
+		this.label = label;
+		this.dataType = type;
+		this.optional = optional;
+		this.ruleEmbedded = ruleEmbedded;
+		this.multiple = multiple;
+		this.dictionary = dictionary;
 	}
 
 	public String getName() {
@@ -82,7 +98,9 @@ public class VerifierParameterDef implements DataDefinition {
 	}
 
 	public List<String> getDictionaryValues() {
-		// TODO Auto-generated method stub
+		if (this.dictionary != null) {
+			return dictionary.getValues();
+		}
 		return null;
 	}
 
@@ -92,5 +110,13 @@ public class VerifierParameterDef implements DataDefinition {
 
 	public void setMultiple(boolean multiple) {
 		this.multiple = multiple;
+	}
+
+	public Dictionary getDictionary() {
+		return dictionary;
+	}
+
+	public void setDictionary(Dictionary dictionary) {
+		this.dictionary = dictionary;
 	}
 }

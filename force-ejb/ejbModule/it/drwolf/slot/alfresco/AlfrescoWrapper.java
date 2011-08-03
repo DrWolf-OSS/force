@@ -106,7 +106,7 @@ public class AlfrescoWrapper {
 		}
 	}
 
-	public AlfrescoFolder findOrCreateFolder(Folder father, String folderName) {
+	public AlfrescoFolder findOrCreateFolder(Folder parent, String folderName) {
 		AlfrescoFolder folder = null;
 		// cerco la cartella con il nome dello slot e se non c'è la creo
 		Session session = this.alfrescoUserIdentity.getSession();
@@ -116,14 +116,14 @@ public class AlfrescoWrapper {
 			session = this.alfrescoAdminIdentity.getSession();
 		}
 		try {
-			folder = (AlfrescoFolder) session.getObjectByPath(father.getPath()
+			folder = (AlfrescoFolder) session.getObjectByPath(parent.getPath()
 					+ "/" + folderName);
 		} catch (CmisObjectNotFoundException e) {
 			HashMap<String, Object> props = new HashMap<String, Object>();
 			props.put(PropertyIds.NAME, folderName);
 			props.put(PropertyIds.OBJECT_TYPE_ID,
 					BaseTypeId.CMIS_FOLDER.value());
-			folder = (AlfrescoFolder) father.createFolder(props, null, null,
+			folder = (AlfrescoFolder) parent.createFolder(props, null, null,
 					null, session.createOperationContext());
 		}
 		return folder;

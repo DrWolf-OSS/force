@@ -24,6 +24,16 @@ public class Dictionary {
 
 	private DataType dataType;
 
+	public Dictionary() {
+	}
+
+	public Dictionary(String name, List<String> values, DataType dataType) {
+		super();
+		this.name = name;
+		this.values = values;
+		this.dataType = dataType;
+	}
+
 	@Id
 	@GeneratedValue
 	public Long getId() {
