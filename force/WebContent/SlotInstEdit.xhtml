@@ -60,9 +60,61 @@
 								<h:outputText value="#{dataInstance.dataDefinition.label}" />
 							</ui:define>
 							
-							<ui:include src="/SlotInst#{dataInstance.multiplicity.value()}Property.xhtml" >
-								<ui:param value="#{dataInstance}" name="dataInstance" />
-							</ui:include>
+							<s:fragment rendered="#{not dataInstance.dataDefinition.multiple}">
+							<h:inputText value="#{dataInstance.stringValue}"
+								rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues == null}"
+								required="#{dataInstance.dataDefinition.required}"
+								disabled="#{not dataInstance.dataDefinition.editable}" />
+							<h:inputText value="#{dataInstance.integerValue}"
+								rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues == null}"
+								required="#{dataInstance.dataDefinition.required}"
+								disabled="#{not dataInstance.dataDefinition.editable}" />
+							<a:region>
+							<h:selectBooleanCheckbox value="#{dataInstance.booleanValue}"
+								rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}"
+								required="#{dataInstance.dataDefinition.required}"
+								disabled="#{not dataInstance.dataDefinition.editable}">
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+							</h:selectBooleanCheckbox>
+							</a:region>
+							<rich:calendar id="subscriptionDate" mode="client"
+								value="#{dataInstance.dateValue}" datePattern="dd/MM/yyyy"
+								rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues == null}"
+								required="#{dataInstance.dataDefinition.required}"
+								disabled="#{not dataInstance.dataDefinition.editable}" />
+							
+							<a:region>
+							<h:selectOneMenu value="#{dataInstance.stringValue}" required="#{dataInstance.dataDefinition.required}"
+										rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues != null}"
+										valueChangeListener="#{valueChangeListener.listener}">
+	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
+												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+	             			</h:selectOneMenu>
+	             			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"
+	             						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues != null}"
+	             						valueChangeListener="#{valueChangeListener.listener}">
+	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
+												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+	             			</h:selectOneMenu>
+	             			<h:selectOneMenu value="#{dataInstance.dateValue}"  required="#{dataInstance.dataDefinition.required}"
+	             						rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues != null}"
+	             						valueChangeListener="#{valueChangeListener.listener}">
+	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
+												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+								<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+	             			</h:selectOneMenu>
+	             			</a:region>
+	             			</s:fragment>
+	             			
+	             			<s:fragment rendered="#{dataInstance.dataDefinition.multiple}">
+							<rich:pickList value="#{dataInstance.valuesAsList}" required="#{dataInstance.dataDefinition.required}">
+								<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" var="value" label="#{value}" />
+							</rich:pickList>
+							</s:fragment>
+	             			
 						</s:decorate>
 					</c:forEach>	
 				</s:div>
@@ -236,11 +288,12 @@
 										</rich:toolTip>
 									</s:decorate>
 
-									<ui:repeat var="dataInstance" value="#{item.singleProperties}">
+									<a:repeat var="dataInstance" value="#{item.documentProperties}">
 										<s:decorate template="/layout/display.xhtml">
 											<ui:define name="label">
 												<h:outputText value="#{dataInstance.dataDefinition.label}" />
 											</ui:define>
+											<s:fragment rendered="#{not dataInstance.dataDefinition.multiple}">
 											<h:outputText value="#{dataInstance.stringValue}"
 												rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"/>
 											<h:outputText value="#{dataInstance.integerValue}"
@@ -252,19 +305,13 @@
 												<s:convertDateTime type="date" dateStyle="short"
 													pattern="dd/MM/yyyy" />
 											</h:outputText>
-										</s:decorate>
-									</ui:repeat>
-									
-									<a:repeat var="dataInstance" value="#{item.multipleProperties}">
-										<s:decorate template="/layout/display.xhtml">
-											<ui:define name="label">
-												<h:outputText value="#{dataInstance.dataDefinition.label}" />
-											</ui:define>
+											</s:fragment>
+											<s:fragment rendered="#{dataInstance.dataDefinition.multiple}">
 											<h:outputText value="#{dataInstance.values.toString()}"/>
+											</s:fragment>
 										</s:decorate>
 									</a:repeat>
-									
-									
+																	
 									<div style="clear: both" />
 									<a:region>
 										<a:commandButton value="Remove"
@@ -421,13 +468,14 @@
 				</s:decorate>
 
 				<ui:repeat var="dataInstance"
-					value="#{slotInstEditBean.activeFileContainer.singleProperties}">
+					value="#{slotInstEditBean.activeFileContainer.documentProperties}">
 					
 					<s:decorate template="/layout/edit.xhtml">
 					<ui:param name="prefix" value="epf" />
 						<ui:define name="label">
 							<h:outputText value="#{dataInstance.dataDefinition.label}" />
 						</ui:define>
+						<s:fragment rendered="#{not dataInstance.dataDefinition.multiple}">
 						<h:inputText value="#{dataInstance.stringValue}"
 							rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues == null}"
 							required="#{dataInstance.dataDefinition.required}"
@@ -462,20 +510,14 @@
 											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" /> 
              			</h:selectOneMenu>
-             			
+             			</s:fragment>
+             			<s:fragment rendered="#{dataInstance.dataDefinition.multiple}">
+             			<rich:pickList value="#{dataInstance.values}" required="#{dataInstance.dataDefinition.required}">
+							<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" var="value" label="#{value}" />
+						</rich:pickList>
+             			</s:fragment>
 					</s:decorate>
 				</ui:repeat>
-				<a:repeat var="multipleDataInstance" value="#{slotInstEditBean.activeFileContainer.multipleProperties}">
-					<s:decorate template="/layout/edit.xhtml">
-						<ui:param name="prefix" value="epf" />
-						<ui:define name="label">
-							<h:outputText value="#{multipleDataInstance.dataDefinition.label}" />
-						</ui:define>
-						<rich:pickList value="#{multipleDataInstance.values}" required="#{multipleDataInstance.dataDefinition.required}">
-							<s:selectItems value="#{multipleDataInstance.dataDefinition.dictionaryValues}" var="value" label="#{value}" />
-						</rich:pickList>
-					</s:decorate>
-				</a:repeat>
 				
 				<div style="clear: both" />
 				<a:commandButton value="Confirm"

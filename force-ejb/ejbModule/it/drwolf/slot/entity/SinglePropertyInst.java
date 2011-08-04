@@ -5,12 +5,10 @@ import it.drwolf.slot.enums.DataType;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-@Entity
 public class SinglePropertyInst extends PropertyInst {
 
 	private String stringValue;

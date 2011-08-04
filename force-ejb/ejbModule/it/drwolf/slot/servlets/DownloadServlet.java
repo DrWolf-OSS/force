@@ -22,7 +22,7 @@ public class DownloadServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		System.out.println("Chiamata alla servlet");
+		// System.out.println("Chiamata alla servlet");
 		Lifecycle.beginCall();
 		resp.addHeader("Content-Disposition", "attachment");
 

@@ -7,12 +7,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Entity;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.CollectionOfElements;
 
-@Entity
 public class MultiplePropertyInst extends PropertyInst {
 
 	// private Long id;
