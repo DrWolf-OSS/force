@@ -25,8 +25,6 @@ public class FileContainer {
 	private UploadItem uploadItem;
 	private AlfrescoDocument document;
 	private List<DocumentPropertyInst> documentProperties = new ArrayList<DocumentPropertyInst>();
-	// private List<DocumentMultiplePropertyInst> multipleProperties = new
-	// ArrayList<DocumentMultiplePropertyInst>();
 	private boolean editable = true;
 	private String id = UUID.randomUUID().toString();
 	private List<Signature> signatures;
@@ -243,60 +241,10 @@ public class FileContainer {
 
 	private void buildPropertyInsts(Set<Property> properties) {
 		for (Property p : properties) {
-			// if (!p.isMultiple()) {
-			// DocumentSinglePropertyInst singlePropertyInst =
-			// buildValorisedSingleDocumentPropertyInst(p);
-			// documentProperties.add(singlePropertyInst);
-			// } else if (p.isMultiple()) {
-			// DocumentMultiplePropertyInst multiplePropertyInst =
-			// buildValorisedMultipleDocumentPropertyInst(p);
-			// multipleProperties.add(multiplePropertyInst);
-			// }
 			DocumentPropertyInst documentProperty = buildValorisedDocumentPropertyInst(p);
 			documentProperties.add(documentProperty);
 		}
 	}
-
-	// private DocumentSinglePropertyInst
-	// buildValorisedSingleDocumentPropertyInst(
-	// Property p) {
-	// DocumentSinglePropertyInst singlePropertyInst = new
-	// DocumentSinglePropertyInst(
-	// p);
-	// if (this.document != null) {
-	// Object propertyValue = document.getPropertyValue(p.getName());
-	// singlePropertyInst.setValue(propertyValue);
-	// }
-	// singlePropertyInst.setEditable(this.editable);
-	// return singlePropertyInst;
-	// }
-	//
-	// private DocumentMultiplePropertyInst
-	// buildValorisedMultipleDocumentPropertyInst(
-	// Property p) {
-	// DocumentMultiplePropertyInst multiplePropertyInst = new
-	// DocumentMultiplePropertyInst(
-	// p);
-	// if (this.document != null) {
-	// List<Object> objValues = document.getPropertyValue(p.getName());
-	// List<String> stringValues = new ArrayList<String>();
-	// if (p.getDataType().equals(DataType.STRING)) {
-	// for (Object obj : objValues) {
-	// String value = ((String) obj).toString();
-	// stringValues.add(value);
-	// }
-	// }
-	// if (p.getDataType().equals(DataType.INTEGER)) {
-	// for (Object obj : objValues) {
-	// String value = ((BigInteger) obj).toString();
-	// stringValues.add(value);
-	// }
-	// }
-	// multiplePropertyInst.setValues(stringValues);
-	// }
-	// multiplePropertyInst.setEditable(this.editable);
-	// return multiplePropertyInst;
-	// }
 
 	private DocumentPropertyInst buildValorisedDocumentPropertyInst(Property p) {
 		DocumentPropertyInst documentPropertyInst = new DocumentPropertyInst(p);
@@ -362,26 +310,5 @@ public class FileContainer {
 	public List<Signature> getSignatures() {
 		return signatures;
 	}
-
-	// public List<DocumentMultiplePropertyInst> getMultipleProperties() {
-	// return multipleProperties;
-	// }
-	//
-	// public void setMultipleProperties(
-	// List<DocumentMultiplePropertyInst> multipleProperties) {
-	// this.multipleProperties = multipleProperties;
-	// }
-
-	// public List<DocumentPropertyInst> getAllPropertyInsts() {
-	// List<DocumentPropertyInst> allProperties = new
-	// ArrayList<DocumentPropertyInst>();
-	// allProperties.addAll(this.documentProperties);
-	// allProperties.addAll(this.multipleProperties);
-	// return allProperties;
-	// }
-
-	// public void setSignatures(List<Signature> signatures) {
-	// this.signatures = signatures;
-	// }
 
 }

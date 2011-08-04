@@ -163,13 +163,6 @@ public class SlotInstEditBean {
 					.getPropertyDefs()) {
 				PropertyInst propertyInst = new PropertyInst(propertyDef,
 						slotInstHome.getInstance());
-				// if (!propertyDef.isMultiple()) {
-				// propertyInst = new SinglePropertyInst(propertyDef,
-				// slotInstHome.getInstance());
-				// } else {
-				// propertyInst = new MultiplePropertyInst(propertyDef,
-				// slotInstHome.getInstance());
-				// }
 				propertyInsts.add(propertyInst);
 			}
 			// /
@@ -204,11 +197,6 @@ public class SlotInstEditBean {
 			this.propertyInsts = new ArrayList<PropertyInst>(slotInstHome
 					.getInstance().getPropertyInsts());
 
-			//
-			// this.multiplePropertyInsts = new ArrayList<MultiplePropertyInst>(
-			// slotInstHome.getInstance().getMultiPropertyInsts());
-			//
-
 			this.docInstCollections = new ArrayList<DocInstCollection>(
 					slotInstHome.getInstance().getDocInstCollections());
 			for (DocInstCollection instCollection : this.docInstCollections) {
@@ -231,11 +219,6 @@ public class SlotInstEditBean {
 						FileContainer container = new FileContainer(document,
 								properties, true);
 
-						//
-						// container.setSignatures(this
-						// .retrieveSignatures(document));
-						//
-
 						this.datas.get(docDefCollection.getId()).add(container);
 					} catch (CmisObjectNotFoundException e) {
 						FacesMessages.instance().add(
@@ -255,10 +238,6 @@ public class SlotInstEditBean {
 						.getProperties(aspectIds);
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				for (AlfrescoDocument document : collPrimaryDocs) {
-					// FileContainer fileContainer = new
-					// FileContainer(document);
-					// FileContainer fileContainer = buildFileContainer(
-					// properties, document, false);
 					FileContainer container = new FileContainer(document,
 							properties, false);
 					fileContainers.add(container);
@@ -314,10 +293,6 @@ public class SlotInstEditBean {
 		slotInstHome.getInstance().setPropertyInsts(
 				new HashSet<PropertyInst>(this.propertyInsts));
 
-		//
-		// slotInstHome.getInstance().setMultiPropertyInsts(
-		// new HashSet<MultiplePropertyInst>(this.multiplePropertyInsts));
-		//
 		AlfrescoFolder slotFolder = retrieveSlotFolder();
 
 		Set<Long> keySet = datas.keySet();
@@ -569,7 +544,6 @@ public class SlotInstEditBean {
 		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
 		Set<Property> properties = customModelController
 				.getProperties(aspectIds);
-		// FileContainer container = buildFileContainer(properties, item, true);
 		FileContainer container = new FileContainer(item, properties, true);
 		//
 		this.activeFileContainer = container;
@@ -648,12 +622,8 @@ public class SlotInstEditBean {
 
 		// poi si aggiungono i valori delle relative properties
 		updateProperties(document, fileContainer.getDocumentProperties());
-		// List<Signature> signatures = verifySignature(document);
-		// fileContainer.setSignatures(signatures);
-		// fileContainer.setDocument(document);
 
 		verifySignature(document);
-		// fileContainer.setSignatures(signatures);
 		fileContainer.setDocument(document);
 
 		return document;
@@ -707,13 +677,6 @@ public class SlotInstEditBean {
 						.getName(), documentPropertyInst.getValue());
 			}
 		}
-		// for (DocumentMultiplePropertyInst multiplePropertyInst :
-		// multipleProperties) {
-		// if (multiplePropertyInst.getValue() != null) {
-		// aspectsProperties.put(multiplePropertyInst.getProperty()
-		// .getName(), multiplePropertyInst.getValue());
-		// }
-		// }
 		document.updateProperties(aspectsProperties);
 	}
 
@@ -1119,7 +1082,6 @@ public class SlotInstEditBean {
 			// per ogni signer ottiene l'insieme dei certificati
 			Collection<SignerInformation> signers = infos.getSigners();
 
-			// List<Signature> signatures = new ArrayList<Signature>();
 			for (SignerInformation info : signers) {
 
 				SignerId sid = info.getSID();
@@ -1134,19 +1096,15 @@ public class SlotInstEditBean {
 					if (validCert != null) {
 						System.out.println("----> certificato trovato!");
 						addSignature(document, x509Certificate, validCert);
-						// signatures.add(signature);
 					}
 				}
 			}
 			extractAndEmbedContent(document, cms);
-			// return signatures;
 
 		} catch (Exception e) {
 			System.out.println(document.getName()
 					+ " non è firmato digitalmente");
-			// e.printStackTrace();
 		}
-		// return null;
 	}
 
 	private void addSignature(AlfrescoDocument document,
@@ -1185,16 +1143,7 @@ public class SlotInstEditBean {
 
 			signatureDoc.updateProperties(props);
 
-			// Signature signature = new Signature();
-			// signature.setAuthority(authority);
-			// signature.setCf(cf);
-			// signature.setExpiry(notAfter);
-			// signature.setSign(mysign);
-			// signature.setValidity(validity);
-			// signature.setNodeRef(signatureNodeRef);
-
 			System.out.println("-> Signature added to " + document.getName());
-			// return signature;
 
 		} catch (Exception e) {
 			System.out
@@ -1202,7 +1151,6 @@ public class SlotInstEditBean {
 							+ document.getName());
 			e.printStackTrace();
 		}
-		// return null;
 	}
 
 	private void extractAndEmbedContent(AlfrescoDocument document,
@@ -1339,14 +1287,5 @@ public class SlotInstEditBean {
 	public void setActiveFileContainer(FileContainer activeFileContainer) {
 		this.activeFileContainer = activeFileContainer;
 	}
-
-	// public List<MultiplePropertyInst> getMultiplePropertyInsts() {
-	// return multiplePropertyInsts;
-	// }
-	//
-	// public void setMultiplePropertyInsts(
-	// List<MultiplePropertyInst> multiplePropertyInsts) {
-	// this.multiplePropertyInsts = multiplePropertyInsts;
-	// }
 
 }
