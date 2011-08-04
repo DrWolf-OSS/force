@@ -216,18 +216,23 @@ public class SlotDefEditBean {
 			for (PropertyDef propertyDef : properties) {
 				if (!propertyDefs.contains(propertyDef)) {
 					propertyDefs.add(propertyDef);
-					//
-					newPropertyDefs.add(propertyDef);
-					//
 				}
+				//
+				if (propertyDef.getId() == null) {
+					newPropertyDefs.add(propertyDef);
+				}
+				//
 			}
 			for (DocDefCollection collection : collections) {
 				if (!docDefCollections.contains(collection)) {
 					docDefCollections.add(collection);
-					//
-					newDocDefCollections.add(collection);
-					//
+
 				}
+				//
+				if (collection.getId() == null) {
+					newDocDefCollections.add(collection);
+				}
+				//
 			}
 			for (EmbeddedProperty embeddedProperty : embeddedProperties) {
 				if (!slotDefEmbeddedProperties.contains(embeddedProperty)) {
