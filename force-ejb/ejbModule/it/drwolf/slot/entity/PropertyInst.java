@@ -147,6 +147,15 @@ public class PropertyInst implements DataInstance {
 		this.dateValue = dateValue;
 	}
 
+	@Transient
+	public String getLinkValue() {
+		if (this.getStringValue().startsWith("http://")) {
+			return stringValue;
+		} else {
+			return "http://".concat(stringValue);
+		}
+	}
+
 	//
 
 	@CollectionOfElements

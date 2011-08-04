@@ -107,6 +107,15 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 	}
 
 	@Transient
+	public String getLinkValue() {
+		if (this.getStringValue().startsWith("http://")) {
+			return stringValue;
+		} else {
+			return "http://".concat(stringValue);
+		}
+	}
+
+	@Transient
 	public Object getValue() {
 		if (!this.isMultiple()) {
 			if (this.getDataType().equals(DataType.STRING))
@@ -209,19 +218,11 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 
 	@Transient
 	public void clean() {
-		// if (!this.isMultiple()) {
-		// if (this.getType().equals(DataType.STRING))
 		this.setStringValue(null);
-		// else if (this.getType().equals(DataType.INTEGER))
 		this.setIntegerValue(null);
-		// else if (this.getType().equals(DataType.DATE))
 		this.setDateValue(null);
-		// else if (this.getType().equals(DataType.BOOLEAN))
 		this.setBooleanValue(null);
-		// } else {
 		this.getValues().clear();
-		// }
-
 	}
 
 }

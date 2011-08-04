@@ -394,7 +394,7 @@
 							
 							<s:fragment rendered="#{not slotDefEditBean.embeddedProperty.multiple}">
 							<h:inputText value="#{slotDefEditBean.embeddedProperty.stringValue}"
-								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
+								rendered="#{(slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' or slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'LINK') and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
 								required="true"
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
 							<h:inputText value="#{slotDefEditBean.embeddedProperty.integerValue}"

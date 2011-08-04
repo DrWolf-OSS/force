@@ -43,7 +43,7 @@
 								pattern="dd/MM/yyyy" />
 						</h:outputText>
 						<s:span rendered="#{dataInstance.dataDefinition.dataType == 'LINK'}">
-							<a href="#{dataInstance.stringValue}" target="blank">#{dataInstance.stringValue}</a>
+							<a href="#{dataInstance.linkValue}" target="blank">#{dataInstance.stringValue}</a>
 						</s:span>
 						</s:fragment>
 						<s:fragment rendered="#{dataInstance.multiple}">
