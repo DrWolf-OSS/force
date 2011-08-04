@@ -1,9 +1,11 @@
 package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.entity.DocDefCollection;
+import it.drwolf.slot.entity.DocInstCollection;
 import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
+import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.interfaces.DataDefinition;
@@ -11,6 +13,7 @@ import it.drwolf.slot.session.DocDefCollectionHome;
 import it.drwolf.slot.session.PropertytDefHome;
 import it.drwolf.slot.session.SlotDefEmbeddedPropertyHome;
 import it.drwolf.slot.session.SlotDefHome;
+import it.drwolf.slot.session.SlotInstHome;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +60,12 @@ public class SlotDefEditBean {
 	private EmbeddedProperty embeddedProperty = new EmbeddedProperty();
 
 	private Map<String, PropertyDef> converterPropertyMap = new HashMap<String, PropertyDef>();
+
+	// @In(create = true)
+	// EntityManager entityManager;
+
+	@In(create = true)
+	private SlotInstHome slotInstHome;
 
 	@Create
 	public void init() {
@@ -200,14 +209,24 @@ public class SlotDefEditBean {
 					slotDefEmbeddedPropertyHome.remove();
 				}
 			}
+
+			Set<PropertyDef> newPropertyDefs = new HashSet<PropertyDef>();
+			Set<DocDefCollection> newDocDefCollections = new HashSet<DocDefCollection>();
+
 			for (PropertyDef propertyDef : properties) {
 				if (!propertyDefs.contains(propertyDef)) {
 					propertyDefs.add(propertyDef);
+					//
+					newPropertyDefs.add(propertyDef);
+					//
 				}
 			}
 			for (DocDefCollection collection : collections) {
 				if (!docDefCollections.contains(collection)) {
 					docDefCollections.add(collection);
+					//
+					newDocDefCollections.add(collection);
+					//
 				}
 			}
 			for (EmbeddedProperty embeddedProperty : embeddedProperties) {
@@ -215,7 +234,11 @@ public class SlotDefEditBean {
 					slotDefEmbeddedProperties.add(embeddedProperty);
 				}
 			}
-			return slotDefHome.update();
+			String updateResult = slotDefHome.update();
+			//
+			modifyReferencedSlotInsts(newPropertyDefs, newDocDefCollections);
+			//
+			return updateResult;
 		} else {
 			return "failed";
 		}
@@ -227,6 +250,27 @@ public class SlotDefEditBean {
 					this.collection.getConditionalPropertyDef()));
 		} else {
 			this.collection.setConditionalPropertyInst(null);
+		}
+	}
+
+	public void modifyReferencedSlotInsts(Set<PropertyDef> newPropertyDefs,
+			Set<DocDefCollection> newDocDefCollections) {
+		List<SlotInst> slotInstsReferenced = slotDefHome
+				.getSlotInstsReferenced();
+		for (SlotInst slotInst : slotInstsReferenced) {
+			for (PropertyDef propertyDef : newPropertyDefs) {
+				PropertyInst propertyInst = new PropertyInst(propertyDef,
+						slotInst);
+				slotInst.getPropertyInsts().add(propertyInst);
+			}
+
+			for (DocDefCollection docDefCollection : newDocDefCollections) {
+				DocInstCollection docInstCollection = new DocInstCollection(
+						slotInst, docDefCollection);
+				slotInst.getDocInstCollections().add(docInstCollection);
+			}
+			slotInstHome.setInstance(slotInst);
+			slotInstHome.update();
 		}
 	}
 

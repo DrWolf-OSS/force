@@ -91,8 +91,8 @@
 			
 			
 			<div style="clear:both"/>
-			<a:commandButton value="add property" action="#{slotDefEditBean.newPoperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="propPanel"/>
-			<a:commandButton value="add collection" action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel"/>
+			<a:commandButton value="add property" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newPoperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="propPanel"/>
+			<a:commandButton value="add collection" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel"/>
 			<a:commandButton value="add embeddedProperty" action="#{slotDefEditBean.newEmbeddedProperty()}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel"/>
 			
             <div style="clear:both">
@@ -560,7 +560,6 @@
 			<a:commandButton value="Refresh" styleClass="rightCommand" reRender="cpf"/>
 			</a:form>
 		</rich:modalPanel>
-
 		
 </ui:define>
 
