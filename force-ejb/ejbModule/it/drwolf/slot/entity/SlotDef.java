@@ -84,13 +84,37 @@ public class SlotDef {
 	}
 
 	@Transient
-	public List<PropertyDef> getPropertiesAsList() {
+	public List<PropertyDef> getPropertyDefsAsList() {
 		return new ArrayList<PropertyDef>(propertyDefs);
+	}
+
+	@Transient
+	public void setPropertyDefsAsList(List<PropertyDef> propertyDefsAsList) {
+		this.propertyDefs = new HashSet<PropertyDef>(propertyDefsAsList);
 	}
 
 	@Transient
 	public List<DocDefCollection> getDocDefCollectionsAsList() {
 		return new ArrayList<DocDefCollection>(docDefCollections);
+	}
+
+	@Transient
+	public void setDocDefCollectionsAsList(
+			List<DocDefCollection> docDefCollectionsAsList) {
+		this.docDefCollections = new HashSet<DocDefCollection>(
+				docDefCollectionsAsList);
+	}
+
+	@Transient
+	public List<EmbeddedProperty> getEmbeddedPropertiesAsList() {
+		return new ArrayList<EmbeddedProperty>(this.embeddedProperties);
+	}
+
+	@Transient
+	public void setEmbeddedPropertiesAsList(
+			List<EmbeddedProperty> embeddedPropertiesAsList) {
+		this.embeddedProperties = new HashSet<EmbeddedProperty>(
+				embeddedPropertiesAsList);
 	}
 
 	@Override
@@ -114,8 +138,7 @@ public class SlotDef {
 		return embeddedProperties;
 	}
 
-	public void setEmbeddedProperties(
-			Set<EmbeddedProperty> embeddedProperties) {
+	public void setEmbeddedProperties(Set<EmbeddedProperty> embeddedProperties) {
 		this.embeddedProperties = embeddedProperties;
 	}
 

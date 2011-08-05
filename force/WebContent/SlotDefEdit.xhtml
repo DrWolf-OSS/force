@@ -32,7 +32,7 @@
             </s:decorate>
             
             <s:div id="embeddedProperties">
-			<c:forEach var="dataInstance" items="#{slotDefEditBean.embeddedProperties}">
+			<c:forEach var="dataInstance" items="#{slotDefHome.instance.embeddedPropertiesAsList}">
 	            <s:decorate template="/layout/display.xhtml">
 					<ui:define name="label">
 						<h:outputText value="#{dataInstance.dataDefinition.label}" />
@@ -61,7 +61,7 @@
 			</s:div>
             
             <s:div id="properties">
-				<c:forEach var="prop" items="#{slotDefEditBean.properties}">
+				<c:forEach var="prop" items="#{slotDefHome.instance.propertyDefsAsList}">
 					<s:decorate template="/layout/display.xhtml">
 		                <ui:define name="label">
 		                	<h:outputText value="#{prop.name}" />
@@ -77,7 +77,7 @@
 			
 
 			<s:div id="collections">
-			<c:forEach var="coll" items="#{slotDefEditBean.collections}">
+			<c:forEach var="coll" items="#{slotDefHome.instance.docDefCollectionsAsList}">
 				<s:decorate template="/layout/display.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="#{coll.name}" />
@@ -502,7 +502,7 @@
 	                	<h:outputText value="Conditional Property" />
 					</ui:define>
 					<h:selectOneMenu id="condPD" value="#{slotDefEditBean.collection.conditionalPropertyDef}" converter="propertyDefConverter">
-     					<s:selectItems value="#{slotDefEditBean.properties}" label="#{propertyDef.name}"
+     					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
 						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="cpf"/>

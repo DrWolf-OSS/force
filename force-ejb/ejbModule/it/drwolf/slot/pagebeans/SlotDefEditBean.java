@@ -5,6 +5,7 @@ import it.drwolf.slot.entity.DocInstCollection;
 import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
+import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
@@ -51,37 +52,17 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotDefEmbeddedPropertyHome slotDefEmbeddedPropertyHome;
 
-	private ArrayList<PropertyDef> properties = new ArrayList<PropertyDef>();
-	private ArrayList<DocDefCollection> collections = new ArrayList<DocDefCollection>();
-	private ArrayList<EmbeddedProperty> embeddedProperties = new ArrayList<EmbeddedProperty>();
-
 	private DocDefCollection collection = new DocDefCollection();
 	private PropertyDef propertyDef = new PropertyDef();
 	private EmbeddedProperty embeddedProperty = new EmbeddedProperty();
 
 	private Map<String, PropertyDef> converterPropertyMap = new HashMap<String, PropertyDef>();
 
-	// @In(create = true)
-	// EntityManager entityManager;
-
 	@In(create = true)
 	private SlotInstHome slotInstHome;
 
 	@Create
 	public void init() {
-		this.properties.addAll(slotDefHome.getInstance().getPropertyDefs());
-		this.collections.addAll(slotDefHome.getInstance()
-				.getDocDefCollections());
-		this.embeddedProperties.addAll(slotDefHome.getInstance()
-				.getEmbeddedProperties());
-	}
-
-	public ArrayList<PropertyDef> getProperties() {
-		return properties;
-	}
-
-	public void setProperties(ArrayList<PropertyDef> properties) {
-		this.properties = properties;
 	}
 
 	public void newPoperty() {
@@ -89,8 +70,9 @@ public class SlotDefEditBean {
 	}
 
 	public void addProperty() {
-		if (!properties.contains(this.propertyDef)) {
-			properties.add(this.propertyDef);
+		SlotDef instance = slotDefHome.getInstance();
+		if (!instance.getPropertyDefsAsList().contains(this.propertyDef)) {
+			instance.getPropertyDefs().add(this.propertyDef);
 		}
 		if (converterPropertyMap.get(propertyDef.getUuid()) == null) {
 			converterPropertyMap.put(propertyDef.getUuid(), propertyDef);
@@ -102,9 +84,11 @@ public class SlotDefEditBean {
 	}
 
 	public void addCollection() {
-		if (!this.collections.contains(this.collection)) {
+		if (!slotDefHome.getInstance().getDocDefCollectionsAsList()
+				.contains(this.collection)) {
 			collection.setSlotDef(slotDefHome.getInstance());
-			collections.add(this.collection);
+			slotDefHome.getInstance().getDocDefCollections()
+					.add(this.collection);
 		}
 	}
 
@@ -113,9 +97,10 @@ public class SlotDefEditBean {
 	}
 
 	public void addEmbeddedProperty() {
-		if (!this.embeddedProperties.contains(this.embeddedProperty)) {
-			// embeddedProperty.setSlotDef(slotDefHome.getInstance());
-			embeddedProperties.add(this.embeddedProperty);
+		if (!slotDefHome.getInstance().getEmbeddedPropertiesAsList()
+				.contains(this.embeddedProperty)) {
+			slotDefHome.getInstance().getEmbeddedProperties()
+					.add(this.embeddedProperty);
 		}
 	}
 
@@ -134,8 +119,9 @@ public class SlotDefEditBean {
 		boolean result = true;
 
 		List<DataDefinition> allProperties = new ArrayList<DataDefinition>();
-		allProperties.addAll(this.properties);
-		allProperties.addAll(this.embeddedProperties);
+		allProperties.addAll(slotDefHome.getInstance().getPropertyDefsAsList());
+		allProperties.addAll(slotDefHome.getInstance()
+				.getEmbeddedPropertiesAsList());
 
 		for (DataDefinition p : allProperties) {
 			differentNames.add(p.getLabel());
@@ -147,10 +133,12 @@ public class SlotDefEditBean {
 		}
 
 		differentNames.clear();
-		for (DocDefCollection d : this.collections) {
+		for (DocDefCollection d : slotDefHome.getInstance()
+				.getDocDefCollectionsAsList()) {
 			differentNames.add(d.getName());
 		}
-		if (differentNames.size() < this.collections.size()) {
+		if (differentNames.size() < this.slotDefHome.getInstance()
+				.getDocDefCollectionsAsList().size()) {
 			result = false;
 			FacesMessages.instance().add(Severity.ERROR,
 					"Non possono esserci collections con lo stesso nome");
@@ -161,12 +149,6 @@ public class SlotDefEditBean {
 
 	public String save() {
 		if (checkNames()) {
-			slotDefHome.getInstance().setPropertyDefs(
-					new HashSet<PropertyDef>(properties));
-			slotDefHome.getInstance().setDocDefCollections(
-					new HashSet<DocDefCollection>(collections));
-			slotDefHome.getInstance().setEmbeddedProperties(
-					new HashSet<EmbeddedProperty>(embeddedProperties));
 			return slotDefHome.persist();
 		} else {
 			return "failed";
@@ -180,7 +162,8 @@ public class SlotDefEditBean {
 			Iterator<DocDefCollection> iterator = docDefCollections.iterator();
 			while (iterator.hasNext()) {
 				DocDefCollection docDefCollection = iterator.next();
-				if (!this.collections.contains(docDefCollection)) {
+				if (!slotDefHome.getInstance().getDocDefCollectionsAsList()
+						.contains(docDefCollection)) {
 					iterator.remove();
 					docDefCollectionHome.setInstance(docDefCollection);
 					docDefCollectionHome.remove();
@@ -191,7 +174,8 @@ public class SlotDefEditBean {
 			Iterator<PropertyDef> iterator2 = propertyDefs.iterator();
 			while (iterator2.hasNext()) {
 				PropertyDef propertyDef = iterator2.next();
-				if (!this.properties.contains(propertyDef)) {
+				if (!slotDefHome.getInstance().getPropertyDefsAsList()
+						.contains(propertyDef)) {
 					iterator2.remove();
 					propertytDefHome.setInstance(propertyDef);
 					propertytDefHome.remove();
@@ -203,7 +187,8 @@ public class SlotDefEditBean {
 					.iterator();
 			while (iterator3.hasNext()) {
 				EmbeddedProperty embeddedProperty = iterator3.next();
-				if (!this.embeddedProperties.contains(embeddedProperty)) {
+				if (!slotDefHome.getInstance().getEmbeddedPropertiesAsList()
+						.contains(embeddedProperty)) {
 					iterator3.remove();
 					slotDefEmbeddedPropertyHome.setInstance(embeddedProperty);
 					slotDefEmbeddedPropertyHome.remove();
@@ -213,30 +198,16 @@ public class SlotDefEditBean {
 			Set<PropertyDef> newPropertyDefs = new HashSet<PropertyDef>();
 			Set<DocDefCollection> newDocDefCollections = new HashSet<DocDefCollection>();
 
-			for (PropertyDef propertyDef : properties) {
-				if (!propertyDefs.contains(propertyDef)) {
-					propertyDefs.add(propertyDef);
-				}
-				//
+			for (PropertyDef propertyDef : slotDefHome.getInstance()
+					.getPropertyDefsAsList()) {
 				if (propertyDef.getId() == null) {
 					newPropertyDefs.add(propertyDef);
 				}
-				//
 			}
-			for (DocDefCollection collection : collections) {
-				if (!docDefCollections.contains(collection)) {
-					docDefCollections.add(collection);
-
-				}
-				//
+			for (DocDefCollection collection : slotDefHome.getInstance()
+					.getDocDefCollectionsAsList()) {
 				if (collection.getId() == null) {
 					newDocDefCollections.add(collection);
-				}
-				//
-			}
-			for (EmbeddedProperty embeddedProperty : embeddedProperties) {
-				if (!slotDefEmbeddedProperties.contains(embeddedProperty)) {
-					slotDefEmbeddedProperties.add(embeddedProperty);
 				}
 			}
 			String updateResult = slotDefHome.update();
@@ -280,7 +251,7 @@ public class SlotDefEditBean {
 	}
 
 	public void removeEmbeddedProp(EmbeddedProperty embeddedProp) {
-		this.embeddedProperties.remove(embeddedProp);
+		slotDefHome.getInstance().getEmbeddedProperties().remove(embeddedProp);
 	}
 
 	public void editEmbeddedProp(EmbeddedProperty embeddedProp) {
@@ -288,7 +259,7 @@ public class SlotDefEditBean {
 	}
 
 	public void removeProp(PropertyDef prop) {
-		this.properties.remove(prop);
+		slotDefHome.getInstance().getPropertyDefs().remove(prop);
 	}
 
 	public void editProp(PropertyDef prop) {
@@ -296,7 +267,7 @@ public class SlotDefEditBean {
 	}
 
 	public void removeColl(DocDefCollection coll) {
-		this.collections.remove(coll);
+		slotDefHome.getInstance().getDocDefCollections().remove(coll);
 	}
 
 	public void editColl(DocDefCollection coll) {
@@ -311,29 +282,12 @@ public class SlotDefEditBean {
 		this.collection = collection;
 	}
 
-	public ArrayList<DocDefCollection> getCollections() {
-		return collections;
-	}
-
-	public void setCollections(ArrayList<DocDefCollection> collections) {
-		this.collections = collections;
-	}
-
 	public PropertyDef getPropertyDef() {
 		return propertyDef;
 	}
 
 	public void setPropertyDef(PropertyDef propertyDef) {
 		this.propertyDef = propertyDef;
-	}
-
-	public ArrayList<EmbeddedProperty> getEmbeddedProperties() {
-		return embeddedProperties;
-	}
-
-	public void setEmbeddedProperties(
-			ArrayList<EmbeddedProperty> embeddedProperties) {
-		this.embeddedProperties = embeddedProperties;
 	}
 
 	public EmbeddedProperty getEmbeddedProperty() {
