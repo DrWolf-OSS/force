@@ -1,0 +1,99 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <rich:panel>
+        <f:facet name="header">Property inst Details</f:facet>
+
+
+        <s:decorate id="booleanValue" template="layout/display.xhtml">
+            <ui:define name="label">Boolean value</ui:define>
+            <h:outputText value="#{propertyInstHome.instance.booleanValue}"/>
+        </s:decorate>
+
+        <s:decorate id="dateValue" template="layout/display.xhtml">
+            <ui:define name="label">Date value</ui:define>
+            <h:outputText value="#{propertyInstHome.instance.dateValue}">
+                <s:convertDateTime type="date" dateStyle="short"/>
+            </h:outputText>
+        </s:decorate>
+
+        <s:decorate id="integerValue" template="layout/display.xhtml">
+            <ui:define name="label">Integer value</ui:define>
+            <h:outputText value="#{propertyInstHome.instance.integerValue}"/>
+        </s:decorate>
+
+        <s:decorate id="stringValue" template="layout/display.xhtml">
+            <ui:define name="label">String value</ui:define>
+            <h:outputText value="#{propertyInstHome.instance.stringValue}"/>
+        </s:decorate>
+
+        <div style="clear:both"/>
+
+    </rich:panel>
+
+    <div class="actionButtons">
+
+        <s:button view="/PropertyInstEdit.xhtml"
+                    id="edit"
+                 value="Edit"/>
+
+        <s:button view="/#{empty propertyInstFrom ? 'PropertyInstList' : propertyInstFrom}.xhtml"
+                    id="done"
+                 value="Done"/>
+
+    </div>
+
+    <rich:tabPanel switchType="ajax">
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/manytoone.gif" style="vertical-align: middle; padding-right: 4px;"/>Propertyt def</h:panelGroup>
+        </f:facet>
+    <div class="association" id="propertytDefParent">
+
+        <h:outputText value="There is no propertytDef associated with this propertyInst."
+                   rendered="#{propertyInstHome.instance.propertytDef == null}"/>
+
+        <rich:dataTable var="_propertytDef"
+                   value="#{propertyInstHome.instance.propertytDef}"
+                rendered="#{propertyInstHome.instance.propertytDef != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="propertytDefTable">
+            <h:column>
+                <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{_propertytDef.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                <h:outputText value="#{_propertytDef.name}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Type</f:facet>
+                <h:outputText value="#{_propertytDef.type}"/>
+            </h:column>
+            <h:column styleClass="action">
+                <f:facet name="header">Action</f:facet>
+                <s:link id="viewpropertytDef"
+                     value="View"
+                      view="/PropertytDef.xhtml">
+                    <f:param name="propertytDefId"
+                           value="#{_propertytDef.id}"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </div>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>
