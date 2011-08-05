@@ -3,6 +3,7 @@ package it.drwolf.slot.ruleverifier;
 import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.entity.Dictionary;
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.exceptions.WrongDataTypeException;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public class TimeValidity implements IRuleVerifier {
 
 	private VerifierReport verifierReport = new VerifierReport();
 
+	private List<VerifierParameterInst> wrongDataTypeParameters = new ArrayList<VerifierParameterInst>();
+
 	public TimeValidity() {
 		params.add(new VerifierParameterDef(this.EARLIER_DATE,
 				"Data Anteriore", DataType.DATE, false, false, false));
@@ -38,7 +41,8 @@ public class TimeValidity implements IRuleVerifier {
 				"Warning Theshold", DataType.INTEGER, true, true, false));
 	}
 
-	public VerifierReport verify(Map<String, List<VerifierParameterInst>> params) {
+	public VerifierReport verify(Map<String, List<VerifierParameterInst>> params)
+			throws WrongDataTypeException {
 		List<VerifierParameterInst> earlierParametersInst = params
 				.get(this.EARLIER_DATE);
 		List<VerifierParameterInst> followingParametersInst = params
@@ -70,7 +74,8 @@ public class TimeValidity implements IRuleVerifier {
 	private void fromEarliers(
 			List<VerifierParameterInst> earlierParametersInst,
 			List<VerifierParameterInst> followingParametersInst,
-			VerifierParameterInst warningThresholdParameterInst) {
+			VerifierParameterInst warningThresholdParameterInst)
+			throws WrongDataTypeException {
 
 		Integer threshold = (Integer) warningThresholdParameterInst.getValue();
 
@@ -84,6 +89,8 @@ public class TimeValidity implements IRuleVerifier {
 				eDate = earlierDateCalendar.getTime();
 			} else if (value instanceof Date) {
 				eDate = (Date) value;
+			} else {
+				throw new WrongDataTypeException(parameterInst);
 			}
 
 			if (earlierThreshold == null || eDate.after(earlierThreshold)) {
@@ -100,6 +107,8 @@ public class TimeValidity implements IRuleVerifier {
 				fDate = earlierDateCalendar.getTime();
 			} else if (value instanceof Date) {
 				fDate = (Date) value;
+			} else {
+				throw new WrongDataTypeException(parameterInst);
 			}
 
 			if (fDate.before(earlierThreshold)) {
@@ -121,7 +130,8 @@ public class TimeValidity implements IRuleVerifier {
 	private void fromFollowers(
 			List<VerifierParameterInst> earlierParametersInst,
 			List<VerifierParameterInst> followingParametersInst,
-			VerifierParameterInst warningThresholdParameterInst) {
+			VerifierParameterInst warningThresholdParameterInst)
+			throws WrongDataTypeException {
 
 		Integer threshold = (Integer) warningThresholdParameterInst.getValue();
 
@@ -135,6 +145,8 @@ public class TimeValidity implements IRuleVerifier {
 				fDate = earlierDateCalendar.getTime();
 			} else if (value instanceof Date) {
 				fDate = (Date) value;
+			} else {
+				throw new WrongDataTypeException(parameterInst);
 			}
 
 			if (followerThreshold == null || fDate.before(followerThreshold)) {
@@ -151,6 +163,8 @@ public class TimeValidity implements IRuleVerifier {
 				eDate = earlierDateCalendar.getTime();
 			} else if (value instanceof Date) {
 				eDate = (Date) value;
+			} else {
+				throw new WrongDataTypeException(parameterInst);
 			}
 
 			if (eDate.after(followerThreshold)) {

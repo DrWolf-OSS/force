@@ -76,17 +76,16 @@
                    value="#{empty from ? 'View' : 'Select'}"
              propagation="#{empty from ? 'none' : 'default'}"
                       id="slotDefViewId">
-                <f:param name="slotDefId"
-                        value="#{_slotDef.id}"/>
+                <f:param name="slotDefId" value="#{_slotDef.id}"/>
             </s:link>
             #{' '}
             <s:link view="/SlotDefEdit.xhtml"
                    value="Edit"
              propagation="none"
                       id="slotDefEdit"
-                rendered="#{empty from}">
-                <f:param name="slotDefId"
-                        value="#{_slotDef.id}"/>
+                rendered="#{empty from}"
+                action="#{slotDefEditBean.checkReference()}">
+                <f:param name="slotDefId" value="#{_slotDef.id}"/>
             </s:link>
         </rich:column>
     </rich:dataTable>

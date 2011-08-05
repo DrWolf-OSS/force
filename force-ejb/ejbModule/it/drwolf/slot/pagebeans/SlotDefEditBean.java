@@ -63,6 +63,7 @@ public class SlotDefEditBean {
 
 	@Create
 	public void init() {
+		// checkReference();
 	}
 
 	public void newPoperty() {
@@ -310,6 +311,41 @@ public class SlotDefEditBean {
 	public void embeddedPropertyListener() {
 		this.embeddedProperty.setDictionary(null);
 		this.embeddedProperty.clean();
+	}
+
+	public String getReferencedCollectionsNames(PropertyDef propertyDef) {
+		String collectionsReferenced = "";
+		Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
+				.getDocDefCollections();
+		Iterator<DocDefCollection> iterator = docDefCollections.iterator();
+		int count = 0;
+		while (iterator.hasNext()) {
+			DocDefCollection docDefCollection = iterator.next();
+			PropertyDef conditionalPropertyDef = docDefCollection
+					.getConditionalPropertyDef();
+			if (conditionalPropertyDef != null
+					&& conditionalPropertyDef.equals(propertyDef)) {
+				if (count == 0) {
+					collectionsReferenced = collectionsReferenced
+							.concat(docDefCollection.getName());
+					count++;
+				} else if (count > 0) {
+					collectionsReferenced = collectionsReferenced.concat(", "
+							+ docDefCollection.getName());
+					count++;
+				}
+			}
+		}
+		return collectionsReferenced;
+	}
+
+	public void checkReference() {
+		if (slotDefHome.isReferenced()) {
+			FacesMessages
+					.instance()
+					.add(Severity.WARN,
+							"ATTENZIONE! Questo SlotDef è già referenziato da uno o più SlotInst!");
+		}
 	}
 
 }

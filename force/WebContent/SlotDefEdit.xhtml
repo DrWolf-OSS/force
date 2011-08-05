@@ -53,8 +53,11 @@
 					<s:fragment rendered="#{dataInstance.multiple}">
 						<h:outputText value="#{dataInstance.value}" />
 					</s:fragment>
-            		<a:commandButton value="remove" action="#{slotDefEditBean.removeEmbeddedProp(dataInstance)}" reRender="embeddedProperties"/>
-		            <a:commandButton value="edit" action="#{slotDefEditBean.editEmbeddedProp(dataInstance)}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel"/>
+            		<a:commandButton value="remove" action="#{slotDefEditBean.removeEmbeddedProp(dataInstance)}" 
+            						disabled="#{slotDefHome.referenced}" reRender="embeddedProperties"/>
+		            <a:commandButton value="edit" action="#{slotDefEditBean.editEmbeddedProp(dataInstance)}" 
+		            			oncomplete="#{rich:component('embeddedPropPanel')}.show()"
+		            			reRender="embeddedPropPanel"/>
 				</s:decorate>
 		
 			</c:forEach>
@@ -67,8 +70,11 @@
 		                	<h:outputText value="#{prop.name}" />
 						</ui:define>
 		                <h:outputText value="#{prop.dataType}" />
-		                <a:commandButton value="remove" action="#{slotDefEditBean.removeProp(prop)}" reRender="properties"/>
-		                <a:commandButton value="edit" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" reRender="propPanel"/>
+		                <a:commandButton value="remove" action="#{slotDefEditBean.removeProp(prop)}" 
+		                				disabled="#{slotDefHome.referenced}" reRender="properties"/>
+		                <a:commandButton value="edit" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" 
+		                		        onclick="var c='#{slotDefEditBean.getReferencedCollectionsNames(prop)}'; if(c!=''){if(!confirm('La proprietà è condizionale per le collection: '+c+'.\\nSicuro di voler continuare?')){return false;}}" 
+		                				reRender="propPanel"/>
 		            </s:decorate>			
 				</c:forEach>
 			</s:div>
@@ -83,7 +89,8 @@
 	                	<h:outputText value="#{coll.name}" />
 					</ui:define>
 					<h:outputText value="#{coll.docDef.name}" />
-					<a:commandButton value="remove" action="#{slotDefEditBean.removeColl(coll)}" reRender="collections"/>
+					<a:commandButton value="remove" action="#{slotDefEditBean.removeColl(coll)}" 
+									disabled="#{slotDefHome.referenced}" reRender="collections"/>
 	                <a:commandButton value="edit" action="#{slotDefEditBean.editColl(coll)}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel"/>
 	            </s:decorate>			
 			</c:forEach>

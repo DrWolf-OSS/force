@@ -1,6 +1,9 @@
 package it.drwolf.slot.ruleverifier;
 
-public class VerifierParameterInst {
+import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.interfaces.DataInstance;
+
+public class VerifierParameterInst implements DataInstance {
 
 	private VerifierParameterDef verifierParameterDef;
 
@@ -62,6 +65,10 @@ public class VerifierParameterInst {
 	public void setParameterCoordinates(
 			ParameterCoordinates parameterCoordinates) {
 		this.parameterCoordinates = parameterCoordinates;
+	}
+
+	public DataDefinition getDataDefinition() {
+		return this.verifierParameterDef;
 	}
 
 }

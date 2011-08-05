@@ -20,7 +20,9 @@ import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.exceptions.WrongDataTypeException;
 import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.interfaces.DataInstance;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.FileContainer;
 import it.drwolf.slot.pagebeans.support.ValueChangeListener;
@@ -790,56 +792,83 @@ public class SlotInstEditBean {
 		//
 		// Comunicazione di eventuali errori o warnings
 		if (verifiable) {
-			boolean passed = true;
-			VerifierReport report = verifier.verify(inInstParams);
-			if (report.getResult().equals(VerifierResult.ERROR)) {
-				passed = false;
-			} else if (report.getResult().equals(VerifierResult.WARNING)) {
-				warning = true;
-			}
+			try {
+				boolean passed = true;
+				VerifierReport report = verifier.verify(inInstParams);
+				if (report.getResult().equals(VerifierResult.ERROR)) {
+					passed = false;
+				} else if (report.getResult().equals(VerifierResult.WARNING)) {
+					warning = true;
+				}
 
-			List<VerifierParameterInst> failedParams = report.getFailedParams();
-			for (VerifierParameterInst parameterInst : failedParams) {
+				List<VerifierParameterInst> failedParams = report
+						.getFailedParams();
+				for (VerifierParameterInst parameterInst : failedParams) {
+					FileContainer fileContainer = processedPropertiesResolverMap
+							.get(parameterInst);
+
+					String prefix = "La proprietà "
+							+ parameterInst.getParameterCoordinates()
+									.getFieldDef().getLabel()
+							+ " ha un valore errato. ";
+					String errorMessage = rule.getErrorMessage();
+					if (fileContainer != null) {
+						if (errorMessage == null || errorMessage.equals("")) {
+							errorMessage = prefix.concat(verifier
+									.getDefaultErrorMessage());
+						}
+						this.addFileMessage(fileContainer.getId(),
+								new VerifierMessage(errorMessage,
+										VerifierMessageType.ERROR));
+					} else {
+						this.addMainMessage(new VerifierMessage(prefix
+								.concat(errorMessage),
+								VerifierMessageType.ERROR));
+					}
+				}
+
+				List<VerifierParameterInst> warningParams = report
+						.getWarningParams();
+				for (VerifierParameterInst parameterInst : warningParams) {
+					FileContainer fileContainer = processedPropertiesResolverMap
+							.get(parameterInst);
+					String warningMessage = rule.getWarningMessage();
+					if (warningMessage == null || warningMessage.equals("")) {
+						warningMessage = verifier.getDefaultWarningMessage();
+					}
+					if (fileContainer != null) {
+						this.addFileMessage(fileContainer.getId(),
+								new VerifierMessage(warningMessage,
+										VerifierMessageType.WARNING));
+					} else {
+						this.addMainMessage(new VerifierMessage(warningMessage,
+								VerifierMessageType.WARNING));
+					}
+				}
+				return passed;
+			} catch (WrongDataTypeException e) {
+				e.printStackTrace();
+				DataInstance dataInstance = e.getDataInstance();
+				VerifierParameterInst parameterInst = (VerifierParameterInst) dataInstance;
+				String prefix = "La proprietà \""
+						+ parameterInst.getParameterCoordinates().getFieldDef()
+								.getLabel()
+						+ "\" ha un DataType errato per essere utilizzata come parametro \""
+						+ parameterInst.getVerifierParameterDef().getLabel()
+						+ "\" in una regola di tipo " + rule.getType().value()
+						+ "!!!";
 				FileContainer fileContainer = processedPropertiesResolverMap
 						.get(parameterInst);
-
-				String prefix = "La proprietà "
-						+ parameterInst.getParameterCoordinates().getFieldDef()
-								.getLabel() + " ha un valore errato. ";
-				String errorMessage = rule.getErrorMessage();
 				if (fileContainer != null) {
-					if (errorMessage == null || errorMessage.equals("")) {
-						errorMessage = prefix.concat(verifier
-								.getDefaultErrorMessage());
-					}
 					this.addFileMessage(fileContainer.getId(),
-							new VerifierMessage(errorMessage,
+							new VerifierMessage(prefix,
 									VerifierMessageType.ERROR));
 				} else {
-					this.addMainMessage(new VerifierMessage(prefix
-							.concat(errorMessage), VerifierMessageType.ERROR));
+					this.addMainMessage(new VerifierMessage(prefix,
+							VerifierMessageType.ERROR));
 				}
+				return false;
 			}
-
-			List<VerifierParameterInst> warningParams = report
-					.getWarningParams();
-			for (VerifierParameterInst parameterInst : warningParams) {
-				FileContainer fileContainer = processedPropertiesResolverMap
-						.get(parameterInst);
-				String warningMessage = rule.getWarningMessage();
-				if (warningMessage == null || warningMessage.equals("")) {
-					warningMessage = verifier.getDefaultWarningMessage();
-				}
-				if (fileContainer != null) {
-					this.addFileMessage(fileContainer.getId(),
-							new VerifierMessage(warningMessage,
-									VerifierMessageType.WARNING));
-				} else {
-					this.addMainMessage(new VerifierMessage(warningMessage,
-							VerifierMessageType.WARNING));
-				}
-			}
-			return passed;
 
 		} else if (failAllowed) {
 			return true;
@@ -876,7 +905,7 @@ public class SlotInstEditBean {
 						if (documentPropertyInst.getProperty().equals(property)) {
 							Object value = documentPropertyInst.getValue();
 							found = true;
-							if (value != null) {
+							if (value != null && !value.equals("")) {
 								VerifierParameterInst parameterInst = new VerifierParameterInst(
 										verifierParameterDef, value, true);
 								paramInsts.add(parameterInst);
@@ -940,7 +969,7 @@ public class SlotInstEditBean {
 					if (propertyInst.getPropertyDef().equals(propertyDef)) {
 						Object value = propertyInst.getValue();
 						found = true;
-						if (value != null) {
+						if (value != null && !value.equals("")) {
 							VerifierParameterInst parameterInst = new VerifierParameterInst(
 									verifierParameterDef, value, true);
 							//
@@ -1051,9 +1080,18 @@ public class SlotInstEditBean {
 					&& instCollection.getDocDefCollection()
 							.getConditionalPropertyDef().getId()
 							.equals(propertyInst.getPropertyDef().getId())) {
-				if (!instCollection.getDocDefCollection()
-						.getConditionalPropertyInst().getValue()
-						.equals(propertyInst.getValue())) {
+				Object conditionalValue = instCollection.getDocDefCollection()
+						.getConditionalPropertyInst().getValue();
+				// TODO: riguardare questo caso!!!
+				// Se alla proprietà che condiziona la collection è stato
+				// cambiato DataType e non è stata aggiornata la definizione
+				// della collection che la referenzia aggiornando il valore
+				// della
+				// property, "ConditionalPropertyInst().getValue()" restituirà
+				// null. In questo caso cancello cmq il contenuto della
+				// collection perchè i valori non matchano
+				if (conditionalValue == null
+						|| !conditionalValue.equals(propertyInst.getValue())) {
 					cleanCollection(instCollection.getDocDefCollection()
 							.getId());
 				}

@@ -1,6 +1,7 @@
 package it.drwolf.slot.ruleverifier;
 
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.exceptions.WrongDataTypeException;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 
 import java.util.ArrayList;
@@ -26,7 +27,8 @@ public class InstantDateValidity implements IRuleVerifier {
 	}
 
 	public VerifierReport verify(
-			Map<String, List<VerifierParameterInst>> parameterInsts) {
+			Map<String, List<VerifierParameterInst>> parameterInsts)
+			throws WrongDataTypeException {
 		List<VerifierParameterInst> datesToVerify = parameterInsts
 				.get(this.DATE_TO_VERIFY);
 		Date today = new Date();
@@ -41,6 +43,8 @@ public class InstantDateValidity implements IRuleVerifier {
 				dateToVerify = (Date) value;
 			} else if (value instanceof Calendar) {
 				dateToVerify = ((Calendar) value).getTime();
+			} else {
+				throw new WrongDataTypeException(parameterInst);
 			}
 
 			if (dateToVerify.before(today)) {
