@@ -18,21 +18,21 @@ public class FormaGiuridica implements Serializable {
 
 		IF(2, "Impresa familiare"),
 
-		SS(3, "Società semplice - SS"),
+		SS(3, "Societ√† semplice - SS"),
 
-		SNC(4, "Società in nome collettivo - SNC"),
+		SNC(4, "Societ√† in nome collettivo - SNC"),
 
-		SAS(5, "Società in accomandita semplice - SAS"),
+		SAS(5, "Societ√† in accomandita semplice - SAS"),
 
-		SRL(6, "Società a responsabilità limitata - SRL"),
+		SRL(6, "Societ√† a responsabilit√† limitata - SRL"),
 
-		SAPA(7, "Società in accomandita per azioni - SAPA"),
+		SAPA(7, "Societ√† in accomandita per azioni - SAPA"),
 
-		SPA(8, "Società per azioni - SPA"),
+		SPA(8, "Societ√† per azioni - SPA"),
 
-		SCARL(9, "Società cooperativa a responsabilità limitata - SCA.r.l."),
+		SCARL(9, "Societ√† cooperativa a responsabilit√† limitata - SCA.r.l."),
 
-		SCRI(10, "Società cooperativa a responsabilità illimitata"),
+		SCRI(10, "Societ√† cooperativa a responsabilit√† illimitata"),
 
 		Associazione(11, "Associazione"),
 

@@ -23,6 +23,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.validator.NotNull;
+
 @Entity
 @Table(name = "Gara")
 public class Gara implements Serializable {
@@ -107,7 +109,7 @@ public class Gara implements Serializable {
 	// deve essere inserito anche un riferimento al settore?
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(nullable = false)
+	@JoinColumn(nullable = true)
 	public Settore getSettore() {
 		return this.settore;
 	}
@@ -129,7 +131,8 @@ public class Gara implements Serializable {
 
 	}
 
-	@Column
+	@Column(nullable = false)
+	@NotNull
 	public String getType() {
 		return this.type;
 	}
