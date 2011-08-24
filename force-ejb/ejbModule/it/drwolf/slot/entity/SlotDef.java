@@ -4,6 +4,7 @@ import it.drwolf.slot.enums.SlotDefType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -142,6 +143,43 @@ public class SlotDef {
 		this.embeddedProperties = embeddedProperties;
 	}
 
+	@Transient
+	public PropertyDef retrievePropertyDefByName(String name) {
+		Iterator<PropertyDef> iterator = this.getPropertyDefs().iterator();
+		while (iterator.hasNext()) {
+			PropertyDef propertyDef = iterator.next();
+			if (propertyDef.getName().equals(name)) {
+				return propertyDef;
+			}
+		}
+		return null;
+	}
+
+	@Transient
+	public DocDefCollection retrieveDocDefCollectionByName(String name) {
+		Iterator<DocDefCollection> iterator = this.getDocDefCollections()
+				.iterator();
+		while (iterator.hasNext()) {
+			DocDefCollection docDefCollection = iterator.next();
+			if (docDefCollection.getName().equals(name)) {
+				return docDefCollection;
+			}
+		}
+		return null;
+	}
+
+	@Transient
+	public EmbeddedProperty retrieveEmbeddedPropertyByName(String name) {
+		Iterator<EmbeddedProperty> iterator = this.getEmbeddedProperties()
+				.iterator();
+		while (iterator.hasNext()) {
+			EmbeddedProperty embeddedProperty = iterator.next();
+			if (embeddedProperty.getName().equals(name)) {
+				return embeddedProperty;
+			}
+		}
+		return null;
+	}
 	// @Override
 	// public int hashCode() {
 	// final int prime = 31;

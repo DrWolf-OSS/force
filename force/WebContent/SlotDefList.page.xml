@@ -10,5 +10,9 @@
 
    <param name="from"/>
    <param name="name" value="#{slotDefList.slotDef.name}"/>
+   
+   <navigation from-action="#{slotDefHome.slotDefClone(_slotDef)}">
+         <redirect view-id="/SlotDefEdit.xhtml"/>
+   </navigation>
 
 </page>

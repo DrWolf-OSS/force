@@ -73,7 +73,7 @@
 		                <a:commandButton value="remove" action="#{slotDefEditBean.removeProp(prop)}" 
 		                				disabled="#{slotDefHome.referenced}" reRender="properties"/>
 		                <a:commandButton value="edit" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" 
-		                		        onclick="var c='#{slotDefEditBean.getReferencedCollectionsNames(prop)}'; if(c!=''){if(!confirm('La proprietà è condizionale per le collection: '+c+'.\\nSicuro di voler continuare?')){return false;}}" 
+		                		        onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
 		                				reRender="propPanel"/>
 		            </s:decorate>			
 				</c:forEach>
@@ -98,7 +98,7 @@
 			
 			
 			<div style="clear:both"/>
-			<a:commandButton value="add property" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newPoperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="propPanel"/>
+			<a:commandButton value="add property" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newPoperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel"/>
 			<a:commandButton value="add collection" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel"/>
 			<a:commandButton value="add embeddedProperty" action="#{slotDefEditBean.newEmbeddedProperty()}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel"/>
 			
@@ -297,7 +297,6 @@
 					<a:support event="onchange" reRender="pf"/>
              		</h:selectOneMenu>
 	            </s:decorate>
-	            </a:region>
 	            
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
@@ -305,17 +304,18 @@
 					</ui:define>
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.required}" />
 	            </s:decorate>
+
 	            
 	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
 	                	<h:outputText value="Multiple" />
 					</ui:define>
-					<a:region>
+
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.multiple}" >
 						<a:support event="onchange" reRender="pf"/>
 					</h:selectBooleanCheckbox>
-					</a:region>
 	            </s:decorate>
+					</a:region>
 	            
 	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
@@ -567,6 +567,18 @@
 			<a:commandButton value="Refresh" styleClass="rightCommand" reRender="cpf"/>
 			</a:form>
 		</rich:modalPanel>
+		
+		<script type="text/javascript">
+		function conf(c){
+			if(c!=''){
+				if(!confirm('La proprietà è condizionale per le collection: '+c+'.\nSicuro di voler continuare?')){
+					return false;
+					}
+			}else{
+				return true;
+			}
+		}
+		</script>
 		
 </ui:define>
 
