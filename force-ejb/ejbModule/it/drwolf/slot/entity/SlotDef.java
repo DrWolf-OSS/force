@@ -19,6 +19,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Cascade;
+
 @Entity
 public class SlotDef {
 
@@ -55,6 +57,7 @@ public class SlotDef {
 	}
 
 	@OneToMany(mappedBy = "slotDef", cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@OrderBy("name")
 	public Set<DocDefCollection> getDocDefCollections() {
 		return docDefCollections;
