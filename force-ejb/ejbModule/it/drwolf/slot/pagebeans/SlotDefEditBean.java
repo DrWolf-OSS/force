@@ -263,6 +263,13 @@ public class SlotDefEditBean {
 	}
 
 	public void removeProp(PropertyDef prop) {
+		Set<DocDefCollection> referencedCollections = this
+				.getReferencedCollections(prop);
+		for (DocDefCollection collection : referencedCollections) {
+			collection.getConditionalPropertyInst().setPropertyDef(null);
+			collection.setConditionalPropertyInst(null);
+			collection.setConditionalPropertyDef(null);
+		}
 		slotDefHome.getInstance().getPropertyDefs().remove(prop);
 	}
 
@@ -319,28 +326,47 @@ public class SlotDefEditBean {
 
 	public String getReferencedCollectionsNames(PropertyDef propertyDef) {
 		String collectionsReferenced = "";
+		// Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
+		// .getDocDefCollections();
+		Iterator<DocDefCollection> iterator = this.getReferencedCollections(
+				propertyDef).iterator();
+		int count = 0;
+		while (iterator.hasNext()) {
+			DocDefCollection docDefCollection = iterator.next();
+			// PropertyDef conditionalPropertyDef = docDefCollection
+			// .getConditionalPropertyDef();
+			// if (conditionalPropertyDef != null
+			// && conditionalPropertyDef.equals(propertyDef)) {
+			if (count == 0) {
+				collectionsReferenced = collectionsReferenced
+						.concat(docDefCollection.getName());
+				count++;
+			} else if (count > 0) {
+				collectionsReferenced = collectionsReferenced.concat(", "
+						+ docDefCollection.getName());
+				count++;
+			}
+			// }
+		}
+		return collectionsReferenced;
+	}
+
+	private Set<DocDefCollection> getReferencedCollections(
+			PropertyDef propertyDef) {
+		Set<DocDefCollection> referencedDocDefCollections = new HashSet<DocDefCollection>();
 		Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
 				.getDocDefCollections();
 		Iterator<DocDefCollection> iterator = docDefCollections.iterator();
-		int count = 0;
 		while (iterator.hasNext()) {
 			DocDefCollection docDefCollection = iterator.next();
 			PropertyDef conditionalPropertyDef = docDefCollection
 					.getConditionalPropertyDef();
 			if (conditionalPropertyDef != null
 					&& conditionalPropertyDef.equals(propertyDef)) {
-				if (count == 0) {
-					collectionsReferenced = collectionsReferenced
-							.concat(docDefCollection.getName());
-					count++;
-				} else if (count > 0) {
-					collectionsReferenced = collectionsReferenced.concat(", "
-							+ docDefCollection.getName());
-					count++;
-				}
+				referencedDocDefCollections.add(docDefCollection);
 			}
 		}
-		return collectionsReferenced;
+		return referencedDocDefCollections;
 	}
 
 	public void checkReference() {

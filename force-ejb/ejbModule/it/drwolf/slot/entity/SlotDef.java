@@ -78,6 +78,7 @@ public class SlotDef {
 
 	@OrderBy("name")
 	@OneToMany(cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@JoinColumn(name = "slotDef_id")
 	public Set<PropertyDef> getPropertyDefs() {
 		return propertyDefs;
@@ -137,6 +138,7 @@ public class SlotDef {
 
 	@OrderBy("name")
 	@OneToMany(cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@JoinColumn(name = "slotDef_id")
 	public Set<EmbeddedProperty> getEmbeddedProperties() {
 		return embeddedProperties;
