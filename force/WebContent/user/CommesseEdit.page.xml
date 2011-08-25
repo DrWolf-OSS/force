@@ -5,6 +5,10 @@
       login-required="true">
 
    <begin-conversation join="true"/>
+   <navigation from-action="#{commessaHome.persist()}">
+            <end-conversation />
+            <redirect view-id="/user/CommesseEdit.xhtml" />
+   </navigation>
    <action execute="#{aziendaHome.wire}"/>
    <param name="aziendaId" value="#{aziendaHome.aziendaId}"/>
    
