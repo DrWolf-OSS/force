@@ -120,7 +120,7 @@
                         </tbody>
                         </table>
                      <a4j:commandButton value="Salva" action="#{commessaHome.persist()}" oncomplete="Richfaces.hideModalPanel('nuovaCommesaPanelId'); return 0;" reRender="commessaList"/>
-  
+                     <a4j:commandButton value="Chiudi" onclick="#{rich:component('nuovaCommesaPanelId')}.hide()"/>   
                 <div style="clear:both">
                 <span class="required">*</span>
                 required fields
