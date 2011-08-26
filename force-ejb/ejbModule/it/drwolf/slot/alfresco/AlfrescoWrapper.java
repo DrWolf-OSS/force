@@ -56,20 +56,20 @@ public class AlfrescoWrapper {
 	// public static final String DRAWINGS_FOLDER_REF =
 	// "6880b7a5-ba84-464c-a328-f5428426b450";
 
-	public static ObjectId ref2id(String ref) {
-		if (("" + ref).length() < 10) {
-			System.out.println("null ref");
-		}
-		return ref.startsWith(AlfrescoWrapper.NODEREF_PREFIX) ? new ObjectIdImpl(
-				ref) : new ObjectIdImpl(AlfrescoWrapper.NODEREF_PREFIX + ref);
-	}
-
 	public static String id2ref(String id) {
 		int slashIndex = id.lastIndexOf("/");
 		if (slashIndex > 0) {
 			return id.substring(slashIndex, id.length());
 		}
 		return "";
+	}
+
+	public static ObjectId ref2id(String ref) {
+		if (("" + ref).length() < 10) {
+			System.out.println("null ref");
+		}
+		return ref.startsWith(AlfrescoWrapper.NODEREF_PREFIX) ? new ObjectIdImpl(
+				ref) : new ObjectIdImpl(AlfrescoWrapper.NODEREF_PREFIX + ref);
 	}
 
 	@In
@@ -106,6 +106,39 @@ public class AlfrescoWrapper {
 		}
 	}
 
+	public void download(String id) {
+		HttpServletResponse response = (HttpServletResponse) this.extCtx
+				.getResponse();
+
+		Document d = (Document) this.alfrescoAdminIdentity.getSession()
+				.getObject(AlfrescoWrapper.ref2id(id));
+
+		ContentStream cs = d.getContentStream();
+
+		response.setContentType(cs.getMimeType());
+
+		response.addHeader("Content-disposition", "attachment; filename=\""
+				+ d.getProperty(PropertyIds.NAME).getValueAsString() + "\"");
+		response.setHeader("Expires", "0");
+		response.setHeader("Cache-Control",
+				"must-revalidate, post-check=0, pre-check=0");
+		try {
+			response.setContentLength((int) cs.getLength());
+			ServletOutputStream os = response.getOutputStream();
+
+			byte[] buffer = new byte[8192];
+			int len;
+			while ((len = cs.getStream().read(buffer)) != -1) {
+				os.write(buffer, 0, len);
+			}
+			os.flush();
+			os.close();
+			FacesContext.getCurrentInstance().responseComplete();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public AlfrescoFolder findOrCreateFolder(Folder parent, String folderName) {
 		AlfrescoFolder folder = null;
 		// cerco la cartella con il nome dello slot e se non c'è la creo
@@ -133,6 +166,47 @@ public class AlfrescoWrapper {
 		Session session = this.alfrescoUserIdentity.getSession();
 		AlfrescoFolder parent = (AlfrescoFolder) session.getObjectByPath(path);
 		return this.findOrCreateFolder(parent, folderName);
+	}
+
+	/**
+	 * @param aspectId
+	 * @param folderId
+	 * @param orderBy
+	 * @return
+	 */
+	public ArrayList<String> getDocumentIdsInFolderByAspect(String aspectId,
+			String folderId, String orderBy, int limit) {
+		// ora il paramentro order by lo gestisco come stringa, vediamo se
+		// conviene gestirlo con lista di stringe
+		ArrayList<String> lists = new ArrayList<String>();
+		try {
+			Session session = this.alfrescoAdminIdentity.getSession();
+			OperationContext context = session.createOperationContext();
+			String query = "SELECT D.cmis:objectId FROM cmis:document AS D JOIN "
+					+ aspectId
+					+ " AS A ON D.cmis:objectId=A.cmis:objectId   WHERE IN_TREE(D, '"
+					+ folderId + "')";
+			if (orderBy != null) {
+				query += " order by A." + orderBy;
+			}
+			ItemIterable<QueryResult> results = session.query(query, true);
+			if (limit > 0) {
+				results = results.getPage(limit);
+			}
+			if (results.getTotalNumItems() != 0) {
+				Iterator<QueryResult> iterator = results.iterator();
+				while (iterator.hasNext()) {
+					QueryResult result = iterator.next();
+					String cmisObjectId = result
+							.getPropertyValueById("cmis:objectId");
+					lists.add(cmisObjectId);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return lists;
 	}
 
 	public Folder getMainProjectFolder() {
@@ -228,39 +302,6 @@ public class AlfrescoWrapper {
 
 		adminSession.createDocument(props, folder, contentStreamImpl,
 				VersioningState.NONE, null, null, null);
-	}
-
-	public void download(String id) {
-		HttpServletResponse response = (HttpServletResponse) this.extCtx
-				.getResponse();
-
-		Document d = (Document) this.alfrescoAdminIdentity.getSession()
-				.getObject(AlfrescoWrapper.ref2id(id));
-
-		ContentStream cs = d.getContentStream();
-
-		response.setContentType(cs.getMimeType());
-
-		response.addHeader("Content-disposition", "attachment; filename=\""
-				+ d.getProperty(PropertyIds.NAME).getValueAsString() + "\"");
-		response.setHeader("Expires", "0");
-		response.setHeader("Cache-Control",
-				"must-revalidate, post-check=0, pre-check=0");
-		try {
-			response.setContentLength((int) cs.getLength());
-			ServletOutputStream os = response.getOutputStream();
-
-			byte[] buffer = new byte[8192];
-			int len;
-			while ((len = cs.getStream().read(buffer)) != -1) {
-				os.write(buffer, 0, len);
-			}
-			os.flush();
-			os.close();
-			FacesContext.getCurrentInstance().responseComplete();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 }
