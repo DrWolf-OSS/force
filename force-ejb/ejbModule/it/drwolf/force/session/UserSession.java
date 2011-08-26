@@ -3,12 +3,15 @@ package it.drwolf.force.session;
 import it.drwolf.force.entity.Azienda;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
+import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.alfresco.webscripts.model.Authority;
 import it.drwolf.slot.alfresco.webscripts.model.AuthorityType;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.entitymanager.PreferenceManager;
+import it.drwolf.slot.prefs.PreferenceKey;
+import it.drwolf.slot.prefs.Preferences;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,6 +20,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.alfresco.cmis.client.AlfrescoFolder;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
@@ -49,11 +53,22 @@ public class UserSession implements Serializable {
 	@In(create = true)
 	PreferenceManager preferenceManager;
 
+	@In(create = true)
+	private AlfrescoWrapper alfrescoWrapper;
+
+	@In(create = true)
+	private Preferences preferences;
+
 	private SlotDef primarySlotDef;
 
 	private SlotInst primarySlotInst;
 
 	private Integer aziendaId;
+
+	private AlfrescoFolder groupFolder; // cartella di alfresco dell'azienda
+
+	private AlfrescoFolder primarySlotFolder; // caretella di alfreso dello slot
+												// primary dell'azienda
 
 	private boolean llpp = false;
 
@@ -101,8 +116,16 @@ public class UserSession implements Serializable {
 		return this.aziendaId;
 	}
 
+	public AlfrescoFolder getGroupFolder() {
+		return this.groupFolder;
+	}
+
 	public SlotDef getPrimarySlotDef() {
 		return this.primarySlotDef;
+	}
+
+	public AlfrescoFolder getPrimarySlotFolder() {
+		return this.primarySlotFolder;
 	}
 
 	public SlotInst getPrimarySlotInst() {
@@ -156,12 +179,25 @@ public class UserSession implements Serializable {
 					} catch (Exception e) {
 						// Non è ancora stato creato uno slotInst
 					}
-					return;
+					break;
 				}
 
 			}
 
 		}
+		// prelevo la cartella principale:
+		this.groupFolder = this.alfrescoWrapper.findOrCreateFolder(
+				this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
+						.name()), this.alfrescoUserIdentity.getActiveGroup()
+						.getShortName());
+
+		this.primarySlotFolder = this.alfrescoWrapper.findOrCreateFolder(
+				this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
+						.name())
+						+ "/"
+						+ this.alfrescoUserIdentity.getActiveGroup()
+								.getShortName(), this.getPrimarySlotDef()
+						.getName());
 
 	}
 
@@ -173,12 +209,20 @@ public class UserSession implements Serializable {
 		this.aziendaId = aziendaId;
 	}
 
+	public void setGroupFolder(AlfrescoFolder groupFolder) {
+		this.groupFolder = groupFolder;
+	}
+
 	public void setLlpp(boolean llpp) {
 		this.llpp = llpp;
 	}
 
 	public void setPrimarySlotDef(SlotDef primarySlotDef) {
 		this.primarySlotDef = primarySlotDef;
+	}
+
+	public void setPrimarySlotFolder(AlfrescoFolder primarySlotFolder) {
+		this.primarySlotFolder = primarySlotFolder;
 	}
 
 	public void setPrimarySlotInst(SlotInst primarySlotInst) {
