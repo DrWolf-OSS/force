@@ -151,39 +151,463 @@ public class SlotInstEditBean {
 
 	// private List<MultiplePropertyInst> multiplePropertyInsts;
 
-	private void resetFlags() {
-		verifiable = true;
-		failAllowed = false;
-		// warning = false;
+	public void addActiveItemToDatas() {
+		if (!this.datas.get(this.activeCollectionId).contains(
+				this.activeFileContainer)) {
+			try {
+				DocInstCollection instCollection = this
+						.findInstCollection(this.activeCollectionId);
+				AlfrescoFolder slotFolder = this.retrieveSlotFolder();
+				this.storeOnAlfresco(this.activeFileContainer, instCollection,
+						slotFolder);
+				this.datas.get(this.activeCollectionId).add(
+						this.activeFileContainer);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				FacesMessages
+						.instance()
+						.add(Severity.ERROR,
+								"Errore interno del sistema di salvataggio dei documenti!");
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void addCollectionMessage(Long collectionId, VerifierMessage message) {
+		ArrayList<VerifierMessage> messages = this.collectionsMessages
+				.get(collectionId);
+		if (messages == null) {
+			messages = new ArrayList<VerifierMessage>();
+			this.collectionsMessages.put(collectionId, messages);
+		}
+		messages.add(message);
+	}
+
+	private void addCollectionsNewDocumentsToSlot(AlfrescoFolder slotFolder,
+			DocInstCollection instCollection) {
+		// Aggiungo elementi nuovi
+		List<FileContainer> containers = this.datas.get(instCollection
+				.getDocDefCollection().getId());
+		if (containers != null) {
+			for (FileContainer container : containers) {
+				if (container.getDocument().hasAspect("P:util:tmp")) {
+					//
+					this.updateProperties(container.getDocument(),
+							container.getDocumentProperties());
+					//
+					container.getDocument().removeAspect("P:util:tmp");
+					DocInst docInst = new DocInst(instCollection, container
+							.getDocument().getId());
+					instCollection.getDocInsts().add(docInst);
+				} else {
+					System.out.println("si deve copiare "
+							+ container.getDocument().getName());
+					String storedRef = this.copyDocumentOnAlfresco(
+							container.getDocument(), instCollection,
+							container.getDocumentProperties(), slotFolder);
+					DocInst docInst = new DocInst(instCollection, storedRef);
+					instCollection.getDocInsts().add(docInst);
+				}
+			}
+		}
+	}
+
+	public void addDocFromPrimary(Long docDefCollectionId,
+			FileContainer container) {
+		//
+		container.setEditable(false);
+		//
+		this.activeCollectionId = docDefCollectionId;
+		this.datas.get(docDefCollectionId).add(container);
+	}
+
+	private void addFileMessage(String fileContainerId, VerifierMessage message) {
+		ArrayList<VerifierMessage> messages = this.filesMessages
+				.get(fileContainerId);
+		if (messages == null) {
+			messages = new ArrayList<VerifierMessage>();
+			this.filesMessages.put(fileContainerId, messages);
+		}
+		messages.add(message);
+	}
+
+	private void addMainMessage(VerifierMessage message) {
+		this.slotMessages.add(message);
+	}
+
+	private void addSignature(AlfrescoDocument document,
+			X509Certificate x509Certificate, X509CertificateObject validCert) {
+		try {
+			Principal subjectDN = x509Certificate.getSubjectDN();
+
+			String mysign = Utils.getCN(subjectDN.toString());
+			String cf = Utils.getCF(subjectDN.toString());
+			Date notAfter = x509Certificate.getNotAfter();
+			String authority = Utils.getCN(validCert.getIssuerDN().toString());
+			Boolean validity = Boolean.TRUE;
+
+			String username = this.alfrescoUserIdentity.getUsername();
+			String password = this.alfrescoUserIdentity.getPassword();
+			String url = this.alfrescoUserIdentity.getUrl();
+			AlfrescoWebScriptClient webScriptClient = new AlfrescoWebScriptClient(
+					username, password, url);
+
+			document.addAspect(Signature.ASPECT_SIGNED);
+
+			String signatureNodeRef = webScriptClient.addSignature(
+					document.getId(),
+					"sign_" + Utils.md5Encode(x509Certificate.getSignature()));
+
+			Session session = this.alfrescoUserIdentity.getSession();
+			AlfrescoDocument signatureDoc = (AlfrescoDocument) session
+					.getObject(signatureNodeRef);
+
+			Map<String, Object> props = new HashMap<String, Object>();
+			props.put(Signature.VALIDITY, validity);
+			props.put(Signature.EXPIRY, Utils.dateToCalendar(notAfter));
+			props.put(Signature.AUTHORITY, authority);
+			props.put(Signature.SIGN, mysign);
+			props.put(Signature.CF, cf);
+
+			signatureDoc.updateProperties(props);
+
+			System.out.println("-> Signature added to " + document.getName());
+
+		} catch (Exception e) {
+			System.out
+					.println("---> Errore nell aggiungere una firma al documento "
+							+ document.getName());
+			e.printStackTrace();
+		}
+	}
+
+	private boolean checkCollectionsSize() {
+		boolean passed = true;
+
+		for (DocDefCollection defCollection : this.slotDefHome.getInstance()
+				.getDocDefCollections()) {
+			if ((defCollection.getConditionalPropertyDef() == null)
+					|| ((defCollection.getConditionalPropertyDef() != null)
+							&& (this.findPropertyInstByDefId(
+									defCollection.getConditionalPropertyDef()
+											.getId()).getValue() != null) && this
+							.findPropertyInstByDefId(
+									defCollection.getConditionalPropertyDef()
+											.getId())
+							.getValue()
+							.equals(defCollection.getConditionalPropertyInst()
+									.getValue()))) {
+
+				List<FileContainer> list = this.datas
+						.get(defCollection.getId());
+				int size = list.size();
+				if ((defCollection.getMin() != null)
+						&& (size < defCollection.getMin())) {
+					passed = false;
+					this.addCollectionMessage(defCollection.getId(),
+							new VerifierMessage(
+									"Questa collection deve contenere almeno "
+											+ defCollection.getMin()
+											+ " documento/i",
+									VerifierMessageType.ERROR));
+				}
+				if ((defCollection.getMax() != null)
+						&& (size > defCollection.getMax())) {
+					passed = false;
+					this.addCollectionMessage(defCollection.getId(),
+							new VerifierMessage(
+									"Questa collection deve contenere al massimo "
+											+ defCollection.getMax()
+											+ " documento/i",
+									VerifierMessageType.ERROR));
+				}
+			}
+		}
+		return passed;
+	}
+
+	private void cleanCollection(Long docDefCollectionId) {
+		List<FileContainer> itemslist = this.datas.get(docDefCollectionId);
+		if (itemslist != null) {
+			itemslist.clear();
+		} else {
+			itemslist = new ArrayList<FileContainer>();
+		}
+	}
+
+	public void cleanConditionalCollection(PropertyInst propertyInst) {
+
+		Object value = this.valueChangeListener.getValue();
+		if ((value == null)
+				&& !propertyInst.getPropertyDef().getDataType()
+						.equals(DataType.BOOLEAN)) {
+			propertyInst.clean();
+		}
+
+		Iterator<DocInstCollection> iterator = this.docInstCollections
+				.iterator();
+		while (iterator.hasNext()) {
+			DocInstCollection instCollection = iterator.next();
+			if ((instCollection.getDocDefCollection()
+					.getConditionalPropertyDef() != null)
+					&& instCollection.getDocDefCollection()
+							.getConditionalPropertyDef().getId()
+							.equals(propertyInst.getPropertyDef().getId())) {
+				Object conditionalValue = instCollection.getDocDefCollection()
+						.getConditionalPropertyInst().getValue();
+				// TODO: riguardare questo caso!!!
+				// Se alla proprietà che condiziona la collection è stato
+				// cambiato DataType e non è stata aggiornata la definizione
+				// della collection che la referenzia aggiornando il valore
+				// della
+				// property, "ConditionalPropertyInst().getValue()" restituirà
+				// null. In questo caso cancello cmq il contenuto della
+				// collection perchè i valori non matchano
+				if ((conditionalValue == null)
+						|| !conditionalValue.equals(propertyInst.getValue())) {
+					this.cleanCollection(instCollection.getDocDefCollection()
+							.getId());
+				}
+			}
+		}
+
+	}
+
+	private void cleanMessages() {
+		Set<String> filesKeys = this.filesMessages.keySet();
+		for (String key : filesKeys) {
+			ArrayList<VerifierMessage> messages = this.filesMessages.get(key);
+			if (messages != null) {
+				messages.clear();
+			}
+		}
+
+		Set<Long> collectionsKeys = this.collectionsMessages.keySet();
+		for (Long key : collectionsKeys) {
+			ArrayList<VerifierMessage> messages = this.collectionsMessages
+					.get(key);
+			if (messages != null) {
+				messages.clear();
+			}
+		}
+
+		if (this.slotMessages != null) {
+			this.slotMessages.clear();
+		}
+	}
+
+	private String copyDocumentOnAlfresco(AlfrescoDocument document,
+			DocInstCollection instCollection,
+			List<DocumentPropertyInst> documentProperties, Folder slotFolder) {
+		String nodeRef = "";
+
+		Session session = this.alfrescoUserIdentity.getSession();
+		// AlfrescoFolder slotFolder = findOrCreateSlotFolder(session);
+
+		ContentStream contentStream = document.getContentStream();
+		Set<String> aspects = instCollection.getDocDefCollection().getDocDef()
+				.getAspectIds();
+		// Set<Property> properties =
+		// customModelController.getProperties(aspects);
+
+		Map<String, Object> props = new HashMap<String, Object>();
+		props.put(PropertyIds.NAME, FileContainer.encodeFilename(FileContainer
+				.decodeFilename(document.getName())));
+		props.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
+
+		ObjectId objectId = session.createDocument(props, slotFolder,
+				contentStream, VersioningState.NONE, null, null, null);
+		System.out.println(objectId);
+
+		AlfrescoDocument documentCopy = (AlfrescoDocument) session
+				.getObject(objectId);
+
+		// prima si aggiungono gli aspect
+		for (String aspect : aspects) {
+			documentCopy.addAspect(aspect);
+		}
+
+		// poi si aggiungono i valori delle relative properties
+		this.updateProperties(documentCopy, documentProperties);
+		this.verifySignature(documentCopy);
+		nodeRef = objectId.getId();
+
+		return nodeRef;
+	}
+
+	public void editItem(Long docDefCollectionId, FileContainer container) {
+		this.activeCollectionId = docDefCollectionId;
+		this.activeFileContainer = container;
+	}
+
+	private void extractAndEmbedContent(AlfrescoDocument document,
+			CMSSignedData cms) {
+
+		try {
+			CMSProcessable signedContent = cms.getSignedContent();
+			final byte[] content = (byte[]) signedContent.getContent();
+
+			ByteArrayInputStream baip = new ByteArrayInputStream(content);
+
+			String contentFilename = FileContainer
+					.retrieveContentFilename(document.getName());
+			String encodedContentFilename = FileContainer
+					.encodeFilename(contentFilename);
+			//
+			String mimetype = "application/octet-stream";
+			ContentStreamImpl contentStreamImpl = new ContentStreamImpl(
+					encodedContentFilename,
+					new BigInteger("" + content.length), mimetype, baip);
+
+			Map<String, Object> properties = new HashMap<String, Object>();
+			properties.put(PropertyIds.NAME, encodedContentFilename);
+			properties.put(PropertyIds.OBJECT_TYPE_ID,
+					BaseTypeId.CMIS_DOCUMENT.value());
+
+			List<Folder> parents = document.getParents();
+			Folder folder = parents.get(0);
+
+			ObjectId objectId = this.alfrescoUserIdentity.getSession()
+					.createDocument(properties, folder, contentStreamImpl,
+							VersioningState.NONE, null, null, null);
+			AlfrescoDocument contentDoc = (AlfrescoDocument) this.alfrescoUserIdentity
+					.getSession().getObject(objectId.getId());
+			contentDoc.addAspect("P:util:tmp");
+
+			//
+			String username = this.alfrescoUserIdentity.getUsername();
+			String password = this.alfrescoUserIdentity.getPassword();
+			String url = this.alfrescoUserIdentity.getUrl();
+			AlfrescoWebScriptClient webScriptClient = new AlfrescoWebScriptClient(
+					username, password, url);
+			webScriptClient.embedContentToSignedDoc(document.getId(),
+					contentDoc.getId(),
+					FileContainer.retrieveContentFilename(document.getName()));
+			//
+			contentDoc.deleteAllVersions();
+			//
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private DocInstCollection findInstCollection(Long defCollectionId) {
+		DocInstCollection instCollection = null;
+		// controllo se c'è una collection che corrisponde a quell'id (ed è
+		// la destinataria dei files uploadati)
+		// boolean found = false;
+		Iterator<DocInstCollection> instCollIterator = this.docInstCollections
+				.iterator();
+		while (instCollIterator.hasNext()) {
+			instCollection = instCollIterator.next();
+			if (instCollection.getDocDefCollection().getId()
+					.equals(defCollectionId)) {
+				// found = true;
+				return instCollection;
+			}
+		}
+		return null;
+	}
+
+	public PropertyInst findPropertyInstByDefId(Long propertyDefId) {
+		Iterator<PropertyInst> iterator = this.propertyInsts.iterator();
+		while (iterator.hasNext()) {
+			PropertyInst propertyInst = iterator.next();
+			if (propertyInst.getPropertyDef().getId().equals(propertyDefId)) {
+				return propertyInst;
+			}
+		}
+		return null;
+	}
+
+	public Long getActiveCollectionId() {
+		return this.activeCollectionId;
+	}
+
+	public FileContainer getActiveFileContainer() {
+		return this.activeFileContainer;
+	}
+
+	public HashMap<Long, ArrayList<VerifierMessage>> getCollectionsMessages() {
+		return this.collectionsMessages;
+	}
+
+	public HashMap<Long, List<FileContainer>> getDatas() {
+		return this.datas;
+	}
+
+	public List<DocInstCollection> getDocInstCollections() {
+		return this.docInstCollections;
+	}
+
+	public List<EmbeddedProperty> getEmbeddedProperties() {
+		return new ArrayList<EmbeddedProperty>(this.slotDefHome.getInstance()
+				.getEmbeddedProperties());
+	}
+
+	public HashMap<String, ArrayList<VerifierMessage>> getFilesMessages() {
+		return this.filesMessages;
+	}
+
+	// quando trovo l'element lo tolgo così lascio solo quelli del tutto nuovi
+	// su cui ciclare alla fine ed aggiungerli nell'update
+	private FileContainer getItemIfContained(List<FileContainer> filesList,
+			String docRef) {
+		if (filesList != null) {
+			Iterator<FileContainer> iterator = filesList.iterator();
+			while (iterator.hasNext()) {
+				FileContainer item = iterator.next();
+				if ((item.getDocument() != null)
+						&& item.getDocument().getId().equals(docRef)) {
+					iterator.remove();
+					return item;
+				}
+			}
+		}
+		return null;
+	}
+
+	public HashMap<Long, List<FileContainer>> getPrimaryDocs() {
+		return this.primaryDocs;
+	}
+
+	public List<PropertyInst> getPropertyInsts() {
+		return this.propertyInsts;
+	}
+
+	public ArrayList<VerifierMessage> getSlotMessages() {
+		return this.slotMessages;
 	}
 
 	@Create
 	public void init() {
-		if (slotInstHome.getId() == null) {
+		if (this.slotInstHome.getId() == null) {
 			this.propertyInsts = new ArrayList<PropertyInst>();
-			for (PropertyDef propertyDef : slotDefHome.getInstance()
+			for (PropertyDef propertyDef : this.slotDefHome.getInstance()
 					.getPropertyDefs()) {
 				PropertyInst propertyInst = new PropertyInst(propertyDef,
-						slotInstHome.getInstance());
-				propertyInsts.add(propertyInst);
+						this.slotInstHome.getInstance());
+				this.propertyInsts.add(propertyInst);
 			}
 			// /
 
 			this.docInstCollections = new ArrayList<DocInstCollection>();
-			for (DocDefCollection defCollection : slotDefHome.getInstance()
-					.getDocDefCollections()) {
+			for (DocDefCollection defCollection : this.slotDefHome
+					.getInstance().getDocDefCollections()) {
 				DocInstCollection instCollection = new DocInstCollection(
-						slotInstHome.getInstance(), defCollection);
-				docInstCollections.add(instCollection);
+						this.slotInstHome.getInstance(), defCollection);
+				this.docInstCollections.add(instCollection);
 
 				//
-				datas.put(defCollection.getId(), new ArrayList<FileContainer>());
+				this.datas.put(defCollection.getId(),
+						new ArrayList<FileContainer>());
 				List<AlfrescoDocument> collPrimaryDocs = this
 						.retrievePrimaryDocs(defCollection.getDocDef().getId());
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				Set<String> aspectIds = defCollection.getDocDef()
 						.getAspectIds();
-				Set<Property> properties = customModelController
+				Set<Property> properties = this.customModelController
 						.getProperties(aspectIds);
 				for (AlfrescoDocument document : collPrimaryDocs) {
 					FileContainer fileContainer = new FileContainer(document,
@@ -192,15 +616,15 @@ public class SlotInstEditBean {
 					// properties, document, false);
 					fileContainers.add(fileContainer);
 				}
-				primaryDocs.put(defCollection.getId(), fileContainers);
+				this.primaryDocs.put(defCollection.getId(), fileContainers);
 			}
 
 		} else {
-			this.propertyInsts = new ArrayList<PropertyInst>(slotInstHome
+			this.propertyInsts = new ArrayList<PropertyInst>(this.slotInstHome
 					.getInstance().getPropertyInsts());
 
 			this.docInstCollections = new ArrayList<DocInstCollection>(
-					slotInstHome.getInstance().getDocInstCollections());
+					this.slotInstHome.getInstance().getDocInstCollections());
 			for (DocInstCollection instCollection : this.docInstCollections) {
 				DocDefCollection docDefCollection = instCollection
 						.getDocDefCollection();
@@ -209,12 +633,12 @@ public class SlotInstEditBean {
 				Set<DocInst> docInsts = instCollection.getDocInsts();
 				Set<String> aspectIds = docDefCollection.getDocDef()
 						.getAspectIds();
-				Set<Property> properties = customModelController
+				Set<Property> properties = this.customModelController
 						.getProperties(aspectIds);
 				for (DocInst docInst : docInsts) {
 					try {
 						String nodeRef = docInst.getNodeRef();
-						AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
+						AlfrescoDocument document = (AlfrescoDocument) this.alfrescoUserIdentity
 								.getSession().getObject(nodeRef);
 						// FileContainer container = buildFileContainer(
 						// properties, document, true);
@@ -230,13 +654,13 @@ public class SlotInstEditBean {
 				}
 			}
 
-			for (DocDefCollection defCollection : slotDefHome.getInstance()
-					.getDocDefCollections()) {
+			for (DocDefCollection defCollection : this.slotDefHome
+					.getInstance().getDocDefCollections()) {
 				List<AlfrescoDocument> collPrimaryDocs = this
 						.retrievePrimaryDocs(defCollection.getDocDef().getId());
 				Set<String> aspectIds = defCollection.getDocDef()
 						.getAspectIds();
-				Set<Property> properties = customModelController
+				Set<Property> properties = this.customModelController
 						.getProperties(aspectIds);
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				for (AlfrescoDocument document : collPrimaryDocs) {
@@ -244,39 +668,236 @@ public class SlotInstEditBean {
 							properties, false);
 					fileContainers.add(container);
 				}
-				primaryDocs.put(defCollection.getId(), fileContainers);
+				this.primaryDocs.put(defCollection.getId(), fileContainers);
 			}
 
-			verify();
+			this.verify();
 		}
 
 	}
 
-	private void cleanMessages() {
-		Set<String> filesKeys = filesMessages.keySet();
-		for (String key : filesKeys) {
-			ArrayList<VerifierMessage> messages = filesMessages.get(key);
-			if (messages != null) {
-				messages.clear();
+	public void listener(UploadEvent event) {
+		UploadItem item = event.getUploadItem();
+
+		String fileName = item.getFileName();
+		Long docDefCollectionId = this.activeCollectionId;
+		List<FileContainer> list = this.datas.get(docDefCollectionId);
+		if (list == null) {
+			list = new ArrayList<FileContainer>();
+			this.datas.put(docDefCollectionId, list);
+		}
+		System.out.println("-> " + fileName + " successfully uploaded");
+		DocDefCollection docDefCollection = this.entityManager.find(
+				DocDefCollection.class, docDefCollectionId);
+		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
+		Set<Property> properties = this.customModelController
+				.getProperties(aspectIds);
+		FileContainer container = new FileContainer(item, properties, true);
+		//
+		this.activeFileContainer = container;
+		//
+	}
+
+	public void remove(Long collectionId, FileContainer container) {
+		System.out.println("---> removing " + container.getFileName() + "...");
+		List<FileContainer> filesList = this.datas.get(collectionId);
+		filesList.remove(container);
+		ArrayList<VerifierMessage> messages = this.filesMessages.get(container
+				.getId());
+		if (messages != null) {
+			messages.clear();
+		}
+	}
+
+	private void resetFlags() {
+		this.verifiable = true;
+		this.failAllowed = false;
+		// warning = false;
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<AlfrescoDocument> retrievePrimaryDocs(Long docDefId) {
+		List<AlfrescoDocument> primaryDocs = new ArrayList<AlfrescoDocument>();
+		List<DocInst> resultList = this.entityManager
+				.createQuery(
+						"from DocInst d where d.docInstCollection.slotInst.slotDef.type = 'Primary' and d.docInstCollection.slotInst.ownerId=:ownerId and d.docInstCollection.docDefCollection.docDef.id=:docDefId")
+				.setParameter(
+						"ownerId",
+						this.alfrescoUserIdentity.getActiveGroup()
+								.getShortName())
+				.setParameter("docDefId", docDefId).getResultList();
+		if (resultList != null) {
+			for (DocInst docInst : resultList) {
+				String nodeRef = docInst.getNodeRef();
+				AlfrescoDocument document = (AlfrescoDocument) this.alfrescoUserIdentity
+						.getSession().getObject(nodeRef);
+				primaryDocs.add(document);
 			}
 		}
+		return primaryDocs;
+	}
 
-		Set<Long> collectionsKeys = collectionsMessages.keySet();
-		for (Long key : collectionsKeys) {
-			ArrayList<VerifierMessage> messages = collectionsMessages.get(key);
-			if (messages != null) {
-				messages.clear();
+	private AlfrescoFolder retrieveSlotFolder() {
+		AlfrescoFolder groupFolder = this.alfrescoWrapper.findOrCreateFolder(
+				this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
+						.name()), this.alfrescoUserIdentity.getActiveGroup()
+						.getShortName());
+
+		AlfrescoFolder slotFolder = this.alfrescoWrapper.findOrCreateFolder(
+				groupFolder, this.slotInstHome.getInstance().getSlotDef()
+						.getName());
+		return slotFolder;
+	}
+
+	private List<VerifierParameterInst> retrieveValueInsts(
+			Rule rule,
+			Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap,
+			VerifierParameterDef verifierParameterDef, Object sourceDef,
+			Object fieldDef) {
+		ParameterCoordinates parameterCoordinates = new ParameterCoordinates(
+				sourceDef, (DataDefinition) fieldDef);
+
+		List<VerifierParameterInst> paramInsts = new ArrayList<VerifierParameterInst>();
+		if (sourceDef instanceof DocDefCollection) {
+			DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
+			Property property = (Property) fieldDef;
+			List<FileContainer> list = this.datas.get(docDefCollection.getId());
+			if ((list != null) && !list.isEmpty()) {
+				for (FileContainer fileContainer : list) {
+					//
+					List<DocumentPropertyInst> allProperties = fileContainer
+							.getDocumentProperties();
+					//
+					Iterator<DocumentPropertyInst> iterator = allProperties
+							.iterator();
+					boolean found = false;
+					while (iterator.hasNext() && (found == false)) {
+						DocumentPropertyInst documentPropertyInst = iterator
+								.next();
+						if (documentPropertyInst.getProperty().equals(property)) {
+							Object value = documentPropertyInst.getValue();
+							found = true;
+							if ((value != null) && !value.equals("")) {
+								VerifierParameterInst parameterInst = new VerifierParameterInst(
+										verifierParameterDef, value, true);
+								paramInsts.add(parameterInst);
+								//
+								parameterInst
+										.setParameterCoordinates(parameterCoordinates);
+								//
+								processedPropertiesResolverMap.put(
+										parameterInst, fileContainer);
+								//
+							} else {
+								if (!verifierParameterDef.isOptional()) {
+									this.verifiable = false;
+									if (rule.isMandatory()) {
+										this.addFileMessage(
+												fileContainer.getId(),
+												new VerifierMessage(
+														documentPropertyInst
+																.getProperty()
+																.getTitle()
+																+ " non può essere nulla per verificare una regola di tipo "
+																+ rule.getType()
+																		.value(),
+														VerifierMessageType.ERROR));
+									} else {
+										this.failAllowed = true;
+									}
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if (!verifierParameterDef.isOptional()) {
+					this.verifiable = false;
+					if (rule.isMandatory()) {
+						this.addCollectionMessage(
+								docDefCollection.getId(),
+								new VerifierMessage(
+										docDefCollection.getName()
+												+ " non può essere vuota per verificare una regola di tipo "
+												+ rule.getType().value()
+												+ " sulla proprietà "
+												+ property.getTitle()
+												+ " dei files che contiene",
+										VerifierMessageType.ERROR));
+					} else {
+						this.failAllowed = true;
+					}
+				}
 			}
-		}
 
-		if (this.slotMessages != null) {
-			slotMessages.clear();
+		} else if (sourceDef instanceof SlotDef) {
+			if (fieldDef instanceof PropertyDef) {
+				PropertyDef propertyDef = (PropertyDef) fieldDef;
+				Iterator<PropertyInst> iterator = this.getPropertyInsts()
+						.iterator();
+				boolean found = false;
+				while (iterator.hasNext() && (found == false)) {
+					PropertyInst propertyInst = iterator.next();
+					if (propertyInst.getPropertyDef().equals(propertyDef)) {
+						Object value = propertyInst.getValue();
+						found = true;
+						if ((value != null) && !value.equals("")) {
+							VerifierParameterInst parameterInst = new VerifierParameterInst(
+									verifierParameterDef, value, true);
+							//
+							parameterInst
+									.setParameterCoordinates(parameterCoordinates);
+							//
+							paramInsts.add(parameterInst);
+						} else {
+							if (!verifierParameterDef.isOptional()) {
+								this.verifiable = false;
+								if (rule.isMandatory()) {
+									this.addMainMessage(new VerifierMessage(
+											propertyDef.getName()
+													+ " non può essere nulla per verificare una regola di tipo "
+													+ rule.getType().value(),
+											VerifierMessageType.ERROR));
+								} else {
+									this.failAllowed = true;
+								}
+							}
+						}
+					}
+				}
+			} else if (fieldDef instanceof EmbeddedProperty) {
+				EmbeddedProperty embeddedProperty = (EmbeddedProperty) fieldDef;
+				Object value = embeddedProperty.getValue();
+				if (value != null) {
+					VerifierParameterInst parameterInst = new VerifierParameterInst(
+							verifierParameterDef, value, false);
+					//
+					parameterInst.setParameterCoordinates(parameterCoordinates);
+					//
+					paramInsts.add(parameterInst);
+				} else {
+					if (!verifierParameterDef.isOptional()) {
+						this.verifiable = false;
+						if (rule.isMandatory()) {
+							this.addMainMessage(new VerifierMessage(
+									embeddedProperty.getName()
+											+ " non può essere nulla per verificare una regola di tipo "
+											+ rule.getType().value(),
+									VerifierMessageType.ERROR));
+						} else {
+							this.failAllowed = true;
+						}
+					}
+				}
+			}
+
 		}
+		return paramInsts;
 	}
 
 	public String save() {
-		cleanMessages();
-		boolean sizeCollectionPassed = checkCollectionsSize();
+		this.cleanMessages();
+		boolean sizeCollectionPassed = this.checkCollectionsSize();
 		if (!sizeCollectionPassed) {
 			FacesMessages
 					.instance()
@@ -285,25 +906,26 @@ public class SlotInstEditBean {
 			return "failed";
 		}
 
-		boolean rulesPassed = verify();
+		boolean rulesPassed = this.verify();
 		if (!rulesPassed) {
 			FacesMessages.instance().add(Severity.ERROR,
 					"Alcune regole non sono verificate!");
 			return "failed";
 		}
 
-		slotInstHome.getInstance().setPropertyInsts(
+		this.slotInstHome.getInstance().setPropertyInsts(
 				new HashSet<PropertyInst>(this.propertyInsts));
 
-		AlfrescoFolder slotFolder = retrieveSlotFolder();
+		AlfrescoFolder slotFolder = this.retrieveSlotFolder();
 
-		Set<Long> keySet = datas.keySet();
+		Set<Long> keySet = this.datas.keySet();
 		for (Long key : keySet) {
-			DocInstCollection instCollection = findInstCollection(key);
+			DocInstCollection instCollection = this.findInstCollection(key);
 			if (instCollection != null) {
 				try {
 
-					addCollectionsNewDocumentsToSlot(slotFolder, instCollection);
+					this.addCollectionsNewDocumentsToSlot(slotFolder,
+							instCollection);
 
 				} catch (Exception e) {
 					FacesMessages.instance().add(
@@ -316,278 +938,66 @@ public class SlotInstEditBean {
 			}
 		}
 
-		slotInstHome.getInstance().setDocInstCollections(
-				new HashSet<DocInstCollection>(docInstCollections));
-		slotInstHome.getInstance().setOwnerId(
-				alfrescoUserIdentity.getActiveGroup().getShortName());
-		slotInstHome.persist();
+		this.slotInstHome.getInstance().setDocInstCollections(
+				new HashSet<DocInstCollection>(this.docInstCollections));
+		this.slotInstHome.getInstance().setOwnerId(
+				this.alfrescoUserIdentity.getActiveGroup().getShortName());
+		this.slotInstHome.persist();
 		FacesMessages.instance().add(
 				"Slot " + this.slotDefHome.getInstance().getName()
 						+ " successfully created");
 
 		if (this.warning) {
-			warning = false;
+			this.warning = false;
 			return "warning";
 		}
 
 		return "saved";
 	}
 
-	private DocInstCollection findInstCollection(Long defCollectionId) {
-		DocInstCollection instCollection = null;
-		// controllo se c'è una collection che corrisponde a quell'id (ed è
-		// la destinataria dei files uploadati)
-		// boolean found = false;
-		Iterator<DocInstCollection> instCollIterator = docInstCollections
-				.iterator();
-		while (instCollIterator.hasNext()) {
-			instCollection = instCollIterator.next();
-			if (instCollection.getDocDefCollection().getId()
-					.equals(defCollectionId)) {
-				// found = true;
-				return instCollection;
-			}
-		}
-		return null;
+	public void setActiveCollectionId(Long activeCollection) {
+		this.activeCollectionId = activeCollection;
 	}
 
-	private boolean checkCollectionsSize() {
-		boolean passed = true;
-
-		for (DocDefCollection defCollection : slotDefHome.getInstance()
-				.getDocDefCollections()) {
-			if ((defCollection.getConditionalPropertyDef() == null)
-					|| (defCollection.getConditionalPropertyDef() != null
-							&& findPropertyInstByDefId(
-									defCollection.getConditionalPropertyDef()
-											.getId()).getValue() != null && findPropertyInstByDefId(
-							defCollection.getConditionalPropertyDef().getId())
-							.getValue().equals(
-									defCollection.getConditionalPropertyInst()
-											.getValue()))) {
-
-				List<FileContainer> list = datas.get(defCollection.getId());
-				int size = list.size();
-				if (defCollection.getMin() != null
-						&& size < defCollection.getMin()) {
-					passed = false;
-					this.addCollectionMessage(defCollection.getId(),
-							new VerifierMessage(
-									"Questa collection deve contenere almeno "
-											+ defCollection.getMin()
-											+ " documento/i",
-									VerifierMessageType.ERROR));
-				}
-				if (defCollection.getMax() != null
-						&& size > defCollection.getMax()) {
-					passed = false;
-					this.addCollectionMessage(defCollection.getId(),
-							new VerifierMessage(
-									"Questa collection deve contenere al massimo "
-											+ defCollection.getMax()
-											+ " documento/i",
-									VerifierMessageType.ERROR));
-				}
-			}
-		}
-		return passed;
+	public void setActiveFileContainer(FileContainer activeFileContainer) {
+		this.activeFileContainer = activeFileContainer;
 	}
 
-	private AlfrescoFolder retrieveSlotFolder() {
-		AlfrescoFolder groupFolder = alfrescoWrapper.findOrCreateFolder(
-				preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH.name()),
-				alfrescoUserIdentity.getActiveGroup().getShortName());
-
-		AlfrescoFolder slotFolder = alfrescoWrapper.findOrCreateFolder(
-				groupFolder, slotInstHome.getInstance().getSlotDef().getName());
-		return slotFolder;
+	public void setCollectionsMessages(
+			HashMap<Long, ArrayList<VerifierMessage>> collectionsMessages) {
+		this.collectionsMessages = collectionsMessages;
 	}
 
-	public String update() {
-		cleanMessages();
-		SlotInst instance = slotInstHome.getInstance();
-
-		boolean sizeCollectionPassed = checkCollectionsSize();
-		if (!sizeCollectionPassed) {
-			FacesMessages
-					.instance()
-					.add(Severity.ERROR,
-							"Le dimensioni di alcune collection non rispettano le specifiche");
-			return "failed";
-		}
-
-		boolean rulesPassed = verify();
-		if (!rulesPassed) {
-			FacesMessages.instance().add(Severity.ERROR,
-					"Alcune regole non sono verificate!");
-			entityManager.clear();
-			return "failed";
-		}
-
-		entityManager.merge(instance);
-		Set<DocInstCollection> persistedDocInstCollections = instance
-				.getDocInstCollections();
-
-		AlfrescoFolder slotFolder = retrieveSlotFolder();
-
-		for (DocInstCollection instCollection : persistedDocInstCollections) {
-			// entityManager.merge(instCollection);
-			Set<DocInst> docInsts = instCollection.getDocInsts();
-			Iterator<DocInst> iterator = docInsts.iterator();
-			while (iterator.hasNext()) {
-				DocInst docInst = iterator.next();
-				AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
-						.getSession().getObject(docInst.getNodeRef());
-				Long docDefCollectionId = instCollection.getDocDefCollection()
-						.getId();
-				List<FileContainer> filesList = datas.get(docDefCollectionId);
-
-				// Controllo se il document è ancora presente nella lista dei
-				// file associati, se c'è ancora ne aggiorno le properties
-				// altrimenti lo cancello da alfresco e lo tolgo dalla relativa
-				// collection
-				FileContainer itemContained = getItemIfContained(filesList,
-						document.getId());
-				if (itemContained == null) {
-					document.deleteAllVersions();
-					iterator.remove();
-					Long id = docInst.getId();
-					DocInst foundDocInst = entityManager
-							.find(DocInst.class, id);
-					entityManager.remove(foundDocInst);
-				} else {
-					// il file è quello vecchio ma potrebbe necessitare di
-					// un aggiornamento delle properties
-					System.out.println("Doc " + document.getName()
-							+ " da aggiornare");
-					updateProperties(document,
-							itemContained.getDocumentProperties());
-				}
-			}
-
-			addCollectionsNewDocumentsToSlot(slotFolder, instCollection);
-		}
-
-		entityManager.merge(instance);
-		entityManager.flush();
-
-		FacesMessages.instance().add(
-				"Slot " + this.slotDefHome.getInstance().getName()
-						+ " successfully updated");
-
-		if (this.warning) {
-			warning = false;
-			return "warning";
-		}
-
-		return "updated";
+	public void setDatas(HashMap<Long, List<FileContainer>> datas) {
+		this.datas = datas;
 	}
 
-	private void addCollectionsNewDocumentsToSlot(AlfrescoFolder slotFolder,
-			DocInstCollection instCollection) {
-		// Aggiungo elementi nuovi
-		List<FileContainer> containers = datas.get(instCollection
-				.getDocDefCollection().getId());
-		if (containers != null) {
-			for (FileContainer container : containers) {
-				if (container.getDocument().hasAspect("P:util:tmp")) {
-					//
-					updateProperties(container.getDocument(),
-							container.getDocumentProperties());
-					//
-					container.getDocument().removeAspect("P:util:tmp");
-					DocInst docInst = new DocInst(instCollection, container
-							.getDocument().getId());
-					instCollection.getDocInsts().add(docInst);
-				} else {
-					System.out.println("si deve copiare "
-							+ container.getDocument().getName());
-					String storedRef = copyDocumentOnAlfresco(
-							container.getDocument(), instCollection,
-							container.getDocumentProperties(), slotFolder);
-					DocInst docInst = new DocInst(instCollection, storedRef);
-					instCollection.getDocInsts().add(docInst);
-				}
-			}
-		}
+	public void setDocInstCollections(List<DocInstCollection> docInstCollections) {
+		this.docInstCollections = docInstCollections;
 	}
 
-	// quando trovo l'element lo tolgo così lascio solo quelli del tutto nuovi
-	// su cui ciclare alla fine ed aggiungerli nell'update
-	private FileContainer getItemIfContained(List<FileContainer> filesList,
-			String docRef) {
-		if (filesList != null) {
-			Iterator<FileContainer> iterator = filesList.iterator();
-			while (iterator.hasNext()) {
-				FileContainer item = iterator.next();
-				if (item.getDocument() != null
-						&& item.getDocument().getId().equals(docRef)) {
-					iterator.remove();
-					return item;
-				}
-			}
-		}
-		return null;
+	public void setFilesMessages(
+			HashMap<String, ArrayList<VerifierMessage>> filesMessages) {
+		this.filesMessages = filesMessages;
 	}
 
-	public void listener(UploadEvent event) {
-		UploadItem item = event.getUploadItem();
-
-		String fileName = item.getFileName();
-		Long docDefCollectionId = this.activeCollectionId;
-		List<FileContainer> list = datas.get(docDefCollectionId);
-		if (list == null) {
-			list = new ArrayList<FileContainer>();
-			datas.put(docDefCollectionId, list);
-		}
-		System.out.println("-> " + fileName + " successfully uploaded");
-		DocDefCollection docDefCollection = entityManager.find(
-				DocDefCollection.class, docDefCollectionId);
-		Set<String> aspectIds = docDefCollection.getDocDef().getAspectIds();
-		Set<Property> properties = customModelController
-				.getProperties(aspectIds);
-		FileContainer container = new FileContainer(item, properties, true);
-		//
-		this.activeFileContainer = container;
-		//
+	public void setPrimaryDocs(HashMap<Long, List<FileContainer>> primaryDocs) {
+		this.primaryDocs = primaryDocs;
 	}
 
-	public void addActiveItemToDatas() {
-		if (!datas.get(this.activeCollectionId).contains(
-				this.activeFileContainer)) {
-			try {
-				DocInstCollection instCollection = findInstCollection(activeCollectionId);
-				AlfrescoFolder slotFolder = retrieveSlotFolder();
-				storeOnAlfresco(activeFileContainer, instCollection, slotFolder);
-				datas.get(this.activeCollectionId)
-						.add(this.activeFileContainer);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				FacesMessages
-						.instance()
-						.add(Severity.ERROR,
-								"Errore interno del sistema di salvataggio dei documenti!");
-				e.printStackTrace();
-			}
-		}
+	public void setPropertyInsts(List<PropertyInst> propertyInsts) {
+		this.propertyInsts = propertyInsts;
 	}
 
-	public void remove(Long collectionId, FileContainer container) {
-		System.out.println("---> removing " + container.getFileName() + "...");
-		List<FileContainer> filesList = datas.get(collectionId);
-		filesList.remove(container);
-		ArrayList<VerifierMessage> messages = filesMessages.get(container
-				.getId());
-		if (messages != null) {
-			messages.clear();
-		}
+	public void setSlotMessages(ArrayList<VerifierMessage> slotMessages) {
+		this.slotMessages = slotMessages;
 	}
 
 	private AlfrescoDocument storeOnAlfresco(FileContainer fileContainer,
 			DocInstCollection instCollection, Folder slotFolder)
 			throws Exception {
 		UploadItem item = fileContainer.getUploadItem();
-		Session session = alfrescoUserIdentity.getSession();
+		Session session = this.alfrescoUserIdentity.getSession();
 
 		String fileName = item.getFileName();
 
@@ -623,51 +1033,93 @@ public class SlotInstEditBean {
 		}
 
 		// poi si aggiungono i valori delle relative properties
-		updateProperties(document, fileContainer.getDocumentProperties());
+		this.updateProperties(document, fileContainer.getDocumentProperties());
 
-		verifySignature(document);
+		this.verifySignature(document);
 		fileContainer.setDocument(document);
 
 		return document;
 	}
 
-	private String copyDocumentOnAlfresco(AlfrescoDocument document,
-			DocInstCollection instCollection,
-			List<DocumentPropertyInst> documentProperties, Folder slotFolder) {
-		String nodeRef = "";
+	public String update() {
+		this.cleanMessages();
+		SlotInst instance = this.slotInstHome.getInstance();
 
-		Session session = alfrescoUserIdentity.getSession();
-		// AlfrescoFolder slotFolder = findOrCreateSlotFolder(session);
-
-		ContentStream contentStream = document.getContentStream();
-		Set<String> aspects = instCollection.getDocDefCollection().getDocDef()
-				.getAspectIds();
-		// Set<Property> properties =
-		// customModelController.getProperties(aspects);
-
-		Map<String, Object> props = new HashMap<String, Object>();
-		props.put(PropertyIds.NAME, FileContainer.encodeFilename(FileContainer
-				.decodeFilename(document.getName())));
-		props.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
-
-		ObjectId objectId = session.createDocument(props, slotFolder,
-				contentStream, VersioningState.NONE, null, null, null);
-		System.out.println(objectId);
-
-		AlfrescoDocument documentCopy = (AlfrescoDocument) session
-				.getObject(objectId);
-
-		// prima si aggiungono gli aspect
-		for (String aspect : aspects) {
-			documentCopy.addAspect(aspect);
+		boolean sizeCollectionPassed = this.checkCollectionsSize();
+		if (!sizeCollectionPassed) {
+			FacesMessages
+					.instance()
+					.add(Severity.ERROR,
+							"Le dimensioni di alcune collection non rispettano le specifiche");
+			return "failed";
 		}
 
-		// poi si aggiungono i valori delle relative properties
-		updateProperties(documentCopy, documentProperties);
-		verifySignature(documentCopy);
-		nodeRef = objectId.getId();
+		boolean rulesPassed = this.verify();
+		if (!rulesPassed) {
+			FacesMessages.instance().add(Severity.ERROR,
+					"Alcune regole non sono verificate!");
+			this.entityManager.clear();
+			return "failed";
+		}
 
-		return nodeRef;
+		this.entityManager.merge(instance);
+		Set<DocInstCollection> persistedDocInstCollections = instance
+				.getDocInstCollections();
+
+		AlfrescoFolder slotFolder = this.retrieveSlotFolder();
+
+		for (DocInstCollection instCollection : persistedDocInstCollections) {
+			// entityManager.merge(instCollection);
+			Set<DocInst> docInsts = instCollection.getDocInsts();
+			Iterator<DocInst> iterator = docInsts.iterator();
+			while (iterator.hasNext()) {
+				DocInst docInst = iterator.next();
+				AlfrescoDocument document = (AlfrescoDocument) this.alfrescoUserIdentity
+						.getSession().getObject(docInst.getNodeRef());
+				Long docDefCollectionId = instCollection.getDocDefCollection()
+						.getId();
+				List<FileContainer> filesList = this.datas
+						.get(docDefCollectionId);
+
+				// Controllo se il document è ancora presente nella lista dei
+				// file associati, se c'è ancora ne aggiorno le properties
+				// altrimenti lo cancello da alfresco e lo tolgo dalla relativa
+				// collection
+				FileContainer itemContained = this.getItemIfContained(
+						filesList, document.getId());
+				if (itemContained == null) {
+					document.deleteAllVersions();
+					iterator.remove();
+					Long id = docInst.getId();
+					DocInst foundDocInst = this.entityManager.find(
+							DocInst.class, id);
+					this.entityManager.remove(foundDocInst);
+				} else {
+					// il file è quello vecchio ma potrebbe necessitare di
+					// un aggiornamento delle properties
+					System.out.println("Doc " + document.getName()
+							+ " da aggiornare");
+					this.updateProperties(document,
+							itemContained.getDocumentProperties());
+				}
+			}
+
+			this.addCollectionsNewDocumentsToSlot(slotFolder, instCollection);
+		}
+
+		this.entityManager.merge(instance);
+		this.entityManager.flush();
+
+		FacesMessages.instance().add(
+				"Slot " + this.slotDefHome.getInstance().getName()
+						+ " successfully updated");
+
+		if (this.warning) {
+			this.warning = false;
+			return "warning";
+		}
+
+		return "updated";
 	}
 
 	private void updateProperties(AlfrescoDocument document,
@@ -682,47 +1134,13 @@ public class SlotInstEditBean {
 		document.updateProperties(aspectsProperties);
 	}
 
-	@SuppressWarnings("unchecked")
-	private List<AlfrescoDocument> retrievePrimaryDocs(Long docDefId) {
-		List<AlfrescoDocument> primaryDocs = new ArrayList<AlfrescoDocument>();
-		List<DocInst> resultList = entityManager
-				.createQuery(
-						"from DocInst d where d.docInstCollection.slotInst.slotDef.type = 'Primary' and d.docInstCollection.slotInst.ownerId=:ownerId and d.docInstCollection.docDefCollection.docDef.id=:docDefId")
-				.setParameter("ownerId",
-						alfrescoUserIdentity.getActiveGroup().getShortName())
-				.setParameter("docDefId", docDefId).getResultList();
-		if (resultList != null) {
-			for (DocInst docInst : resultList) {
-				String nodeRef = docInst.getNodeRef();
-				AlfrescoDocument document = (AlfrescoDocument) alfrescoUserIdentity
-						.getSession().getObject(nodeRef);
-				primaryDocs.add(document);
-			}
-		}
-		return primaryDocs;
-	}
-
-	public void addDocFromPrimary(Long docDefCollectionId,
-			FileContainer container) {
-		//
-		container.setEditable(false);
-		//
-		this.activeCollectionId = docDefCollectionId;
-		datas.get(docDefCollectionId).add(container);
-	}
-
-	public void editItem(Long docDefCollectionId, FileContainer container) {
-		this.activeCollectionId = docDefCollectionId;
-		this.activeFileContainer = container;
-	}
-
 	private boolean verify() {
 		SlotDef slotDef = this.slotDefHome.getInstance();
 		Set<Rule> rules = slotDef.getRules();
 		boolean passed = true;
-		if (rules != null && !rules.isEmpty()) {
+		if ((rules != null) && !rules.isEmpty()) {
 			for (Rule rule : rules) {
-				boolean rulePassed = verifyRule(rule);
+				boolean rulePassed = this.verifyRule(rule);
 				if (!rulePassed) {
 					passed = false;
 				}
@@ -732,7 +1150,7 @@ public class SlotInstEditBean {
 	}
 
 	private boolean verifyRule(Rule rule) {
-		resetFlags();
+		this.resetFlags();
 		//
 		Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap = new HashMap<VerifierParameterInst, FileContainer>();
 		//
@@ -758,27 +1176,29 @@ public class SlotInstEditBean {
 				parameterInst.setFallible(false);
 				paramInsts.add(parameterInst);
 				inInstParams.put(paramName, paramInsts);
-			} else if (encodedParams != null && !encodedParams.equals("")) {
+			} else if ((encodedParams != null) && !encodedParams.equals("")) {
 				String[] splitted = encodedParams.split("\\|");
 				String source = splitted[0];
 				String field = splitted[1];
-				Object sourceDef = ruleParametersResolver
+				Object sourceDef = this.ruleParametersResolver
 						.resolveSourceDef(source);
-				Object fieldDef = ruleParametersResolver.resolveFieldDef(field);
-				List<VerifierParameterInst> paramInsts = retrieveValueInsts(
-						rule, processedPropertiesResolverMap,
-						verifierParameterDef, sourceDef, fieldDef);
+				Object fieldDef = this.ruleParametersResolver
+						.resolveFieldDef(field);
+				List<VerifierParameterInst> paramInsts = this
+						.retrieveValueInsts(rule,
+								processedPropertiesResolverMap,
+								verifierParameterDef, sourceDef, fieldDef);
 				inInstParams.put(paramName, paramInsts);
 			} else {
 				if (!verifierParameterDef.isOptional()) {
-					verifiable = false;
+					this.verifiable = false;
 					if (rule.isMandatory()) {
 						this.addMainMessage(new VerifierMessage(
 								verifierParameterDef.getLabel()
 										+ " not defined in rule!",
 								VerifierMessageType.ERROR));
 					} else {
-						failAllowed = true;
+						this.failAllowed = true;
 					}
 				}
 			}
@@ -791,14 +1211,14 @@ public class SlotInstEditBean {
 		//
 		//
 		// Comunicazione di eventuali errori o warnings
-		if (verifiable) {
+		if (this.verifiable) {
 			try {
 				boolean passed = true;
 				VerifierReport report = verifier.verify(inInstParams);
 				if (report.getResult().equals(VerifierResult.ERROR)) {
 					passed = false;
 				} else if (report.getResult().equals(VerifierResult.WARNING)) {
-					warning = true;
+					this.warning = true;
 				}
 
 				List<VerifierParameterInst> failedParams = report
@@ -813,7 +1233,7 @@ public class SlotInstEditBean {
 							+ " ha un valore errato. ";
 					String errorMessage = rule.getErrorMessage();
 					if (fileContainer != null) {
-						if (errorMessage == null || errorMessage.equals("")) {
+						if ((errorMessage == null) || errorMessage.equals("")) {
 							errorMessage = prefix.concat(verifier
 									.getDefaultErrorMessage());
 						}
@@ -833,7 +1253,7 @@ public class SlotInstEditBean {
 					FileContainer fileContainer = processedPropertiesResolverMap
 							.get(parameterInst);
 					String warningMessage = rule.getWarningMessage();
-					if (warningMessage == null || warningMessage.equals("")) {
+					if ((warningMessage == null) || warningMessage.equals("")) {
 						warningMessage = verifier.getDefaultWarningMessage();
 					}
 					if (fileContainer != null) {
@@ -870,234 +1290,11 @@ public class SlotInstEditBean {
 				return false;
 			}
 
-		} else if (failAllowed) {
+		} else if (this.failAllowed) {
 			return true;
 		}
 
 		return false;
-	}
-
-	private List<VerifierParameterInst> retrieveValueInsts(
-			Rule rule,
-			Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap,
-			VerifierParameterDef verifierParameterDef, Object sourceDef,
-			Object fieldDef) {
-		ParameterCoordinates parameterCoordinates = new ParameterCoordinates(
-				sourceDef, (DataDefinition) fieldDef);
-
-		List<VerifierParameterInst> paramInsts = new ArrayList<VerifierParameterInst>();
-		if (sourceDef instanceof DocDefCollection) {
-			DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
-			Property property = (Property) fieldDef;
-			List<FileContainer> list = datas.get(docDefCollection.getId());
-			if (list != null && !list.isEmpty()) {
-				for (FileContainer fileContainer : list) {
-					//
-					List<DocumentPropertyInst> allProperties = fileContainer
-							.getDocumentProperties();
-					//
-					Iterator<DocumentPropertyInst> iterator = allProperties
-							.iterator();
-					boolean found = false;
-					while (iterator.hasNext() && found == false) {
-						DocumentPropertyInst documentPropertyInst = iterator
-								.next();
-						if (documentPropertyInst.getProperty().equals(property)) {
-							Object value = documentPropertyInst.getValue();
-							found = true;
-							if (value != null && !value.equals("")) {
-								VerifierParameterInst parameterInst = new VerifierParameterInst(
-										verifierParameterDef, value, true);
-								paramInsts.add(parameterInst);
-								//
-								parameterInst
-										.setParameterCoordinates(parameterCoordinates);
-								//
-								processedPropertiesResolverMap.put(
-										parameterInst, fileContainer);
-								//
-							} else {
-								if (!verifierParameterDef.isOptional()) {
-									verifiable = false;
-									if (rule.isMandatory()) {
-										this.addFileMessage(
-												fileContainer.getId(),
-												new VerifierMessage(
-														documentPropertyInst
-																.getProperty()
-																.getTitle()
-																+ " non può essere nulla per verificare una regola di tipo "
-																+ rule.getType()
-																		.value(),
-														VerifierMessageType.ERROR));
-									} else {
-										failAllowed = true;
-									}
-								}
-							}
-						}
-					}
-				}
-			} else {
-				if (!verifierParameterDef.isOptional()) {
-					verifiable = false;
-					if (rule.isMandatory()) {
-						addCollectionMessage(
-								docDefCollection.getId(),
-								new VerifierMessage(
-										docDefCollection.getName()
-												+ " non può essere vuota per verificare una regola di tipo "
-												+ rule.getType().value()
-												+ " sulla proprietà "
-												+ property.getTitle()
-												+ " dei files che contiene",
-										VerifierMessageType.ERROR));
-					} else {
-						failAllowed = true;
-					}
-				}
-			}
-
-		} else if (sourceDef instanceof SlotDef) {
-			if (fieldDef instanceof PropertyDef) {
-				PropertyDef propertyDef = (PropertyDef) fieldDef;
-				Iterator<PropertyInst> iterator = this.getPropertyInsts()
-						.iterator();
-				boolean found = false;
-				while (iterator.hasNext() && found == false) {
-					PropertyInst propertyInst = iterator.next();
-					if (propertyInst.getPropertyDef().equals(propertyDef)) {
-						Object value = propertyInst.getValue();
-						found = true;
-						if (value != null && !value.equals("")) {
-							VerifierParameterInst parameterInst = new VerifierParameterInst(
-									verifierParameterDef, value, true);
-							//
-							parameterInst
-									.setParameterCoordinates(parameterCoordinates);
-							//
-							paramInsts.add(parameterInst);
-						} else {
-							if (!verifierParameterDef.isOptional()) {
-								verifiable = false;
-								if (rule.isMandatory()) {
-									this.addMainMessage(new VerifierMessage(
-											propertyDef.getName()
-													+ " non può essere nulla per verificare una regola di tipo "
-													+ rule.getType().value(),
-											VerifierMessageType.ERROR));
-								} else {
-									failAllowed = true;
-								}
-							}
-						}
-					}
-				}
-			} else if (fieldDef instanceof EmbeddedProperty) {
-				EmbeddedProperty embeddedProperty = (EmbeddedProperty) fieldDef;
-				Object value = embeddedProperty.getValue();
-				if (value != null) {
-					VerifierParameterInst parameterInst = new VerifierParameterInst(
-							verifierParameterDef, value, false);
-					//
-					parameterInst.setParameterCoordinates(parameterCoordinates);
-					//
-					paramInsts.add(parameterInst);
-				} else {
-					if (!verifierParameterDef.isOptional()) {
-						verifiable = false;
-						if (rule.isMandatory()) {
-							this.addMainMessage(new VerifierMessage(
-									embeddedProperty.getName()
-											+ " non può essere nulla per verificare una regola di tipo "
-											+ rule.getType().value(),
-									VerifierMessageType.ERROR));
-						} else {
-							failAllowed = true;
-						}
-					}
-				}
-			}
-
-		}
-		return paramInsts;
-	}
-
-	private void addCollectionMessage(Long collectionId, VerifierMessage message) {
-		ArrayList<VerifierMessage> messages = collectionsMessages
-				.get(collectionId);
-		if (messages == null) {
-			messages = new ArrayList<VerifierMessage>();
-			collectionsMessages.put(collectionId, messages);
-		}
-		messages.add(message);
-	}
-
-	private void addFileMessage(String fileContainerId, VerifierMessage message) {
-		ArrayList<VerifierMessage> messages = filesMessages
-				.get(fileContainerId);
-		if (messages == null) {
-			messages = new ArrayList<VerifierMessage>();
-			filesMessages.put(fileContainerId, messages);
-		}
-		messages.add(message);
-	}
-
-	public PropertyInst findPropertyInstByDefId(Long propertyDefId) {
-		Iterator<PropertyInst> iterator = propertyInsts.iterator();
-		while (iterator.hasNext()) {
-			PropertyInst propertyInst = iterator.next();
-			if (propertyInst.getPropertyDef().getId().equals(propertyDefId)) {
-				return propertyInst;
-			}
-		}
-		return null;
-	}
-
-	private void cleanCollection(Long docDefCollectionId) {
-		List<FileContainer> itemslist = this.datas.get(docDefCollectionId);
-		if (itemslist != null) {
-			itemslist.clear();
-		} else {
-			itemslist = new ArrayList<FileContainer>();
-		}
-	}
-
-	public void cleanConditionalCollection(PropertyInst propertyInst) {
-
-		Object value = valueChangeListener.getValue();
-		if (value == null
-				&& !propertyInst.getPropertyDef().getDataType()
-						.equals(DataType.BOOLEAN)) {
-			propertyInst.clean();
-		}
-
-		Iterator<DocInstCollection> iterator = docInstCollections.iterator();
-		while (iterator.hasNext()) {
-			DocInstCollection instCollection = iterator.next();
-			if (instCollection.getDocDefCollection()
-					.getConditionalPropertyDef() != null
-					&& instCollection.getDocDefCollection()
-							.getConditionalPropertyDef().getId()
-							.equals(propertyInst.getPropertyDef().getId())) {
-				Object conditionalValue = instCollection.getDocDefCollection()
-						.getConditionalPropertyInst().getValue();
-				// TODO: riguardare questo caso!!!
-				// Se alla proprietà che condiziona la collection è stato
-				// cambiato DataType e non è stata aggiornata la definizione
-				// della collection che la referenzia aggiornando il valore
-				// della
-				// property, "ConditionalPropertyInst().getValue()" restituirà
-				// null. In questo caso cancello cmq il contenuto della
-				// collection perchè i valori non matchano
-				if (conditionalValue == null
-						|| !conditionalValue.equals(propertyInst.getValue())) {
-					cleanCollection(instCollection.getDocDefCollection()
-							.getId());
-				}
-			}
-		}
-
 	}
 
 	private void verifySignature(AlfrescoDocument document) {
@@ -1128,202 +1325,21 @@ public class SlotInstEditBean {
 						.getCertificates(sid);
 
 				for (X509Certificate x509Certificate : certsCollection) {
-					X509CertificateObject validCert = certsController
+					X509CertificateObject validCert = this.certsController
 							.getCerts().match(x509Certificate);
 
 					if (validCert != null) {
 						System.out.println("----> certificato trovato!");
-						addSignature(document, x509Certificate, validCert);
+						this.addSignature(document, x509Certificate, validCert);
 					}
 				}
 			}
-			extractAndEmbedContent(document, cms);
+			this.extractAndEmbedContent(document, cms);
 
 		} catch (Exception e) {
 			System.out.println(document.getName()
 					+ " non è firmato digitalmente");
 		}
-	}
-
-	private void addSignature(AlfrescoDocument document,
-			X509Certificate x509Certificate, X509CertificateObject validCert) {
-		try {
-			Principal subjectDN = x509Certificate.getSubjectDN();
-
-			String mysign = Utils.getCN(subjectDN.toString());
-			String cf = Utils.getCF(subjectDN.toString());
-			Date notAfter = x509Certificate.getNotAfter();
-			String authority = Utils.getCN(validCert.getIssuerDN().toString());
-			Boolean validity = Boolean.TRUE;
-
-			String username = alfrescoUserIdentity.getUsername();
-			String password = alfrescoUserIdentity.getPassword();
-			String url = alfrescoUserIdentity.getUrl();
-			AlfrescoWebScriptClient webScriptClient = new AlfrescoWebScriptClient(
-					username, password, url);
-
-			document.addAspect(Signature.ASPECT_SIGNED);
-
-			String signatureNodeRef = webScriptClient.addSignature(
-					document.getId(),
-					"sign_" + Utils.md5Encode(x509Certificate.getSignature()));
-
-			Session session = alfrescoUserIdentity.getSession();
-			AlfrescoDocument signatureDoc = (AlfrescoDocument) session
-					.getObject(signatureNodeRef);
-
-			Map<String, Object> props = new HashMap<String, Object>();
-			props.put(Signature.VALIDITY, validity);
-			props.put(Signature.EXPIRY, Utils.dateToCalendar(notAfter));
-			props.put(Signature.AUTHORITY, authority);
-			props.put(Signature.SIGN, mysign);
-			props.put(Signature.CF, cf);
-
-			signatureDoc.updateProperties(props);
-
-			System.out.println("-> Signature added to " + document.getName());
-
-		} catch (Exception e) {
-			System.out
-					.println("---> Errore nell aggiungere una firma al documento "
-							+ document.getName());
-			e.printStackTrace();
-		}
-	}
-
-	private void extractAndEmbedContent(AlfrescoDocument document,
-			CMSSignedData cms) {
-
-		try {
-			CMSProcessable signedContent = cms.getSignedContent();
-			final byte[] content = (byte[]) signedContent.getContent();
-
-			ByteArrayInputStream baip = new ByteArrayInputStream(content);
-
-			String contentFilename = FileContainer
-					.retrieveContentFilename(document.getName());
-			String encodedContentFilename = FileContainer
-					.encodeFilename(contentFilename);
-			//
-			String mimetype = "application/octet-stream";
-			ContentStreamImpl contentStreamImpl = new ContentStreamImpl(
-					encodedContentFilename,
-					new BigInteger("" + content.length), mimetype, baip);
-
-			Map<String, Object> properties = new HashMap<String, Object>();
-			properties.put(PropertyIds.NAME, encodedContentFilename);
-			properties.put(PropertyIds.OBJECT_TYPE_ID,
-					BaseTypeId.CMIS_DOCUMENT.value());
-
-			List<Folder> parents = document.getParents();
-			Folder folder = parents.get(0);
-
-			ObjectId objectId = alfrescoUserIdentity.getSession()
-					.createDocument(properties, folder, contentStreamImpl,
-							VersioningState.NONE, null, null, null);
-			AlfrescoDocument contentDoc = (AlfrescoDocument) alfrescoUserIdentity
-					.getSession().getObject(objectId.getId());
-			contentDoc.addAspect("P:util:tmp");
-
-			//
-			String username = alfrescoUserIdentity.getUsername();
-			String password = alfrescoUserIdentity.getPassword();
-			String url = alfrescoUserIdentity.getUrl();
-			AlfrescoWebScriptClient webScriptClient = new AlfrescoWebScriptClient(
-					username, password, url);
-			webScriptClient.embedContentToSignedDoc(document.getId(),
-					contentDoc.getId(),
-					FileContainer.retrieveContentFilename(document.getName()));
-			//
-			contentDoc.deleteAllVersions();
-			//
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private void addMainMessage(VerifierMessage message) {
-		slotMessages.add(message);
-	}
-
-	public List<PropertyInst> getPropertyInsts() {
-		return propertyInsts;
-	}
-
-	public void setPropertyInsts(List<PropertyInst> propertyInsts) {
-		this.propertyInsts = propertyInsts;
-	}
-
-	public List<DocInstCollection> getDocInstCollections() {
-		return docInstCollections;
-	}
-
-	public void setDocInstCollections(List<DocInstCollection> docInstCollections) {
-		this.docInstCollections = docInstCollections;
-	}
-
-	public HashMap<Long, List<FileContainer>> getDatas() {
-		return datas;
-	}
-
-	public void setDatas(HashMap<Long, List<FileContainer>> datas) {
-		this.datas = datas;
-	}
-
-	public Long getActiveCollectionId() {
-		return activeCollectionId;
-	}
-
-	public void setActiveCollectionId(Long activeCollection) {
-		this.activeCollectionId = activeCollection;
-	}
-
-	public HashMap<Long, List<FileContainer>> getPrimaryDocs() {
-		return primaryDocs;
-	}
-
-	public void setPrimaryDocs(HashMap<Long, List<FileContainer>> primaryDocs) {
-		this.primaryDocs = primaryDocs;
-	}
-
-	public List<EmbeddedProperty> getEmbeddedProperties() {
-		return new ArrayList<EmbeddedProperty>(this.slotDefHome.getInstance()
-				.getEmbeddedProperties());
-	}
-
-	public ArrayList<VerifierMessage> getSlotMessages() {
-		return slotMessages;
-	}
-
-	public void setSlotMessages(ArrayList<VerifierMessage> slotMessages) {
-		this.slotMessages = slotMessages;
-	}
-
-	public HashMap<String, ArrayList<VerifierMessage>> getFilesMessages() {
-		return filesMessages;
-	}
-
-	public void setFilesMessages(
-			HashMap<String, ArrayList<VerifierMessage>> filesMessages) {
-		this.filesMessages = filesMessages;
-	}
-
-	public HashMap<Long, ArrayList<VerifierMessage>> getCollectionsMessages() {
-		return collectionsMessages;
-	}
-
-	public void setCollectionsMessages(
-			HashMap<Long, ArrayList<VerifierMessage>> collectionsMessages) {
-		this.collectionsMessages = collectionsMessages;
-	}
-
-	public FileContainer getActiveFileContainer() {
-		return activeFileContainer;
-	}
-
-	public void setActiveFileContainer(FileContainer activeFileContainer) {
-		this.activeFileContainer = activeFileContainer;
 	}
 
 }
