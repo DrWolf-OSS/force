@@ -2,6 +2,8 @@ package it.drwolf.force.session;
 
 import it.drwolf.force.entity.Gara;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
+import it.drwolf.slot.alfresco.AlfrescoWrapper;
+import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
 import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.pagebeans.SlotInstEditBean;
@@ -33,7 +35,14 @@ public class ControlPanelBean {
 	@In(create = true)
 	AlfrescoUserIdentity alfrescoUserIdentity;
 
+	@In(create = true)
+	private AlfrescoWrapper alfrescoWrapper;
+
 	public List<DocInstCollection> getDocInstCollections() {
+		for (DocInstCollection element : this.slotInstEditBean
+				.getDocInstCollections()) {
+			System.out.println(element);
+		}
 		return this.slotInstEditBean.getDocInstCollections();
 	}
 
@@ -59,9 +68,24 @@ public class ControlPanelBean {
 
 	@Create
 	public void init() {
+		// all'inizializzazione mi faccio dare i primi n documenti in scadenza
+		// per farlo procedo nel seguente modo:
+		// prelevo con una query cmis tutti i documenti che sono nella cartella
+		// dello slot primary che sono scabili
+		ArrayList<String> ids = this.alfrescoWrapper
+				.getDocumentIdsInFolderByAspect("slot:expirable",
+						this.userSession.getPrimarySlotFolder().getId(),
+						"slot:expirationDate", 2);
 		for (DocInstCollection docs : this.slotInstEditBean
 				.getDocInstCollections()) {
-			docs.getDocInsts();
+			for (DocInst doc : docs.getDocInsts()) {
+				for (String id : ids) {
+					if (doc.getNodeRef().equals(id)) {
+						// documento prossimo alla scadenza
+						System.out.println(doc);
+					}
+				}
+			}
 		}
 	}
 }
