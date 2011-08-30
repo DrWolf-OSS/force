@@ -8,7 +8,7 @@
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:a="http://richfaces.org/a4j"
     xmlns:rich="http://richfaces.org/rich"
-    template="layout/template.xhtml">
+    template="/layout/template.xhtml">
 
 <ui:define name="body">
 
@@ -17,18 +17,18 @@
         <rich:panel>
             <f:facet name="header">#{slotDefHome.managed ? 'Edit' : 'Add'} Slot def</f:facet>
 
-            <s:decorate id="templateField" template="/layout/edit.xhtml">
+            <s:decorate id="templateField" template="/layout/edit.xhtml" rendered="#{not slotDefEditBean.model}">
                 <ui:define name="label">Modello</ui:define>
                	<h:selectBooleanCheckbox value="#{slotDefHome.instance.template}" />
             </s:decorate>
 
             <s:decorate id="nameField" template="/layout/edit.xhtml">
-                <ui:define name="label">Name</ui:define>
+                <ui:define name="label">Nome</ui:define>
                 <h:inputText id="name" value="#{slotDefHome.instance.name}"/>
             </s:decorate>
             
-            <s:decorate id="typeField" template="/layout/edit.xhtml">
-                <ui:define name="label">Type</ui:define>
+            <s:decorate id="typeField" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.mode == 'Normal'}">
+                <ui:define name="label">Tipo</ui:define>
                 <h:selectOneMenu id="slotDefType" value="#{slotDefHome.instance.type}" >
                     	<s:selectItems value="#{slotDefEditBean.slotDefTypes}" 
 						var="slotDefType" label="#{slotDefType.value()}"/>
@@ -68,45 +68,102 @@
 			</c:forEach>
 			</s:div>
             
-            <s:div id="properties">
-				<c:forEach var="prop" items="#{slotDefHome.instance.propertyDefsAsList}">
-					<s:decorate template="/layout/display.xhtml">
-		                <ui:define name="label">
-		                	<h:outputText value="#{prop.name}" />
-						</ui:define>
-		                <h:outputText value="#{prop.dataType}" />
-		                <a:commandButton value="remove" action="#{slotDefEditBean.removeProp(prop)}" 
+			
+			<s:decorate template="/layout/display.xhtml">
+				<ui:define name="label">
+	                <h:outputText value="Informazioni dell'azienda" />
+				</ui:define>
+				<h:outputText value="Nessuna informazione definita"/>
+				<rich:dataTable value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" id="propTable" >
+					<rich:column>
+						<f:facet name="header">Nome</f:facet>
+						<h:outputText value="#{prop.name}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Tipologia di dato</f:facet>
+						<h:outputText value="#{prop.dataType.value()}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Informazione obbligatoria</f:facet>
+						<h:outputText value="#{prop.required ? 'obbligatoria' : 'facoltativa'}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Accetta valori multipli</f:facet>
+						<h:outputText value="#{prop.multiple ? 'sì' : 'no'}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Dizionario associato</f:facet>
+						<h:outputText value="#{prop.dictionary!=null ? prop.dictionary.name : 'nessuno'}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Vincolante per le richieste</f:facet>
+						<h:outputText value="#{!slotDefEditBean.getReferencedCollectionsNames(prop).equals('') ? slotDefEditBean.getReferencedCollectionsNames(prop) : 'nessuna'}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Azioni</f:facet>
+						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeProp(prop)}" 
 		                				onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
-		                				disabled="#{slotDefHome.referenced}" reRender="properties,collections"/>
-		                <a:commandButton value="edit" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" 
+		                				disabled="#{slotDefHome.referenced}" reRender="propTable,collTable"/>
+		                #{' '}
+		                <a:commandLink value="Modifica" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" 
 		                		        onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
 		                				reRender="propPanel"/>
-		            </s:decorate>			
-				</c:forEach>
-			</s:div>
+					</rich:column>
+				</rich:dataTable>
+			</s:decorate>
+			
+			
+			<s:decorate template="/layout/display.xhtml" id="collTable">
+				<ui:define name="label">
+	                <h:outputText value="Richieste" />
+				</ui:define>
+				<h:outputText value="Nessuna richiesta definita" rendered="#{empty slotDefHome.instance.docDefCollectionsAsList}"/>
+				<rich:dataTable value="#{slotDefHome.instance.docDefCollectionsAsList}" var="coll" id="propTable" rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}">
+					<rich:column>
+						<f:facet name="header">Nome</f:facet>
+						<h:outputText value="#{coll.name}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Tipo di cocumento</f:facet>
+						<h:outputText value="#{coll.docDef.name}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Obbligatoria</f:facet>
+						<h:outputText value="#{coll.mandatory ? 'sì' : 'no'}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Informazione vincolante</f:facet>
+						<h:outputText value="#{coll.conditionalPropertyDef!=null ? coll.conditionalPropertyDef.name : ''}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Valore informazione vincolante</f:facet>
+						<h:outputText value="#{coll.conditionalPropertyInst.stringValue}"
+								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
+						<h:outputText value="#{coll.conditionalPropertyInst.integerValue}"
+								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'INTEGER'}" />
+						<h:outputText value="#{coll.conditionalPropertyInst.booleanValue ? 'true' : 'false'}"
+								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'BOOLEAN'}" />
+						<h:outputText value="#{coll.conditionalPropertyInst.dateValue}"
+								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'DATE'}">
+							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Azioni</f:facet>
+							<a:commandLink value="Elimina" action="#{slotDefEditBean.removeColl(coll)}" 
+									disabled="#{slotDefHome.referenced}" reRender="collTable"/>
+							#{'  '}
+	                		<a:commandLink value="Modifica" action="#{slotDefEditBean.editColl(coll)}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel"/>
+					</rich:column>
+				</rich:dataTable>
+			</s:decorate>
+			
 			
 			<div style="clear:both"/>
-			
-
-			<s:div id="collections">
-			<c:forEach var="coll" items="#{slotDefHome.instance.docDefCollectionsAsList}">
-				<s:decorate template="/layout/display.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="#{coll.name}" />
-					</ui:define>
-					<h:outputText value="#{coll.docDef.name}" />
-					<a:commandButton value="remove" action="#{slotDefEditBean.removeColl(coll)}" 
-									disabled="#{slotDefHome.referenced}" reRender="collections"/>
-	                <a:commandButton value="edit" action="#{slotDefEditBean.editColl(coll)}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel"/>
-	            </s:decorate>			
-			</c:forEach>
-			</s:div>
-			
-			
-			<div style="clear:both"/>
-			<a:commandButton value="add property" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newPoperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel"/>
-			<a:commandButton value="add collection" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel"/>
-			<a:commandButton value="add embeddedProperty" action="#{slotDefEditBean.newEmbeddedProperty()}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel"/>
+			<a:commandButton value="Aggiungi informazione sull'azienda" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newPoperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel"/>
+			<a:commandButton value="Aggiungi richieste" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel" rendered="#{slotDefEditBean.mode == 'Normal'}"/>
+			<a:commandButton value="Aggiungi richiesta" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collTypePanel')}.show()" reRender="collPanel"/>
+			<a:commandButton value="add embeddedProperty" action="#{slotDefEditBean.newEmbeddedProperty()}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel" rendered="#{slotDefEditBean.mode != 'Primary'}"/>
 			
             <div style="clear:both">
                 <span class="required">*</span>
@@ -149,174 +206,70 @@
         </div>
 
     </h:form>
+    
+       <rich:modalPanel id="collTypePanel" autosized="true" minWidth="500"
+				resizeable="false">
+			<f:facet name="header">
+				<h:outputText value="Scegli la tipologia di richiesta" />
+			</f:facet>
+			<a:form id="ctpf">
+			<s:div style="text-align: center">
+				<a:commandButton action="#{slotDefEditBean.setConditional(false)}" oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('collPanel')}.show();"
+								value="Aggiungi richiesta comune" reRender="collPanel,propPanel"/>
+				#{' '}
+				<a:commandButton action="#{slotDefEditBean.newConditionaProperty()}" oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('propPanel')}.show();"
+								value="Aggiungi richiesta vincolata" reRender="pf,collPanel,propPanel"/>
+	        <div style="clear:both"/>
+	        </s:div>
+	        <a:region>
+			<a:commandButton value="Annulla" oncomplete="#{rich:component('collTypePanel')}.hide()" reRender="pf,propPanel,collPanel"/>
+			</a:region>
+			</a:form>
+		</rich:modalPanel>
+    
 
-<rich:tabPanel switchType="client">
-
-    <rich:tab label="Doc def collections">
-        <h:form styleClass="association" id="docDefCollectionsChildren">
-
-            <h:outputText value="There are no docDefCollections associated with this slotDef."
-                       rendered="#{empty slotDefHome.docDefCollections}"/>
-
-            <rich:dataTable value="#{slotDefHome.docDefCollections}"
-                           var="_docDefCollection"
-                      rendered="#{not empty slotDefHome.docDefCollections}"
-                    rowClasses="rvgRowOne,rvgRowTwo"
-                            id="docDefCollectionsTable">
-                <rich:column sortBy="#{_docDefCollection.id}">
-                    <f:facet name="header">Id</f:facet>
-                    <h:outputText value="#{_docDefCollection.id}"/>
-                </rich:column>
-                <rich:column sortBy="#{_docDefCollection.name}">
-                    <f:facet name="header">Name</f:facet>
-                    <h:outputText value="#{_docDefCollection.name}"/>
-                </rich:column>
-                <rich:column sortBy="#{_docDefCollection.min}">
-                    <f:facet name="header">Min</f:facet>
-                    <h:outputText value="#{_docDefCollection.min}"/>
-                </rich:column>
-                <rich:column sortBy="#{_docDefCollection.max}">
-                    <f:facet name="header">Max</f:facet>
-                    <h:outputText value="#{_docDefCollection.max}"/>
-                </rich:column>
-            </rich:dataTable>
-
-        </h:form>
-
-        <f:subview rendered="#{slotDefHome.managed}" id="docDefCollections">
-        <div class="actionButtons">
-            <s:button id="adddocDefCollection"
-                   value="Add docDefCollection"
-                    view="/DocDefCollectionEdit.xhtml"
-             propagation="none">
-                 <f:param name="slotDefId"
-                         value="#{slotDefHome.instance.id}"/>
-                 <f:param name="docDefCollectionFrom" value="SlotDef"/>
-            </s:button>
-        </div>
-        </f:subview>
-    </rich:tab>
-
-    <rich:tab label="Propertyt defs">
-        <h:form styleClass="association" id="propertyDefsChildren">
-
-            <h:outputText value="There are no propertyDefs associated with this slotDef."
-                       rendered="#{empty slotDefHome.propertyDefs}"/>
-
-            <rich:dataTable value="#{slotDefHome.propertyDefs}"
-                           var="_propertytDef"
-                      rendered="#{not empty slotDefHome.propertyDefs}"
-                    rowClasses="rvgRowOne,rvgRowTwo"
-                            id="propertyDefsTable">
-                <rich:column sortBy="#{_propertytDef.id}">
-                    <f:facet name="header">Id</f:facet>
-                    <h:outputText value="#{_propertytDef.id}"/>
-                </rich:column>
-                <rich:column sortBy="#{_propertytDef.name}">
-                    <f:facet name="header">Name</f:facet>
-                    <h:outputText value="#{_propertytDef.name}"/>
-                </rich:column>
-                <rich:column sortBy="#{_propertytDef.dataType}">
-                    <f:facet name="header">Type</f:facet>
-                    <h:outputText value="#{_propertytDef.dataType}"/>
-                </rich:column>
-            </rich:dataTable>
-
-        </h:form>
-
-        <f:subview rendered="#{slotDefHome.managed}" id="propertyDefs">
-        <div class="actionButtons">
-            <s:button id="addpropertytDef"
-                   value="Add propertytDef"
-                    view="/PropertytDefEdit.xhtml"
-             propagation="none">
-                 <f:param name="slotDefId"
-                         value="#{slotDefHome.instance.id}"/>
-                 <f:param name="propertytDefFrom" value="SlotDef"/>
-            </s:button>
-        </div>
-        </f:subview>
-    </rich:tab>
-
-    <rich:tab label="Rules">
-        <h:form styleClass="association" id="rulesChildren">
-
-            <h:outputText value="There are no rules associated with this slotDef."
-                       rendered="#{empty slotDefHome.rules}"/>
-
-            <rich:dataTable value="#{slotDefHome.rules}"
-                           var="_rule"
-                      rendered="#{not empty slotDefHome.rules}"
-                    rowClasses="rvgRowOne,rvgRowTwo"
-                            id="rulesTable">
-                <rich:column sortBy="#{_rule.id}">
-                    <f:facet name="header">Id</f:facet>
-                    <h:outputText value="#{_rule.id}"/>
-                </rich:column>
-                <rich:column sortBy="#{_rule.type}">
-                    <f:facet name="header">Type</f:facet>
-                    <h:outputText value="#{_rule.type}"/>
-                </rich:column>
-            </rich:dataTable>
-
-        </h:form>
-
-        <f:subview rendered="#{slotDefHome.managed}" id="rules">
-        <div class="actionButtons">
-            <s:button id="addrule"
-                   value="Add rule"
-                    view="/RuleEdit.xhtml"
-             propagation="none">
-                 <f:param name="slotDefId"
-                         value="#{slotDefHome.instance.id}"/>
-                 <f:param name="ruleFrom" value="SlotDef"/>
-            </s:button>
-        </div>
-        </f:subview>
-    </rich:tab>
-</rich:tabPanel>
-
-       <rich:modalPanel id="propPanel" autosized="true" width="400" 
+       <rich:modalPanel id="propPanel" autosized="true" minWidth="600"
 				resizeable="false">
 			<f:facet name="header">
 				<h:outputText value="Add Property" />
 			</f:facet>
 			<a:form id="pf">
 				<script type="text/javascript">
-					var invalid = false;
+					var pinvalid = false;
 				</script>
+				<ui:param name="customType" value="p" />
+				<ui:param name="prefix" value="p" />
 			<s:div>
 	            <a:region>
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
-	                	<h:outputText value="Property Name" />
+	                	<h:outputText value="Nome dell'informazione"/>
 					</ui:define>
-					<h:inputText value="#{slotDefEditBean.propertyDef.name}" required="true"/>
+					<h:inputText value="#{slotDefEditBean.propertyDef.name}" required="true" styleClass="ptext"/>
 	            </s:decorate>
 	            
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
-	                	<h:outputText value="Property Data Type" />
+	                	<h:outputText value="Tipologia del dato" />
 					</ui:define>
 					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.propertyDef.dataType}" required="true">
-                    	<s:selectItems value="#{dataTypes}" var="type" label="#{type}" noSelectionLabel="-- seleziona un tipo --"/>
+                    	<s:selectItems value="#{dataTypes}" var="type" label="#{type.value()}" noSelectionLabel="-- seleziona un tipo --"/>
 					<a:support event="onchange" reRender="pf"/>
              		</h:selectOneMenu>
 	            </s:decorate>
 	            
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
-	                	<h:outputText value="Required" />
+	                	<h:outputText value="Informazione obbligatoria" />
 					</ui:define>
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.required}" />
 	            </s:decorate>
 
 	            
-	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.dataType != 'BOOLEAN'}">
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.dataType != 'BOOLEAN' and not slotDefEditBean.conditional}">
 	                <ui:define name="label">
-	                	<h:outputText value="Multiple" />
+	                	<h:outputText value="Accetta valori multipli" />
 					</ui:define>
-
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.multiple}" >
 						<a:support event="onchange" reRender="pf"/>
 					</h:selectBooleanCheckbox>
@@ -325,26 +278,29 @@
 	            
 	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
-	                	<h:outputText value="Dictionary" />
+	                	<h:outputText value="Dizionario associato" />
 					</ui:define>
-					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}" required="#{slotDefEditBean.propertyDef.multiple}">
+					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}" required="#{slotDefEditBean.propertyDef.multiple or slotDefEditBean.conditional}">
                     		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.propertyDef.dataType)}" 
-											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- select a dictionary --"/>
+											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- seleziona un dizionario --"/>
 							<s:convertEntity/>
              		</h:selectOneMenu>
 	            </s:decorate>
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" oncomplete="if(!invalid){#{rich:component('propPanel')}.hide();}" reRender="pf,properties,condPD"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();}" 
+							rendered="#{not slotDefEditBean.conditional}"	reRender="pf,condPD,propTable"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionalProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();#{rich:component('collPanel')}.show();}" 
+							rendered="#{slotDefEditBean.conditional}"	reRender="cpf,pf,condPD,condPI,propTable"/>
 			<a:region>
-			<a:commandButton value="Cancel" onclick="#{rich:component('propPanel')}.hide()" reRender="pf,propPanel"/>
+			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('propPanel')}.hide()" reRender="pf,propPanel,collPanel"/>
 			</a:region>
-			<a:commandButton value="Refresh" styleClass="rightCommand" reRender="pf"/>
+			<a:commandButton value="Aggiorna" styleClass="rightCommand" reRender="pf"/>
 			</a:form>
 		</rich:modalPanel>
 		
 
-		<rich:modalPanel id="embeddedPropPanel" autosized="true" minWidth="450"
+		<rich:modalPanel id="embeddedPropPanel" autosized="true" minWidth="550"
 				resizeable="false">
 			<f:facet name="header">
 				<h:outputText value="Add Embedded Property" />
@@ -353,7 +309,7 @@
 				<script type="text/javascript">
 					var invalid = false;
 				</script>
-				
+				<ui:param name="customType" value="p" /> 
 			<s:div id="embeddedPropValue">
 			<a:region>
 				<s:decorate template="/layout/edit.xhtml">
@@ -428,7 +384,6 @@
 								required="true"
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
 							
-
 							<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.stringValue}" required="true"
 										rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 										valueChangeListener="#{valueChangeListener.listener}">
@@ -462,7 +417,7 @@
 	            </s:div>
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addEmbeddedProperty()}" oncomplete="if(!invalid){#{rich:component('embeddedPropPanel')}.hide();}" reRender="epForm,embeddedProperties,propPanel"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addEmbeddedProperty()}" oncomplete="if(!invalid){#{rich:component('embeddedPropPanel')}.hide();}" reRender="epForm,embeddedProperties"/>
 			<a:region>
 			<a:commandButton value="Cancel" onclick="#{rich:component('embeddedPropPanel')}.hide()"/>
 			</a:region>
@@ -471,10 +426,10 @@
 		</rich:modalPanel>
 		
 		<!-- TODO: Per controllare il form uso la variabile invalid invece di cpfinvalid che non viene valorizzata.. -->
-		<rich:modalPanel id="collPanel" autosized="true" width="400" 
+		<rich:modalPanel id="collPanel" autosized="true" minWidth="500"
 				resizeable="false">
 			<f:facet name="header">
-				<h:outputText value="Add Collection" />
+				<h:outputText value="Descrizione della Richiesta" />
 			</f:facet>
 			<a:form id="cpf">
 				<script type="text/javascript">
@@ -484,10 +439,13 @@
 			<a:region>
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
-	                	<h:outputText value="Collection Name" />
+	                	<h:outputText value="Nome della Richiesta" rendered="#{not slotDefEditBean.conditional}"/>
+	                	<h:outputText value="Nome della Richiesta Vincolata" rendered="#{slotDefEditBean.conditional}"/>
 					</ui:define>
 					<h:inputText value="#{slotDefEditBean.collection.name}" required="true"/>
 	            </s:decorate>
+	            
+	            <s:fragment rendered="false">
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Min" />
@@ -500,21 +458,23 @@
 					</ui:define>
 					<h:inputText value="#{slotDefEditBean.collection.max}" />
 	            </s:decorate>
+	            </s:fragment>
+	            
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
-	                	<h:outputText value="DocDef Type" />
+	                	<h:outputText value="Tipo di documento" />
 					</ui:define>
-					<h:selectOneMenu id="cDocDef" value="#{slotDefEditBean.collection.docDef}" >
+					<h:selectOneMenu id="cDocDef" value="#{slotDefEditBean.collection.docDef}" required="true">
                     	<s:selectItems value="#{docDefList.resultList}" 
-						var="docDef" label="#{docDef.name}"/>
+						var="docDef" label="#{docDef.name}" noSelectionLabel="-- seleziona una tipologia di documento --"/>
 						<s:convertEntity/>
              		</h:selectOneMenu>
 	            </s:decorate>
-	            <s:decorate template="/layout/edit.xhtml">
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.conditional}" id="condPD">
 	                <ui:define name="label">
-	                	<h:outputText value="Conditional Property" />
+	                	<h:outputText value="Informazione vincolante" />
 					</ui:define>
-					<h:selectOneMenu id="condPD" value="#{slotDefEditBean.collection.conditionalPropertyDef}" converter="propertyDefConverter">
+					<h:selectOneMenu  value="#{slotDefEditBean.collection.conditionalPropertyDef}" converter="propertyDefConverter" disabled="#{slotDefEditBean.conditional}">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
@@ -524,11 +484,10 @@
 				</a:region>
 				
 				
-				<s:div rendered="#{slotDefEditBean.collection.conditionalPropertyDef != null}">			
-	            <s:decorate  template="/layout/edit.xhtml">
-	            	
+				<s:div >			
+	            <s:decorate  template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef != null}" id="condPI">	            	
 	                <ui:define name="label">
-	                	<h:outputText value="Conditional Property Value" />
+	                	<h:outputText value="Valore vincolante" />
 					</ui:define>
 					<h:inputText value="#{slotDefEditBean.collection.conditionalPropertyInst.stringValue}"
 							rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'STRING' and slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues == null}"
@@ -561,14 +520,20 @@
 											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
              			</h:selectOneMenu>
-
 	            </s:decorate>
 	            </s:div>
+	            
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Obbigatoria" />
+					</ui:define>
+					<h:selectBooleanCheckbox value="#{slotDefEditBean.collection.mandatory}" />
+	            </s:decorate>
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addCollection()}" oncomplete="if(!invalid){#{rich:component('collPanel')}.hide();}" reRender="cpf,collections"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionedCollection()}" oncomplete="if(!invalid){#{rich:component('collPanel')}.hide();}" reRender="cpf,pf,collTable,propTable,propPanel"/>
 			<a:region>
-			<a:commandButton value="Cancel" onclick="#{rich:component('collPanel')}.hide()" reRender="cpf"/>
+			<a:commandButton value="Cancel" action="#{slotDefEditBean.setConditional(false)}" oncomplete="#{rich:component('collPanel')}.hide()" reRender="cpf"/>
 			</a:region>
 			<a:commandButton value="Refresh" styleClass="rightCommand" reRender="cpf"/>
 			</a:form>
