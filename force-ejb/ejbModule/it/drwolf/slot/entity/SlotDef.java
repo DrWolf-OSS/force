@@ -4,6 +4,7 @@ import it.drwolf.slot.enums.SlotDefType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +18,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.Cascade;
 
 @Entity
 public class SlotDef {
@@ -54,6 +57,7 @@ public class SlotDef {
 	}
 
 	@OneToMany(mappedBy = "slotDef", cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@OrderBy("name")
 	public Set<DocDefCollection> getDocDefCollections() {
 		return docDefCollections;
@@ -74,6 +78,7 @@ public class SlotDef {
 
 	@OrderBy("name")
 	@OneToMany(cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@JoinColumn(name = "slotDef_id")
 	public Set<PropertyDef> getPropertyDefs() {
 		return propertyDefs;
@@ -133,6 +138,7 @@ public class SlotDef {
 
 	@OrderBy("name")
 	@OneToMany(cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@JoinColumn(name = "slotDef_id")
 	public Set<EmbeddedProperty> getEmbeddedProperties() {
 		return embeddedProperties;
@@ -142,6 +148,43 @@ public class SlotDef {
 		this.embeddedProperties = embeddedProperties;
 	}
 
+	@Transient
+	public PropertyDef retrievePropertyDefByName(String name) {
+		Iterator<PropertyDef> iterator = this.getPropertyDefs().iterator();
+		while (iterator.hasNext()) {
+			PropertyDef propertyDef = iterator.next();
+			if (propertyDef.getName().equals(name)) {
+				return propertyDef;
+			}
+		}
+		return null;
+	}
+
+	@Transient
+	public DocDefCollection retrieveDocDefCollectionByName(String name) {
+		Iterator<DocDefCollection> iterator = this.getDocDefCollections()
+				.iterator();
+		while (iterator.hasNext()) {
+			DocDefCollection docDefCollection = iterator.next();
+			if (docDefCollection.getName().equals(name)) {
+				return docDefCollection;
+			}
+		}
+		return null;
+	}
+
+	@Transient
+	public EmbeddedProperty retrieveEmbeddedPropertyByName(String name) {
+		Iterator<EmbeddedProperty> iterator = this.getEmbeddedProperties()
+				.iterator();
+		while (iterator.hasNext()) {
+			EmbeddedProperty embeddedProperty = iterator.next();
+			if (embeddedProperty.getName().equals(name)) {
+				return embeddedProperty;
+			}
+		}
+		return null;
+	}
 	// @Override
 	// public int hashCode() {
 	// final int prime = 31;

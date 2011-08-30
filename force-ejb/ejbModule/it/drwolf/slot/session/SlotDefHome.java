@@ -1,21 +1,40 @@
 package it.drwolf.slot.session;
 
+import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.entity.DocDefCollection;
+import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
+import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.entity.Rule;
+import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
+import it.drwolf.slot.ruleverifier.RuleParametersResolver;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.framework.EntityHome;
+import org.jboss.seam.international.StatusMessage.Severity;
 
 @Name("slotDefHome")
 public class SlotDefHome extends EntityHome<SlotDef> {
 
 	private static final long serialVersionUID = -8721399617784074986L;
+
+	private SlotDef model;
+
+	@In(create = true)
+	private RuleParametersResolver ruleParametersResolver;
+
+	@In(create = true)
+	private RuleHome ruleHome;
 
 	public void setSlotDefId(Long id) {
 		setId(id);
@@ -94,4 +113,219 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		return false;
 	}
 
+	public void slotDefClone(SlotDef slotDef) {
+		this.model = slotDef;
+		SlotDef clonedSlotDef = new SlotDef();
+		clonedSlotDef.setName("Copia di " + slotDef.getName());
+		clonedSlotDef.setType(slotDef.getType());
+
+		for (EmbeddedProperty embeddedProperty : slotDef
+				.getEmbeddedProperties()) {
+			EmbeddedProperty clonedEmbeddedProperty = cloneEmbeddedProperty(embeddedProperty);
+			clonedSlotDef.getEmbeddedProperties().add(clonedEmbeddedProperty);
+		}
+
+		for (PropertyDef propertyDef : slotDef.getPropertyDefs()) {
+			PropertyDef clonedPropertyDef = clonePropertyDef(propertyDef);
+			clonedSlotDef.getPropertyDefs().add(clonedPropertyDef);
+		}
+
+		for (DocDefCollection collection : slotDef.getDocDefCollections()) {
+			DocDefCollection clonedDocDefCollection = cloneDocDefCollection(
+					collection, clonedSlotDef);
+			clonedDocDefCollection.setSlotDef(clonedSlotDef);
+			clonedSlotDef.getDocDefCollections().add(clonedDocDefCollection);
+		}
+		this.setInstance(clonedSlotDef);
+	}
+
+	private EmbeddedProperty cloneEmbeddedProperty(
+			EmbeddedProperty embeddedProperty) {
+		EmbeddedProperty clonedEmbeddedProperty = new EmbeddedProperty();
+		clonedEmbeddedProperty.setName(embeddedProperty.getName());
+		clonedEmbeddedProperty.setDataType(embeddedProperty.getDataType());
+		clonedEmbeddedProperty.setMultiple(embeddedProperty.isMultiple());
+
+		// clonedEmbeddedProperty.setStringValue(embeddedProperty.getStringValue());
+		// clonedEmbeddedProperty.setIntegerValue(embeddedProperty.getIntegerValue());
+		// clonedEmbeddedProperty.setBooleanValue(embeddedProperty.getBooleanValue());
+		// clonedEmbeddedProperty.setDateValue(embeddedProperty.getDateValue());
+
+		clonedEmbeddedProperty.setDictionary(embeddedProperty.getDictionary());
+		clonedEmbeddedProperty.setValues(new HashSet<String>(embeddedProperty
+				.getValues()));
+		return clonedEmbeddedProperty;
+	}
+
+	private PropertyDef clonePropertyDef(PropertyDef propertyDef) {
+		PropertyDef clonedPropertyDef = new PropertyDef();
+		clonedPropertyDef.setName(propertyDef.getName());
+		clonedPropertyDef.setDataType(propertyDef.getDataType());
+		clonedPropertyDef.setMultiple(propertyDef.isMultiple());
+		clonedPropertyDef.setRequired(propertyDef.isRequired());
+		clonedPropertyDef.setDictionary(propertyDef.getDictionary());
+		return clonedPropertyDef;
+	}
+
+	private DocDefCollection cloneDocDefCollection(DocDefCollection collection,
+			SlotDef clonedSlotDef) {
+		DocDefCollection clonedCollection = new DocDefCollection();
+		clonedCollection.setName(collection.getName());
+		clonedCollection.setDocDef(collection.getDocDef());
+		clonedCollection.setMin(collection.getMin());
+		clonedCollection.setMax(collection.getMax());
+
+		if (collection.getConditionalPropertyDef() != null) {
+			// SlotDef slotDef = collection.getSlotDef();
+			PropertyDef clonedConditionalPropertyDef = clonedSlotDef
+					.retrievePropertyDefByName(collection
+							.getConditionalPropertyDef().getName());
+			clonedCollection
+					.setConditionalPropertyDef(clonedConditionalPropertyDef);
+			PropertyInst conditionalPropertyInst = collection
+					.getConditionalPropertyInst();
+			PropertyInst clonedConditionalPropertyInst = new PropertyInst(
+					clonedConditionalPropertyDef);
+			clonedCollection
+					.setConditionalPropertyInst(clonedConditionalPropertyInst);
+			//
+			clonedConditionalPropertyInst
+					.setStringValue(conditionalPropertyInst.getStringValue());
+			clonedConditionalPropertyInst
+					.setIntegerValue(conditionalPropertyInst.getIntegerValue());
+			clonedConditionalPropertyInst
+					.setBooleanValue(conditionalPropertyInst.getBooleanValue());
+			clonedConditionalPropertyInst.setDateValue(conditionalPropertyInst
+					.getDateValue());
+			clonedConditionalPropertyInst
+					.setMultiplicity(conditionalPropertyInst.getMultiplicity());
+			clonedConditionalPropertyInst.setValues(new HashSet<String>(
+					conditionalPropertyInst.getValues()));
+			//
+
+		}
+		return clonedCollection;
+	}
+
+	@Override
+	public String persist() {
+		if (!checkEmbeddedPropertyValues()) {
+			return "failed";
+		}
+		String result = super.persist();
+		if (result.equals("persisted") && this.model != null) {
+			for (Rule rule : this.model.getRules()) {
+				Rule clonedRule = cloneRule(rule);
+				this.getInstance().getRules().add(clonedRule);
+				ruleHome.setInstance(clonedRule);
+				ruleHome.persist();
+			}
+			// this.update();
+		}
+		return result;
+	}
+
+	private boolean checkEmbeddedPropertyValues() {
+		boolean passed = true;
+		for (EmbeddedProperty embeddedProperty : this.getInstance()
+				.getEmbeddedProperties()) {
+			if (embeddedProperty.getValue() == null
+					|| embeddedProperty.getValue().equals("")) {
+				FacesMessages.instance().add(
+						Severity.ERROR,
+						"La proprietà \"" + embeddedProperty.getLabel()
+								+ "\" non è stata valorizzata");
+				passed = false;
+			}
+			if (!passed) {
+				FacesMessages
+						.instance()
+						.add(Severity.ERROR,
+								"Non possono esserci proprietà del bando non valorizzate");
+			}
+		}
+		return passed;
+	}
+
+	private Rule cloneRule(Rule rule) {
+		Rule clonedRule = new Rule();
+		Map<String, String> parametersMap = rule.getParametersMap();
+		Set<String> keySet = parametersMap.keySet();
+
+		for (String key : keySet) {
+			String encodedParams = parametersMap.get(key);
+			String[] splitted = encodedParams.split("\\|");
+			String source = splitted[0];
+			String field = splitted[1];
+
+			String clonedParam = "";
+			Object sourceDef = ruleParametersResolver.resolveSourceDef(source);
+			if (sourceDef instanceof SlotDef) {
+				clonedParam = clonedParam.concat(SlotDef.class.getName()) + ":"
+						+ this.getInstance().getId().toString();
+			} else if (sourceDef instanceof DocDefCollection) {
+				clonedParam = clonedParam.concat(DocDefCollection.class
+						.getName()) + ":";
+				DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
+				DocDefCollection clonedDocDefCollection = this.getInstance()
+						.retrieveDocDefCollectionByName(
+								docDefCollection.getName());
+				clonedParam = clonedParam.concat(":"
+						+ clonedDocDefCollection.getId().toString());
+			}
+			clonedParam = clonedParam.concat("|");
+			Object fieldDef = ruleParametersResolver.resolveFieldDef(field);
+			if (fieldDef instanceof Property) {
+				clonedParam = clonedParam.concat(Property.class.getName() + ":"
+						+ ((Property) fieldDef).getName());
+			} else if (fieldDef instanceof PropertyDef) {
+				PropertyDef clonedPropertyDef = this.getInstance()
+						.retrievePropertyDefByName(
+								((PropertyDef) fieldDef).getName());
+				clonedParam = clonedParam.concat(PropertyDef.class.getName()
+						+ ":" + clonedPropertyDef.getId().toString());
+			} else if (fieldDef instanceof EmbeddedProperty) {
+				EmbeddedProperty clonedEmbeddedProperty = this.getInstance()
+						.retrieveEmbeddedPropertyByName(
+								((EmbeddedProperty) fieldDef).getName());
+				clonedParam = clonedParam.concat(EmbeddedProperty.class
+						.getName())
+						+ ":"
+						+ clonedEmbeddedProperty.getId().toString();
+			}
+
+			clonedRule.getParametersMap().put(key, clonedParam);
+		}
+
+		Map<String, RuleParameterInst> embeddedParametersMap = rule
+				.getEmbeddedParametersMap();
+		Set<String> keySet2 = embeddedParametersMap.keySet();
+		for (String key : keySet2) {
+			RuleParameterInst ruleParameterInst = embeddedParametersMap
+					.get(key);
+			RuleParameterInst clonedRuleParameterInst = new RuleParameterInst();
+			clonedRuleParameterInst.setStringValue(ruleParameterInst
+					.getStringValue());
+			clonedRuleParameterInst.setIntegerValue(ruleParameterInst
+					.getIntegerValue());
+			clonedRuleParameterInst.setBooleanValue(ruleParameterInst
+					.getBooleanValue());
+			clonedRuleParameterInst.setDateValue(ruleParameterInst
+					.getDateValue());
+
+			clonedRuleParameterInst.setRule(clonedRule);
+			clonedRuleParameterInst.setVerifierParameterDef(ruleParameterInst
+					.getVerifierParameterDef());
+			clonedRule.getEmbeddedParametersMap().put(key,
+					clonedRuleParameterInst);
+		}
+
+		clonedRule.setMandatory(rule.isMandatory());
+		clonedRule.setSlotDef(this.getInstance());
+		clonedRule.setType(rule.getType());
+		clonedRule.setErrorMessage(rule.getErrorMessage());
+		clonedRule.setWarningMessage(rule.getWarningMessage());
+
+		return clonedRule;
+	}
 }

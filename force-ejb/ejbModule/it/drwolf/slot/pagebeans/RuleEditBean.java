@@ -177,12 +177,6 @@ public class RuleEditBean {
 					encodedRule = encodedRule.concat("|"
 							+ propertyContainer.toString());
 					parametersMap.put(parameter.getName(), encodedRule);
-					// if (!this.errorMessage.getText().equals("")) {
-					// rule.setErrorMessage(this.errorMessage);
-					// }
-					// if (!this.warningMessage.getText().equals("")) {
-					// rule.setWarningMessage(this.warningMessage);
-					// }
 				} else {
 					if (!parameter.isOptional() && !isInEmbedded(parameter)) {
 						error = true;
@@ -194,9 +188,6 @@ public class RuleEditBean {
 				}
 			}
 
-			//
-			// rule.setEmbeddedParameterInsts(new HashSet<RuleParameterInst>(
-			// this.embeddedParameters));
 			for (RuleParameterInst embeddedParameter : embeddedParameters) {
 				embeddedParameter.setRule(rule);
 				rule.getEmbeddedParametersMap().put(

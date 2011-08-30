@@ -1,0 +1,124 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <rich:panel>
+        <f:facet name="header">Doc def collection Details</f:facet>
+
+
+        <s:decorate id="max" template="layout/display.xhtml">
+            <ui:define name="label">Max</ui:define>
+            <h:outputText value="#{docDefCollectionHome.instance.max}"/>
+        </s:decorate>
+
+        <s:decorate id="min" template="layout/display.xhtml">
+            <ui:define name="label">Min</ui:define>
+            <h:outputText value="#{docDefCollectionHome.instance.min}"/>
+        </s:decorate>
+
+        <s:decorate id="name" template="layout/display.xhtml">
+            <ui:define name="label">Name</ui:define>
+            <h:outputText value="#{docDefCollectionHome.instance.name}"/>
+        </s:decorate>
+
+        <div style="clear:both"/>
+
+    </rich:panel>
+
+    <div class="actionButtons">
+
+        <s:button view="/DocDefCollectionEdit.xhtml"
+                    id="edit"
+                 value="Edit"/>
+
+        <s:button view="/#{empty docDefCollectionFrom ? 'DocDefCollectionList' : docDefCollectionFrom}.xhtml"
+                    id="done"
+                 value="Done"/>
+
+    </div>
+
+    <rich:tabPanel switchType="ajax">
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/manytoone.gif" style="vertical-align: middle; padding-right: 4px;"/>Doc def</h:panelGroup>
+        </f:facet>
+    <div class="association" id="docDefParent">
+
+        <h:outputText value="There is no docDef associated with this docDefCollection."
+                   rendered="#{docDefCollectionHome.instance.docDef == null}"/>
+
+        <rich:dataTable var="_docDef"
+                   value="#{docDefCollectionHome.instance.docDef}"
+                rendered="#{docDefCollectionHome.instance.docDef != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="docDefTable">
+            <h:column>
+                <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{_docDef.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                <h:outputText value="#{_docDef.name}"/>
+            </h:column>
+            <h:column styleClass="action">
+                <f:facet name="header">Action</f:facet>
+                <s:link id="viewdocDef"
+                     value="View"
+                      view="/DocDef.xhtml">
+                    <f:param name="docDefId"
+                           value="#{_docDef.id}"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </div>
+    </rich:tab>
+
+    <rich:tab>
+        <f:facet name="label">
+            <h:panelGroup><h:graphicImage value="/img/manytoone.gif" style="vertical-align: middle; padding-right: 4px;"/>Slot def</h:panelGroup>
+        </f:facet>
+    <div class="association" id="slotDefParent">
+
+        <h:outputText value="There is no slotDef associated with this docDefCollection."
+                   rendered="#{docDefCollectionHome.instance.slotDef == null}"/>
+
+        <rich:dataTable var="_slotDef"
+                   value="#{docDefCollectionHome.instance.slotDef}"
+                rendered="#{docDefCollectionHome.instance.slotDef != null}"
+              rowClasses="rvgRowOne,rvgRowTwo"
+                      id="slotDefTable">
+            <h:column>
+                <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{_slotDef.id}"/>
+            </h:column>
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                <h:outputText value="#{_slotDef.name}"/>
+            </h:column>
+            <h:column styleClass="action">
+                <f:facet name="header">Action</f:facet>
+                <s:link id="viewslotDef"
+                     value="View"
+                      view="/SlotDef.xhtml">
+                    <f:param name="slotDefId"
+                           value="#{_slotDef.id}"/>
+                </s:link>
+            </h:column>
+        </rich:dataTable>
+
+    </div>
+    </rich:tab>
+</rich:tabPanel>
+</ui:define>
+
+</ui:composition>

@@ -1,0 +1,81 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="propertytDef" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">#{propertytDefHome.managed ? 'Edit' : 'Add'} Propertyt def</f:facet>
+
+
+
+            <s:decorate id="nameField" template="layout/edit.xhtml">
+                <ui:define name="label">Name</ui:define>
+                <h:inputTextarea id="name"
+                               cols="80"
+                               rows="3"
+                              value="#{propertytDefHome.instance.name}"/>
+            </s:decorate>
+
+
+            <s:decorate id="typeField" template="layout/edit.xhtml">
+                <ui:define name="label">Type</ui:define>
+                <h:inputText id="type"
+                          value="#{propertytDefHome.instance.type}">
+                    <a:support event="onblur" reRender="typeField" bypassUpdates="true" ajaxSingle="true"/>
+                </h:inputText>
+            </s:decorate>
+
+            <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Save"
+                         action="#{propertytDefHome.persist}"
+                       disabled="#{!propertytDefHome.wired}"
+                       rendered="#{!propertytDefHome.managed}"/>
+
+            <h:commandButton id="update"
+                          value="Save"
+                         action="#{propertytDefHome.update}"
+                       rendered="#{propertytDefHome.managed}"/>
+
+            <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{propertytDefHome.remove}"
+                      immediate="true"
+                       rendered="#{propertytDefHome.managed}"/>
+
+            <s:button id="cancelEdit"
+                   value="Cancel"
+             propagation="end"
+                    view="/PropertytDef.xhtml"
+                rendered="#{propertytDefHome.managed}"/>
+
+            <s:button id="cancelAdd"
+                   value="Cancel"
+             propagation="end"
+                    view="/#{empty propertytDefFrom ? 'PropertytDefList' : propertytDefFrom}.xhtml"
+                rendered="#{!propertytDefHome.managed}"/>
+
+        </div>
+    </h:form>
+
+</ui:define>
+
+</ui:composition>

@@ -1,0 +1,59 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich">
+
+							<h:inputText value="#{dataInstance.stringValue}"
+								rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues == null}"
+								required="#{dataInstance.dataDefinition.required}"
+								disabled="#{not dataInstance.dataDefinition.editable}" />
+							<h:inputText value="#{dataInstance.integerValue}"
+								rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues == null}"
+								required="#{dataInstance.dataDefinition.required}"
+								disabled="#{not dataInstance.dataDefinition.editable}" />
+							<a:region>
+							<h:selectBooleanCheckbox value="#{dataInstance.booleanValue}"
+								rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}"
+								required="#{dataInstance.dataDefinition.required}"
+								disabled="#{not dataInstance.dataDefinition.editable}">
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+							</h:selectBooleanCheckbox>
+							</a:region>
+							<rich:calendar id="subscriptionDate" mode="client"
+								value="#{dataInstance.dateValue}" datePattern="dd/MM/yyyy"
+								rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues == null}"
+								required="#{dataInstance.dataDefinition.required}"
+								disabled="#{not dataInstance.dataDefinition.editable}" />
+							
+							<a:region>
+							<h:selectOneMenu value="#{dataInstance.stringValue}" required="#{dataInstance.dataDefinition.required}"
+										rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues != null}"
+										valueChangeListener="#{valueChangeListener.listener}">
+	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
+												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+	             			</h:selectOneMenu>
+	             			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"
+	             						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues != null}"
+	             						valueChangeListener="#{valueChangeListener.listener}">
+	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
+												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+	             			</h:selectOneMenu>
+	             			<h:selectOneMenu value="#{dataInstance.dateValue}"  required="#{dataInstance.dataDefinition.required}"
+	             						rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues != null}"
+	             						valueChangeListener="#{valueChangeListener.listener}">
+	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
+												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+								<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+	             			</h:selectOneMenu>
+	             			</a:region>
+
+
+</ui:composition>

@@ -158,43 +158,45 @@ public class SlotDefEditBean {
 
 	public String update() {
 		if (checkNames()) {
-			Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
-					.getDocDefCollections();
-			Iterator<DocDefCollection> iterator = docDefCollections.iterator();
-			while (iterator.hasNext()) {
-				DocDefCollection docDefCollection = iterator.next();
-				if (!slotDefHome.getInstance().getDocDefCollectionsAsList()
-						.contains(docDefCollection)) {
-					iterator.remove();
-					docDefCollectionHome.setInstance(docDefCollection);
-					docDefCollectionHome.remove();
-				}
-			}
-			Set<PropertyDef> propertyDefs = slotDefHome.getInstance()
-					.getPropertyDefs();
-			Iterator<PropertyDef> iterator2 = propertyDefs.iterator();
-			while (iterator2.hasNext()) {
-				PropertyDef propertyDef = iterator2.next();
-				if (!slotDefHome.getInstance().getPropertyDefsAsList()
-						.contains(propertyDef)) {
-					iterator2.remove();
-					propertytDefHome.setInstance(propertyDef);
-					propertytDefHome.remove();
-				}
-			}
-			Set<EmbeddedProperty> slotDefEmbeddedProperties = slotDefHome
-					.getInstance().getEmbeddedProperties();
-			Iterator<EmbeddedProperty> iterator3 = slotDefEmbeddedProperties
-					.iterator();
-			while (iterator3.hasNext()) {
-				EmbeddedProperty embeddedProperty = iterator3.next();
-				if (!slotDefHome.getInstance().getEmbeddedPropertiesAsList()
-						.contains(embeddedProperty)) {
-					iterator3.remove();
-					slotDefEmbeddedPropertyHome.setInstance(embeddedProperty);
-					slotDefEmbeddedPropertyHome.remove();
-				}
-			}
+			// Set<DocDefCollection> docDefCollections =
+			// slotDefHome.getInstance()
+			// .getDocDefCollections();
+			// Iterator<DocDefCollection> iterator =
+			// docDefCollections.iterator();
+			// while (iterator.hasNext()) {
+			// DocDefCollection docDefCollection = iterator.next();
+			// if (!slotDefHome.getInstance().getDocDefCollectionsAsList()
+			// .contains(docDefCollection)) {
+			// iterator.remove();
+			// docDefCollectionHome.setInstance(docDefCollection);
+			// docDefCollectionHome.remove();
+			// }
+			// }
+			// Set<PropertyDef> propertyDefs = slotDefHome.getInstance()
+			// .getPropertyDefs();
+			// Iterator<PropertyDef> iterator2 = propertyDefs.iterator();
+			// while (iterator2.hasNext()) {
+			// PropertyDef propertyDef = iterator2.next();
+			// if (!slotDefHome.getInstance().getPropertyDefsAsList()
+			// .contains(propertyDef)) {
+			// iterator2.remove();
+			// propertytDefHome.setInstance(propertyDef);
+			// propertytDefHome.remove();
+			// }
+			// }
+			// Set<EmbeddedProperty> slotDefEmbeddedProperties = slotDefHome
+			// .getInstance().getEmbeddedProperties();
+			// Iterator<EmbeddedProperty> iterator3 = slotDefEmbeddedProperties
+			// .iterator();
+			// while (iterator3.hasNext()) {
+			// EmbeddedProperty embeddedProperty = iterator3.next();
+			// if (!slotDefHome.getInstance().getEmbeddedPropertiesAsList()
+			// .contains(embeddedProperty)) {
+			// iterator3.remove();
+			// slotDefEmbeddedPropertyHome.setInstance(embeddedProperty);
+			// slotDefEmbeddedPropertyHome.remove();
+			// }
+			// }
 
 			Set<PropertyDef> newPropertyDefs = new HashSet<PropertyDef>();
 			Set<DocDefCollection> newDocDefCollections = new HashSet<DocDefCollection>();
@@ -212,9 +214,10 @@ public class SlotDefEditBean {
 				}
 			}
 			String updateResult = slotDefHome.update();
-			//
-			modifyReferencedSlotInsts(newPropertyDefs, newDocDefCollections);
-			//
+			if ((!newDocDefCollections.isEmpty() || !newPropertyDefs.isEmpty())
+					&& slotDefHome.isReferenced()) {
+				modifyReferencedSlotInsts(newPropertyDefs, newDocDefCollections);
+			}
 			return updateResult;
 		} else {
 			return "failed";
@@ -260,6 +263,13 @@ public class SlotDefEditBean {
 	}
 
 	public void removeProp(PropertyDef prop) {
+		Set<DocDefCollection> referencedCollections = this
+				.getReferencedCollections(prop);
+		for (DocDefCollection collection : referencedCollections) {
+			collection.getConditionalPropertyInst().setPropertyDef(null);
+			collection.setConditionalPropertyInst(null);
+			collection.setConditionalPropertyDef(null);
+		}
 		slotDefHome.getInstance().getPropertyDefs().remove(prop);
 	}
 
@@ -269,6 +279,7 @@ public class SlotDefEditBean {
 
 	public void removeColl(DocDefCollection coll) {
 		slotDefHome.getInstance().getDocDefCollections().remove(coll);
+		coll.setSlotDef(null);
 	}
 
 	public void editColl(DocDefCollection coll) {
@@ -315,28 +326,47 @@ public class SlotDefEditBean {
 
 	public String getReferencedCollectionsNames(PropertyDef propertyDef) {
 		String collectionsReferenced = "";
+		// Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
+		// .getDocDefCollections();
+		Iterator<DocDefCollection> iterator = this.getReferencedCollections(
+				propertyDef).iterator();
+		int count = 0;
+		while (iterator.hasNext()) {
+			DocDefCollection docDefCollection = iterator.next();
+			// PropertyDef conditionalPropertyDef = docDefCollection
+			// .getConditionalPropertyDef();
+			// if (conditionalPropertyDef != null
+			// && conditionalPropertyDef.equals(propertyDef)) {
+			if (count == 0) {
+				collectionsReferenced = collectionsReferenced
+						.concat(docDefCollection.getName());
+				count++;
+			} else if (count > 0) {
+				collectionsReferenced = collectionsReferenced.concat(", "
+						+ docDefCollection.getName());
+				count++;
+			}
+			// }
+		}
+		return collectionsReferenced;
+	}
+
+	private Set<DocDefCollection> getReferencedCollections(
+			PropertyDef propertyDef) {
+		Set<DocDefCollection> referencedDocDefCollections = new HashSet<DocDefCollection>();
 		Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
 				.getDocDefCollections();
 		Iterator<DocDefCollection> iterator = docDefCollections.iterator();
-		int count = 0;
 		while (iterator.hasNext()) {
 			DocDefCollection docDefCollection = iterator.next();
 			PropertyDef conditionalPropertyDef = docDefCollection
 					.getConditionalPropertyDef();
 			if (conditionalPropertyDef != null
 					&& conditionalPropertyDef.equals(propertyDef)) {
-				if (count == 0) {
-					collectionsReferenced = collectionsReferenced
-							.concat(docDefCollection.getName());
-					count++;
-				} else if (count > 0) {
-					collectionsReferenced = collectionsReferenced.concat(", "
-							+ docDefCollection.getName());
-					count++;
-				}
+				referencedDocDefCollections.add(docDefCollection);
 			}
 		}
-		return collectionsReferenced;
+		return referencedDocDefCollections;
 	}
 
 	public void checkReference() {

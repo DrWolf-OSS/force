@@ -39,10 +39,6 @@ public class Rule {
 
 	private IRuleVerifier verifier;
 
-	// private VerifierMessage errorMessage;
-	//
-	// private VerifierMessage warningMessage;
-
 	private String errorMessage;
 
 	private String warningMessage;
@@ -94,24 +90,6 @@ public class Rule {
 	public void setSlotDef(SlotDef slotDef) {
 		this.slotDef = slotDef;
 	}
-
-	// @OneToOne(cascade = CascadeType.ALL)
-	// public VerifierMessage getErrorMessage() {
-	// return errorMessage;
-	// }
-	//
-	// public void setErrorMessage(VerifierMessage errorMessage) {
-	// this.errorMessage = errorMessage;
-	// }
-	//
-	// @OneToOne(cascade = CascadeType.ALL)
-	// public VerifierMessage getWarningMessage() {
-	// return warningMessage;
-	// }
-	//
-	// public void setWarningMessage(VerifierMessage warningMessage) {
-	// this.warningMessage = warningMessage;
-	// }
 
 	public boolean isMandatory() {
 		return mandatory;

@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.validator.NotNull;
 
 @Entity
@@ -96,6 +97,7 @@ public class DocDefCollection {
 	}
 
 	@OneToOne(cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	public PropertyInst getConditionalPropertyInst() {
 		return conditionalPropertyInst;
 	}

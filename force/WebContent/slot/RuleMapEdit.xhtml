@@ -1,0 +1,72 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="rule" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">#{ruleHome.managed ? 'Edit' : 'Add'} Rule Map</f:facet>
+
+         	<c:forEach var="param" items="#{ruleHome.instance.verifier.inParams}">
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="#{param.name}" />
+					</ui:define>
+	                <h:inputText value="#{ruleHome.instance.parametersMap[param.name]}"/>
+	            </s:decorate>			
+			</c:forEach>
+
+            <div style="clear:both">
+                <span class="required">*</span>
+                required fields
+            </div>
+
+        </rich:panel>
+
+        <div class="actionButtons">
+
+            <h:commandButton id="save"
+                          value="Save"
+                         action="#{ruleHome.persist}"
+                       disabled="#{!ruleHome.wired}"
+                       rendered="#{!ruleHome.managed}"/>
+
+            <h:commandButton id="update"
+                          value="Save"
+                         action="#{ruleHome.update}"
+                       rendered="#{ruleHome.managed}"/>
+
+            <h:commandButton id="delete"
+                          value="Delete"
+                         action="#{ruleHome.remove}"
+                      immediate="true"
+                       rendered="#{ruleHome.managed}"/>
+
+            <s:button id="cancelEdit"
+                   value="Cancel"
+             propagation="end"
+                    view="/Rule.xhtml"
+                rendered="#{ruleHome.managed}"/>
+
+            <s:button id="cancelAdd"
+                   value="Cancel"
+             propagation="end"
+                    view="/#{empty ruleFrom ? 'RuleList' : ruleFrom}.xhtml"
+                rendered="#{!ruleHome.managed}"/>
+
+        </div>
+    </h:form>
+
+</ui:define>
+
+</ui:composition>
