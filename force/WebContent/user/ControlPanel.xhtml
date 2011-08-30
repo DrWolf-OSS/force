@@ -1,4 +1,4 @@
-<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
     xmlns:s="http://jboss.com/products/seam/taglib"
@@ -47,20 +47,129 @@
         <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
         <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
     </s:link>
-    <h:outputText value="Documenti in Scadenza" /></s:span>
+    <h:outputText value="I tuoi documenti prossimi alla  scadenza" /></s:span>
     </f:facet>
     <h:outputText value="Non hai ancora inserito documenti nel tuo archivio."
-               rendered="#{empty controlPanelBean.docInstCollections}"/>
+               rendered="#{empty controlPanelBean.inScadenza}"/>
     
     <c:forEach var="coll"
-               items="#{controlPanelBean.docInstCollections}">
+               items="#{controlPanelBean.inScadenza}">
                     <s:div id="infoPanel_#{coll.docDefCollection.id}">  
                            <h:outputText value="#{coll.docDefCollection.name}" />
-                                
-                                  
+                           
+                           <a:repeat value="#{controlPanelBean.inScadenzaFC[coll.docDefCollection.id]}"
+                                     var="item">
+                            
+                                <s:div styleClass="fileItem">
+            
+                                    <ui:repeat var="message"
+                                        value="#{slotInstEditBean.filesMessages[item.id]}">
+                                        <h:graphicImage value="/img/msgerror.png"
+                                            rendered="#{message.type == 'ERROR'}" />
+                                        <h:graphicImage value="/img/msgwarn.png"
+                                            rendered="#{message.type == 'WARNING'}" />
+                                        <h:outputText value="#{message.text}" />
+                                        <br />
+                                    </ui:repeat>
 
-                                   
+                                    <s:decorate template="/layout/display.xhtml">
+                                        <rich:toolTip direction="top-left">
+                                            <img src="/force/tn?id=#{item.document.id}&amp;name=imgpreview"/>
+                                        </rich:toolTip>
+                                        <ui:define name="label">
+                                            <h:outputText value="File Name" />
+                                        </ui:define>
+                                        <h:graphicImage value="/img/mimetype/document-pdf.png" rendered="#{item.mimetype.contains('pdf')}" styleClass="fileIcon"/>
+                                        <h:graphicImage value="/img/mimetype/document-word.png" rendered="#{item.mimetype.contains('word')}" styleClass="fileIcon"/>
+                                        <h:graphicImage value="/img/mimetype/document-powerpoint.png" rendered="#{item.mimetype.contains('powerpoint')}" styleClass="fileIcon"/>
+                                        <h:graphicImage value="/img/mimetype/document-excel.png" rendered="#{item.mimetype.contains('excel')}" styleClass="fileIcon"/>
+                                        <h:graphicImage value="/img/mimetype/document-table.png" rendered="#{item.mimetype.contains('opendocument.spreadsheet')}" styleClass="fileIcon"/>
+                                        <h:graphicImage value="/img/mimetype/document-image.png" rendered="#{item.mimetype.contains('image')}" styleClass="fileIcon"/>
+                                        <h:graphicImage value="/img/mimetype/document-text.png" rendered="#{item.mimetype.contains('text') or item.mimetype.contains('rtf')}"
+                                                        styleClass="fileIcon"/>
+                                        <h:graphicImage value="/img/mimetype/vise-drawer.png" rendered="#{item.mimetype.contains('zip')}" styleClass="fileIcon"/>
+                                        <h:graphicImage value="/img/mimetype/document.png" 
+                                                        rendered="#{not item.mimetype.contains('pdf') and not item.mimetype.contains('word') and not item.mimetype.contains('powerpoint')
+                                                                    and not item.mimetype.contains('excel') and not item.mimetype.contains('opendocument.spreadsheet') and not item.mimetype.contains('image') 
+                                                                    and not item.mimetype.contains('text') and not item.mimetype.contains('rtf') and not item.mimetype.contains('zip')}" 
+                                                        styleClass="fileIcon"/>
+                                        <h:graphicImage value="/img/tick-small.png" rendered="#{item.document.hasAspect('P:dw:signed')}" style="margin-left:-6px" />
+                                        <a href="/force/download/#{item.fileName}?ref=#{item.document.id}">
+                                        <h:outputText value="#{item.fileName}" />
+                                        </a>
+                                    </s:decorate>
+                                    <s:decorate template="/layout/display.xhtml">
+                                        <ui:define name="label">
+                                            <h:outputText value="Firmato" />
+                                        </ui:define>
+                                        <h:outputText value="#{item.document.hasAspect('P:dw:signed') ? 'Yes' : 'No'}"/>
+                                        <rich:toolTip mode="client" rendered="#{item.document.hasAspect('P:dw:signed')}">
+                                            <s:span>
+                                                <a:repeat var="sign" value="#{item.signatures}" rowKeyVar="key">                                        
+                                                    <s:decorate template="/layout/display.xhtml">
+                                                        <ui:define name="label">
+                                                            <h:outputText value="Authority" />
+                                                        </ui:define>
+                                                        <h:outputText value="#{sign.authority}" />
+                                                    </s:decorate>
+                                                    <s:decorate template="/layout/display.xhtml">
+                                                        <ui:define name="label">
+                                                            <h:outputText value="Signature" />
+                                                        </ui:define>
+                                                        <h:outputText value="#{sign.sign}" />
+                                                    </s:decorate>
+                                                    <s:decorate template="/layout/display.xhtml">
+                                                        <ui:define name="label">
+                                                            <h:outputText value="Codice Fiscale" />
+                                                        </ui:define>
+                                                        <h:outputText value="#{sign.cf}" />
+                                                    </s:decorate>
+                                                    <s:decorate template="/layout/display.xhtml">
+                                                        <ui:define name="label">
+                                                            <h:outputText value="Expiration date" />
+                                                        </ui:define>
+                                                        <h:outputText value="#{sign.expiry}" >
+                                                            <s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+                                                        </h:outputText>
+                                                    </s:decorate>
+                                                    <div style="clear: both" />
+                                                    <rich:separator styleClass="tooltipSeparator" height="1" rendered="#{key ge 1}"/>
+                                                </a:repeat>
+                                            </s:span>
+                                        </rich:toolTip>
+                                    </s:decorate>
+
+                                    <a:repeat var="dataInstance" value="#{item.documentProperties}">
+                                        <s:decorate template="/layout/display.xhtml">
+                                            <ui:define name="label">
+                                                <h:outputText value="#{dataInstance.dataDefinition.label}" />
+                                            </ui:define>
+                                            <s:fragment rendered="#{not dataInstance.dataDefinition.multiple}">
+                                            <h:outputText value="#{dataInstance.stringValue}"
+                                                rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"/>
+                                            <h:outputText value="#{dataInstance.integerValue}"
+                                                rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER'}" />
+                                            <h:outputText value="#{dataInstance.booleanValue ? 'true' : 'false'}"
+                                                rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}" />
+                                            <h:outputText value="#{dataInstance.dateValue}"
+                                                rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}">
+                                                <s:convertDateTime type="date" dateStyle="short"
+                                                    pattern="dd/MM/yyyy" />
+                                            </h:outputText>
+                                            </s:fragment>
+                                            <s:fragment rendered="#{dataInstance.dataDefinition.multiple}">
+                                            <h:outputText value="#{dataInstance.values.toString()}"/>
+                                            </s:fragment>
+                                        </s:decorate>
+                                    </a:repeat>
+                                                                    
                                     <div style="clear: both" />
+                                    
+                                </s:div>
+                                        
+                           </a:repeat>   
+                           
+                            <div style="clear: both" />
                                
 
                         </s:div>
