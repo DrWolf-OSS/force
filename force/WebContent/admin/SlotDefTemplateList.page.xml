@@ -11,6 +11,9 @@
    <param name="from"/>
    <param name="name" value="#{slotDefList.slotDef.name}"/>
    
+   <param name="model" value="#{slotDefListManager.model}"/>
+   <param name="mode" value="#{slotDefListManager.mode}"/> 
+   
    <navigation from-action="#{slotDefHome.slotDefClone(_slotDef)}">
          <redirect view-id="/SlotDefWizardEdit.xhtml"/>
    </navigation>

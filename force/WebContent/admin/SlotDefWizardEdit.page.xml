@@ -13,6 +13,7 @@
    <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
    <param name="model" value="#{slotDefEditBean.model}"/>
    <param name="mode" value="#{slotDefEditBean.mode}"/>
+   <param name="from" value="#{slotDefEditBean.from}"/>
 
 	<action execute="#{slotDefEditBean.setKnownParameters}"/>
 
@@ -40,7 +41,10 @@
    <navigation from-action="#{slotDefEditBean.save()}">
       <rule if-outcome="persisted">
          <end-conversation/>
-         <redirect view-id="/SlotDef.xhtml"/>
+         <redirect view-id="#{slotDefEditBean.from}">
+         	<param name="model" value="#{slotDefEditBean.model}"/>
+         	<param name="mode" value="#{slotDefEditBean.mode}"/>
+         </redirect>
       </rule>
       <rule if-outcome="failed">
          <redirect/>
@@ -50,8 +54,10 @@
    <navigation from-action="#{slotDefEditBean.update()}">
       <rule if-outcome="updated">
          <end-conversation before-redirect="true"/>
-         <redirect view-id="/SlotDefEdit.xhtml">
+         <redirect>
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="model" value="#{slotDefEditBean.model}"/>
+         	<param name="mode" value="#{slotDefEditBean.mode}"/>
          </redirect>
       </rule>
       <rule if-outcome="failed">

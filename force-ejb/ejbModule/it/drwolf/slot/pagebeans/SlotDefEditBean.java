@@ -40,15 +40,6 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotDefHome slotDefHome;
 
-	// @In(create = true)
-	// private PropertytDefHome propertytDefHome;
-	//
-	// @In(create = true)
-	// private DocDefCollectionHome docDefCollectionHome;
-	//
-	// @In(create = true)
-	// private SlotDefEmbeddedPropertyHome slotDefEmbeddedPropertyHome;
-
 	private DocDefCollection collection = new DocDefCollection();
 	private PropertyDef propertyDef = new PropertyDef();
 	private EmbeddedProperty embeddedProperty = new EmbeddedProperty();
@@ -61,6 +52,7 @@ public class SlotDefEditBean {
 	private boolean conditional = Boolean.FALSE;
 	private boolean model = Boolean.FALSE;
 	private String mode = SlotDefType.GENERAL.value();
+	private String from = "";
 
 	@Create
 	public void init() {
@@ -178,46 +170,6 @@ public class SlotDefEditBean {
 
 	public String update() {
 		if (checkNames()) {
-			// Set<DocDefCollection> docDefCollections =
-			// slotDefHome.getInstance()
-			// .getDocDefCollections();
-			// Iterator<DocDefCollection> iterator =
-			// docDefCollections.iterator();
-			// while (iterator.hasNext()) {
-			// DocDefCollection docDefCollection = iterator.next();
-			// if (!slotDefHome.getInstance().getDocDefCollectionsAsList()
-			// .contains(docDefCollection)) {
-			// iterator.remove();
-			// docDefCollectionHome.setInstance(docDefCollection);
-			// docDefCollectionHome.remove();
-			// }
-			// }
-			// Set<PropertyDef> propertyDefs = slotDefHome.getInstance()
-			// .getPropertyDefs();
-			// Iterator<PropertyDef> iterator2 = propertyDefs.iterator();
-			// while (iterator2.hasNext()) {
-			// PropertyDef propertyDef = iterator2.next();
-			// if (!slotDefHome.getInstance().getPropertyDefsAsList()
-			// .contains(propertyDef)) {
-			// iterator2.remove();
-			// propertytDefHome.setInstance(propertyDef);
-			// propertytDefHome.remove();
-			// }
-			// }
-			// Set<EmbeddedProperty> slotDefEmbeddedProperties = slotDefHome
-			// .getInstance().getEmbeddedProperties();
-			// Iterator<EmbeddedProperty> iterator3 = slotDefEmbeddedProperties
-			// .iterator();
-			// while (iterator3.hasNext()) {
-			// EmbeddedProperty embeddedProperty = iterator3.next();
-			// if (!slotDefHome.getInstance().getEmbeddedPropertiesAsList()
-			// .contains(embeddedProperty)) {
-			// iterator3.remove();
-			// slotDefEmbeddedPropertyHome.setInstance(embeddedProperty);
-			// slotDefEmbeddedPropertyHome.remove();
-			// }
-			// }
-
 			Set<PropertyDef> newPropertyDefs = new HashSet<PropertyDef>();
 			Set<DocDefCollection> newDocDefCollections = new HashSet<DocDefCollection>();
 
@@ -433,6 +385,14 @@ public class SlotDefEditBean {
 		this.collection = new DocDefCollection();
 		this.propertyDef = new PropertyDef();
 		this.conditional = false;
+	}
+
+	public String getFrom() {
+		return from;
+	}
+
+	public void setFrom(String from) {
+		this.from = from;
 	}
 
 }

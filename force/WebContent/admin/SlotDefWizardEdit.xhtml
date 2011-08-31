@@ -24,7 +24,7 @@
 
             <s:decorate id="nameField" template="/layout/edit.xhtml">
                 <ui:define name="label">Nome</ui:define>
-                <h:inputText id="name" value="#{slotDefHome.instance.name}"/>
+                <h:inputText id="name" value="#{slotDefHome.instance.name}" required="true"/>
             </s:decorate>
             
             <s:decorate id="typeField" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.mode == 'Normal'}">
@@ -35,40 +35,62 @@
 						<s:convertEnum/>
              	</h:selectOneMenu>
             </s:decorate>
-            
-            <s:div id="embeddedProperties">
-			<c:forEach var="dataInstance" items="#{slotDefHome.instance.embeddedPropertiesAsList}">
-	            <s:decorate template="/layout/display.xhtml">
-					<ui:define name="label">
-						<h:outputText value="#{dataInstance.dataDefinition.label}" />
-					</ui:define>
-					<s:fragment rendered="#{not dataInstance.multiple}">
-					<h:outputText value="#{dataInstance.stringValue}"
-						rendered="#{dataInstance.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
-					<h:outputText value="#{dataInstance.integerValue}"
-						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER'}" />
-					<h:outputText value="#{dataInstance.booleanValue ? 'true' : 'false'}"
-						rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}" />
-					<h:outputText value="#{dataInstance.dateValue}"
-						rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}">
-						<s:convertDateTime type="date" dateStyle="short"
-							pattern="dd/MM/yyyy" />
-					</h:outputText>
-					</s:fragment>
-					<s:fragment rendered="#{dataInstance.multiple}">
-						<h:outputText value="#{dataInstance.value}" />
-					</s:fragment>
-            		<a:commandButton value="remove" action="#{slotDefEditBean.removeEmbeddedProp(dataInstance)}" 
-            						disabled="#{slotDefHome.referenced}" reRender="embeddedProperties"/>
-		            <a:commandButton value="edit" action="#{slotDefEditBean.editEmbeddedProp(dataInstance)}" 
+			
+			<div style="clear:both"/>
+			<rich:separator height="25px" lineType="none" rendered="#{slotDefEditBean.mode != 'Primary'}"/>
+			
+			<s:decorate template="/layout/display.xhtml" rendered="#{slotDefEditBean.mode != 'Primary'}">
+				<ui:define name="label">
+	                <h:outputText value="Informazioni sul bando" />
+				</ui:define>
+				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.embeddedPropertiesAsList}"/>
+				<rich:dataTable id="epropTable" value="#{slotDefHome.instance.embeddedPropertiesAsList}" var="eprop" 
+						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" style="width:1024px">
+					<rich:column style="width:200px">
+						<f:facet name="header">Nome</f:facet>
+						<h:outputText value="#{eprop.name}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Tipologia di dato</f:facet>
+						<h:outputText value="#{eprop.dataType.value()}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Multipla</f:facet>
+						<h:outputText value="#{eprop.multiple ? 'sì' : 'no'}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Valore</f:facet>
+						<s:fragment rendered="#{not eprop.multiple}">
+							<h:outputText value="#{eprop.stringValue}"
+									rendered="#{eprop.dataDefinition.dataType == 'STRING' or eprop.dataDefinition.dataType == 'LINK'}"/>
+							<h:outputText value="#{eprop.integerValue}"
+									rendered="#{eprop.dataDefinition.dataType == 'INTEGER'}" />
+							<h:outputText value="#{eprop.booleanValue ? 'true' : 'false'}"
+									rendered="#{eprop.dataDefinition.dataType == 'BOOLEAN'}" />
+							<h:outputText value="#{eprop.dateValue}"
+									rendered="#{eprop.dataDefinition.dataType == 'DATE'}">
+								<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</s:fragment>
+						<s:fragment rendered="#{eprop.multiple}">
+							<h:outputText value="#{eprop.value}" />
+						</s:fragment>
+					</rich:column>
+					<rich:column styleClass="action">
+						<f:facet name="header">Azioni</f:facet>
+		                <a:commandLink value="Modifica" action="#{slotDefEditBean.editEmbeddedProp(dataInstance)}" 
 		            			oncomplete="#{rich:component('embeddedPropPanel')}.show()"
 		            			reRender="embeddedPropPanel"/>
-				</s:decorate>
-		
-			</c:forEach>
-			</s:div>
+		                #{' '}
+						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(dataInstance)}" 
+            						disabled="#{slotDefHome.referenced}" reRender="embeddedProperties"/>
+					</rich:column>
+				</rich:dataTable>
+			</s:decorate>
             
-			
+            <div style="clear:both"/>
+            <rich:separator height="25px" lineType="none" />
+            
 			<s:decorate template="/layout/display.xhtml">
 				<ui:define name="label">
 	                <h:outputText value="Informazioni dell'azienda" />
@@ -85,11 +107,11 @@
 						<h:outputText value="#{prop.dataType.value()}" />
 					</rich:column>
 					<rich:column>
-						<f:facet name="header">Informazione obbligatoria</f:facet>
+						<f:facet name="header">Obbligatoria</f:facet>
 						<h:outputText value="#{prop.required ? 'sì' : 'no'}" />
 					</rich:column>
 					<rich:column>
-						<f:facet name="header">Accetta valori multipli</f:facet>
+						<f:facet name="header">Multipla</f:facet>
 						<h:outputText value="#{prop.multiple ? 'sì' : 'no'}" />
 					</rich:column>
 					<rich:column>
@@ -98,7 +120,7 @@
 					</rich:column>
 					<rich:column>
 						<f:facet name="header">Vincolante per le richieste</f:facet>
-						<h:outputText value="#{!slotDefEditBean.getReferencedCollectionsNames(prop).equals('') ? slotDefEditBean.getReferencedCollectionsNames(prop) : 'nessuna'}" />
+						<h:outputText value="#{!slotDefEditBean.getReferencedCollectionsNames(prop).equals('') ? slotDefEditBean.getReferencedCollectionsNames(prop) : ''}" />
 					</rich:column>
 					<rich:column styleClass="action">
 						<f:facet name="header">Azioni</f:facet>
@@ -113,6 +135,8 @@
 				</rich:dataTable>
 			</s:decorate>
 			
+			<div style="clear:both"/>
+			<rich:separator height="25px" lineType="none" />
 			
 			<s:decorate template="/layout/display.xhtml" id="collTable">
 				<ui:define name="label">
@@ -126,7 +150,7 @@
 						<h:outputText value="#{coll.name}" />
 					</rich:column>
 					<rich:column>
-						<f:facet name="header">Tipo di cocumento</f:facet>
+						<f:facet name="header">Tipo di documento</f:facet>
 						<h:outputText value="#{coll.docDef.name}" />
 					</rich:column>
 					<rich:column>
@@ -162,10 +186,15 @@
 			
 			
 			<div style="clear:both"/>
-			<a:commandButton value="Aggiungi informazione sull'azienda" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newPoperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel"/>
-			<a:commandButton value="Aggiungi richieste" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel" rendered="#{slotDefEditBean.mode == 'Normal'}"/>
-			<a:commandButton value="Aggiungi richiesta" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collTypePanel')}.show()" reRender="collPanel"/>
-			<a:commandButton value="add embeddedProperty" action="#{slotDefEditBean.newEmbeddedProperty()}" oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel" rendered="#{slotDefEditBean.mode != 'Primary'}"/>
+			<rich:separator height="25px" lineType="none" />
+			
+			<a:commandButton value="Aggiungi informazione #{slotDefEditBean.mode == 'Primary' ? 'sull azienda' : ''}" 
+						onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
+						action="#{slotDefEditBean.newPoperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel" rendered="#{slotDefEditBean.mode != 'General'}"/>
+			<a:commandButton value="Aggiungi richiesta" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
+						action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collTypePanel')}.show()" reRender="collPanel"/>
+			<a:commandButton value="Aggiungi informazioni relative alla gara" action="#{slotDefEditBean.newEmbeddedProperty()}" 
+						oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel" rendered="#{slotDefEditBean.mode != 'Primary'}"/>
 			
             <div style="clear:both">
                 <span class="required">*</span>
@@ -302,16 +331,17 @@
 		</rich:modalPanel>
 		
 
-		<rich:modalPanel id="embeddedPropPanel" autosized="true" minWidth="550"
+		<rich:modalPanel id="embeddedPropPanel" autosized="true" minWidth="600"
 				resizeable="false">
 			<f:facet name="header">
 				<h:outputText value="Add Embedded Property" />
 			</f:facet>
 			<a:form id="epForm">
 				<script type="text/javascript">
-					var invalid = false;
+					var epinvalid = false;
 				</script>
-				<ui:param name="customType" value="p" /> 
+				<ui:param name="customType" value="p" />
+				<ui:param name="prefix" value="ep" />
 			<s:div id="embeddedPropValue">
 			<a:region>
 				<s:decorate template="/layout/edit.xhtml">
@@ -321,13 +351,13 @@
 					<h:inputText value="#{slotDefEditBean.embeddedProperty.name}" required="true"/>
 	            </s:decorate>
 
-	            <s:decorate template="/layout/display.xhtml">
+	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
-	                	<h:outputText value="Data Type" />
+	                	<h:outputText value="Tipologia del dato" />
 					</ui:define>
-					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.dataType}">
-                    	<s:selectItems value="#{dataTypes}" var="type" label="#{type}"
-							noSelectionLabel="-- select a type --"/>
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.dataType}" required="true">
+                    	<s:selectItems value="#{dataTypes}" var="type" label="#{type.value()}"
+							noSelectionLabel="-- seleziona un tipo --"/>
 						<s:convertEnum/>
 					<a:support event="onchange" action="#{slotDefEditBean.embeddedPropertyListener}" reRender="epForm"/>
              		</h:selectOneMenu>
@@ -335,7 +365,7 @@
 	            
 	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
-	                	<h:outputText value="Multiple" />
+	                	<h:outputText value="Accetta valori multipli" />
 					</ui:define>
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.multiple}" >
 						<a:support event="onchange" action="#{slotDefEditBean.embeddedProperty.clean}" reRender="epForm"/>
@@ -346,11 +376,11 @@
 				<a:region>
 	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
-	                	<h:outputText value="Dictionary" />
+	                	<h:outputText value="Dizionario associato" />
 					</ui:define>
 					<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dictionary}" required="#{slotDefEditBean.embeddedProperty.multiple}">
                     		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.embeddedProperty.dataType)}" 
-											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- select a dictionary --"/>
+											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- seleziona un dizionario --"/>
 							<s:convertEntity/>
 					<a:support event="onchange" action="#{slotDefEditBean.embeddedProperty.clean}" reRender="epForm"/>
              		</h:selectOneMenu>
@@ -360,7 +390,7 @@
 	            <s:div rendered="#{slotDefEditBean.embeddedProperty.dataType != null}">
 		            <s:decorate template="/layout/edit.xhtml">
 		                <ui:define name="label">
-		                	<h:outputText value="Value" />
+		                	<h:outputText value="Valore" />
 						</ui:define>
 							
 							<s:fragment rendered="#{not slotDefEditBean.embeddedProperty.multiple}">
@@ -377,7 +407,6 @@
 								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'BOOLEAN'}"
 								required="true"
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}">
-								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(slotDefEditBean.embeddedProperty)}" reRender="collections"/>
 							</h:selectBooleanCheckbox>
 							</a:region>
 							<rich:calendar id="subscriptionDate" mode="client"
@@ -391,14 +420,12 @@
 										valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
-								<a:support event="onchange" reRender="collections"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.integerValue}" required="true"
 	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'INTEGER' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
-								<a:support event="onchange" reRender="collections"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dateValue}"  required="true"
 	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'DATE' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
@@ -406,7 +433,6 @@
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
 								<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
-								<a:support event="onchange" reRender="collections"/>
 	             			</h:selectOneMenu>
 	             			</s:fragment>
 	             			
@@ -419,11 +445,11 @@
 	            </s:div>
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addEmbeddedProperty()}" oncomplete="if(!invalid){#{rich:component('embeddedPropPanel')}.hide();}" reRender="epForm,embeddedProperties"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addEmbeddedProperty()}" oncomplete="if(!epinvalid){#{rich:component('embeddedPropPanel')}.hide();}" reRender="epForm,slotDef"/>
 			<a:region>
-			<a:commandButton value="Cancel" onclick="#{rich:component('embeddedPropPanel')}.hide()"/>
+			<a:commandButton value="Annulla" onclick="#{rich:component('embeddedPropPanel')}.hide()"/>
 			</a:region>
-			<a:commandButton value="Refresh" styleClass="rightCommand" reRender="epForm"/>
+			<a:commandButton value="Aggiorna" styleClass="rightCommand" reRender="epForm"/>
 			</a:form>
 		</rich:modalPanel>
 		
@@ -487,8 +513,7 @@
 	            </s:decorate>
 				</a:region>
 				
-				
-				<s:div >			
+					
 	            <s:decorate  template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef != null}" id="condPI">	            	
 	                <ui:define name="label">
 	                	<h:outputText value="Valore vincolante" />
@@ -525,7 +550,6 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
              			</h:selectOneMenu>
 	            </s:decorate>
-	            </s:div>
 	            
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
@@ -537,9 +561,9 @@
 	        <div style="clear:both"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionedCollection()}" oncomplete="if(!cinvalid){#{rich:component('collPanel')}.hide();}" reRender="cpf,pf,collTable,propTable,propPanel"/>
 			<a:region>
-			<a:commandButton value="Cancel" action="#{slotDefEditBean.setConditional(false)}" oncomplete="#{rich:component('collPanel')}.hide()" reRender="cpf"/>
+			<a:commandButton value="Annulla" action="#{slotDefEditBean.setConditional(false)}" oncomplete="#{rich:component('collPanel')}.hide()" reRender="cpf"/>
 			</a:region>
-			<a:commandButton value="Refresh" styleClass="rightCommand" reRender="cpf"/>
+			<a:commandButton value="Aggiorna" styleClass="rightCommand" reRender="cpf"/>
 			</a:form>
 		</rich:modalPanel>
 		
