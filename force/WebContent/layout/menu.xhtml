@@ -169,6 +169,29 @@
                 propagation="none"/>
         </rich:menuItem>
     </rich:dropDownMenu>
+    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('ADMIN')}">
+        <f:facet name="label">Gestione Modelli</f:facet>
+        <rich:menuItem>
+            <s:link view="/admin/SlotDefTemplateList.xhtml"
+                value="Buste di Riferimento"
+                id="primaryTemplates"
+                includePageParams="false"
+                propagation="none">
+             	<f:param name="model" value="#{true}"/>
+            	<f:param name="mode" value="Primary"/>
+           	</s:link>
+        </rich:menuItem>
+        <rich:menuItem>
+            <s:link view="/admin/SlotDefTemplateList.xhtml"
+                value="Buste Amministrative"
+                id="generalTemplates"
+                includePageParams="false"
+                propagation="none">
+            <f:param name="model" value="#{true}"/>
+            <f:param name="mode" value="General"/>
+            </s:link>
+        </rich:menuItem>
+    </rich:dropDownMenu>
     <!-- @newMenuItem@ -->
     <rich:toolBarGroup location="right">
         <h:outputText id="menuWelcomeId" value="Autenticato come: #{credentials.username} " rendered="#{identity.loggedIn}"/>

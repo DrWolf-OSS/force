@@ -10,9 +10,6 @@ import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.interfaces.DataDefinition;
-import it.drwolf.slot.session.DocDefCollectionHome;
-import it.drwolf.slot.session.PropertytDefHome;
-import it.drwolf.slot.session.SlotDefEmbeddedPropertyHome;
 import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
@@ -43,15 +40,6 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotDefHome slotDefHome;
 
-	@In(create = true)
-	private PropertytDefHome propertytDefHome;
-
-	@In(create = true)
-	private DocDefCollectionHome docDefCollectionHome;
-
-	@In(create = true)
-	private SlotDefEmbeddedPropertyHome slotDefEmbeddedPropertyHome;
-
 	private DocDefCollection collection = new DocDefCollection();
 	private PropertyDef propertyDef = new PropertyDef();
 	private EmbeddedProperty embeddedProperty = new EmbeddedProperty();
@@ -61,13 +49,25 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotInstHome slotInstHome;
 
+	private boolean conditional = Boolean.FALSE;
+	private boolean model = Boolean.FALSE;
+	private String mode = SlotDefType.GENERAL.value();
+	private String from = "";
+
 	@Create
 	public void init() {
 		// checkReference();
+		// slotDefHome.getInstance().setTemplate(model);
+		// slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
 	}
 
 	public void newPoperty() {
 		this.propertyDef = new PropertyDef();
+	}
+
+	public void newConditionaProperty() {
+		this.newPoperty();
+		this.conditional = true;
 	}
 
 	public void addProperty() {
@@ -78,6 +78,13 @@ public class SlotDefEditBean {
 		if (converterPropertyMap.get(propertyDef.getUuid()) == null) {
 			converterPropertyMap.put(propertyDef.getUuid(), propertyDef);
 		}
+	}
+
+	public void addConditionalProperty() {
+		this.newCollection();
+		this.addProperty();
+		this.collection.setConditionalPropertyDef(this.propertyDef);
+		this.conditionalPropertyListener(null);
 	}
 
 	public void newCollection() {
@@ -91,6 +98,11 @@ public class SlotDefEditBean {
 			slotDefHome.getInstance().getDocDefCollections()
 					.add(this.collection);
 		}
+	}
+
+	public void addConditionedCollection() {
+		this.addCollection();
+		this.conditional = false;
 	}
 
 	public void newEmbeddedProperty() {
@@ -158,46 +170,6 @@ public class SlotDefEditBean {
 
 	public String update() {
 		if (checkNames()) {
-			// Set<DocDefCollection> docDefCollections =
-			// slotDefHome.getInstance()
-			// .getDocDefCollections();
-			// Iterator<DocDefCollection> iterator =
-			// docDefCollections.iterator();
-			// while (iterator.hasNext()) {
-			// DocDefCollection docDefCollection = iterator.next();
-			// if (!slotDefHome.getInstance().getDocDefCollectionsAsList()
-			// .contains(docDefCollection)) {
-			// iterator.remove();
-			// docDefCollectionHome.setInstance(docDefCollection);
-			// docDefCollectionHome.remove();
-			// }
-			// }
-			// Set<PropertyDef> propertyDefs = slotDefHome.getInstance()
-			// .getPropertyDefs();
-			// Iterator<PropertyDef> iterator2 = propertyDefs.iterator();
-			// while (iterator2.hasNext()) {
-			// PropertyDef propertyDef = iterator2.next();
-			// if (!slotDefHome.getInstance().getPropertyDefsAsList()
-			// .contains(propertyDef)) {
-			// iterator2.remove();
-			// propertytDefHome.setInstance(propertyDef);
-			// propertytDefHome.remove();
-			// }
-			// }
-			// Set<EmbeddedProperty> slotDefEmbeddedProperties = slotDefHome
-			// .getInstance().getEmbeddedProperties();
-			// Iterator<EmbeddedProperty> iterator3 = slotDefEmbeddedProperties
-			// .iterator();
-			// while (iterator3.hasNext()) {
-			// EmbeddedProperty embeddedProperty = iterator3.next();
-			// if (!slotDefHome.getInstance().getEmbeddedPropertiesAsList()
-			// .contains(embeddedProperty)) {
-			// iterator3.remove();
-			// slotDefEmbeddedPropertyHome.setInstance(embeddedProperty);
-			// slotDefEmbeddedPropertyHome.remove();
-			// }
-			// }
-
 			Set<PropertyDef> newPropertyDefs = new HashSet<PropertyDef>();
 			Set<DocDefCollection> newDocDefCollections = new HashSet<DocDefCollection>();
 
@@ -376,6 +348,51 @@ public class SlotDefEditBean {
 					.add(Severity.WARN,
 							"ATTENZIONE! Questo SlotDef è già referenziato da uno o più SlotInst!");
 		}
+	}
+
+	public boolean isConditional() {
+		return conditional;
+	}
+
+	public void setConditional(boolean conditional) {
+		this.conditional = conditional;
+	}
+
+	public boolean isModel() {
+		return model;
+	}
+
+	public void setModel(boolean model) {
+		this.model = model;
+	}
+
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+
+	// Viene eseguito dopo aver settato i parametri, in init() venivano eseguite
+	// prima che fossero settati i parametri
+	public void setKnownParameters() {
+		slotDefHome.getInstance().setTemplate(model);
+		slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
+	}
+
+	public void clearEditing() {
+		this.collection = new DocDefCollection();
+		this.propertyDef = new PropertyDef();
+		this.conditional = false;
+	}
+
+	public String getFrom() {
+		return from;
+	}
+
+	public void setFrom(String from) {
+		this.from = from;
 	}
 
 }

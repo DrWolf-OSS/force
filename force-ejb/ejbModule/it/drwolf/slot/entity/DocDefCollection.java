@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.validator.NotNull;
@@ -104,6 +105,22 @@ public class DocDefCollection {
 
 	public void setConditionalPropertyInst(PropertyInst conditionalPropertyInst) {
 		this.conditionalPropertyInst = conditionalPropertyInst;
+	}
+
+	@Transient
+	public void setMandatory(boolean mandatory) {
+		if (mandatory) {
+			this.setMin(new Integer(1));
+		}
+	}
+
+	@Transient
+	public boolean isMandatory() {
+		if (this.getMin() == null)
+			return false;
+		else if (this.getMin() > 0)
+			return true;
+		return false;
 	}
 
 	// @Override

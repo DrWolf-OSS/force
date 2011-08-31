@@ -2,7 +2,7 @@ package it.drwolf.slot.enums;
 
 public enum DataType {
 
-	STRING("String"), INTEGER("Integer"), BOOLEAN("Boolean"), DATE("Date"), LINK(
+	STRING("Testo"), INTEGER("Numero"), BOOLEAN("Vero/Falso"), DATE("Data"), LINK(
 			"Link");
 	private final String value;
 

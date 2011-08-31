@@ -1,0 +1,84 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="/layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="slotDefSearch" styleClass="edit">
+
+    <rich:panel>
+        <f:facet name="header">SlotDef Search Results</f:facet>
+    <div class="results" id="slotDefList">
+
+    <h:outputText value="The slotDef search returned no results."
+               rendered="#{empty slotDefList.resultList}"/>
+
+    <rich:dataTable id="slotDefList"
+                var="_slotDef"
+              value="#{slotDefsByParams}"
+           rendered="#{not empty allPrimaryTemplates}"
+           	   rows="35">
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{slotDefList}"/>
+                    <ui:param name="propertyLabel" value="Id"/>
+                    <ui:param name="propertyPath" value="slotDef.id"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_slotDef.id}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{slotDefList}"/>
+                    <ui:param name="propertyLabel" value="Name"/>
+                    <ui:param name="propertyPath" value="slotDef.name"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_slotDef.name}" />
+        </h:column>
+        <rich:column styleClass="action">
+            <f:facet name="header">Action</f:facet>        
+            <s:link view="/admin/SlotDefWizardEdit.xhtml"
+                   value="Edit"
+             propagation="none"
+                      id="slotDefEdit"
+                action="#{slotDefEditBean.checkReference()}">
+                <f:param name="slotDefId" value="#{_slotDef.id}"/>
+                <f:param name="model" value="#{true}"/>
+            	<f:param name="mode" value="#{slotDefListManager.mode}"/>
+            	<f:param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
+            </s:link>
+            #{' '}
+            <h:commandLink action="#{slotDefHome.slotDefClone(_slotDef)}" value="Clone" rendered="#{slotDefListManager.model}"/>
+        </rich:column>
+    </rich:dataTable>
+    <rich:datascroller for="slotDefList"></rich:datascroller>
+
+    </div>
+    </rich:panel>
+
+    <s:div styleClass="actionButtons">
+        <s:button view="/admin/SlotDefWizardEdit.xhtml"
+                    id="create"
+           propagation="none"
+                 value="Crea un nuovo modello">
+            <f:param name="slotDefId"/>
+            <f:param name="model" value="#{true}"/>
+            <f:param name="mode" value="#{slotDefListManager.mode}"/>
+            <f:param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
+        </s:button>
+    </s:div>
+    
+    </h:form>
+
+</ui:define>
+
+</ui:composition>

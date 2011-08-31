@@ -65,3 +65,25 @@ a:HOVER {
 .rightCommand{
    float:right;
 }
+
+/* customType = p */
+.pname {
+	vertical-align: top;
+	font-weight: bold;
+	width: 175px;
+	float: left;
+	padding: 5px;
+	margin-top: 3px;
+	clear: left;
+}
+
+.pvalue {
+	float: left;
+	padding: 5px;
+	width: 255px;
+}
+
+.ptext{
+	width: 100%;
+}
+/* --- */

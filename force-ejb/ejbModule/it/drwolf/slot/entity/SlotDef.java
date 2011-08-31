@@ -38,6 +38,8 @@ public class SlotDef {
 
 	private Set<EmbeddedProperty> embeddedProperties = new HashSet<EmbeddedProperty>();
 
+	private boolean template = Boolean.FALSE;
+
 	@Id
 	@GeneratedValue
 	public Long getId() {
@@ -185,6 +187,7 @@ public class SlotDef {
 		}
 		return null;
 	}
+
 	// @Override
 	// public int hashCode() {
 	// final int prime = 31;
@@ -231,5 +234,13 @@ public class SlotDef {
 	// return false;
 	// return true;
 	// }
+
+	public boolean isTemplate() {
+		return template;
+	}
+
+	public void setTemplate(boolean template) {
+		this.template = template;
+	}
 
 }
