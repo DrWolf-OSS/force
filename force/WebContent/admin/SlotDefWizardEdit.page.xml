@@ -42,13 +42,18 @@
    <navigation from-action="#{slotDefEditBean.save()}">
       <rule if-outcome="persisted">
          <end-conversation/>
-         <redirect view-id="#{slotDefEditBean.from}">
+         <redirect view-id="#{empty from ? 'SlotDefTemplateList.xhtml' : from}">
          	<param name="model" value="#{slotDefEditBean.model}"/>
-         	<param name="mode" value="#{slotDefEditBean.mode}"/>
+    		<param name="mode" value="#{slotDefEditBean.mode}"/>
+    		<param name="wizard" value="#{slotDefEditBean.wizard}"/>
          </redirect>
       </rule>
       <rule if-outcome="failed">
-         <redirect/>
+         <redirect>
+         	<param name="model" value="#{slotDefEditBean.model}"/>
+    		<param name="mode" value="#{slotDefEditBean.mode}"/>
+    		<param name="wizard" value="#{slotDefEditBean.wizard}"/>
+         </redirect>
       </rule>
    </navigation>
    
@@ -57,13 +62,17 @@
          <end-conversation before-redirect="true"/>
          <redirect>
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
-         	<param name="model" value="#{slotDefEditBean.model}"/>
-         	<param name="mode" value="#{slotDefEditBean.mode}"/>
+    		<param name="model" value="#{slotDefEditBean.model}"/>
+    		<param name="mode" value="#{slotDefEditBean.mode}"/>
+    		<param name="wizard" value="#{slotDefEditBean.wizard}"/>
          </redirect>
       </rule>
       <rule if-outcome="failed">
          <redirect>
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="model" value="#{slotDefEditBean.model}"/>
+    		<param name="mode" value="#{slotDefEditBean.mode}"/>
+    		<param name="wizard" value="#{slotDefEditBean.wizard}"/>
          </redirect>
       </rule>
    </navigation>

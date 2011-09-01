@@ -49,11 +49,13 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotInstHome slotInstHome;
 
-	private boolean conditional = Boolean.FALSE;
 	private boolean model = Boolean.FALSE;
 	private String mode = SlotDefType.GENERAL.value();
 	private String from = "";
 	private boolean wizard = Boolean.FALSE;
+
+	private boolean conditional = Boolean.FALSE;
+	private boolean edit = Boolean.FALSE;
 
 	@Create
 	public void init() {
@@ -62,12 +64,12 @@ public class SlotDefEditBean {
 		// slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
 	}
 
-	public void newPoperty() {
+	public void newProperty() {
 		this.propertyDef = new PropertyDef();
 	}
 
 	public void newConditionaProperty() {
-		this.newPoperty();
+		this.newProperty();
 		this.conditional = true;
 	}
 
@@ -79,6 +81,8 @@ public class SlotDefEditBean {
 		if (converterPropertyMap.get(propertyDef.getUuid()) == null) {
 			converterPropertyMap.put(propertyDef.getUuid(), propertyDef);
 		}
+		//
+		this.edit = false;
 	}
 
 	public void addConditionalProperty() {
@@ -165,9 +169,10 @@ public class SlotDefEditBean {
 		boolean passed = true;
 		for (EmbeddedProperty embeddedProperty : this.slotDefHome.getInstance()
 				.getEmbeddedProperties()) {
-			if (embeddedProperty.getValue() == null
-					|| embeddedProperty.getValue().equals("")
-					|| ((Set<String>) embeddedProperty.getValue()).isEmpty()) {
+			if ((!embeddedProperty.isMultiple() && (embeddedProperty.getValue() == null || embeddedProperty
+					.getValue().equals("")))
+					|| (embeddedProperty.isMultiple() && ((Set) embeddedProperty
+							.getValue()).isEmpty())) {
 				FacesMessages.instance().add(
 						Severity.ERROR,
 						"L'informazione \"" + embeddedProperty.getLabel()
@@ -312,6 +317,8 @@ public class SlotDefEditBean {
 		} else {
 			this.conditional = true;
 		}
+		//
+		this.edit = true;
 	}
 
 	public void removeColl(DocDefCollection coll) {
@@ -436,13 +443,17 @@ public class SlotDefEditBean {
 	// prima che fossero settati i parametri
 	public void setKnownParameters() {
 		slotDefHome.getInstance().setTemplate(model);
-		slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
+		if (mode.equals(SlotDefType.PRIMARY.value())
+				|| mode.equals(SlotDefType.GENERAL.value())) {
+			slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
+		}
 	}
 
 	public void clearEditing() {
 		this.collection = new DocDefCollection();
 		this.propertyDef = new PropertyDef();
 		this.conditional = false;
+		this.edit = false;
 	}
 
 	public String getFrom() {
@@ -459,6 +470,14 @@ public class SlotDefEditBean {
 
 	public void setWizard(boolean wizard) {
 		this.wizard = wizard;
+	}
+
+	public boolean isEdit() {
+		return edit;
+	}
+
+	public void setEdit(boolean edit) {
+		this.edit = edit;
 	}
 
 }

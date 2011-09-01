@@ -45,6 +45,7 @@
                 action="#{slotDefEditBean.checkReference()}">
                 <f:param name="slotDefId" value="#{_slotDef.id}"/>
                 <f:param name="model" value="#{true}"/>
+                <f:param name="wizard" value="#{true}"/>
             	<f:param name="mode" value="#{slotDefListManager.mode}"/>
             	<f:param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
             </s:link>
@@ -64,6 +65,7 @@
                  value="Crea un nuovo modello">
             <f:param name="slotDefId"/>
             <f:param name="model" value="#{true}"/>
+            <f:param name="wizard" value="#{true}"/>
             <f:param name="mode" value="#{slotDefListManager.mode}"/>
             <f:param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
         </s:button>
