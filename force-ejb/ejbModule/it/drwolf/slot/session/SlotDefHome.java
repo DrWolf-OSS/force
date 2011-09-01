@@ -19,9 +19,7 @@ import java.util.Set;
 
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.framework.EntityHome;
-import org.jboss.seam.international.StatusMessage.Severity;
 
 @Name("slotDefHome")
 public class SlotDefHome extends EntityHome<SlotDef> {
@@ -152,8 +150,7 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		// clonedEmbeddedProperty.setDateValue(embeddedProperty.getDateValue());
 
 		clonedEmbeddedProperty.setDictionary(embeddedProperty.getDictionary());
-		clonedEmbeddedProperty.setValues(new HashSet<String>(embeddedProperty
-				.getValues()));
+		clonedEmbeddedProperty.setValues(new HashSet<String>());
 		return clonedEmbeddedProperty;
 	}
 
@@ -209,9 +206,9 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 
 	@Override
 	public String persist() {
-		if (!checkEmbeddedPropertyValues()) {
-			return "failed";
-		}
+		// if (!checkEmbeddedPropertyValues()) {
+		// return "failed";
+		// }
 		String result = super.persist();
 		if (result.equals("persisted") && this.model != null) {
 			for (Rule rule : this.model.getRules()) {
@@ -225,27 +222,28 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		return result;
 	}
 
-	private boolean checkEmbeddedPropertyValues() {
-		boolean passed = true;
-		for (EmbeddedProperty embeddedProperty : this.getInstance()
-				.getEmbeddedProperties()) {
-			if (embeddedProperty.getValue() == null
-					|| embeddedProperty.getValue().equals("")) {
-				FacesMessages.instance().add(
-						Severity.ERROR,
-						"La proprietà \"" + embeddedProperty.getLabel()
-								+ "\" non è stata valorizzata");
-				passed = false;
-			}
-			if (!passed) {
-				FacesMessages
-						.instance()
-						.add(Severity.ERROR,
-								"Non possono esserci proprietà del bando non valorizzate");
-			}
-		}
-		return passed;
-	}
+	// private boolean checkEmbeddedPropertyValues() {
+	// boolean passed = true;
+	// for (EmbeddedProperty embeddedProperty : this.getInstance()
+	// .getEmbeddedProperties()) {
+	// if (embeddedProperty.getValue() == null
+	// || embeddedProperty.getValue().equals("")
+	// || ((Set<String>) embeddedProperty.getValue()).isEmpty()) {
+	// FacesMessages.instance().add(
+	// Severity.ERROR,
+	// "L'informazione \"" + embeddedProperty.getLabel()
+	// + "\" non è stata valorizzata");
+	// passed = false;
+	// }
+	// }
+	// if (!passed) {
+	// FacesMessages
+	// .instance()
+	// .add(Severity.ERROR,
+	// "Non possono esserci informazioni sulla gara non valorizzate");
+	// }
+	// return passed;
+	// }
 
 	private Rule cloneRule(Rule rule) {
 		Rule clonedRule = new Rule();

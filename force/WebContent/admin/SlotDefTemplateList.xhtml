@@ -22,25 +22,17 @@
     <rich:dataTable id="slotDefList"
                 var="_slotDef"
               value="#{slotDefsByParams}"
-           rendered="#{not empty allPrimaryTemplates}"
+           rendered="#{not empty slotDefsByParams}"
            	   rows="35">
         <h:column>
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{slotDefList}"/>
-                    <ui:param name="propertyLabel" value="Id"/>
-                    <ui:param name="propertyPath" value="slotDef.id"/>
-                </ui:include>
+				<h:outputText value="Id" />
             </f:facet>
             <h:outputText value="#{_slotDef.id}"/>
         </h:column>
         <h:column>
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{slotDefList}"/>
-                    <ui:param name="propertyLabel" value="Name"/>
-                    <ui:param name="propertyPath" value="slotDef.name"/>
-                </ui:include>
+				<h:outputText value="Nome" />
             </f:facet>
             <h:outputText value="#{_slotDef.name}" />
         </h:column>
@@ -53,6 +45,7 @@
                 action="#{slotDefEditBean.checkReference()}">
                 <f:param name="slotDefId" value="#{_slotDef.id}"/>
                 <f:param name="model" value="#{true}"/>
+                <f:param name="wizard" value="#{true}"/>
             	<f:param name="mode" value="#{slotDefListManager.mode}"/>
             	<f:param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
             </s:link>
@@ -72,6 +65,7 @@
                  value="Crea un nuovo modello">
             <f:param name="slotDefId"/>
             <f:param name="model" value="#{true}"/>
+            <f:param name="wizard" value="#{true}"/>
             <f:param name="mode" value="#{slotDefListManager.mode}"/>
             <f:param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
         </s:button>

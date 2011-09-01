@@ -41,7 +41,7 @@
 			
 			<s:decorate template="/layout/display.xhtml" rendered="#{slotDefEditBean.mode != 'Primary'}">
 				<ui:define name="label">
-	                <h:outputText value="Informazioni sul bando" />
+	                <h:outputText value="Informazioni sulla gara" />
 				</ui:define>
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.embeddedPropertiesAsList}"/>
 				<rich:dataTable id="epropTable" value="#{slotDefHome.instance.embeddedPropertiesAsList}" var="eprop" 
@@ -78,11 +78,11 @@
 					</rich:column>
 					<rich:column styleClass="action">
 						<f:facet name="header">Azioni</f:facet>
-		                <a:commandLink value="Modifica" action="#{slotDefEditBean.editEmbeddedProp(dataInstance)}" 
+		                <a:commandLink value="Modifica" action="#{slotDefEditBean.editEmbeddedProp(eprop)}" 
 		            			oncomplete="#{rich:component('embeddedPropPanel')}.show()"
 		            			reRender="embeddedPropPanel"/>
 		                #{' '}
-						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(dataInstance)}" 
+						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(eprop)}" 
             						disabled="#{slotDefHome.referenced}" reRender="embeddedProperties"/>
 					</rich:column>
 				</rich:dataTable>
@@ -93,7 +93,7 @@
             
 			<s:decorate template="/layout/display.xhtml">
 				<ui:define name="label">
-	                <h:outputText value="Informazioni dell'azienda" />
+	                <h:outputText value="Informazioni sull'azienda" />
 				</ui:define>
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.propertyDefsAsList}"/>
 				<rich:dataTable id="propTable" value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
@@ -186,15 +186,21 @@
 			
 			
 			<div style="clear:both"/>
-			<rich:separator height="25px" lineType="none" />
+			<rich:separator height="15px" lineType="none" />
 			
-			<a:commandButton value="Aggiungi informazione #{slotDefEditBean.mode == 'Primary' ? 'sull azienda' : ''}" 
-						onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
-						action="#{slotDefEditBean.newPoperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel" rendered="#{slotDefEditBean.mode != 'General'}"/>
-			<a:commandButton value="Aggiungi richiesta" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
-						action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collTypePanel')}.show()" reRender="collPanel"/>
-			<a:commandButton value="Aggiungi informazioni relative alla gara" action="#{slotDefEditBean.newEmbeddedProperty()}" 
-						oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel" rendered="#{slotDefEditBean.mode != 'Primary'}"/>
+			
+			<s:decorate template="/layout/display.xhtml">
+				<ui:define name="label">
+	                <h:outputText value="" />
+				</ui:define>
+				<a:commandButton value="Aggiungi informazione #{slotDefEditBean.mode == 'Primary' ? 'sull azienda' : ''}" 
+							onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
+							action="#{slotDefEditBean.newProperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel" rendered="#{slotDefEditBean.mode != 'General'}"/>
+				<a:commandButton value="Aggiungi richiesta" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
+							action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collTypePanel')}.show()" reRender="collPanel"/>
+				<a:commandButton value="Aggiungi informazioni relative alla gara" action="#{slotDefEditBean.newEmbeddedProperty()}" 
+							oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel" rendered="#{slotDefEditBean.mode != 'Primary'}"/>
+			</s:decorate>
 			
             <div style="clear:both">
                 <span class="required">*</span>
@@ -206,33 +212,39 @@
         <div class="actionButtons">
 
             <h:commandButton id="save"
-                          value="Save"
+                          value="Salva"
                          action="#{slotDefEditBean.save()}"
                        disabled="#{!slotDefHome.wired}"
                        rendered="#{!slotDefHome.managed}"/>
 
             <h:commandButton id="update"
-                          value="Save"
+                          value="Salva"
                          action="#{slotDefEditBean.update()}"
                        rendered="#{slotDefHome.managed}"/>
 
             <h:commandButton id="delete"
-                          value="Delete"
+                          value="Elimina"
                          action="#{slotDefHome.remove}"
                       immediate="true"
                        rendered="#{slotDefHome.managed}"/>
 
             <s:button id="cancelEdit"
-                   value="Cancel"
+                   value="Annulla"
              propagation="end"
-                    view="/SlotDef.xhtml"
-                rendered="#{slotDefHome.managed}"/>
+                    view="/#{empty from ? 'SlotDefList.xhtml' : from}"
+                rendered="#{slotDefHome.managed}">
+                <f:param name="mode" value="#{slotDefEditBean.mode}"/>
+                <f:param name="model" value="#{slotDefEditBean.model}"/>
+            </s:button>
 
             <s:button id="cancelAdd"
-                   value="Cancel"
+                   value="Annulla"
              propagation="end"
-                    view="/#{empty slotDefFrom ? 'SlotDefList' : slotDefFrom}.xhtml"
-                rendered="#{!slotDefHome.managed}"/>
+                    view="/#{empty from ? 'SlotDefList.xhtml' : from}"
+                rendered="#{!slotDefHome.managed}">
+                <f:param name="mode" value="#{slotDefEditBean.mode}"/>
+                <f:param name="model" value="#{slotDefEditBean.model}"/>
+            </s:button>
 
         </div>
 
@@ -320,9 +332,9 @@
 	        </s:div>
 	        <div style="clear:both"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();}" 
-							rendered="#{not slotDefEditBean.conditional}"	reRender="pf,slotDef,condPD"/>
+							rendered="#{not (slotDefEditBean.conditional and slotDefEditBean.wizard and not slotDefEditBean.edit)}"	reRender="pf,slotDef,condPD"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionalProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();#{rich:component('collPanel')}.show();}" 
-							rendered="#{slotDefEditBean.conditional}"	reRender="slotDef,cpf,pf"/>
+							rendered="#{slotDefEditBean.conditional and slotDefEditBean.wizard and not slotDefEditBean.edit}"	reRender="slotDef,cpf,pf"/>
 			<a:region>
 			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('propPanel')}.hide()" reRender="pf,propPanel,collPanel"/>
 			</a:region>
@@ -561,7 +573,7 @@
 	        <div style="clear:both"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionedCollection()}" oncomplete="if(!cinvalid){#{rich:component('collPanel')}.hide();}" reRender="cpf,pf,collTable,propTable,propPanel"/>
 			<a:region>
-			<a:commandButton value="Annulla" action="#{slotDefEditBean.setConditional(false)}" oncomplete="#{rich:component('collPanel')}.hide()" reRender="cpf"/>
+			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('collPanel')}.hide()" reRender="cpf"/>
 			</a:region>
 			<a:commandButton value="Aggiorna" styleClass="rightCommand" reRender="cpf"/>
 			</a:form>
@@ -570,7 +582,7 @@
 		<script type="text/javascript">
 		function conf(c){
 			if(c!=''){
-				if(!confirm('La proprietà è condizionale per le collection: '+c+'.\nSicuro di voler continuare?')){
+				if(!confirm('L\'informazione è condizionale per le richieste: "'+c+'".\nSicuro di voler continuare?')){
 					return false;
 				}else{
 					return true;

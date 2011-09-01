@@ -49,10 +49,13 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotInstHome slotInstHome;
 
-	private boolean conditional = Boolean.FALSE;
 	private boolean model = Boolean.FALSE;
 	private String mode = SlotDefType.GENERAL.value();
 	private String from = "";
+	private boolean wizard = Boolean.FALSE;
+
+	private boolean conditional = Boolean.FALSE;
+	private boolean edit = Boolean.FALSE;
 
 	@Create
 	public void init() {
@@ -61,12 +64,12 @@ public class SlotDefEditBean {
 		// slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
 	}
 
-	public void newPoperty() {
+	public void newProperty() {
 		this.propertyDef = new PropertyDef();
 	}
 
 	public void newConditionaProperty() {
-		this.newPoperty();
+		this.newProperty();
 		this.conditional = true;
 	}
 
@@ -78,6 +81,8 @@ public class SlotDefEditBean {
 		if (converterPropertyMap.get(propertyDef.getUuid()) == null) {
 			converterPropertyMap.put(propertyDef.getUuid(), propertyDef);
 		}
+		//
+		this.edit = false;
 	}
 
 	public void addConditionalProperty() {
@@ -160,8 +165,65 @@ public class SlotDefEditBean {
 		return result;
 	}
 
+	private boolean checkEmbeddedPropertyValues() {
+		boolean passed = true;
+		for (EmbeddedProperty embeddedProperty : this.slotDefHome.getInstance()
+				.getEmbeddedProperties()) {
+			if ((!embeddedProperty.isMultiple() && (embeddedProperty.getValue() == null || embeddedProperty
+					.getValue().equals("")))
+					|| (embeddedProperty.isMultiple() && ((Set) embeddedProperty
+							.getValue()).isEmpty())) {
+				FacesMessages.instance().add(
+						Severity.ERROR,
+						"L'informazione \"" + embeddedProperty.getLabel()
+								+ "\" non è stata valorizzata");
+				passed = false;
+			}
+		}
+		if (!passed) {
+			FacesMessages
+					.instance()
+					.add(Severity.ERROR,
+							"Non possono esserci informazioni sulla gara non valorizzate!");
+		}
+		return passed;
+	}
+
+	private boolean checkCollectionReferences() {
+		boolean result = true;
+
+		for (DocDefCollection collection : slotDefHome.getInstance()
+				.getDocDefCollections()) {
+			PropertyDef conditionalPropertyDef = collection
+					.getConditionalPropertyDef();
+			if (conditionalPropertyDef != null
+					&& collection.getConditionalPropertyInst().getValue() == null) {
+				result = false;
+				FacesMessages
+						.instance()
+						.add(Severity.ERROR,
+								"La richiesta \""
+										+ collection.getName()
+										+ "\" vincolata dall'informazione \""
+										+ conditionalPropertyDef.getLabel()
+										+ "\" non ha il valore del vincolo valorizzato");
+			}
+		}
+		if (!result) {
+			FacesMessages
+					.instance()
+					.add(Severity.ERROR,
+							"Non possono esserci richieste vincolate con il loro vincolo non valorizzato!");
+		}
+
+		return result;
+	}
+
 	public String save() {
-		if (checkNames()) {
+		boolean names = checkNames();
+		boolean references = checkCollectionReferences();
+		boolean embeddedValues = checkEmbeddedPropertyValues();
+		if (names && references && embeddedValues) {
 			return slotDefHome.persist();
 		} else {
 			return "failed";
@@ -169,7 +231,10 @@ public class SlotDefEditBean {
 	}
 
 	public String update() {
-		if (checkNames()) {
+		boolean names = checkNames();
+		boolean references = checkCollectionReferences();
+		boolean embeddedValues = checkEmbeddedPropertyValues();
+		if (names && references && embeddedValues) {
 			Set<PropertyDef> newPropertyDefs = new HashSet<PropertyDef>();
 			Set<DocDefCollection> newDocDefCollections = new HashSet<DocDefCollection>();
 
@@ -247,6 +312,13 @@ public class SlotDefEditBean {
 
 	public void editProp(PropertyDef prop) {
 		this.propertyDef = prop;
+		if (getReferencedCollections(prop).isEmpty()) {
+			this.conditional = false;
+		} else {
+			this.conditional = true;
+		}
+		//
+		this.edit = true;
 	}
 
 	public void removeColl(DocDefCollection coll) {
@@ -298,17 +370,11 @@ public class SlotDefEditBean {
 
 	public String getReferencedCollectionsNames(PropertyDef propertyDef) {
 		String collectionsReferenced = "";
-		// Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
-		// .getDocDefCollections();
 		Iterator<DocDefCollection> iterator = this.getReferencedCollections(
 				propertyDef).iterator();
 		int count = 0;
 		while (iterator.hasNext()) {
 			DocDefCollection docDefCollection = iterator.next();
-			// PropertyDef conditionalPropertyDef = docDefCollection
-			// .getConditionalPropertyDef();
-			// if (conditionalPropertyDef != null
-			// && conditionalPropertyDef.equals(propertyDef)) {
 			if (count == 0) {
 				collectionsReferenced = collectionsReferenced
 						.concat(docDefCollection.getName());
@@ -318,7 +384,6 @@ public class SlotDefEditBean {
 						+ docDefCollection.getName());
 				count++;
 			}
-			// }
 		}
 		return collectionsReferenced;
 	}
@@ -378,13 +443,17 @@ public class SlotDefEditBean {
 	// prima che fossero settati i parametri
 	public void setKnownParameters() {
 		slotDefHome.getInstance().setTemplate(model);
-		slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
+		if (mode.equals(SlotDefType.PRIMARY.value())
+				|| mode.equals(SlotDefType.GENERAL.value())) {
+			slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
+		}
 	}
 
 	public void clearEditing() {
 		this.collection = new DocDefCollection();
 		this.propertyDef = new PropertyDef();
 		this.conditional = false;
+		this.edit = false;
 	}
 
 	public String getFrom() {
@@ -393,6 +462,22 @@ public class SlotDefEditBean {
 
 	public void setFrom(String from) {
 		this.from = from;
+	}
+
+	public boolean isWizard() {
+		return wizard;
+	}
+
+	public void setWizard(boolean wizard) {
+		this.wizard = wizard;
+	}
+
+	public boolean isEdit() {
+		return edit;
+	}
+
+	public void setEdit(boolean edit) {
+		this.edit = edit;
 	}
 
 }
