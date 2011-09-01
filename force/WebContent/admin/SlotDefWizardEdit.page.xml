@@ -14,6 +14,7 @@
    <param name="model" value="#{slotDefEditBean.model}"/>
    <param name="mode" value="#{slotDefEditBean.mode}"/>
    <param name="from" value="#{slotDefEditBean.from}"/>
+   <param name="wizard" value="#{slotDefEditBean.wizard}"/>
 
 	<action execute="#{slotDefEditBean.setKnownParameters}"/>
 

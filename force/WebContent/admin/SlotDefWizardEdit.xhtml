@@ -41,7 +41,7 @@
 			
 			<s:decorate template="/layout/display.xhtml" rendered="#{slotDefEditBean.mode != 'Primary'}">
 				<ui:define name="label">
-	                <h:outputText value="Informazioni sul bando" />
+	                <h:outputText value="Informazioni sulla gara" />
 				</ui:define>
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.embeddedPropertiesAsList}"/>
 				<rich:dataTable id="epropTable" value="#{slotDefHome.instance.embeddedPropertiesAsList}" var="eprop" 
@@ -78,11 +78,11 @@
 					</rich:column>
 					<rich:column styleClass="action">
 						<f:facet name="header">Azioni</f:facet>
-		                <a:commandLink value="Modifica" action="#{slotDefEditBean.editEmbeddedProp(dataInstance)}" 
+		                <a:commandLink value="Modifica" action="#{slotDefEditBean.editEmbeddedProp(eprop)}" 
 		            			oncomplete="#{rich:component('embeddedPropPanel')}.show()"
 		            			reRender="embeddedPropPanel"/>
 		                #{' '}
-						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(dataInstance)}" 
+						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(eprop)}" 
             						disabled="#{slotDefHome.referenced}" reRender="embeddedProperties"/>
 					</rich:column>
 				</rich:dataTable>
@@ -93,7 +93,7 @@
             
 			<s:decorate template="/layout/display.xhtml">
 				<ui:define name="label">
-	                <h:outputText value="Informazioni dell'azienda" />
+	                <h:outputText value="Informazioni sull'azienda" />
 				</ui:define>
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.propertyDefsAsList}"/>
 				<rich:dataTable id="propTable" value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
@@ -570,7 +570,7 @@
 		<script type="text/javascript">
 		function conf(c){
 			if(c!=''){
-				if(!confirm('La proprietà è condizionale per le collection: '+c+'.\nSicuro di voler continuare?')){
+				if(!confirm('L\'informazione è condizionale per le richieste: "'+c+'".\nSicuro di voler continuare?')){
 					return false;
 				}else{
 					return true;

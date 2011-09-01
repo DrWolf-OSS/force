@@ -22,25 +22,17 @@
     <rich:dataTable id="slotDefList"
                 var="_slotDef"
               value="#{slotDefsByParams}"
-           rendered="#{not empty allPrimaryTemplates}"
+           rendered="#{not empty slotDefsByParams}"
            	   rows="35">
         <h:column>
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{slotDefList}"/>
-                    <ui:param name="propertyLabel" value="Id"/>
-                    <ui:param name="propertyPath" value="slotDef.id"/>
-                </ui:include>
+				<h:outputText value="Id" />
             </f:facet>
             <h:outputText value="#{_slotDef.id}"/>
         </h:column>
         <h:column>
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{slotDefList}"/>
-                    <ui:param name="propertyLabel" value="Name"/>
-                    <ui:param name="propertyPath" value="slotDef.name"/>
-                </ui:include>
+				<h:outputText value="Nome" />
             </f:facet>
             <h:outputText value="#{_slotDef.name}" />
         </h:column>
