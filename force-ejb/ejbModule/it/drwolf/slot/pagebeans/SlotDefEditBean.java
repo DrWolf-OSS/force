@@ -7,6 +7,7 @@ import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
+import it.drwolf.slot.enums.CollectionQuantifier;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.interfaces.DataDefinition;
@@ -130,6 +131,11 @@ public class SlotDefEditBean {
 	@Factory("slotDefTypes")
 	public List<SlotDefType> getSlotDefTypes() {
 		return Arrays.asList(SlotDefType.values());
+	}
+
+	@Factory("quantifierTypes")
+	public List<CollectionQuantifier> getQuantifierfTypes() {
+		return Arrays.asList(CollectionQuantifier.values());
 	}
 
 	private boolean checkNames() {
@@ -479,5 +485,4 @@ public class SlotDefEditBean {
 	public void setEdit(boolean edit) {
 		this.edit = edit;
 	}
-
 }

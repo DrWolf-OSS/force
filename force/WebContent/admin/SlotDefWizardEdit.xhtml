@@ -154,8 +154,8 @@
 						<h:outputText value="#{coll.docDef.name}" />
 					</rich:column>
 					<rich:column>
-						<f:facet name="header">Obbligatoria</f:facet>
-						<h:outputText value="#{coll.mandatory ? 'sì' : 'no'}" />
+						<f:facet name="header">Quantità</f:facet>
+						<h:outputText value="#{coll.quantifier.value()}" />
 					</rich:column>
 					<rich:column>
 						<f:facet name="header">Informazione vincolante</f:facet>
@@ -358,7 +358,7 @@
 			<a:region>
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
-	                	<h:outputText value="Property Name" />
+	                	<h:outputText value="Nome dell'informazione" styleClass="ptext"/>
 					</ui:define>
 					<h:inputText value="#{slotDefEditBean.embeddedProperty.name}" required="true"/>
 	            </s:decorate>
@@ -563,12 +563,14 @@
              			</h:selectOneMenu>
 	            </s:decorate>
 	            
-	            <s:decorate template="/layout/edit.xhtml">
-	                <ui:define name="label">
-	                	<h:outputText value="Obbigatoria" />
-					</ui:define>
-					<h:selectBooleanCheckbox value="#{slotDefEditBean.collection.mandatory}" />
-	            </s:decorate>
+	            <s:decorate id="quantifier" template="/layout/edit.xhtml">
+                	<ui:define name="label">Quantità</ui:define>
+               		<h:selectOneMenu value="#{slotDefEditBean.collection.quantifier}" required="true">
+                    	<s:selectItems value="#{quantifierTypes}" noSelectionLabel="-- seleziona una quantità --" 
+							var="quantifierType" label="#{quantifierType.value()}"/>
+						<s:convertEnum/>
+             		</h:selectOneMenu>
+            	</s:decorate>
 	        </s:div>
 	        <div style="clear:both"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionedCollection()}" oncomplete="if(!cinvalid){#{rich:component('collPanel')}.hide();}" reRender="cpf,pf,collTable,propTable,propPanel"/>
