@@ -183,21 +183,21 @@ public class UserSession implements Serializable {
 				}
 
 			}
+			// prelevo la cartella principale:
+			this.groupFolder = this.alfrescoWrapper.findOrCreateFolder(
+					this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
+							.name()), this.alfrescoUserIdentity
+							.getActiveGroup().getShortName());
+
+			this.primarySlotFolder = this.alfrescoWrapper.findOrCreateFolder(
+					this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
+							.name())
+							+ "/"
+							+ this.alfrescoUserIdentity.getActiveGroup()
+									.getShortName(), this.getPrimarySlotDef()
+							.getName());
 
 		}
-		// prelevo la cartella principale:
-		this.groupFolder = this.alfrescoWrapper.findOrCreateFolder(
-				this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
-						.name()), this.alfrescoUserIdentity.getActiveGroup()
-						.getShortName());
-
-		this.primarySlotFolder = this.alfrescoWrapper.findOrCreateFolder(
-				this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
-						.name())
-						+ "/"
-						+ this.alfrescoUserIdentity.getActiveGroup()
-								.getShortName(), this.getPrimarySlotDef()
-						.getName());
 
 	}
 
