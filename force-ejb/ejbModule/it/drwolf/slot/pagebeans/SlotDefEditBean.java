@@ -417,7 +417,11 @@ public class SlotDefEditBean {
 			FacesMessages
 					.instance()
 					.add(Severity.WARN,
-							"ATTENZIONE! Questo SlotDef è già referenziato da uno o più SlotInst!");
+							"ATTENZIONE! Questa"
+									+ (this.mode.equals(SlotDefType.PRIMARY
+											.value()) ? " Busta di Riferimento "
+											: " Busta Amministrativa ")
+									+ "è referenziata da una o più istanze già compilate!");
 		}
 	}
 

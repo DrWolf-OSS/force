@@ -15,7 +15,7 @@
     <h:form id="slotDef" styleClass="edit">
 
         <rich:panel>
-            <f:facet name="header">#{slotDefHome.managed ? 'Edit' : 'Add'} Slot def</f:facet>
+            <f:facet name="header">#{slotDefHome.managed ? 'Modifica' : 'Creazione'} #{slotDefEditBean.model ? 'modello di' : ''} #{slotDefEditBean.mode=='Primary' ? 'Busta di Riferimento' : 'Busta Amministrativa'}</f:facet>
 
             <s:decorate id="templateField" template="/layout/edit.xhtml" rendered="#{not slotDefEditBean.model}">
                 <ui:define name="label">Modello</ui:define>
