@@ -43,8 +43,8 @@
             <ui:repeat var="p" value="#{ruleEditBean.normalParameters}">
 	            <s:decorate id="params" template="/layout/edit.xhtml">
 	                <ui:define name="label">#{p.label}</ui:define>
-		                <h:selectOneMenu value="#{ruleEditBean.targetPropertiesSourceMap[p.name]}" rendered="#{ruleEditBean.sourcePropertiesSourceMap[p.name] != null}">
-			            	<s:selectItems value="#{ruleEditBean.sourcePropertiesSourceMap[p.name]}"
+		                <h:selectOneMenu value="#{ruleEditBean.targetPropertiesSourceMap[p.name]}" >
+			            	<s:selectItems value="#{ruleEditBean.propertiesSources}"
 			            					var="sourceContainer" label="#{sourceContainer.label}" itemValue="#{sourceContainer}" 
 			            					disabled="#{not sourceContainer.hasPropertiesOfType(p.dataType)}" noSelectionLabel="-- select a collection or a slot --"/>
 			            	<f:converter converterId="propertiesSourceContainerConverter"/>
@@ -52,7 +52,7 @@
 			            </h:selectOneMenu>
 			            &#160;
 			            <h:selectOneMenu value="#{ruleEditBean.targetPropertyMap[p.name]}" rendered="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties != null}">
-			            	<s:selectItems value="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties}"
+			            	<s:selectItems value="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties}" noSelectionLabel="-- select a field --"
 			            					var="prop" label="#{prop.label}" itemValue="#{prop}" disabled="#{prop.type != p.dataType}" />
 			            	<f:converter converterId="propertyContainerConverter"/>
 			            	<a:support event="onchange" reRender="inParams"/>
@@ -64,7 +64,7 @@
 	            </s:decorate>
 	        </ui:repeat>
             </s:div>
-            </a:region>
+        </a:region>
             
             <s:div id="embeddedParameters">
             <a:repeat var="ep" value="#{ruleEditBean.embeddedParameters}">
@@ -149,8 +149,8 @@
                        rendered="#{!ruleHome.managed}"/>
 
             <h:commandButton id="update"
-                          value="Save"
-                         action="#{ruleHome.update}"
+                          value="Update"
+                         action="#{ruleEditBean.update()}"
                        rendered="#{ruleHome.managed}"/>
 
             <h:commandButton id="delete"

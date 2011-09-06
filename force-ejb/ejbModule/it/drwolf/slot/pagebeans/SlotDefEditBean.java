@@ -58,11 +58,21 @@ public class SlotDefEditBean {
 	private boolean conditional = Boolean.FALSE;
 	private boolean edit = Boolean.FALSE;
 
+	private boolean dirty = Boolean.FALSE;
+
 	@Create
 	public void init() {
 		// checkReference();
 		// slotDefHome.getInstance().setTemplate(model);
 		// slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
+	}
+
+	private void persist() {
+		if (slotDefHome.getInstance().getId() == null) {
+			this.save();
+		} else {
+			this.update();
+		}
 	}
 
 	public void newProperty() {
@@ -82,8 +92,10 @@ public class SlotDefEditBean {
 		if (converterPropertyMap.get(propertyDef.getUuid()) == null) {
 			converterPropertyMap.put(propertyDef.getUuid(), propertyDef);
 		}
-		//
 		this.edit = false;
+
+		//
+		this.persist();
 	}
 
 	public void addConditionalProperty() {
@@ -109,6 +121,9 @@ public class SlotDefEditBean {
 	public void addConditionedCollection() {
 		this.addCollection();
 		this.conditional = false;
+
+		//
+		this.persist();
 	}
 
 	public void newEmbeddedProperty() {
@@ -121,6 +136,9 @@ public class SlotDefEditBean {
 			slotDefHome.getInstance().getEmbeddedProperties()
 					.add(this.embeddedProperty);
 		}
+
+		//
+		this.persist();
 	}
 
 	@Factory("dataTypes")
@@ -299,6 +317,8 @@ public class SlotDefEditBean {
 
 	public void removeEmbeddedProp(EmbeddedProperty embeddedProp) {
 		slotDefHome.getInstance().getEmbeddedProperties().remove(embeddedProp);
+		//
+		this.persist();
 	}
 
 	public void editEmbeddedProp(EmbeddedProperty embeddedProp) {
@@ -314,6 +334,9 @@ public class SlotDefEditBean {
 			collection.setConditionalPropertyDef(null);
 		}
 		slotDefHome.getInstance().getPropertyDefs().remove(prop);
+
+		//
+		this.persist();
 	}
 
 	public void editProp(PropertyDef prop) {
@@ -330,6 +353,8 @@ public class SlotDefEditBean {
 	public void removeColl(DocDefCollection coll) {
 		slotDefHome.getInstance().getDocDefCollections().remove(coll);
 		coll.setSlotDef(null);
+		//
+		this.persist();
 	}
 
 	public void editColl(DocDefCollection coll) {
@@ -488,5 +513,13 @@ public class SlotDefEditBean {
 
 	public void setEdit(boolean edit) {
 		this.edit = edit;
+	}
+
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	public void setDirty(boolean dirty) {
+		this.dirty = dirty;
 	}
 }

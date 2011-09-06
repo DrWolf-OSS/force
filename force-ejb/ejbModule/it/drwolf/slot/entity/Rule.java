@@ -4,7 +4,9 @@ import it.drwolf.slot.entity.listeners.RuleListener;
 import it.drwolf.slot.enums.RuleType;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
@@ -124,6 +126,11 @@ public class Rule {
 
 	public void setWarningMessage(String warningMessage) {
 		this.warningMessage = warningMessage;
+	}
+
+	public List<RuleParameterInst> getEmbeddedParametersAsList() {
+		return new ArrayList<RuleParameterInst>(this.getEmbeddedParametersMap()
+				.values());
 	}
 
 }

@@ -39,12 +39,12 @@
 			<div style="clear:both"/>
 			<rich:separator height="25px" lineType="none" rendered="#{slotDefEditBean.mode != 'Primary'}"/>
 			
-			<s:decorate template="/layout/display.xhtml" rendered="#{slotDefEditBean.mode != 'Primary'}">
+			<s:decorate template="/layout/display.xhtml" rendered="#{slotDefEditBean.mode != 'Primary'}" id="epropTable">
 				<ui:define name="label">
 	                <h:outputText value="Informazioni sulla gara" />
 				</ui:define>
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.embeddedPropertiesAsList}"/>
-				<rich:dataTable id="epropTable" value="#{slotDefHome.instance.embeddedPropertiesAsList}" var="eprop" 
+				<rich:dataTable value="#{slotDefHome.instance.embeddedPropertiesAsList}" var="eprop" 
 						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" style="width:1024px">
 					<rich:column style="width:200px">
 						<f:facet name="header">Nome</f:facet>
@@ -83,7 +83,7 @@
 		            			reRender="embeddedPropPanel"/>
 		                #{' '}
 						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(eprop)}" 
-            						disabled="#{slotDefHome.referenced}" reRender="embeddedProperties"/>
+            						disabled="#{slotDefHome.referenced}" reRender="epropTable"/>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -91,12 +91,12 @@
             <div style="clear:both"/>
             <rich:separator height="25px" lineType="none" />
             
-			<s:decorate template="/layout/display.xhtml">
+			<s:decorate template="/layout/display.xhtml" id="propTable">
 				<ui:define name="label">
 	                <h:outputText value="Informazioni sull'azienda" />
 				</ui:define>
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.propertyDefsAsList}"/>
-				<rich:dataTable id="propTable" value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
+				<rich:dataTable value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
 						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" style="width:1024px">
 					<rich:column style="width:200px">
 						<f:facet name="header">Nome</f:facet>
@@ -143,7 +143,7 @@
 	                <h:outputText value="Richieste" />
 				</ui:define>
 				<h:outputText value="Nessuna richiesta definita" rendered="#{empty slotDefHome.instance.docDefCollectionsAsList}"/>
-				<rich:dataTable id="propTable" value="#{slotDefHome.instance.docDefCollectionsAsList}" var="coll" 
+				<rich:dataTable value="#{slotDefHome.instance.docDefCollectionsAsList}" var="coll" 
 						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" style="width:1024px">
 					<rich:column style="width:200px">
 						<f:facet name="header">Nome</f:facet>
@@ -203,9 +203,55 @@
 			</s:decorate>
 			
             <div style="clear:both">
-                <span class="required">*</span>
-                required fields
             </div>
+            
+            
+            
+			<rich:separator height="15px" lineType="none" />
+			<rich:separator height="1px" lineType="solid" />	
+			<rich:separator height="15px" lineType="none" />
+			
+			
+			<s:decorate template="/layout/display.xhtml">
+				<ui:define name="label">
+	                <h:outputText value="Regole" />
+				</ui:define>
+			<rich:dataTable value="#{slotDefHome.instance.rulesAsList}" var="rule">
+				<rich:column>
+					<f:facet name="header">Id</f:facet>
+					<h:outputText value="#{rule.id}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">Tipo di regola</f:facet>
+					<h:outputText value="#{rule.type.value()}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">Azioni</f:facet>
+					<s:link view="/RuleEdit.xhtml"
+                		 value="Modifica"
+                 	propagation="none">
+          				<f:param name="slotDefId" value="#{slotDefHome.id}" />
+          				<f:param name="ruleId" value="#{rule.id}"/>
+					</s:link>
+				</rich:column>
+			</rich:dataTable>
+			</s:decorate>
+			
+			<s:decorate template="/layout/display.xhtml">
+				<ui:define name="label">
+	                <h:outputText value="" />
+				</ui:define>
+				<s:button view="/RuleEdit.xhtml"
+                 		value="Crea regola"
+                 	propagation="none">
+          			<f:param name="slotDefId" value="#{slotDefHome.id}" />
+          			<f:param name="ruleId"/>
+        		</s:button>
+			</s:decorate>
+			
+            <div style="clear:both">
+            </div>
+			<div style="clear:both"/>
 
         </rich:panel>
 

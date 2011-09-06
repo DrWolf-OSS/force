@@ -243,4 +243,14 @@ public class SlotDef {
 		this.template = template;
 	}
 
+	@Transient
+	public List<Rule> getRulesAsList() {
+		return new ArrayList<Rule>(this.rules);
+	}
+
+	@Transient
+	public void setRulesAsList(List<Rule> rules) {
+		this.setRules(new HashSet<Rule>(rules));
+	}
+
 }

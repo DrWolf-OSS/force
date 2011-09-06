@@ -59,6 +59,9 @@ public class RuleEditBean {
 
 	private RuleParameterInst activeEmbeddedParameter;
 
+	//
+	private List<PropertiesSourceContainer> propertiesSources = new ArrayList<PropertiesSourceContainer>();
+
 	@Factory("ruleTypes")
 	public List<RuleType> getRuleTypes() {
 		return Arrays.asList(RuleType.values());
@@ -69,6 +72,7 @@ public class RuleEditBean {
 		Rule rule = ruleHome.getInstance();
 		IRuleVerifier verifier = rule.getVerifier();
 		if (verifier != null) {
+
 			List<VerifierParameterDef> inParams = verifier.getInParams();
 			Map<String, String> encodedParametersMap = rule.getParametersMap();
 			for (VerifierParameterDef parameterDef : inParams) {
@@ -79,6 +83,9 @@ public class RuleEditBean {
 				if (ruleParameterInst != null) {
 					embeddedParameters.add(ruleParameterInst);
 				} else {
+					//
+					this.normalParameters.add(parameterDef);
+					//
 					String encodedParams = encodedParametersMap.get(paramName);
 					if (encodedParams != null && !encodedParams.equals("")) {
 						String[] splitted = encodedParams.split("\\|");
@@ -103,6 +110,9 @@ public class RuleEditBean {
 					}
 				}
 			}
+
+			//
+			buildSources();
 		}
 	}
 
@@ -132,22 +142,7 @@ public class RuleEditBean {
 				}
 			}
 			//
-			SlotDef slotDef = slotDefHome.getInstance();
-			Set<DocDefCollection> docDefCollections = slotDef
-					.getDocDefCollections();
-
-			for (VerifierParameterDef verifierParameter : normalParameters) {
-				ArrayList<PropertiesSourceContainer> propertiesSourceContainerList = new ArrayList<PropertiesSourceContainer>();
-				for (DocDefCollection collection : docDefCollections) {
-					PropertiesSourceContainer sourceContainer = new PropertiesSourceContainer(
-							collection);
-					propertiesSourceContainerList.add(sourceContainer);
-				}
-				propertiesSourceContainerList
-						.add(new PropertiesSourceContainer(slotDef));
-				sourcePropertiesSourceMap.put(verifierParameter.getName(),
-						propertiesSourceContainerList);
-			}
+			buildSources();
 
 		} else {
 			this.normalParameters.clear();
@@ -156,6 +151,28 @@ public class RuleEditBean {
 			targetPropertiesSourceMap.clear();
 			targetPropertyMap.clear();
 		}
+	}
+
+	private void buildSources() {
+		SlotDef slotDef = slotDefHome.getInstance();
+		Set<DocDefCollection> docDefCollections = slotDef
+				.getDocDefCollections();
+
+		// for (VerifierParameterDef verifierParameter : normalParameters) {
+		ArrayList<PropertiesSourceContainer> propertiesSourceContainerList = new ArrayList<PropertiesSourceContainer>();
+		for (DocDefCollection collection : docDefCollections) {
+			PropertiesSourceContainer sourceContainer = new PropertiesSourceContainer(
+					collection);
+			propertiesSourceContainerList.add(sourceContainer);
+		}
+		propertiesSourceContainerList
+				.add(new PropertiesSourceContainer(slotDef));
+		// sourcePropertiesSourceMap.put(verifierParameter.getName(),
+		// propertiesSourceContainerList);
+		// }
+
+		//
+		this.propertiesSources = propertiesSourceContainerList;
 	}
 
 	public void save() {
@@ -203,6 +220,10 @@ public class RuleEditBean {
 		if (!error) {
 			ruleHome.persist();
 		}
+	}
+
+	public void update() {
+		this.save();
 	}
 
 	private boolean isInEmbedded(VerifierParameterDef parameterDef) {
@@ -288,6 +309,15 @@ public class RuleEditBean {
 	public void setActiveEmbeddedParameter(
 			RuleParameterInst activeEmbeddedParameter) {
 		this.activeEmbeddedParameter = activeEmbeddedParameter;
+	}
+
+	public List<PropertiesSourceContainer> getPropertiesSources() {
+		return propertiesSources;
+	}
+
+	public void setPropertiesSources(
+			List<PropertiesSourceContainer> propertiesSources) {
+		this.propertiesSources = propertiesSources;
 	}
 
 }
