@@ -26,7 +26,6 @@ import java.util.Set;
 import javax.faces.event.ActionEvent;
 
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -60,12 +59,12 @@ public class SlotDefEditBean {
 
 	private boolean dirty = Boolean.FALSE;
 
-	@Create
-	public void init() {
-		// checkReference();
-		// slotDefHome.getInstance().setTemplate(model);
-		// slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
-	}
+	// @Create
+	// public void init() {
+	// // checkReference();
+	// // slotDefHome.getInstance().setTemplate(model);
+	// // slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
+	// }
 
 	private void persist() {
 		if (slotDefHome.getInstance().getId() == null) {

@@ -13,8 +13,10 @@
    <param name="ruleId" value="#{ruleHome.ruleId}"/>
    <param name="slotDefFrom"/>
    <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
-
-
+   
+	<param name="model" value="#{slotDefEditBean.model}"/>
+	<param name="wizard" value="#{slotDefEditBean.wizard}"/>
+   
 
    <navigation from-action="#{ruleHome.persist}">
       <rule if-outcome="persisted">
@@ -34,6 +36,35 @@
       <rule if-outcome="removed">
          <end-conversation/>
          <redirect view-id="/RuleList.xhtml"/>
+      </rule>
+   </navigation>
+   
+   
+   <navigation from-action="#{ruleEditBean.save()}">
+      <rule if-outcome="persisted">
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/admin/SlotDefWizardEdit.xhtml">
+
+			<param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+         </redirect>
+      </rule>
+   </navigation>
+   
+   <navigation from-action="#{ruleEditBean.update()}">
+      <rule if-outcome="persisted">
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/admin/SlotDefWizardEdit.xhtml" >
+			<param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+
+         </redirect>
+      </rule>
+      <rule if-outcome="failed">
+         <end-conversation before-redirect="true"/>
+         <redirect >
+			<param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+			<param name="ruleId" value="#{ruleHome.ruleId}"/>
+
+         </redirect>
       </rule>
    </navigation>
 

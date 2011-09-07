@@ -21,6 +21,7 @@ import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
@@ -103,6 +104,7 @@ public class Rule {
 
 	@MapKey(name = "parameterName")
 	@OneToMany(mappedBy = "rule", cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	public Map<String, RuleParameterInst> getEmbeddedParametersMap() {
 		return embeddedParametersMap;
 	}
@@ -128,6 +130,7 @@ public class Rule {
 		this.warningMessage = warningMessage;
 	}
 
+	@Transient
 	public List<RuleParameterInst> getEmbeddedParametersAsList() {
 		return new ArrayList<RuleParameterInst>(this.getEmbeddedParametersMap()
 				.values());
