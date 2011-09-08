@@ -41,7 +41,7 @@ public class SlotDefListManager {
 	private List<SlotDef> retrieve(Boolean areTemplates, SlotDefType slotDefType) {
 		int count = 0;
 		String templates = "";
-		if (slotDefType != null) {
+		if (areTemplates != null) {
 			templates = "s.template=:areTemplates";
 			count++;
 		}
@@ -64,9 +64,21 @@ public class SlotDefListManager {
 		String query = "from SlotDef s " + where + " " + templates + " " + and
 				+ " " + type;
 
-		List<SlotDef> resultList = entityManager.createQuery(query)
-				.setParameter("areTemplates", areTemplates)
-				.setParameter("slotDefType", slotDefType).getResultList();
+		List<SlotDef> resultList = null;
+
+		if (areTemplates != null && slotDefType != null) {
+			resultList = entityManager.createQuery(query)
+					.setParameter("areTemplates", areTemplates)
+					.setParameter("slotDefType", slotDefType).getResultList();
+		} else if (areTemplates != null && slotDefType == null) {
+			resultList = entityManager.createQuery(query)
+					.setParameter("areTemplates", areTemplates).getResultList();
+		} else if (areTemplates == null && slotDefType != null) {
+			resultList = entityManager.createQuery(query)
+					.setParameter("slotDefType", slotDefType).getResultList();
+		} else if (areTemplates == null && slotDefType == null) {
+			resultList = entityManager.createQuery(query).getResultList();
+		}
 		return resultList;
 	}
 

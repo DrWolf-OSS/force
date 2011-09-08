@@ -14,21 +14,28 @@
     <a:form id="rule" styleClass="edit">
 
         <rich:panel>
-            <f:facet name="header">#{ruleHome.managed ? 'Edit' : 'Add'} Rule</f:facet>
+            <f:facet name="header">#{ruleHome.managed ? 'Modifica' : 'Creazione'} Regola</f:facet>
  
             <s:decorate id="description" template="/layout/display.xhtml">
-                <ui:define name="label">Description</ui:define>
+                <ui:define name="label">Descrizione</ui:define>
+                <s:div style="width: 400px">
                 <h:outputText value="#{ruleHome.instance.verifier.description}" rendered="#{ruleHome.instance.verifier != null}"/>
+                </s:div>
             </s:decorate>
  
 			<s:decorate id="mandatoryField" template="/layout/edit.xhtml">
-                <ui:define name="label">Mandatory</ui:define>
-                <h:selectBooleanCheckbox value="#{ruleHome.instance.mandatory}" />
+                <rich:toolTip attached="true" for="mandatoryLabel" style="width: 400px">
+                	Se obbligatoria la regola dovrà essere verificata per forza. Nel caso in cui non siano presenti le informazioni o i documenti necessari a verificare la regola la busta non sarà considerata valida. 
+                	Al contrario, se marcata come facoltativa, nel caso non sia presente anche una sola delle informazioni necessarie alla sua verifica, la regola non verrà applicata.
+                </rich:toolTip>
+                <ui:define name="label"><h:outputText id="mandatoryLabel" value="Obbligatoria" /></ui:define>
+                <h:selectBooleanCheckbox value="#{ruleHome.instance.mandatory}" >
+                </h:selectBooleanCheckbox>
             </s:decorate>
             
  		<a:region>
             <s:decorate id="typeField" template="/layout/edit.xhtml">
-                <ui:define name="label">Type</ui:define>
+                <ui:define name="label">Tipo di regola</ui:define>
                 <h:selectOneMenu id="ruleType" value="#{ruleHome.instance.type}" disabled="#{ruleHome.ruleId!=null}">
                     	<s:selectItems value="#{ruleTypes}" 
 						var="type" label="#{type.value()}" noSelectionLabel="-- select rule type --"/>
@@ -121,18 +128,24 @@
             <rich:separator id="sep2" height="25px" lineType="none"/>
             
             <s:decorate id="errorMsg" template="/layout/edit.xhtml">
-            	<ui:define name="label">Error Message</ui:define>
+            	<rich:toolTip for="errorLabel">
+            	Messaggio visualizzato dall'utente in caso la regola fallisca.
+            	</rich:toolTip>
+            	<ui:define name="label"><h:outputText id="errorLabel" value="Messaggio di Errore" /></ui:define>
             	<h:inputTextarea value="#{ruleHome.instance.errorMessage}" cols="50"/>
             </s:decorate>
             
             <s:decorate id="warningMsg" template="/layout/edit.xhtml">
-            	<ui:define name="label">Warning Message</ui:define>
+            	<rich:toolTip for="warningLabel">
+            	Messaggio visualizzato dall'utente in caso la regola vada a buon fine ma ci si trovi comunque in uno stato che necessita un messaggio di avvertimento.
+            	</rich:toolTip>
+            	<ui:define name="label"><h:outputText id="warningLabel" value="Messaggio di Avvertimento" /></ui:define>
             	<h:inputTextarea value="#{ruleHome.instance.warningMessage}"  cols="50"/>
             </s:decorate>
             
             <div style="clear:both">
                 <span class="required">*</span>
-                required fields
+                campi obbligatori
             </div>
 
         </rich:panel>
@@ -140,18 +153,18 @@
         <div class="actionButtons">
 
             <h:commandButton id="save"
-                          value="Save"
+                          value="Salva"
                          action="#{ruleEditBean.save()}"
                        disabled="#{!ruleHome.wired}"
                        rendered="#{!ruleHome.managed}"/>
 
             <h:commandButton id="update"
-                          value="Update"
+                          value="Aggiorna"
                          action="#{ruleEditBean.update()}"
                        rendered="#{ruleHome.managed}"/>
 
             <h:commandButton id="delete"
-                          value="Delete"
+                          value="Elimina"
                          action="#{ruleHome.remove}"
                       immediate="true"
                        rendered="#{ruleHome.managed}"/>
