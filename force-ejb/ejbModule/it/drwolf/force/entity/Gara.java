@@ -38,6 +38,10 @@ public class Gara implements Serializable {
 
 	private String oggetto;
 
+	private String cig;
+
+	private String link;
+
 	private Date dataPubblicazione;
 
 	private Date dataScadenza;
@@ -50,6 +54,8 @@ public class Gara implements Serializable {
 
 	private String type;
 
+	private Fonte fonte;
+
 	private SlotDef slotDef;
 
 	private Set<CategoriaMerceologica> categorieMerceologiche;
@@ -57,6 +63,18 @@ public class Gara implements Serializable {
 	private Set<SOA> SOA;
 
 	private Settore settore;
+
+	public Gara() {
+		super();
+	}
+
+	public Gara(String oggetto, String link, String type, Fonte fonte) {
+		super();
+		this.oggetto = oggetto;
+		this.link = link;
+		this.type = type;
+		this.fonte = fonte;
+	}
 
 	@ManyToMany
 	public Set<CategoriaMerceologica> getCategorieMerceologiche() {
@@ -71,6 +89,11 @@ public class Gara implements Serializable {
 	}
 
 	@Column
+	public String getCig() {
+		return this.cig;
+	}
+
+	@Column
 	public Date getDataPubblicazione() {
 		return this.dataPubblicazione;
 	}
@@ -78,6 +101,12 @@ public class Gara implements Serializable {
 	@Column
 	public Date getDataScadenza() {
 		return this.dataScadenza;
+	}
+
+	@ManyToOne
+	@JoinColumn(name = "Fonte")
+	public Fonte getFonte() {
+		return this.fonte;
 	}
 
 	@Id
@@ -89,6 +118,11 @@ public class Gara implements Serializable {
 	@Column
 	public BigDecimal getImporto() {
 		return this.importo;
+	}
+
+	@Column
+	public String getLink() {
+		return this.link;
 	}
 
 	@Column
@@ -106,10 +140,8 @@ public class Gara implements Serializable {
 		return this.requisitoTecnico;
 	}
 
-	// deve essere inserito anche un riferimento al settore?
-
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(nullable = true)
+	@JoinColumn(name = "Settore", nullable = true)
 	public Settore getSettore() {
 		return this.settore;
 	}
@@ -124,6 +156,8 @@ public class Gara implements Serializable {
 	public Set<SOA> getSOA() {
 		return this.SOA;
 	}
+
+	// deve essere inserito anche un riferimento al settore?
 
 	@Transient
 	public List<SOA> getSOAAsList() {
@@ -164,6 +198,10 @@ public class Gara implements Serializable {
 		this.setCategorieMerceologiche(new HashSet<CategoriaMerceologica>(lista));
 	}
 
+	public void setCig(String cig) {
+		this.cig = cig;
+	}
+
 	public void setDataPubblicazione(Date dataPubblicazione) {
 		this.dataPubblicazione = dataPubblicazione;
 	}
@@ -172,12 +210,20 @@ public class Gara implements Serializable {
 		this.dataScadenza = dataScadenza;
 	}
 
+	public void setFonte(Fonte fonte) {
+		this.fonte = fonte;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
 	public void setImporto(BigDecimal importo) {
 		this.importo = importo;
+	}
+
+	public void setLink(String link) {
+		this.link = link;
 	}
 
 	public void setOggetto(String oggetto) {
