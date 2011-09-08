@@ -216,30 +216,91 @@
 				<ui:define name="label">
 	                <h:outputText value="Regole" />
 				</ui:define>
-			<rich:dataTable value="#{slotDefHome.instance.rulesAsList}" var="rule">
-				<rich:column>
-					<f:facet name="header">Id</f:facet>
-					<h:outputText value="#{rule.id}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">Tipo di regola</f:facet>
-					<h:outputText value="#{rule.type.value()}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">Azioni</f:facet>
-					<s:link view="/admin/RuleEdit.xhtml"
-                		 value="Modifica"
-                 	propagation="none">
-          				<f:param name="slotDefId" value="#{slotDefHome.id}" />
-          				<f:param name="ruleId" value="#{rule.id}"/>
-          				<f:param name="mode" value="#{slotDefEditBean.mode}"/>
-          				<f:param name="model" value="#{slotDefEditBean.model}"/>
-          				<f:param name="wizard" value="#{slotDefEditBean.wizard}"/>
-					</s:link>
-				</rich:column>
-			</rich:dataTable>
+				<rich:tabPanel switchType="client">
+				<c:forEach items="#{slotDefHome.instance.rulesAsList}" var="rule">					
+					<rich:tab>
+						<f:facet name="label">Regola #{rule.id}</f:facet>
+						
+						<s:decorate template="/layout/display.xhtml">
+							<ui:define name="label">
+	                			<h:outputText value="Verificatore" />
+							</ui:define>
+							<h:outputText value="#{rule.type.value()}" />
+						</s:decorate>
+						
+						<s:decorate template="/layout/display.xhtml">
+							<ui:define name="label">
+	                			<h:outputText value="Obbligatoria" />
+							</ui:define>
+							<h:outputText value="#{rule.mandatory ? 'Sì' : 'No'}" />
+						</s:decorate>
+						
+						<s:decorate template="/layout/display.xhtml">
+							<ui:define name="label">
+	                			<h:outputText value="Parametri" />
+							</ui:define>
+							<rich:dataTable value="#{rule.verifier.inParams}" var="p">
+								<rich:column>
+									<f:facet name="header">Nome del parametro</f:facet>
+									<h:outputText value="#{p.label}" />
+								</rich:column>
+								<rich:column>
+									<f:facet name="header">Tipologia di dato</f:facet>
+									<h:outputText value="#{p.dataType.value()}" />
+								</rich:column>
+								<rich:column>
+									<f:facet name="header">Multiplo</f:facet>
+									<h:outputText value="#{p.multiple ? 'sì' : 'no'}" />
+								</rich:column>
+								<rich:column>
+									<f:facet name="header">Valore</f:facet>
+									<h:outputText value="&#60; #{slotDefEditBean.retrieveRuleParameterValue(rule.id,p.name)} &#62;" style="font-style: italic"
+												rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name)==null}"/>
+									<s:fragment rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name)!=null}">
+										<s:fragment rendered="#{not slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.multiple}">
+											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).stringValue}"
+													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'STRING'}"/>
+											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).integerValue}"
+													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'INTEGER'}" />
+											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).booleanValue ? 'true' : 'false'}"
+													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'BOOLEAN'}" />
+											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dateValue}"
+													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'DATE'}">
+												<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+											</h:outputText>
+											<s:span rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'LINK'}">
+												<a href="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).linkValue}" target="blank">#{dataInstance.stringValue}</a>
+											</s:span>
+										</s:fragment>
+										<s:fragment rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.multiple}">
+											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).value}" />
+										</s:fragment>
+									</s:fragment>
+								</rich:column>
+							</rich:dataTable>
+						</s:decorate>
+						
+						<s:decorate template="/layout/display.xhtml">
+							<ui:define name="label">
+	                			<h:outputText value="" />
+							</ui:define>
+							<s:button view="/admin/RuleEdit.xhtml"
+	                			 value="Modifica"
+	                 		propagation="none">
+		          				<f:param name="slotDefId" value="#{slotDefHome.id}" />
+		          				<f:param name="ruleId" value="#{rule.id}"/>
+		          				<f:param name="mode" value="#{slotDefEditBean.mode}"/>
+		          				<f:param name="model" value="#{slotDefEditBean.model}"/>
+		          				<f:param name="wizard" value="#{slotDefEditBean.wizard}"/>
+							</s:button>
+						</s:decorate>
+						
+					</rich:tab>
+					</c:forEach>
+				</rich:tabPanel>			
 			</s:decorate>
 			
+
 			<s:decorate template="/layout/display.xhtml">
 				<ui:define name="label">
 	                <h:outputText value="" />
@@ -267,7 +328,7 @@
                        rendered="#{!slotDefHome.managed}"/>
 
             <h:commandButton id="update"
-                          value="Salva"
+                          value="Aggiorna"
                          action="#{slotDefEditBean.update()}"
                        rendered="#{slotDefHome.managed}"/>
 

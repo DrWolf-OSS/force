@@ -11,29 +11,31 @@ public class DocDefCollectionListener {
 	@PrePersist
 	public void setMinMax(DocDefCollection docDefCollection) {
 		CollectionQuantifier quantifier = docDefCollection.getQuantifier();
-		switch (quantifier) {
-		case ANY_OR_ONE:
-			docDefCollection.setMin(null);
-			docDefCollection.setMax(new Integer(1));
-			break;
+		if (quantifier != null) {
+			switch (quantifier) {
+			case ANY_OR_ONE:
+				docDefCollection.setMin(null);
+				docDefCollection.setMax(new Integer(1));
+				break;
 
-		case ANY_OR_MORE:
-			docDefCollection.setMin(null);
-			docDefCollection.setMax(null);
-			break;
+			case ANY_OR_MORE:
+				docDefCollection.setMin(null);
+				docDefCollection.setMax(null);
+				break;
 
-		case ONLY_ONE:
-			docDefCollection.setMin(new Integer(1));
-			docDefCollection.setMax(new Integer(1));
-			break;
+			case ONLY_ONE:
+				docDefCollection.setMin(new Integer(1));
+				docDefCollection.setMax(new Integer(1));
+				break;
 
-		case ONE_OR_MORE:
-			docDefCollection.setMin(new Integer(1));
-			docDefCollection.setMax(null);
-			break;
+			case ONE_OR_MORE:
+				docDefCollection.setMin(new Integer(1));
+				docDefCollection.setMax(null);
+				break;
 
-		default:
-			break;
+			default:
+				break;
+			}
 		}
 	}
 

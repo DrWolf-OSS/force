@@ -38,7 +38,8 @@ public class TimeValidity implements IRuleVerifier {
 		params.add(new VerifierParameterDef(this.FOLLOWING_DATE,
 				"Data Posteriore", DataType.DATE, false, false, false));
 		params.add(new VerifierParameterDef(this.WARNING_THRESHOLD,
-				"Warning Theshold", DataType.INTEGER, true, true, false));
+				"Giorni prima di notifica di avvertimento", DataType.INTEGER,
+				true, true, false));
 	}
 
 	public VerifierReport verify(Map<String, List<VerifierParameterInst>> params)

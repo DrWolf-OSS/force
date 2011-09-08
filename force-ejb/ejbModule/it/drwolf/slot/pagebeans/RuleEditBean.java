@@ -71,9 +71,6 @@ public class RuleEditBean {
 	@Create
 	public void init() {
 		Rule rule = ruleHome.getInstance();
-		//
-		// ruleListener.setVerifier(rule);
-		//
 		IRuleVerifier verifier = rule.getVerifier();
 		if (verifier != null) {
 			List<VerifierParameterDef> inParams = verifier.getInParams();

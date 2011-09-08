@@ -46,7 +46,7 @@
    <navigation from-action="#{slotDefEditBean.save()}">
       <rule if-outcome="persisted">
          <end-conversation/>
-         <redirect view-id="#{empty from ? 'SlotDefTemplateList.xhtml' : from}">
+         <redirect view-id="#{empty from ? '/admin/SlotDefTemplateList.xhtml' : from}">
          	<param name="model" value="#{slotDefEditBean.model}"/>
     		<param name="mode" value="#{slotDefEditBean.mode}"/>
     		<param name="wizard" value="#{slotDefEditBean.wizard}"/>

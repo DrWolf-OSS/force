@@ -5,12 +5,16 @@ import it.drwolf.slot.entity.DocInstCollection;
 import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
+import it.drwolf.slot.entity.Rule;
+import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.enums.CollectionQuantifier;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.pagebeans.support.PropertiesSourceContainer;
+import it.drwolf.slot.session.RuleHome;
 import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
@@ -59,6 +63,12 @@ public class SlotDefEditBean {
 
 	private boolean dirty = Boolean.FALSE;
 
+	@In(create = true)
+	private RuleEditBean ruleEditBean;
+
+	@In(create = true)
+	private RuleHome ruleHome;
+
 	// @Create
 	// public void init() {
 	// // checkReference();
@@ -66,13 +76,13 @@ public class SlotDefEditBean {
 	// // slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
 	// }
 
-	private void persist() {
-		if (slotDefHome.getInstance().getId() == null) {
-			this.save();
-		} else {
-			this.update();
-		}
-	}
+	// private void persist() {
+	// if (slotDefHome.getInstance().getId() == null) {
+	// this.save();
+	// } else {
+	// this.update();
+	// }
+	// }
 
 	public void newProperty() {
 		this.propertyDef = new PropertyDef();
@@ -94,7 +104,7 @@ public class SlotDefEditBean {
 		this.edit = false;
 
 		//
-		this.persist();
+		// this.persist();
 	}
 
 	public void addConditionalProperty() {
@@ -122,7 +132,7 @@ public class SlotDefEditBean {
 		this.conditional = false;
 
 		//
-		this.persist();
+		// this.persist();
 	}
 
 	public void newEmbeddedProperty() {
@@ -137,7 +147,7 @@ public class SlotDefEditBean {
 		}
 
 		//
-		this.persist();
+		// this.persist();
 	}
 
 	@Factory("dataTypes")
@@ -317,7 +327,7 @@ public class SlotDefEditBean {
 	public void removeEmbeddedProp(EmbeddedProperty embeddedProp) {
 		slotDefHome.getInstance().getEmbeddedProperties().remove(embeddedProp);
 		//
-		this.persist();
+		// this.persist();
 	}
 
 	public void editEmbeddedProp(EmbeddedProperty embeddedProp) {
@@ -335,7 +345,7 @@ public class SlotDefEditBean {
 		slotDefHome.getInstance().getPropertyDefs().remove(prop);
 
 		//
-		this.persist();
+		// this.persist();
 	}
 
 	public void editProp(PropertyDef prop) {
@@ -353,7 +363,7 @@ public class SlotDefEditBean {
 		slotDefHome.getInstance().getDocDefCollections().remove(coll);
 		coll.setSlotDef(null);
 		//
-		this.persist();
+		// this.persist();
 	}
 
 	public void editColl(DocDefCollection coll) {
@@ -520,5 +530,28 @@ public class SlotDefEditBean {
 
 	public void setDirty(boolean dirty) {
 		this.dirty = dirty;
+	}
+
+	public String retrieveRuleParameterValue(Long ruleId, String paramName) {
+		ruleHome.setRuleId(ruleId);
+		ruleHome.find();
+		ruleEditBean.init();
+		PropertiesSourceContainer propertiesSourceContainer = ruleEditBean
+				.getTargetPropertiesSourceMap().get(paramName);
+		if (propertiesSourceContainer != null) {
+			return propertiesSourceContainer.getLabel()
+					+ " » "
+					+ ruleEditBean.getTargetPropertyMap().get(paramName)
+							.getLabel();
+		}
+		return "";
+	}
+
+	public RuleParameterInst retrieveRuleParameterInst(Long ruleId,
+			String paramName) {
+		ruleHome.setRuleId(ruleId);
+		ruleHome.find();
+		Rule rule = ruleHome.getInstance();
+		return rule.getEmbeddedParametersMap().get(paramName);
 	}
 }
