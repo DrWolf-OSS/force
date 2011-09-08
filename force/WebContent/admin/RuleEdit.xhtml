@@ -156,17 +156,15 @@
                       immediate="true"
                        rendered="#{ruleHome.managed}"/>
 
-            <s:button id="cancelEdit"
-                   value="Cancel"
-             propagation="end"
-                    view="/Rule.xhtml"
-                rendered="#{ruleHome.managed}"/>
-
             <s:button id="cancelAdd"
-                   value="Cancel"
+                   value="Annulla"
              propagation="end"
-                    view="/#{empty ruleFrom ? 'RuleList' : ruleFrom}.xhtml"
-                rendered="#{!ruleHome.managed}"/>
+                    view="/#{empty ruleFrom ? 'admin/SlotDefView' : ruleFrom}.xhtml">
+                <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+				<f:param name="mode" value="#{slotDefParameters.mode}"/>
+				<f:param name="model" value="#{slotDefParameters.model}"/>
+				<f:param name="wizard" value="#{slotDefParameters.wizard}"/>
+            </s:button>
 
         </div>
     </a:form>

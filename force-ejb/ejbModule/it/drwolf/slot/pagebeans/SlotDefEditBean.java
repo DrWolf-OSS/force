@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.faces.event.ActionEvent;
 
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -53,10 +54,10 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotInstHome slotInstHome;
 
-	private boolean model = Boolean.FALSE;
-	private String mode = SlotDefType.GENERAL.value();
+	// private boolean model = Boolean.FALSE;
+	// private String mode = SlotDefType.GENERAL.value();
 	private String from = "";
-	private boolean wizard = Boolean.FALSE;
+	// private boolean wizard = Boolean.FALSE;
 
 	private boolean conditional = Boolean.FALSE;
 	private boolean edit = Boolean.FALSE;
@@ -69,12 +70,16 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private RuleHome ruleHome;
 
-	// @Create
-	// public void init() {
-	// // checkReference();
-	// // slotDefHome.getInstance().setTemplate(model);
-	// // slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
-	// }
+	@In(create = true)
+	private SlotDefParameters slotDefParameters;
+
+	@Create
+	public void init() {
+		// checkReference();
+		// slotDefHome.getInstance().setTemplate(model);
+		// slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
+		setKnownParameters();
+	}
 
 	// private void persist() {
 	// if (slotDefHome.getInstance().getId() == null) {
@@ -452,8 +457,8 @@ public class SlotDefEditBean {
 					.instance()
 					.add(Severity.WARN,
 							"ATTENZIONE! Questa"
-									+ (this.mode.equals(SlotDefType.PRIMARY
-											.value()) ? " Busta di Riferimento "
+									+ (slotDefParameters.getMode().equals(
+											SlotDefType.PRIMARY.value()) ? " Busta di Riferimento "
 											: " Busta Amministrativa ")
 									+ "è referenziata da una o più istanze già compilate!");
 		}
@@ -467,29 +472,35 @@ public class SlotDefEditBean {
 		this.conditional = conditional;
 	}
 
-	public boolean isModel() {
-		return model;
-	}
-
-	public void setModel(boolean model) {
-		this.model = model;
-	}
-
-	public String getMode() {
-		return mode;
-	}
-
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
+	// public boolean isModel() {
+	// return model;
+	// }
+	//
+	// public void setModel(boolean model) {
+	// this.model = model;
+	// }
+	//
+	// public String getMode() {
+	// return mode;
+	// }
+	//
+	// public void setMode(String mode) {
+	// this.mode = mode;
+	// }
 
 	// Viene eseguito dopo aver settato i parametri, in init() venivano eseguite
 	// prima che fossero settati i parametri
-	public void setKnownParameters() {
-		slotDefHome.getInstance().setTemplate(model);
-		if (mode.equals(SlotDefType.PRIMARY.value())
-				|| mode.equals(SlotDefType.GENERAL.value())) {
-			slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
+	private void setKnownParameters() {
+		//
+		if (slotDefHome.getInstance().getId() == null) {
+			//
+			slotDefHome.getInstance().setTemplate(slotDefParameters.isModel());
+			if (slotDefParameters.getMode().equals(SlotDefType.PRIMARY.name())
+					|| slotDefParameters.getMode().equals(
+							SlotDefType.GENERAL.name())) {
+				slotDefHome.getInstance().setType(
+						SlotDefType.valueOf(slotDefParameters.getMode()));
+			}
 		}
 	}
 
@@ -508,13 +519,13 @@ public class SlotDefEditBean {
 		this.from = from;
 	}
 
-	public boolean isWizard() {
-		return wizard;
-	}
-
-	public void setWizard(boolean wizard) {
-		this.wizard = wizard;
-	}
+	// public boolean isWizard() {
+	// return wizard;
+	// }
+	//
+	// public void setWizard(boolean wizard) {
+	// this.wizard = wizard;
+	// }
 
 	public boolean isEdit() {
 		return edit;

@@ -13,7 +13,7 @@
     <h:form id="slotDefSearch" styleClass="edit">
 
     <rich:panel>
-        <f:facet name="header">Elenco #{slotDefListManager.model ? 'modelli' : ''} #{slotDefListManager.mode=='Primary' ? 'Buste di Riferimento' : 'Buste Amministrative'}</f:facet>
+        <f:facet name="header">Elenco #{slotDefParameters.model ? 'modelli' : ''} #{slotDefParameters.mode=='Primary' ? 'Buste di Riferimento' : 'Buste Amministrative'}</f:facet>
     <div class="results" id="slotDefList">
 
     <h:outputText value="The slotDef search returned no results."
@@ -34,7 +34,10 @@
             <f:facet name="header">
 				<h:outputText value="Nome" />
             </f:facet>
-            <h:outputText value="#{_slotDef.name}" />
+            <s:link value="#{_slotDef.name}" view="/admin/SlotDefView.xhtml" propagation="none">
+            	<f:param name="slotDefId" value="#{_slotDef.id}"/>
+            	<f:param name="mode" value="#{slotDefParameters.mode}"/>    	
+            </s:link>
         </h:column>
         <rich:column styleClass="action">
             <f:facet name="header">Azioni</f:facet>        
@@ -46,11 +49,11 @@
                 <f:param name="slotDefId" value="#{_slotDef.id}"/>
                 <f:param name="model" value="#{true}"/>
                 <f:param name="wizard" value="#{true}"/>
-            	<f:param name="mode" value="#{slotDefListManager.mode}"/>
+            	<f:param name="mode" value="#{slotDefParameters.mode}"/>
             	<f:param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
             </s:link>
             #{' '}
-            <h:commandLink action="#{slotDefHome.slotDefClone(_slotDef)}" value="Clona" rendered="#{slotDefListManager.model}"/>
+            <h:commandLink action="#{slotDefHome.slotDefClone(_slotDef)}" value="Clona" rendered="#{slotDefParameters.model}"/>
         </rich:column>
     </rich:dataTable>
     <rich:datascroller for="slotDefList"></rich:datascroller>
@@ -66,7 +69,7 @@
             <f:param name="slotDefId"/>
             <f:param name="model" value="#{true}"/>
             <f:param name="wizard" value="#{true}"/>
-            <f:param name="mode" value="#{slotDefListManager.mode}"/>
+            <f:param name="mode" value="#{slotDefParameters.mode}"/>
             <f:param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
         </s:button>
     </s:div>

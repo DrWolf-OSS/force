@@ -1,0 +1,298 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="/layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="slotDef" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">Visualizzazione #{slotDefParameters.model ? 'modello di' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Busta di Riferimento' : 'Busta Amministrativa'}, identificativo:#{slotDefHome.slotDefId}</f:facet>
+
+            <s:decorate id="templateField" template="/layout/display.xhtml">
+                <ui:define name="label">Modello</ui:define>
+               	<h:outputText value="#{slotDefHome.instance.template ? 'Sì' : 'No' }" />
+            </s:decorate>
+
+            <s:decorate id="nameField" template="/layout/display.xhtml">
+                <ui:define name="label">Nome</ui:define>
+                <h:outputText id="name" value="#{slotDefHome.instance.name}"/>
+            </s:decorate>
+            
+            <s:decorate id="typeField" template="/layout/display.xhtml">
+                <ui:define name="label">Tipo</ui:define>
+                <h:outputText value="#{slotDefHome.instance.type.value()}" />
+            </s:decorate>
+			
+			<div style="clear:both"/>
+			<rich:separator height="25px" lineType="none" rendered="#{slotDefParameters.mode != 'PRIMARY'}"/>
+			
+			<s:decorate template="/layout/display.xhtml" rendered="#{slotDefParameters.mode != 'PRIMARY'}" id="epropTable">
+				<ui:define name="label">
+	                <h:outputText value="Informazioni sulla gara" />
+				</ui:define>
+				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.embeddedPropertiesAsList}"/>
+				<rich:dataTable value="#{slotDefHome.instance.embeddedPropertiesAsList}" var="eprop" 
+						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" style="width:1024px">
+					<rich:column style="width:200px">
+						<f:facet name="header">Nome</f:facet>
+						<h:outputText value="#{eprop.name}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Tipologia di dato</f:facet>
+						<h:outputText value="#{eprop.dataType.value()}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Multipla</f:facet>
+						<h:outputText value="#{eprop.multiple ? 'sì' : 'no'}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Valore</f:facet>
+						<s:fragment rendered="#{not eprop.multiple}">
+							<h:outputText value="#{eprop.stringValue}"
+									rendered="#{eprop.dataDefinition.dataType == 'STRING' or eprop.dataDefinition.dataType == 'LINK'}"/>
+							<h:outputText value="#{eprop.integerValue}"
+									rendered="#{eprop.dataDefinition.dataType == 'INTEGER'}" />
+							<h:outputText value="#{eprop.booleanValue ? 'true' : 'false'}"
+									rendered="#{eprop.dataDefinition.dataType == 'BOOLEAN'}" />
+							<h:outputText value="#{eprop.dateValue}"
+									rendered="#{eprop.dataDefinition.dataType == 'DATE'}">
+								<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</s:fragment>
+						<s:fragment rendered="#{eprop.multiple}">
+							<h:outputText value="#{eprop.value}" />
+						</s:fragment>
+					</rich:column>
+				</rich:dataTable>
+			</s:decorate>
+            
+            <div style="clear:both"/>
+            <rich:separator height="25px" lineType="none" />
+            
+			<s:decorate template="/layout/display.xhtml" id="propTable">
+				<ui:define name="label">
+	                <h:outputText value="Informazioni sull'azienda" />
+				</ui:define>
+				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.propertyDefsAsList}"/>
+				<rich:dataTable value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
+						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" style="width:1024px">
+					<rich:column style="width:200px">
+						<f:facet name="header">Nome</f:facet>
+						<h:outputText value="#{prop.name}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Tipologia di dato</f:facet>
+						<h:outputText value="#{prop.dataType.value()}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Obbligatoria</f:facet>
+						<h:outputText value="#{prop.required ? 'sì' : 'no'}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Multipla</f:facet>
+						<h:outputText value="#{prop.multiple ? 'sì' : 'no'}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Dizionario associato</f:facet>
+						<h:outputText value="#{prop.dictionary!=null ? prop.dictionary.name : ''}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Vincolante per le richieste</f:facet>
+						<h:outputText value="#{!slotDefEditBean.getReferencedCollectionsNames(prop).equals('') ? slotDefEditBean.getReferencedCollectionsNames(prop) : ''}" />
+					</rich:column>
+				</rich:dataTable>
+			</s:decorate>
+			
+			<div style="clear:both"/>
+			<rich:separator height="25px" lineType="none" />
+			
+			<s:decorate template="/layout/display.xhtml" id="collTable">
+				<ui:define name="label">
+	                <h:outputText value="Richieste" />
+				</ui:define>
+				<h:outputText value="Nessuna richiesta definita" rendered="#{empty slotDefHome.instance.docDefCollectionsAsList}"/>
+				<rich:dataTable value="#{slotDefHome.instance.docDefCollectionsAsList}" var="coll" 
+						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" style="width:1024px">
+					<rich:column style="width:200px">
+						<f:facet name="header">Nome</f:facet>
+						<h:outputText value="#{coll.name}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Tipo di documento</f:facet>
+						<h:outputText value="#{coll.docDef.name}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Quantità</f:facet>
+						<h:outputText value="#{coll.quantifier.value()}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Informazione vincolante</f:facet>
+						<h:outputText value="#{coll.conditionalPropertyDef!=null ? coll.conditionalPropertyDef.name : ''}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Valore informazione vincolante</f:facet>
+						<h:outputText value="#{coll.conditionalPropertyInst.stringValue}"
+								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
+						<h:outputText value="#{coll.conditionalPropertyInst.integerValue}"
+								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'INTEGER'}" />
+						<h:outputText value="#{coll.conditionalPropertyInst.booleanValue ? 'true' : 'false'}"
+								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'BOOLEAN'}" />
+						<h:outputText value="#{coll.conditionalPropertyInst.dateValue}"
+								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'DATE'}">
+							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</rich:column>
+				</rich:dataTable>
+			</s:decorate>
+			
+			
+			<div style="clear:both"/>
+			<rich:separator height="15px" lineType="none" />
+			
+			
+			<s:decorate template="/layout/display.xhtml">
+				<ui:define name="label">
+	                <h:outputText value="" />
+				</ui:define>
+				<s:button value="Modifica Informazioni" view="/admin/SlotDefWizardEdit.xhtml" propagation="none">
+					<f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+					<f:param name="mode" value="#{slotDefParameters.mode}"/>
+		          	<f:param name="model" value="#{slotDefParameters.model}"/>
+		          	<f:param name="wizard" value="#{true}"/>
+				</s:button>
+			</s:decorate>
+			
+            <div style="clear:both">
+            </div>
+            
+            
+            
+			<rich:separator height="15px" lineType="none" />
+			<rich:separator height="1px" lineType="solid" />	
+			<rich:separator height="15px" lineType="none" />
+			
+			
+			<s:decorate template="/layout/display.xhtml">
+				<ui:define name="label">
+	                <h:outputText value="Regole" />
+				</ui:define>
+				<h:outputText value="Nessuna regola definita" rendered="#{empty slotDefHome.instance.rulesAsList}"/>
+				<rich:tabPanel switchType="client" rendered="#{not empty slotDefHome.instance.rulesAsList}">
+				<c:forEach items="#{slotDefHome.instance.rulesAsList}" var="rule">					
+					<rich:tab>
+						<f:facet name="label">Regola #{rule.id}</f:facet>
+						
+						<s:decorate template="/layout/display.xhtml">
+							<ui:define name="label">
+	                			<h:outputText value="Verificatore" />
+							</ui:define>
+							<h:outputText value="#{rule.type.value()}" />
+						</s:decorate>
+						
+						<s:decorate template="/layout/display.xhtml">
+							<ui:define name="label">
+	                			<h:outputText value="Obbligatoria" />
+							</ui:define>
+							<h:outputText value="#{rule.mandatory ? 'Sì' : 'No'}" />
+						</s:decorate>
+						
+						<s:decorate template="/layout/display.xhtml">
+							<ui:define name="label">
+	                			<h:outputText value="Parametri" />
+							</ui:define>
+							<rich:dataTable value="#{rule.verifier.inParams}" var="p">
+								<rich:column>
+									<f:facet name="header">Nome del parametro</f:facet>
+									<h:outputText value="#{p.label}" />
+								</rich:column>
+								<rich:column>
+									<f:facet name="header">Tipologia di dato</f:facet>
+									<h:outputText value="#{p.dataType.value()}" />
+								</rich:column>
+								<rich:column>
+									<f:facet name="header">Multiplo</f:facet>
+									<h:outputText value="#{p.multiple ? 'sì' : 'no'}" />
+								</rich:column>
+								<rich:column>
+									<f:facet name="header">Valore</f:facet>
+									<h:outputText value="&#60; #{slotDefEditBean.retrieveRuleParameterValue(rule.id,p.name)} &#62;" style="font-style: italic"
+												rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name)==null}"/>
+									<s:fragment rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name)!=null}">
+										<s:fragment rendered="#{not slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.multiple}">
+											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).stringValue}"
+													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'STRING'}"/>
+											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).integerValue}"
+													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'INTEGER'}" />
+											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).booleanValue ? 'true' : 'false'}"
+													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'BOOLEAN'}" />
+											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dateValue}"
+													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'DATE'}">
+												<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+											</h:outputText>
+											<s:span rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'LINK'}">
+												<a href="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).linkValue}" target="blank">#{dataInstance.stringValue}</a>
+											</s:span>
+										</s:fragment>
+										<s:fragment rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.multiple}">
+											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).value}" />
+										</s:fragment>
+									</s:fragment>
+								</rich:column>
+							</rich:dataTable>
+						</s:decorate>
+						
+						<s:decorate template="/layout/display.xhtml">
+							<ui:define name="label">
+	                			<h:outputText value="" />
+							</ui:define>
+							<s:button view="/admin/RuleEdit.xhtml"
+	                			 value="Modifica"
+	                 		propagation="none">
+		          				<f:param name="slotDefId" value="#{slotDefHome.id}" />
+		          				<f:param name="ruleId" value="#{rule.id}"/>
+		          				<f:param name="mode" value="#{slotDefParameters.mode}"/>
+		          				<f:param name="model" value="#{slotDefParameters.model}"/>
+							</s:button>
+						</s:decorate>
+						
+					</rich:tab>
+					</c:forEach>
+				</rich:tabPanel>			
+			</s:decorate>
+			
+
+			<s:decorate template="/layout/display.xhtml">
+				<ui:define name="label">
+	                <h:outputText value="" />
+				</ui:define>
+				<s:button view="/admin/RuleEdit.xhtml"
+                 		value="Crea regola"
+                 	propagation="none">
+          			<f:param name="slotDefId" value="#{slotDefHome.id}" />
+          			<f:param name="ruleId"/>
+          			<f:param name="mode" value="#{slotDefParameters.mode}"/>
+		          	<f:param name="model" value="#{slotDefParameters.model}"/>
+		          	<f:param name="wizard" value="#{slotDefParameters.wizard}"/>
+        		</s:button>
+			</s:decorate>
+			
+            <div style="clear:both">
+            </div>
+			<div style="clear:both"/>
+
+        </rich:panel>
+
+    </h:form>
+		
+</ui:define>
+
+</ui:composition>

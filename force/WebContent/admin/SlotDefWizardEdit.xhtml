@@ -15,9 +15,9 @@
     <h:form id="slotDef" styleClass="edit">
 
         <rich:panel>
-            <f:facet name="header">#{slotDefHome.managed ? 'Modifica' : 'Creazione'} #{slotDefEditBean.model ? 'modello di' : ''} #{slotDefEditBean.mode=='Primary' ? 'Busta di Riferimento' : 'Busta Amministrativa'}</f:facet>
+            <f:facet name="header">#{slotDefHome.managed ? 'Modifica' : 'Creazione'} #{slotDefParameters.model ? 'modello di' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Busta di Riferimento' : 'Busta Amministrativa'}</f:facet>
 
-            <s:decorate id="templateField" template="/layout/edit.xhtml" rendered="#{not slotDefEditBean.model}">
+            <s:decorate id="templateField" template="/layout/edit.xhtml" rendered="#{not slotDefParameters.model}">
                 <ui:define name="label">Modello</ui:define>
                	<h:selectBooleanCheckbox value="#{slotDefHome.instance.template}" />
             </s:decorate>
@@ -27,7 +27,7 @@
                 <h:inputText id="name" value="#{slotDefHome.instance.name}" required="true"/>
             </s:decorate>
             
-            <s:decorate id="typeField" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.mode == 'Normal'}">
+            <s:decorate id="typeField" template="/layout/edit.xhtml" rendered="#{slotDefParameters.mode == 'Normal'}">
                 <ui:define name="label">Tipo</ui:define>
                 <h:selectOneMenu id="slotDefType" value="#{slotDefHome.instance.type}" >
                     	<s:selectItems value="#{slotDefEditBean.slotDefTypes}" 
@@ -37,9 +37,9 @@
             </s:decorate>
 			
 			<div style="clear:both"/>
-			<rich:separator height="25px" lineType="none" rendered="#{slotDefEditBean.mode != 'Primary'}"/>
+			<rich:separator height="25px" lineType="none" rendered="#{slotDefParameters.mode != 'PRIMARY'}"/>
 			
-			<s:decorate template="/layout/display.xhtml" rendered="#{slotDefEditBean.mode != 'Primary'}" id="epropTable">
+			<s:decorate template="/layout/display.xhtml" rendered="#{slotDefParameters.mode != 'PRIMARY'}" id="epropTable">
 				<ui:define name="label">
 	                <h:outputText value="Informazioni sulla gara" />
 				</ui:define>
@@ -193,129 +193,17 @@
 				<ui:define name="label">
 	                <h:outputText value="" />
 				</ui:define>
-				<a:commandButton value="Aggiungi informazione #{slotDefEditBean.mode == 'Primary' ? 'sull azienda' : ''}" 
+				<a:commandButton value="Aggiungi informazione #{slotDefParameters.mode == 'PRIMARY' ? 'sull azienda' : ''}" 
 							onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
-							action="#{slotDefEditBean.newProperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel" rendered="#{slotDefEditBean.mode != 'General'}"/>
+							action="#{slotDefEditBean.newProperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel" rendered="#{slotDefParameters.mode != 'GENERAL'}"/>
 				<a:commandButton value="Aggiungi richiesta" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
 							action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collTypePanel')}.show()" reRender="collPanel"/>
 				<a:commandButton value="Aggiungi informazioni relative alla gara" action="#{slotDefEditBean.newEmbeddedProperty()}" 
-							oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel" rendered="#{slotDefEditBean.mode != 'Primary'}"/>
+							oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel" rendered="#{slotDefParameters.mode != 'PRIMARY'}"/>
 			</s:decorate>
 			
             <div style="clear:both">
             </div>
-            
-            
-            
-			<rich:separator height="15px" lineType="none" />
-			<rich:separator height="1px" lineType="solid" />	
-			<rich:separator height="15px" lineType="none" />
-			
-			
-			<s:decorate template="/layout/display.xhtml">
-				<ui:define name="label">
-	                <h:outputText value="Regole" />
-				</ui:define>
-				<rich:tabPanel switchType="client">
-				<c:forEach items="#{slotDefHome.instance.rulesAsList}" var="rule">					
-					<rich:tab>
-						<f:facet name="label">Regola #{rule.id}</f:facet>
-						
-						<s:decorate template="/layout/display.xhtml">
-							<ui:define name="label">
-	                			<h:outputText value="Verificatore" />
-							</ui:define>
-							<h:outputText value="#{rule.type.value()}" />
-						</s:decorate>
-						
-						<s:decorate template="/layout/display.xhtml">
-							<ui:define name="label">
-	                			<h:outputText value="Obbligatoria" />
-							</ui:define>
-							<h:outputText value="#{rule.mandatory ? 'Sì' : 'No'}" />
-						</s:decorate>
-						
-						<s:decorate template="/layout/display.xhtml">
-							<ui:define name="label">
-	                			<h:outputText value="Parametri" />
-							</ui:define>
-							<rich:dataTable value="#{rule.verifier.inParams}" var="p">
-								<rich:column>
-									<f:facet name="header">Nome del parametro</f:facet>
-									<h:outputText value="#{p.label}" />
-								</rich:column>
-								<rich:column>
-									<f:facet name="header">Tipologia di dato</f:facet>
-									<h:outputText value="#{p.dataType.value()}" />
-								</rich:column>
-								<rich:column>
-									<f:facet name="header">Multiplo</f:facet>
-									<h:outputText value="#{p.multiple ? 'sì' : 'no'}" />
-								</rich:column>
-								<rich:column>
-									<f:facet name="header">Valore</f:facet>
-									<h:outputText value="&#60; #{slotDefEditBean.retrieveRuleParameterValue(rule.id,p.name)} &#62;" style="font-style: italic"
-												rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name)==null}"/>
-									<s:fragment rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name)!=null}">
-										<s:fragment rendered="#{not slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.multiple}">
-											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).stringValue}"
-													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'STRING'}"/>
-											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).integerValue}"
-													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'INTEGER'}" />
-											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).booleanValue ? 'true' : 'false'}"
-													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'BOOLEAN'}" />
-											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dateValue}"
-													rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'DATE'}">
-												<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
-											</h:outputText>
-											<s:span rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.dataType == 'LINK'}">
-												<a href="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).linkValue}" target="blank">#{dataInstance.stringValue}</a>
-											</s:span>
-										</s:fragment>
-										<s:fragment rendered="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).dataDefinition.multiple}">
-											<h:outputText value="#{slotDefEditBean.retrieveRuleParameterInst(rule.id,p.name).value}" />
-										</s:fragment>
-									</s:fragment>
-								</rich:column>
-							</rich:dataTable>
-						</s:decorate>
-						
-						<s:decorate template="/layout/display.xhtml">
-							<ui:define name="label">
-	                			<h:outputText value="" />
-							</ui:define>
-							<s:button view="/admin/RuleEdit.xhtml"
-	                			 value="Modifica"
-	                 		propagation="none">
-		          				<f:param name="slotDefId" value="#{slotDefHome.id}" />
-		          				<f:param name="ruleId" value="#{rule.id}"/>
-		          				<f:param name="mode" value="#{slotDefEditBean.mode}"/>
-		          				<f:param name="model" value="#{slotDefEditBean.model}"/>
-		          				<f:param name="wizard" value="#{slotDefEditBean.wizard}"/>
-							</s:button>
-						</s:decorate>
-						
-					</rich:tab>
-					</c:forEach>
-				</rich:tabPanel>			
-			</s:decorate>
-			
-
-			<s:decorate template="/layout/display.xhtml">
-				<ui:define name="label">
-	                <h:outputText value="" />
-				</ui:define>
-				<s:button view="/admin/RuleEdit.xhtml"
-                 		value="Crea regola"
-                 	propagation="none">
-          			<f:param name="slotDefId" value="#{slotDefHome.id}" />
-          			<f:param name="ruleId"/>
-        		</s:button>
-			</s:decorate>
-			
-            <div style="clear:both">
-            </div>
-			<div style="clear:both"/>
 
         </rich:panel>
 
@@ -343,8 +231,8 @@
              propagation="end"
                     view="/#{empty from ? 'SlotDefList.xhtml' : from}"
                 rendered="#{slotDefHome.managed}">
-                <f:param name="mode" value="#{slotDefEditBean.mode}"/>
-                <f:param name="model" value="#{slotDefEditBean.model}"/>
+                <f:param name="mode" value="#{slotDefParameters.mode}"/>
+                <f:param name="model" value="#{slotDefParameters.model}"/>
             </s:button>
 
             <s:button id="cancelAdd"
@@ -352,8 +240,8 @@
              propagation="end"
                     view="/#{empty from ? 'SlotDefList.xhtml' : from}"
                 rendered="#{!slotDefHome.managed}">
-                <f:param name="mode" value="#{slotDefEditBean.mode}"/>
-                <f:param name="model" value="#{slotDefEditBean.model}"/>
+                <f:param name="mode" value="#{slotDefParameters.mode}"/>
+                <f:param name="model" value="#{slotDefParameters.model}"/>
             </s:button>
 
         </div>
@@ -442,9 +330,9 @@
 	        </s:div>
 	        <div style="clear:both"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();}" 
-							rendered="#{not (slotDefEditBean.conditional and slotDefEditBean.wizard and not slotDefEditBean.edit)}"	reRender="pf,slotDef,condPD"/>
+							rendered="#{not (slotDefEditBean.conditional and slotDefParameters.wizard and not slotDefEditBean.edit)}"	reRender="pf,slotDef,condPD"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionalProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();#{rich:component('collPanel')}.show();}" 
-							rendered="#{slotDefEditBean.conditional and slotDefEditBean.wizard and not slotDefEditBean.edit}"	reRender="slotDef,cpf,pf"/>
+							rendered="#{slotDefEditBean.conditional and slotDefParameters.wizard and not slotDefEditBean.edit}"	reRender="slotDef,cpf,pf"/>
 			<a:region>
 			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('propPanel')}.hide()" reRender="pf,propPanel,collPanel"/>
 			</a:region>
