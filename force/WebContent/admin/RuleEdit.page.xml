@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns="http://jboss.com/products/seam/pages"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+      no-conversation-view-id="/RuleList.xhtml"
+      login-required="true">
+
+   <begin-conversation join="true" />
+
+   <action execute="#{ruleHome.wire}"/>
+
+   <param name="ruleFrom"/>
+   <param name="ruleId" value="#{ruleHome.ruleId}"/>
+   <param name="slotDefFrom"/>
+   <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+   
+   	<param name="mode" value="#{slotDefParameters.mode}"/>
+	<param name="model" value="#{slotDefParameters.model}"/>
+	<param name="wizard" value="#{slotDefParameters.wizard}"/>
+   
+
+   <navigation from-action="#{ruleHome.persist}">
+      <rule if-outcome="persisted">
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/RuleMapEdit.xhtml"/>
+      </rule>
+   </navigation>
+
+   <navigation from-action="#{ruleHome.update}">
+      <rule if-outcome="updated">
+         <end-conversation/>
+         <redirect view-id="/Rule.xhtml"/>
+      </rule>
+   </navigation>
+
+   <navigation from-action="#{ruleHome.remove}">
+      <rule if-outcome="removed">
+         <end-conversation/>
+         <redirect view-id="/RuleList.xhtml"/>
+      </rule>
+   </navigation>
+   
+   
+   <navigation from-action="#{ruleEditBean.save()}">
+      <rule if-outcome="persisted">
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/admin/SlotDefView.xhtml">
+			<param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+			<param name="mode" value="#{slotDefParameters.mode}"/>
+			<param name="model" value="#{slotDefParameters.model}"/>
+			<param name="wizard" value="#{slotDefParameters.wizard}"/>
+         </redirect>
+      </rule>
+   </navigation>
+   
+   <navigation from-action="#{ruleEditBean.update()}">
+      <rule if-outcome="persisted">
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/admin/SlotDefWizardEdit.xhtml" >
+			<param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+			<param name="mode" value="#{slotDefParameters.mode}"/>
+			<param name="model" value="#{slotDefParameters.model}"/>
+			<param name="wizard" value="#{slotDefParameters.wizard}"/>
+         </redirect>
+      </rule>
+      <rule if-outcome="failed">
+         <end-conversation before-redirect="true"/>
+         <redirect >
+			<param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+			<param name="ruleId" value="#{ruleHome.ruleId}"/>
+			<param name="mode" value="#{slotDefParameters.mode}"/>
+			<param name="model" value="#{slotDefParameters.model}"/>
+			<param name="wizard" value="#{slotDefParameters.wizard}"/>
+         </redirect>
+      </rule>
+   </navigation>
+
+</page>

@@ -1,7 +1,11 @@
 package it.drwolf.slot.entity;
 
+import it.drwolf.slot.entity.listeners.DocDefCollectionListener;
+import it.drwolf.slot.enums.CollectionQuantifier;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -12,6 +16,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.validator.NotNull;
 
 @Entity
+@EntityListeners(value = DocDefCollectionListener.class)
 public class DocDefCollection {
 
 	private Long id;
@@ -29,6 +34,8 @@ public class DocDefCollection {
 	private PropertyDef conditionalPropertyDef;
 
 	private PropertyInst conditionalPropertyInst;
+
+	private CollectionQuantifier quantifier;
 
 	@Id
 	@GeneratedValue
@@ -108,20 +115,55 @@ public class DocDefCollection {
 	}
 
 	@Transient
-	public void setMandatory(boolean mandatory) {
-		if (mandatory) {
-			this.setMin(new Integer(1));
-		}
+	public CollectionQuantifier getQuantifier() {
+		return quantifier;
 	}
 
-	@Transient
-	public boolean isMandatory() {
-		if (this.getMin() == null)
-			return false;
-		else if (this.getMin() > 0)
-			return true;
-		return false;
+	public void setQuantifier(CollectionQuantifier quantifier) {
+		this.quantifier = quantifier;
 	}
+
+	// @Transient
+	// public void setQuantifier(CollectionQuantifier quantifier) {
+	// switch (quantifier) {
+	// case ANY_OR_ONE:
+	// this.min = null;
+	// this.max = new Integer(1);
+	// break;
+	//
+	// case ANY_OR_MORE:
+	// this.min = null;
+	// this.max = null;
+	// break;
+	//
+	// case ONLY_ONE:
+	// this.min = new Integer(1);
+	// this.max = new Integer(1);
+	// break;
+	//
+	// case ONE_OR_MORE:
+	// this.min = new Integer(1);
+	// this.max = null;
+	// break;
+	//
+	// default:
+	// break;
+	// }
+	// }
+	//
+	// @Transient
+	// public CollectionQuantifier getQuantifier() {
+	// if (this.min == null && this.max != null && this.max == 1)
+	// return CollectionQuantifier.ANY_OR_ONE;
+	// else if (this.min == null && this.max == null)
+	// return CollectionQuantifier.ANY_OR_MORE;
+	// else if (this.min != null && this.min == 1 && this.max != null
+	// && this.max == 1)
+	// return CollectionQuantifier.ONLY_ONE;
+	// else if (this.min != null && this.min == 1 && this.max == null)
+	// return CollectionQuantifier.ONE_OR_MORE;
+	// return null;
+	// }
 
 	// @Override
 	// public int hashCode() {

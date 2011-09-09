@@ -4,9 +4,9 @@ import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.entity.DocDef;
 import it.drwolf.slot.entity.DocDefCollection;
+import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.SlotDef;
-import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.enums.DataType;
 
 import java.util.ArrayList;
@@ -126,9 +126,10 @@ public class PropertiesSourceContainer {
 	@Override
 	public String toString() {
 		if (slotDef != null) {
-			return "SlotDef:" + slotDef.getId();
+			return SlotDef.class.getName() + ":" + slotDef.getId();
 		} else if (docDefCollection != null) {
-			return "DocDefCollection:" + docDefCollection.getId();
+			return DocDefCollection.class.getName() + ":"
+					+ docDefCollection.getId();
 		}
 		return "";
 	}

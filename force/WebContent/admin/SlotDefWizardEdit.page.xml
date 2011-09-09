@@ -11,48 +11,39 @@
 
    <param name="slotDefFrom"/>
    <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
-   <param name="model" value="#{slotDefEditBean.model}"/>
-   <param name="mode" value="#{slotDefEditBean.mode}"/>
-   <param name="from" value="#{slotDefEditBean.from}"/>
-   <param name="wizard" value="#{slotDefEditBean.wizard}"/>
+   <param name="model" value="#{slotDefParameters.model}"/>
+   <param name="mode" value="#{slotDefParameters.mode}"/>
+   <param name="from" value="#{slotDefParameters.from}"/>
+   <param name="wizard" value="#{slotDefParameters.wizard}"/>
 
-	<action execute="#{slotDefEditBean.setKnownParameters}"/>
 
-   <navigation from-action="#{slotDefHome.persist}">
-      <rule if-outcome="persisted">
-         <end-conversation/>
-         <redirect view-id="/SlotDef.xhtml"/>
-      </rule>
-   </navigation>
 
-   <navigation from-action="#{slotDefHome.update}">
-      <rule if-outcome="updated">
-         <end-conversation/>
-         <redirect view-id="/SlotDef.xhtml"/>
-      </rule>
-   </navigation>
 
    <navigation from-action="#{slotDefHome.remove}">
       <rule if-outcome="removed">
          <end-conversation/>
-         <redirect view-id="/SlotDefList.xhtml"/>
+         <redirect view-id="/admin/#{empty from ? 'SlotDefTemplateList.xhtml' : from}">
+         	<param name="model" value="#{slotDefParameters.model}"/>
+    		<param name="mode" value="#{slotDefParameters.mode}"/>
+    		<param name="wizard" value="#{slotDefParameters.wizard}"/>
+         </redirect>
       </rule>
    </navigation>
    
    <navigation from-action="#{slotDefEditBean.save()}">
       <rule if-outcome="persisted">
-         <end-conversation/>
-         <redirect view-id="#{empty from ? 'SlotDefTemplateList.xhtml' : from}">
-         	<param name="model" value="#{slotDefEditBean.model}"/>
-    		<param name="mode" value="#{slotDefEditBean.mode}"/>
-    		<param name="wizard" value="#{slotDefEditBean.wizard}"/>
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="#{empty from ? '/admin/SlotDefTemplateList.xhtml' : from}">
+         	<param name="model" value="#{slotDefParameters.model}"/>
+    		<param name="mode" value="#{slotDefParameters.mode}"/>
+    		<param name="wizard" value="#{slotDefParameters.wizard}"/>
          </redirect>
       </rule>
       <rule if-outcome="failed">
          <redirect>
-         	<param name="model" value="#{slotDefEditBean.model}"/>
-    		<param name="mode" value="#{slotDefEditBean.mode}"/>
-    		<param name="wizard" value="#{slotDefEditBean.wizard}"/>
+         	<param name="model" value="#{slotDefParameters.model}"/>
+    		<param name="mode" value="#{slotDefParameters.mode}"/>
+    		<param name="wizard" value="#{slotDefParameters.wizard}"/>
          </redirect>
       </rule>
    </navigation>
@@ -62,17 +53,36 @@
          <end-conversation before-redirect="true"/>
          <redirect>
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
-    		<param name="model" value="#{slotDefEditBean.model}"/>
-    		<param name="mode" value="#{slotDefEditBean.mode}"/>
-    		<param name="wizard" value="#{slotDefEditBean.wizard}"/>
+    		<param name="model" value="#{slotDefParameters.model}"/>
+    		<param name="mode" value="#{slotDefParameters.mode}"/>
+    		<param name="wizard" value="#{slotDefParameters.wizard}"/>
          </redirect>
       </rule>
       <rule if-outcome="failed">
          <redirect>
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
-         	<param name="model" value="#{slotDefEditBean.model}"/>
-    		<param name="mode" value="#{slotDefEditBean.mode}"/>
-    		<param name="wizard" value="#{slotDefEditBean.wizard}"/>
+         	<param name="model" value="#{slotDefParameters.model}"/>
+    		<param name="mode" value="#{slotDefParameters.mode}"/>
+    		<param name="wizard" value="#{slotDefParameters.wizard}"/>
+         </redirect>
+      </rule>
+   </navigation>
+   
+   <navigation from-action="#{garaHome.persistAssosiation()}">
+	  <rule if-outcome="associated">
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/admin/GaraEdit.xhtml">
+         	<param name="garaId" value="#{garaHome.garaId}"/>
+         </redirect>
+	  </rule>
+      <rule if-outcome="failed">
+         <redirect>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="model" value="#{slotDefParameters.model}"/>
+    		<param name="mode" value="#{slotDefParameters.mode}"/>
+    		<param name="wizard" value="#{slotDefParameters.wizard}"/>
+    		<param name="garaId" value="#{garaHome.garaId}"/>
+    		<param name="from" value="#{slotDefParameters.from}"/>
          </redirect>
       </rule>
    </navigation>

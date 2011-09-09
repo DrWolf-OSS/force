@@ -2,7 +2,8 @@ package it.drwolf.slot.enums;
 
 public enum RuleType {
 
-	TIME_VALIDITY("TimeValidity"), INSTANT_DATE_VALIDITY("InstantDateValidity");
+	DATE_COMPARISON("Comparazione date"), INSTANT_DATE_VALIDITY(
+			"Validità al momento attuale");
 	private final String value;
 
 	RuleType(String value) {

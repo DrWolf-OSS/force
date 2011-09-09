@@ -1,8 +1,8 @@
 package it.drwolf.slot.pagebeans.support;
 
 import it.drwolf.slot.alfresco.custom.model.Property;
-import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.EmbeddedProperty;
+import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.enums.DataType;
 
 public class PropertyContainer {
@@ -85,11 +85,12 @@ public class PropertyContainer {
 	@Override
 	public String toString() {
 		if (property != null) {
-			return "Property:" + property.getName();
+			return Property.class.getName() + ":" + property.getName();
 		} else if (propertyDef != null) {
-			return "PropertyDef:" + propertyDef.getId();
+			return PropertyDef.class.getName() + ":" + propertyDef.getId();
 		} else if (embeddedProperty != null) {
-			return "EmbeddedProperty:" + embeddedProperty.getId();
+			return EmbeddedProperty.class.getName() + ":"
+					+ embeddedProperty.getId();
 		}
 		return "";
 	}

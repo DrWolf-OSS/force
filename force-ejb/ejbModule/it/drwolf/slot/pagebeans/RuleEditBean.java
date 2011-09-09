@@ -55,9 +55,13 @@ public class RuleEditBean {
 
 	private List<VerifierParameterDef> normalParameters = new ArrayList<VerifierParameterDef>();
 
-	private List<RuleParameterInst> embeddedParameters = new ArrayList<RuleParameterInst>();
+	// private List<RuleParameterInst> embeddedParameters = new
+	// ArrayList<RuleParameterInst>();
 
 	private RuleParameterInst activeEmbeddedParameter;
+
+	//
+	private List<PropertiesSourceContainer> propertiesSources = new ArrayList<PropertiesSourceContainer>();
 
 	@Factory("ruleTypes")
 	public List<RuleType> getRuleTypes() {
@@ -76,9 +80,13 @@ public class RuleEditBean {
 
 				RuleParameterInst ruleParameterInst = rule
 						.getEmbeddedParametersMap().get(paramName);
-				if (ruleParameterInst != null) {
-					embeddedParameters.add(ruleParameterInst);
-				} else {
+				if (ruleParameterInst == null) {
+					// embeddedParameters.add(ruleParameterInst);
+
+					// } else {
+					//
+					this.normalParameters.add(parameterDef);
+					//
 					String encodedParams = encodedParametersMap.get(paramName);
 					if (encodedParams != null && !encodedParams.equals("")) {
 						String[] splitted = encodedParams.split("\\|");
@@ -103,6 +111,9 @@ public class RuleEditBean {
 					}
 				}
 			}
+
+			//
+			buildSources();
 		}
 	}
 
@@ -115,7 +126,7 @@ public class RuleEditBean {
 		if (verifier != null) {
 			List<VerifierParameterDef> inParams = verifier.getInParams();
 			//
-			this.embeddedParameters.clear();
+			// this.embeddedParameters.clear();
 			this.normalParameters.clear();
 			for (VerifierParameterDef verifierParameter : inParams) {
 				if (verifierParameter.isRuleEmbedded()) {
@@ -126,39 +137,52 @@ public class RuleEditBean {
 					// embeddedParameterInst.setParameterName(verifierParameter
 					// .getName());
 					embeddedParameterInst.setRule(instance);
-					embeddedParameters.add(embeddedParameterInst);
+					// embeddedParameters.add(embeddedParameterInst);
+
+					//
+					ruleHome.getInstance()
+							.getEmbeddedParametersMap()
+							.put(verifierParameter.getName(),
+									embeddedParameterInst);
 				} else {
 					this.normalParameters.add(verifierParameter);
 				}
 			}
 			//
-			SlotDef slotDef = slotDefHome.getInstance();
-			Set<DocDefCollection> docDefCollections = slotDef
-					.getDocDefCollections();
-
-			for (VerifierParameterDef verifierParameter : normalParameters) {
-				ArrayList<PropertiesSourceContainer> propertiesSourceContainerList = new ArrayList<PropertiesSourceContainer>();
-				for (DocDefCollection collection : docDefCollections) {
-					PropertiesSourceContainer sourceContainer = new PropertiesSourceContainer(
-							collection);
-					propertiesSourceContainerList.add(sourceContainer);
-				}
-				propertiesSourceContainerList
-						.add(new PropertiesSourceContainer(slotDef));
-				sourcePropertiesSourceMap.put(verifierParameter.getName(),
-						propertiesSourceContainerList);
-			}
+			buildSources();
 
 		} else {
 			this.normalParameters.clear();
-			this.embeddedParameters.clear();
+			// this.embeddedParameters.clear();
 
 			targetPropertiesSourceMap.clear();
 			targetPropertyMap.clear();
 		}
 	}
 
-	public void save() {
+	private void buildSources() {
+		SlotDef slotDef = slotDefHome.getInstance();
+		Set<DocDefCollection> docDefCollections = slotDef
+				.getDocDefCollections();
+
+		// for (VerifierParameterDef verifierParameter : normalParameters) {
+		ArrayList<PropertiesSourceContainer> propertiesSourceContainerList = new ArrayList<PropertiesSourceContainer>();
+		for (DocDefCollection collection : docDefCollections) {
+			PropertiesSourceContainer sourceContainer = new PropertiesSourceContainer(
+					collection);
+			propertiesSourceContainerList.add(sourceContainer);
+		}
+		propertiesSourceContainerList
+				.add(new PropertiesSourceContainer(slotDef));
+		// sourcePropertiesSourceMap.put(verifierParameter.getName(),
+		// propertiesSourceContainerList);
+		// }
+
+		//
+		this.propertiesSources = propertiesSourceContainerList;
+	}
+
+	public String save() {
 		boolean error = false;
 		Rule rule = ruleHome.getInstance();
 		IRuleVerifier verifier = rule.getVerifier();
@@ -188,26 +212,37 @@ public class RuleEditBean {
 				}
 			}
 
-			for (RuleParameterInst embeddedParameter : embeddedParameters) {
-				embeddedParameter.setRule(rule);
-				rule.getEmbeddedParametersMap().put(
-						embeddedParameter.getVerifierParameterDef().getName(),
-						embeddedParameter);
-			}
+			// for (RuleParameterInst embeddedParameter : embeddedParameters) {
+			// embeddedParameter.setRule(rule);
+			// rule.getEmbeddedParametersMap().put(
+			// embeddedParameter.getVerifierParameterDef().getName(),
+			// embeddedParameter);
+			// }
 		} else {
 			error = true;
 			FacesMessages.instance().add(
 					"Select a rule type and compile the rule");
+			return "failed";
 		}
 
 		if (!error) {
-			ruleHome.persist();
+			return ruleHome.persist();
 		}
+
+		return "failed";
+	}
+
+	public String update() {
+		return this.save();
 	}
 
 	private boolean isInEmbedded(VerifierParameterDef parameterDef) {
-		Iterator<RuleParameterInst> iterator = this.embeddedParameters
-				.iterator();
+		// Iterator<RuleParameterInst> iterator = this.embeddedParameters
+		// .iterator();
+		//
+		Iterator<RuleParameterInst> iterator = ruleHome.getInstance()
+				.getEmbeddedParametersMap().values().iterator();
+		//
 		while (iterator.hasNext()) {
 			RuleParameterInst parameterInst = iterator.next();
 			if (parameterInst.getVerifierParameterDef().equals(parameterDef)) {
@@ -228,13 +263,24 @@ public class RuleEditBean {
 		//
 		// vanno messi in una collection a parte per poi poterli riconoscere e
 		// togliere
-		this.embeddedParameters.add(this.activeEmbeddedParameter);
+		// this.embeddedParameters.add(this.activeEmbeddedParameter);
+		this.ruleHome
+				.getInstance()
+				.getEmbeddedParametersMap()
+				.put(this.activeEmbeddedParameter.getVerifierParameterDef()
+						.getName(), this.activeEmbeddedParameter);
+		this.activeEmbeddedParameter.setRule(ruleHome.getInstance());
+		//
 		this.normalParameters.remove(this.activeEmbeddedParameter
 				.getVerifierParameterDef());
 	}
 
 	public void removeEmbeddedParameter(RuleParameterInst parameterInst) {
-		this.embeddedParameters.remove(parameterInst);
+		// this.embeddedParameters.remove(parameterInst);
+		this.ruleHome.getInstance().getEmbeddedParametersMap()
+				.remove(parameterInst.getVerifierParameterDef().getName());
+		parameterInst.setRule(null);
+		//
 		this.normalParameters.add(parameterInst.getVerifierParameterDef());
 	}
 
@@ -273,13 +319,14 @@ public class RuleEditBean {
 		this.normalParameters = normalParameters;
 	}
 
-	public List<RuleParameterInst> getEmbeddedParameters() {
-		return embeddedParameters;
-	}
-
-	public void setEmbeddedParameters(List<RuleParameterInst> embeddedParameters) {
-		this.embeddedParameters = embeddedParameters;
-	}
+	// public List<RuleParameterInst> getEmbeddedParameters() {
+	// return embeddedParameters;
+	// }
+	//
+	// public void setEmbeddedParameters(List<RuleParameterInst>
+	// embeddedParameters) {
+	// this.embeddedParameters = embeddedParameters;
+	// }
 
 	public RuleParameterInst getActiveEmbeddedParameter() {
 		return activeEmbeddedParameter;
@@ -288,6 +335,15 @@ public class RuleEditBean {
 	public void setActiveEmbeddedParameter(
 			RuleParameterInst activeEmbeddedParameter) {
 		this.activeEmbeddedParameter = activeEmbeddedParameter;
+	}
+
+	public List<PropertiesSourceContainer> getPropertiesSources() {
+		return propertiesSources;
+	}
+
+	public void setPropertiesSources(
+			List<PropertiesSourceContainer> propertiesSources) {
+		this.propertiesSources = propertiesSources;
 	}
 
 }

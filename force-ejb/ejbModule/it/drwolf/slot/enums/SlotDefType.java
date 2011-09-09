@@ -1,7 +1,7 @@
 package it.drwolf.slot.enums;
 
 public enum SlotDefType {
-	PRIMARY("Primary"), GENERAL("General");
+	PRIMARY("Busta di Riferimento"), GENERAL("Busta Amministrativa");
 	private final String value;
 
 	SlotDefType(String value) {

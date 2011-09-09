@@ -16,7 +16,7 @@ import javax.persistence.EntityManager;
 
 import org.apache.commons.lang.time.DateUtils;
 
-public class TimeValidity implements IRuleVerifier {
+public class DateComparison implements IRuleVerifier {
 
 	private final String EARLIER_DATE = "EarlierDate";
 	private final String FOLLOWING_DATE = "FollowingDate";
@@ -24,7 +24,7 @@ public class TimeValidity implements IRuleVerifier {
 
 	private final String DESCRIPTION = "La regola controlla che la data selezionata per il parametro \"Data Anteriore\" "
 			+ "sia anteriore a quella selezionata per \"Data Posteriore\". "
-			+ "Nel caso le date siano molteplici vengono confrontate in modo che tutte le Earlier siano anteriori alle Following";
+			+ "Nel caso le date siano molteplici vengono confrontate in modo che tutte le \"Date Anteriori\" siano anteriori alle \"Date Posteriori\"";
 
 	final private List<VerifierParameterDef> params = new ArrayList<VerifierParameterDef>();
 
@@ -32,13 +32,14 @@ public class TimeValidity implements IRuleVerifier {
 
 	private List<VerifierParameterInst> wrongDataTypeParameters = new ArrayList<VerifierParameterInst>();
 
-	public TimeValidity() {
+	public DateComparison() {
 		params.add(new VerifierParameterDef(this.EARLIER_DATE,
 				"Data Anteriore", DataType.DATE, false, false, false));
 		params.add(new VerifierParameterDef(this.FOLLOWING_DATE,
 				"Data Posteriore", DataType.DATE, false, false, false));
 		params.add(new VerifierParameterDef(this.WARNING_THRESHOLD,
-				"Warning Theshold", DataType.INTEGER, true, true, false));
+				"Giorni prima di notifica di avvertimento", DataType.INTEGER,
+				true, true, false));
 	}
 
 	public VerifierReport verify(Map<String, List<VerifierParameterInst>> params)

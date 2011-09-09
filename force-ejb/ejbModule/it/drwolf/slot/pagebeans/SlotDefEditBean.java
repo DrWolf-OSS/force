@@ -5,11 +5,16 @@ import it.drwolf.slot.entity.DocInstCollection;
 import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.PropertyInst;
+import it.drwolf.slot.entity.Rule;
+import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
+import it.drwolf.slot.enums.CollectionQuantifier;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.pagebeans.support.PropertiesSourceContainer;
+import it.drwolf.slot.session.RuleHome;
 import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
 
@@ -49,19 +54,23 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotInstHome slotInstHome;
 
-	private boolean model = Boolean.FALSE;
-	private String mode = SlotDefType.GENERAL.value();
-	private String from = "";
-	private boolean wizard = Boolean.FALSE;
-
 	private boolean conditional = Boolean.FALSE;
 	private boolean edit = Boolean.FALSE;
 
+	private boolean dirty = Boolean.FALSE;
+
+	@In(create = true)
+	private RuleEditBean ruleEditBean;
+
+	@In(create = true)
+	private RuleHome ruleHome;
+
+	@In(create = true)
+	private SlotDefParameters slotDefParameters;
+
 	@Create
 	public void init() {
-		// checkReference();
-		// slotDefHome.getInstance().setTemplate(model);
-		// slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
+		setKnownParameters();
 	}
 
 	public void newProperty() {
@@ -81,7 +90,6 @@ public class SlotDefEditBean {
 		if (converterPropertyMap.get(propertyDef.getUuid()) == null) {
 			converterPropertyMap.put(propertyDef.getUuid(), propertyDef);
 		}
-		//
 		this.edit = false;
 	}
 
@@ -130,6 +138,11 @@ public class SlotDefEditBean {
 	@Factory("slotDefTypes")
 	public List<SlotDefType> getSlotDefTypes() {
 		return Arrays.asList(SlotDefType.values());
+	}
+
+	@Factory("quantifierTypes")
+	public List<CollectionQuantifier> getQuantifierfTypes() {
+		return Arrays.asList(CollectionQuantifier.values());
 	}
 
 	private boolean checkNames() {
@@ -411,7 +424,11 @@ public class SlotDefEditBean {
 			FacesMessages
 					.instance()
 					.add(Severity.WARN,
-							"ATTENZIONE! Questo SlotDef è già referenziato da uno o più SlotInst!");
+							"ATTENZIONE! Questa"
+									+ (slotDefParameters.getMode().equals(
+											SlotDefType.PRIMARY.value()) ? " Busta di Riferimento "
+											: " Busta Amministrativa ")
+									+ "è referenziata da una o più istanze già compilate!");
 		}
 	}
 
@@ -423,29 +440,16 @@ public class SlotDefEditBean {
 		this.conditional = conditional;
 	}
 
-	public boolean isModel() {
-		return model;
-	}
-
-	public void setModel(boolean model) {
-		this.model = model;
-	}
-
-	public String getMode() {
-		return mode;
-	}
-
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
-
-	// Viene eseguito dopo aver settato i parametri, in init() venivano eseguite
-	// prima che fossero settati i parametri
-	public void setKnownParameters() {
-		slotDefHome.getInstance().setTemplate(model);
-		if (mode.equals(SlotDefType.PRIMARY.value())
-				|| mode.equals(SlotDefType.GENERAL.value())) {
-			slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
+	private void setKnownParameters() {
+		if (slotDefHome.getInstance().getId() == null) {
+			slotDefHome.getInstance().setTemplate(slotDefParameters.isModel());
+			if ((slotDefParameters.getMode() != null && slotDefParameters
+					.getMode().equals(SlotDefType.PRIMARY.name()))
+					|| (slotDefParameters.getMode() != null && slotDefParameters
+							.getMode().equals(SlotDefType.GENERAL.name()))) {
+				slotDefHome.getInstance().setType(
+						SlotDefType.valueOf(slotDefParameters.getMode()));
+			}
 		}
 	}
 
@@ -456,28 +460,43 @@ public class SlotDefEditBean {
 		this.edit = false;
 	}
 
-	public String getFrom() {
-		return from;
-	}
-
-	public void setFrom(String from) {
-		this.from = from;
-	}
-
-	public boolean isWizard() {
-		return wizard;
-	}
-
-	public void setWizard(boolean wizard) {
-		this.wizard = wizard;
-	}
-
 	public boolean isEdit() {
 		return edit;
 	}
 
 	public void setEdit(boolean edit) {
 		this.edit = edit;
+	}
+
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	public void setDirty(boolean dirty) {
+		this.dirty = dirty;
+	}
+
+	public String retrieveRuleParameterValue(Long ruleId, String paramName) {
+		ruleHome.setRuleId(ruleId);
+		ruleHome.find();
+		ruleEditBean.init();
+		PropertiesSourceContainer propertiesSourceContainer = ruleEditBean
+				.getTargetPropertiesSourceMap().get(paramName);
+		if (propertiesSourceContainer != null) {
+			return propertiesSourceContainer.getLabel()
+					+ " » "
+					+ ruleEditBean.getTargetPropertyMap().get(paramName)
+							.getLabel();
+		}
+		return "";
+	}
+
+	public RuleParameterInst retrieveRuleParameterInst(Long ruleId,
+			String paramName) {
+		ruleHome.setRuleId(ruleId);
+		ruleHome.find();
+		Rule rule = ruleHome.getInstance();
+		return rule.getEmbeddedParametersMap().get(paramName);
 	}
 
 }

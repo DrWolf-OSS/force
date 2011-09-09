@@ -172,6 +172,9 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		clonedCollection.setMin(collection.getMin());
 		clonedCollection.setMax(collection.getMax());
 
+		//
+		clonedCollection.setQuantifier(collection.getQuantifier());
+
 		if (collection.getConditionalPropertyDef() != null) {
 			// SlotDef slotDef = collection.getSlotDef();
 			PropertyDef clonedConditionalPropertyDef = clonedSlotDef
@@ -268,8 +271,8 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 				DocDefCollection clonedDocDefCollection = this.getInstance()
 						.retrieveDocDefCollectionByName(
 								docDefCollection.getName());
-				clonedParam = clonedParam.concat(":"
-						+ clonedDocDefCollection.getId().toString());
+				clonedParam = clonedParam.concat(clonedDocDefCollection.getId()
+						.toString());
 			}
 			clonedParam = clonedParam.concat("|");
 			Object fieldDef = ruleParametersResolver.resolveFieldDef(field);

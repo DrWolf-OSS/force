@@ -1,5 +1,6 @@
 package it.drwolf.slot.ruleverifier;
 
+import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.application.CustomModelController;
 
 import java.util.List;
@@ -35,7 +36,8 @@ public class RuleParametersResolver {
 		int splitIndex = field.indexOf(":");
 		String clazz = field.substring(0, splitIndex);
 
-		if (clazz.equals("Property")) {
+		// if (clazz.equals("Property")) {
+		if (clazz.equals(Property.class.getName())) {
 			CustomModelController customModelController = (CustomModelController) org.jboss.seam.Component
 					.getInstance("customModelController");
 			String name = field.substring(splitIndex + 1);

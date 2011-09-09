@@ -2,6 +2,7 @@ package it.drwolf.slot.entitymanager;
 
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.enums.SlotDefType;
+import it.drwolf.slot.pagebeans.SlotDefParameters;
 
 import java.util.List;
 
@@ -20,8 +21,11 @@ public class SlotDefListManager {
 	@In(create = true)
 	private EntityManager entityManager;
 
-	private boolean model = Boolean.FALSE;
-	private String mode = SlotDefType.GENERAL.value();
+	// private boolean model = Boolean.FALSE;
+	// private String mode = SlotDefType.GENERAL.name();
+
+	@In(create = true)
+	private SlotDefParameters slotDefParameters;
 
 	@Factory("allPrimaryTemplates")
 	public List<SlotDef> retrieveAllPrimaryTemplates() {
@@ -37,7 +41,7 @@ public class SlotDefListManager {
 	private List<SlotDef> retrieve(Boolean areTemplates, SlotDefType slotDefType) {
 		int count = 0;
 		String templates = "";
-		if (slotDefType != null) {
+		if (areTemplates != null) {
 			templates = "s.template=:areTemplates";
 			count++;
 		}
@@ -60,37 +64,50 @@ public class SlotDefListManager {
 		String query = "from SlotDef s " + where + " " + templates + " " + and
 				+ " " + type;
 
-		List<SlotDef> resultList = entityManager.createQuery(query)
-				.setParameter("areTemplates", areTemplates)
-				.setParameter("slotDefType", slotDefType).getResultList();
+		List<SlotDef> resultList = null;
+
+		if (areTemplates != null && slotDefType != null) {
+			resultList = entityManager.createQuery(query)
+					.setParameter("areTemplates", areTemplates)
+					.setParameter("slotDefType", slotDefType).getResultList();
+		} else if (areTemplates != null && slotDefType == null) {
+			resultList = entityManager.createQuery(query)
+					.setParameter("areTemplates", areTemplates).getResultList();
+		} else if (areTemplates == null && slotDefType != null) {
+			resultList = entityManager.createQuery(query)
+					.setParameter("slotDefType", slotDefType).getResultList();
+		} else if (areTemplates == null && slotDefType == null) {
+			resultList = entityManager.createQuery(query).getResultList();
+		}
 		return resultList;
 	}
 
 	@Factory("slotDefsByParams")
 	public List<SlotDef> retrieveByParams() {
-		if (mode == null || mode.equals(""))
-			return retrieve(model, null);
-		else if (mode.equals(SlotDefType.PRIMARY.value()))
-			return retrieve(model, SlotDefType.PRIMARY);
-		else if (mode.equals(SlotDefType.GENERAL.value()))
-			return retrieve(model, SlotDefType.GENERAL);
+		if (slotDefParameters.getMode() == null
+				|| slotDefParameters.getMode().equals(""))
+			return retrieve(slotDefParameters.isModel(), null);
+		else if (slotDefParameters.getMode().equals(SlotDefType.PRIMARY.name()))
+			return retrieve(slotDefParameters.isModel(), SlotDefType.PRIMARY);
+		else if (slotDefParameters.getMode().equals(SlotDefType.GENERAL.name()))
+			return retrieve(slotDefParameters.isModel(), SlotDefType.GENERAL);
 		return null;
 	}
 
-	public boolean isModel() {
-		return model;
-	}
-
-	public void setModel(boolean model) {
-		this.model = model;
-	}
-
-	public String getMode() {
-		return mode;
-	}
-
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
+	// public boolean isModel() {
+	// return model;
+	// }
+	//
+	// public void setModel(boolean model) {
+	// this.model = model;
+	// }
+	//
+	// public String getMode() {
+	// return mode;
+	// }
+	//
+	// public void setMode(String mode) {
+	// this.mode = mode;
+	// }
 
 }

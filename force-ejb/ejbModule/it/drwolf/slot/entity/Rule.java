@@ -4,7 +4,9 @@ import it.drwolf.slot.entity.listeners.RuleListener;
 import it.drwolf.slot.enums.RuleType;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
@@ -19,6 +21,7 @@ import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
@@ -101,6 +104,7 @@ public class Rule {
 
 	@MapKey(name = "parameterName")
 	@OneToMany(mappedBy = "rule", cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	public Map<String, RuleParameterInst> getEmbeddedParametersMap() {
 		return embeddedParametersMap;
 	}
@@ -124,6 +128,12 @@ public class Rule {
 
 	public void setWarningMessage(String warningMessage) {
 		this.warningMessage = warningMessage;
+	}
+
+	@Transient
+	public List<RuleParameterInst> getEmbeddedParametersAsList() {
+		return new ArrayList<RuleParameterInst>(this.getEmbeddedParametersMap()
+				.values());
 	}
 
 }
