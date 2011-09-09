@@ -10,5 +10,8 @@
    <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
    <param name="model" value="#{slotDefParameters.model}"/>
    <param name="mode" value="#{slotDefParameters.mode}"/>
+   <param name="from" value="#{slotDefParameters.from}"/>
+   
+   <param name="garaId" value="#{garaHome.garaId}"/> 
 
 </page>

@@ -79,10 +79,21 @@
              <s:button view="/admin/SlotDefTemplateList.xhtml"
                     id="create"
                     propagation="none"
-                    value="Seleziona modello">
+                    value="Associa Busta" rendered="#{garaHome.instance.slotDef==null}">
                    	<f:param name="model" value="#{true}"/>
             		<f:param name="mode" value="GENERAL"/>
             		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
+            		<f:param name="garaId" value="#{garaHome.garaId}"/>
+             </s:button>
+               
+             <s:button view="/admin/SlotDefWizardEdit.xhtml"
+                    id="slotEdit"
+                    propagation="none"
+                    value="Modifica Busta" rendered="#{garaHome.instance.slotDef!=null}">
+                   	<f:param name="model" value="#{false}"/>
+            		<f:param name="mode" value="GENERAL"/>
+            		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
+            		<f:param name="slotDefId" value="#{garaHome.instance.slotDef.id}"/>
             		<f:param name="garaId" value="#{garaHome.garaId}"/>
                </s:button>
 

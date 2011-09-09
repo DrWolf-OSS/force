@@ -13,6 +13,13 @@
 <ui:define name="body">
 
     <h:form id="slotDef" styleClass="edit">
+    
+    	<rich:simpleTogglePanel switchType="client" rendered="#{garaHome.garaId != null}">
+    		<f:facet name="header">Gara selezionata</f:facet>
+    	</rich:simpleTogglePanel>
+    	
+    	<rich:separator height="15px" lineType="none" rendered="#{garaHome.garaId != null}"/>
+    	<div style="clear:both"/>
 
         <rich:panel>
             <f:facet name="header">Visualizzazione #{slotDefParameters.model ? 'modello di' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Busta di Riferimento' : 'Busta Amministrativa'}, identificativo:#{slotDefHome.slotDefId}</f:facet>
@@ -168,6 +175,7 @@
 					<f:param name="mode" value="#{slotDefParameters.mode}"/>
 		          	<f:param name="model" value="#{slotDefParameters.model}"/>
 		          	<f:param name="wizard" value="#{true}"/>
+		          	<f:param name="garaId" value="#{garaHome.garaId}"/>
 				</s:button>
 			</s:decorate>
 			
