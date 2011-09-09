@@ -1,7 +1,5 @@
 package it.drwolf.slot.pagebeans;
 
-import it.drwolf.force.entity.Gara;
-import it.drwolf.force.session.homes.GaraHome;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInstCollection;
 import it.drwolf.slot.entity.EmbeddedProperty;
@@ -37,7 +35,6 @@ import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage.Severity;
 
@@ -57,11 +54,6 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotInstHome slotInstHome;
 
-	// private boolean model = Boolean.FALSE;
-	// private String mode = SlotDefType.GENERAL.value();
-	private String from = "";
-	// private boolean wizard = Boolean.FALSE;
-
 	private boolean conditional = Boolean.FALSE;
 	private boolean edit = Boolean.FALSE;
 
@@ -76,27 +68,10 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotDefParameters slotDefParameters;
 
-	// BRUTTO ma sennò non so come fare
-	@In(create = true)
-	private GaraHome garaHome;
-
-	//
-
 	@Create
 	public void init() {
-		// checkReference();
-		// slotDefHome.getInstance().setTemplate(model);
-		// slotDefHome.getInstance().setType(SlotDefType.fromValue(mode));
 		setKnownParameters();
 	}
-
-	// private void persist() {
-	// if (slotDefHome.getInstance().getId() == null) {
-	// this.save();
-	// } else {
-	// this.update();
-	// }
-	// }
 
 	public void newProperty() {
 		this.propertyDef = new PropertyDef();
@@ -116,9 +91,6 @@ public class SlotDefEditBean {
 			converterPropertyMap.put(propertyDef.getUuid(), propertyDef);
 		}
 		this.edit = false;
-
-		//
-		// this.persist();
 	}
 
 	public void addConditionalProperty() {
@@ -144,9 +116,6 @@ public class SlotDefEditBean {
 	public void addConditionedCollection() {
 		this.addCollection();
 		this.conditional = false;
-
-		//
-		// this.persist();
 	}
 
 	public void newEmbeddedProperty() {
@@ -159,9 +128,6 @@ public class SlotDefEditBean {
 			slotDefHome.getInstance().getEmbeddedProperties()
 					.add(this.embeddedProperty);
 		}
-
-		//
-		// this.persist();
 	}
 
 	@Factory("dataTypes")
@@ -340,8 +306,6 @@ public class SlotDefEditBean {
 
 	public void removeEmbeddedProp(EmbeddedProperty embeddedProp) {
 		slotDefHome.getInstance().getEmbeddedProperties().remove(embeddedProp);
-		//
-		// this.persist();
 	}
 
 	public void editEmbeddedProp(EmbeddedProperty embeddedProp) {
@@ -357,9 +321,6 @@ public class SlotDefEditBean {
 			collection.setConditionalPropertyDef(null);
 		}
 		slotDefHome.getInstance().getPropertyDefs().remove(prop);
-
-		//
-		// this.persist();
 	}
 
 	public void editProp(PropertyDef prop) {
@@ -376,8 +337,6 @@ public class SlotDefEditBean {
 	public void removeColl(DocDefCollection coll) {
 		slotDefHome.getInstance().getDocDefCollections().remove(coll);
 		coll.setSlotDef(null);
-		//
-		// this.persist();
 	}
 
 	public void editColl(DocDefCollection coll) {
@@ -481,32 +440,13 @@ public class SlotDefEditBean {
 		this.conditional = conditional;
 	}
 
-	// public boolean isModel() {
-	// return model;
-	// }
-	//
-	// public void setModel(boolean model) {
-	// this.model = model;
-	// }
-	//
-	// public String getMode() {
-	// return mode;
-	// }
-	//
-	// public void setMode(String mode) {
-	// this.mode = mode;
-	// }
-
-	// Viene eseguito dopo aver settato i parametri, in init() venivano eseguite
-	// prima che fossero settati i parametri
 	private void setKnownParameters() {
-		//
 		if (slotDefHome.getInstance().getId() == null) {
-			//
 			slotDefHome.getInstance().setTemplate(slotDefParameters.isModel());
-			if (slotDefParameters.getMode().equals(SlotDefType.PRIMARY.name())
-					|| slotDefParameters.getMode().equals(
-							SlotDefType.GENERAL.name())) {
+			if ((slotDefParameters.getMode() != null && slotDefParameters
+					.getMode().equals(SlotDefType.PRIMARY.name()))
+					|| (slotDefParameters.getMode() != null && slotDefParameters
+							.getMode().equals(SlotDefType.GENERAL.name()))) {
 				slotDefHome.getInstance().setType(
 						SlotDefType.valueOf(slotDefParameters.getMode()));
 			}
@@ -519,22 +459,6 @@ public class SlotDefEditBean {
 		this.conditional = false;
 		this.edit = false;
 	}
-
-	public String getFrom() {
-		return from;
-	}
-
-	public void setFrom(String from) {
-		this.from = from;
-	}
-
-	// public boolean isWizard() {
-	// return wizard;
-	// }
-	//
-	// public void setWizard(boolean wizard) {
-	// this.wizard = wizard;
-	// }
 
 	public boolean isEdit() {
 		return edit;
@@ -575,20 +499,4 @@ public class SlotDefEditBean {
 		return rule.getEmbeddedParametersMap().get(paramName);
 	}
 
-	@Transactional
-	public String persistAssosiation() {
-		Gara gara = garaHome.getInstance();
-		if (gara != null) {
-			String slotResult = this.save();
-			if (slotResult.equals("persisted")) {
-				SlotDef slotDef = slotDefHome.getInstance();
-				gara.setSlotDef(slotDef);
-				String garaResult = garaHome.update();
-				if (garaResult.equals("updated")) {
-					return "associated";
-				}
-			}
-		}
-		return "failed";
-	}
 }

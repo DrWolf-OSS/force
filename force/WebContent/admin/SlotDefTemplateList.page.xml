@@ -18,7 +18,7 @@
    
    <navigation from-action="#{slotDefHome.slotDefClone(_slotDef)}">
          <redirect view-id="/admin/SlotDefWizardEdit.xhtml">
-            <param name="model" value="#{true}"/>
+            <param name="model" value="#{slotDefParameters.from.equals('/admin/GaraEdit.xhtml') ? false : slotDefParameters.model}"/>
             <param name="wizard" value="#{true}"/>
             <param name="mode" value="#{slotDefParameters.mode}"/>
             <param name="from" value="/admin/SlotDefTemplateList.xhtml"/>

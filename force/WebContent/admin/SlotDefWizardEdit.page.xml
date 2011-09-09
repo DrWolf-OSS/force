@@ -68,7 +68,7 @@
       </rule>
    </navigation>
    
-   <navigation from-action="#{slotDefEditBean.persistAssosiation()}">
+   <navigation from-action="#{garaHome.persistAssosiation()}">
 	  <rule if-outcome="associated">
          <end-conversation before-redirect="true"/>
          <redirect view-id="/admin/GaraEdit.xhtml">

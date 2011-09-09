@@ -18,13 +18,13 @@
             <f:facet name="header">#{slotDefHome.managed ? 'Modifica' : 'Creazione'} #{slotDefParameters.model ? 'modello di' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Busta di Riferimento' : 'Busta Amministrativa'}</f:facet>
 
             <s:decorate id="templateField" template="/layout/edit.xhtml" rendered="#{not slotDefParameters.model}">
-                <ui:define name="label">Modello</ui:define>
+                <ui:define name="label">Utilizza come modello</ui:define>
                	<h:selectBooleanCheckbox value="#{slotDefHome.instance.template}" />
             </s:decorate>
 
             <s:decorate id="nameField" template="/layout/edit.xhtml">
                 <ui:define name="label">Nome</ui:define>
-                <h:inputText id="name" value="#{slotDefHome.instance.name}" required="true"/>
+                <h:inputText id="name" value="#{slotDefHome.instance.name}" required="true" style="width:255px"/>
             </s:decorate>
             
             <s:decorate id="typeField" template="/layout/edit.xhtml" rendered="#{slotDefParameters.mode == 'Normal'}">
@@ -211,7 +211,7 @@
         
         	<h:commandButton id="assign"
                           value="Associa alla gara"
-                         action="#{slotDefEditBean.persistAssosiation()}"
+                         action="#{garaHome.persistAssosiation()}"
                        disabled="#{!slotDefHome.wired}"
                        rendered="#{garaHome.garaId != null}"/>
 
