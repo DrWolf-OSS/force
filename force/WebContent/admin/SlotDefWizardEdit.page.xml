@@ -22,7 +22,7 @@
    <navigation from-action="#{slotDefHome.remove}">
       <rule if-outcome="removed">
          <end-conversation/>
-         <redirect view-id="#{empty from ? 'SlotDefTemplateList.xhtml' : from}">
+         <redirect view-id="/admin/#{empty from ? 'SlotDefTemplateList.xhtml' : from}">
          	<param name="model" value="#{slotDefParameters.model}"/>
     		<param name="mode" value="#{slotDefParameters.mode}"/>
     		<param name="wizard" value="#{slotDefParameters.wizard}"/>
@@ -64,6 +64,25 @@
          	<param name="model" value="#{slotDefParameters.model}"/>
     		<param name="mode" value="#{slotDefParameters.mode}"/>
     		<param name="wizard" value="#{slotDefParameters.wizard}"/>
+         </redirect>
+      </rule>
+   </navigation>
+   
+   <navigation from-action="#{slotDefEditBean.persistAssosiation()}">
+	  <rule if-outcome="associated">
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/admin/GaraEdit.xhtml">
+         	<param name="garaId" value="#{garaHome.garaId}"/>
+         </redirect>
+	  </rule>
+      <rule if-outcome="failed">
+         <redirect>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="model" value="#{slotDefParameters.model}"/>
+    		<param name="mode" value="#{slotDefParameters.mode}"/>
+    		<param name="wizard" value="#{slotDefParameters.wizard}"/>
+    		<param name="garaId" value="#{garaHome.garaId}"/>
+    		<param name="from" value="#{slotDefParameters.from}"/>
          </redirect>
       </rule>
    </navigation>

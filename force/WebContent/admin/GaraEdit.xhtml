@@ -76,11 +76,14 @@
                          action="#{garaHome.update}"
                        rendered="#{garaHome.instance.active}"/>
             
-             <s:button view="/SlotDefEdit.xhtml"
+             <s:button view="/admin/SlotDefTemplateList.xhtml"
                     id="create"
                     propagation="none"
-                    value="Crea Repository Gara">
-                    <f:param name="slotDefId"/>
+                    value="Seleziona modello">
+                   	<f:param name="model" value="#{true}"/>
+            		<f:param name="mode" value="GENERAL"/>
+            		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
+            		<f:param name="garaId" value="#{garaHome.garaId}"/>
                </s:button>
 
 

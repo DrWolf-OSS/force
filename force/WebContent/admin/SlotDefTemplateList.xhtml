@@ -40,20 +40,12 @@
             </s:link>
         </h:column>
         <rich:column styleClass="action">
-            <f:facet name="header">Azioni</f:facet>        
-            <s:link view="/admin/SlotDefWizardEdit.xhtml"
-                   value="Modifica"
-             propagation="none"
-                      id="slotDefEdit"
-                action="#{slotDefEditBean.checkReference()}">
-                <f:param name="slotDefId" value="#{_slotDef.id}"/>
-                <f:param name="model" value="#{true}"/>
-                <f:param name="wizard" value="#{true}"/>
-            	<f:param name="mode" value="#{slotDefParameters.mode}"/>
-            	<f:param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
-            </s:link>
-            #{' '}
+            <f:facet name="header">Azioni</f:facet>
             <h:commandLink action="#{slotDefHome.slotDefClone(_slotDef)}" value="Clona" rendered="#{slotDefParameters.model}"/>
+            <s:fragment rendered="#{slotDefParameters.from != null}">
+        	#{' '}
+        	<h:commandLink value="Usa" action="#{slotDefHome.slotDefClone(_slotDef)}" />
+        	</s:fragment>
         </rich:column>
     </rich:dataTable>
     <rich:datascroller for="slotDefList"></rich:datascroller>

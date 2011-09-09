@@ -8,11 +8,13 @@
    <param name="dir" value="#{slotDefList.orderDirection}"/>
    <param name="logic" value="#{slotDefList.restrictionLogicOperator}"/>
 
-   <param name="from"/>
    <param name="name" value="#{slotDefList.slotDef.name}"/>
    
+   <param name="from" value="#{slotDefParameters.from}"/>
    <param name="model" value="#{slotDefParameters.model}"/>
    <param name="mode" value="#{slotDefParameters.mode}"/> 
+   
+   <param name="garaId" value="#{garaHome.garaId}"/>
    
    <navigation from-action="#{slotDefHome.slotDefClone(_slotDef)}">
          <redirect view-id="/admin/SlotDefWizardEdit.xhtml">
@@ -20,6 +22,16 @@
             <param name="wizard" value="#{true}"/>
             <param name="mode" value="#{slotDefParameters.mode}"/>
             <param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
+            <param name="garaId" value="#{garaHome.garaId}"/>
+         </redirect>
+   </navigation>
+   
+   <navigation from-action="#{garaHome.assignClonedSlotDef(_slotDef)}">
+         <redirect view-id="/admin/SlotDefWizardEdit.xhtml">
+            <param name="model" value="#{false}"/>
+            <param name="wizard" value="#{true}"/>
+            <param name="mode" value="#{slotDefParameters.mode}"/>
+            <param name="from" value="#{slotDefParameters.from}"/>
          </redirect>
    </navigation>
 

@@ -1,5 +1,7 @@
 package it.drwolf.slot.pagebeans;
 
+import it.drwolf.force.entity.Gara;
+import it.drwolf.force.session.homes.GaraHome;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInstCollection;
 import it.drwolf.slot.entity.EmbeddedProperty;
@@ -35,6 +37,7 @@ import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage.Severity;
 
@@ -72,6 +75,12 @@ public class SlotDefEditBean {
 
 	@In(create = true)
 	private SlotDefParameters slotDefParameters;
+
+	// BRUTTO ma sennò non so come fare
+	@In(create = true)
+	private GaraHome garaHome;
+
+	//
 
 	@Create
 	public void init() {
@@ -564,5 +573,22 @@ public class SlotDefEditBean {
 		ruleHome.find();
 		Rule rule = ruleHome.getInstance();
 		return rule.getEmbeddedParametersMap().get(paramName);
+	}
+
+	@Transactional
+	public String persistAssosiation() {
+		Gara gara = garaHome.getInstance();
+		if (gara != null) {
+			String slotResult = this.save();
+			if (slotResult.equals("persisted")) {
+				SlotDef slotDef = slotDefHome.getInstance();
+				gara.setSlotDef(slotDef);
+				String garaResult = garaHome.update();
+				if (garaResult.equals("updated")) {
+					return "associated";
+				}
+			}
+		}
+		return "failed";
 	}
 }

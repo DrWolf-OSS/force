@@ -208,6 +208,12 @@
         </rich:panel>
 
         <div class="actionButtons">
+        
+        	<h:commandButton id="assign"
+                          value="Associa alla gara"
+                         action="#{slotDefEditBean.persistAssosiation()}"
+                       disabled="#{!slotDefHome.wired}"
+                       rendered="#{garaHome.garaId != null}"/>
 
             <h:commandButton id="save"
                           value="Salva"

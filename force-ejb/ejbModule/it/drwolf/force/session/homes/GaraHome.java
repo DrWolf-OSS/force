@@ -2,6 +2,8 @@ package it.drwolf.force.session.homes;
 
 import it.drwolf.force.entity.Gara;
 import it.drwolf.force.enums.TipoGara;
+import it.drwolf.slot.entity.SlotDef;
+import it.drwolf.slot.session.SlotDefHome;
 
 import javax.persistence.EntityManager;
 
@@ -19,6 +21,12 @@ public class GaraHome extends EntityHome<Gara> {
 
 	@In
 	EntityManager entityManager;
+
+	@In(create = true)
+	private SlotDefHome slotDefHome;
+
+	// @In(create = true)
+	// private SlotDefEditBean slotDefEditBean;
 
 	public String attivaGara() {
 		this.getInstance().setType(TipoGara.GESTITA.getNome());
@@ -61,5 +69,12 @@ public class GaraHome extends EntityHome<Gara> {
 
 	public void wire() {
 		this.getInstance();
+	}
+
+	public void assignClonedSlotDef(SlotDef slotDefToClone) {
+		slotDefHome.slotDefClone(slotDefToClone);
+		SlotDef clonedSlotDef = slotDefHome.getInstance();
+		clonedSlotDef.setTemplate(false);
+		this.getInstance().setSlotDef(clonedSlotDef);
 	}
 }
