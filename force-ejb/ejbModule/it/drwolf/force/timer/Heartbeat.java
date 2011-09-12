@@ -95,6 +95,15 @@ public class Heartbeat {
 						// nella pagina del dettaglio
 						StartFeedParser startFeed = new StartFeedParser();
 						startFeed.parse(post.getLink());
+						Date dataInizio = startFeed.getDataInizio();
+						if (dataInizio != null) {
+							gara.setDataPubblicazione(dataInizio);
+						}
+						Date dataFine = startFeed.getDataFine();
+						if (dataInizio != null) {
+							gara.setDataScadenza(dataFine);
+						}
+
 						List<String> categorie = startFeed.getCategorie();
 						if (categorie.size() > 0) {
 							System.out.println("trovate le categorie : "
