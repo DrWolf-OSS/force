@@ -14,6 +14,11 @@
          </redirect>
          
       </rule>
+       <rule if="#{identity.hasRole('ADMIN')}">
+         <redirect view-id="/admin/ControlPanel.xhtml">
+         </redirect>
+         
+      </rule>
    </navigation>
 
 </page>
