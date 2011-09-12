@@ -35,7 +35,10 @@
             
  		<a:region>
             <s:decorate id="typeField" template="/layout/edit.xhtml">
-                <ui:define name="label">Tipo di regola</ui:define>
+                <rich:toolTip attached="true" for="typeFieldLabel" style="width: 400px" rendered="#{ruleHome.ruleId!=null}">
+                Una volta salvata la regola non è possibile modificarne il tipo. Se è necessario cambiare il tipo cancellare la regola e crearne una del tipo giusto.	
+                </rich:toolTip>
+                <ui:define name="label"><h:outputText id="typeFieldLabel" value="Tipo di regola"/></ui:define>
                 <h:selectOneMenu id="ruleType" value="#{ruleHome.instance.type}" disabled="#{ruleHome.ruleId!=null}">
                     	<s:selectItems value="#{ruleTypes}" 
 						var="type" label="#{type.value()}" noSelectionLabel="-- select rule type --"/>
@@ -50,7 +53,7 @@
             <ui:repeat var="p" value="#{ruleEditBean.normalParameters}">
 	            <s:decorate id="params" template="/layout/edit.xhtml">
 	                <ui:define name="label">#{p.label}</ui:define>
-		                <h:selectOneMenu value="#{ruleEditBean.targetPropertiesSourceMap[p.name]}" required="#{p.required}">
+		                <h:selectOneMenu value="#{ruleEditBean.targetPropertiesSourceMap[p.name]}">
 			            	<s:selectItems value="#{ruleEditBean.propertiesSources}"
 			            					var="sourceContainer" label="#{sourceContainer.label}" itemValue="#{sourceContainer}" 
 			            					disabled="#{not sourceContainer.hasPropertiesOfType(p.dataType)}" noSelectionLabel="-- select a collection or a slot --"/>
@@ -58,7 +61,7 @@
 			            <a:support event="onchange" reRender="inParams"/>
 			            </h:selectOneMenu>
 			            &#160;
-			            <h:selectOneMenu value="#{ruleEditBean.targetPropertyMap[p.name]}" rendered="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties != null}" required="#{p.required}">
+			            <h:selectOneMenu value="#{ruleEditBean.targetPropertyMap[p.name]}" rendered="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties != null}">
 			            	<s:selectItems value="#{ruleEditBean.targetPropertiesSourceMap[p.name].properties}" noSelectionLabel="-- select a field --"
 			            					var="prop" label="#{prop.label}" itemValue="#{prop}" disabled="#{prop.type != p.dataType}" />
 			            	<f:converter converterId="propertyContainerConverter"/>

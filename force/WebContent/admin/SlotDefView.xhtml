@@ -16,6 +16,25 @@
     
     	<rich:simpleTogglePanel switchType="client" rendered="#{garaHome.garaId != null}">
     		<f:facet name="header">Gara selezionata</f:facet>
+    		
+    		<s:decorate id="oggettoField" template="/layout/display.xhtml">
+                <ui:define name="label">Oggetto</ui:define>
+                <h:outputText value="#{garaHome.instance.oggetto}" />
+            </s:decorate>
+
+            <s:decorate id="tecreqField" template="/layout/display.xhtml">
+                <ui:define name="label">Requisito Tecnico</ui:define>
+                <h:outputText id="tecreq"
+                               cols="80"
+                               value="#{garaHome.instance.requisitoTecnico}"/>
+            </s:decorate>
+
+            <s:decorate id="ecoreqField" template="/layout/display.xhtml">
+                <ui:define name="label">Requisito Economico</ui:define>
+                <h:outputText id="ecoreq"
+                               cols="80"
+                               value="#{garaHome.instance.requisitoEconomico}"/>
+            </s:decorate>
     	</rich:simpleTogglePanel>
     	
     	<rich:separator height="15px" lineType="none" rendered="#{garaHome.garaId != null}"/>
@@ -194,6 +213,7 @@
 	                <h:outputText value="Regole" />
 				</ui:define>
 				<h:outputText value="Nessuna regola definita" rendered="#{empty slotDefHome.instance.rulesAsList}"/>
+				<s:div style="width:1024px">
 				<rich:tabPanel switchType="client" rendered="#{not empty slotDefHome.instance.rulesAsList}">
 				<c:forEach items="#{slotDefHome.instance.rulesAsList}" var="rule">					
 					<rich:tab>
@@ -201,7 +221,7 @@
 						
 						<s:decorate template="/layout/display.xhtml">
 							<ui:define name="label">
-	                			<h:outputText value="Verificatore" />
+	                			<h:outputText value="Tipo di regola" />
 							</ui:define>
 							<h:outputText value="#{rule.type.value()}" />
 						</s:decorate>
@@ -217,6 +237,8 @@
 							<ui:define name="label">
 	                			<h:outputText value="Parametri" />
 							</ui:define>
+							
+							<s:div style="width:850px">
 							<rich:dataTable value="#{rule.verifier.inParams}" var="p">
 								<rich:column>
 									<f:facet name="header">Nome del parametro</f:facet>
@@ -256,6 +278,7 @@
 									</s:fragment>
 								</rich:column>
 							</rich:dataTable>
+							</s:div>
 						</s:decorate>
 						
 						<s:decorate template="/layout/display.xhtml">
@@ -274,7 +297,8 @@
 						
 					</rich:tab>
 					</c:forEach>
-				</rich:tabPanel>			
+				</rich:tabPanel>
+				</s:div>		
 			</s:decorate>
 			
 

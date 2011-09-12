@@ -38,20 +38,24 @@
    <navigation from-action="#{ruleHome.remove}">
       <rule if-outcome="removed">
          <end-conversation/>
-         <redirect view-id="/RuleList.xhtml"/>
+         <redirect view-id="/admin/SlotDefView.xhtml">
+			<param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+			<param name="mode" value="#{slotDefParameters.mode}"/>
+			<param name="model" value="#{slotDefParameters.model}"/>
+			<param name="wizard" value="#{slotDefParameters.wizard}"/>
+         </redirect>
       </rule>
    </navigation>
    
    
    <navigation from-action="#{ruleEditBean.save()}">
       <rule if-outcome="persisted">
-         <end-conversation before-redirect="true"/>
+         <end-conversation />
          <redirect view-id="/admin/SlotDefView.xhtml">
 			<param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
 			<param name="mode" value="#{slotDefParameters.mode}"/>
 			<param name="model" value="#{slotDefParameters.model}"/>
 			<param name="wizard" value="#{slotDefParameters.wizard}"/>
-			<param name="garaId"/>
          </redirect>
       </rule>
    </navigation>
@@ -59,12 +63,11 @@
    <navigation from-action="#{ruleEditBean.update()}">
       <rule if-outcome="persisted">
          <end-conversation before-redirect="true"/>
-         <redirect view-id="/admin/SlotDefWizardEdit.xhtml" >
+         <redirect view-id="/admin/SlotDefView.xhtml" >
 			<param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
 			<param name="mode" value="#{slotDefParameters.mode}"/>
 			<param name="model" value="#{slotDefParameters.model}"/>
 			<param name="wizard" value="#{slotDefParameters.wizard}"/>
-			<param name="garaId"/>
          </redirect>
       </rule>
       <rule if-outcome="failed">
@@ -75,7 +78,6 @@
 			<param name="mode" value="#{slotDefParameters.mode}"/>
 			<param name="model" value="#{slotDefParameters.model}"/>
 			<param name="wizard" value="#{slotDefParameters.wizard}"/>
-			<param name="garaId"/>
          </redirect>
       </rule>
    </navigation>

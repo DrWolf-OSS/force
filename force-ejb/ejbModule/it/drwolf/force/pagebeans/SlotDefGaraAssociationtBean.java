@@ -29,7 +29,7 @@ public class SlotDefGaraAssociationtBean {
 		if (garaHome.getGaraId() != null && slotDefHome.getSlotDefId() == null
 				&& slotDefHome.getInstance() != null) {
 			slotDefHome.getInstance().setName(
-					garaHome.getInstance().getOggetto());
+					garaHome.getInstance().getOggetto().trim());
 		}
 	}
 

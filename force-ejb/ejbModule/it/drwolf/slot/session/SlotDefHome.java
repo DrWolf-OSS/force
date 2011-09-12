@@ -209,18 +209,16 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 
 	@Override
 	public String persist() {
-		// if (!checkEmbeddedPropertyValues()) {
-		// return "failed";
-		// }
 		String result = super.persist();
 		if (result.equals("persisted") && this.model != null) {
 			for (Rule rule : this.model.getRules()) {
 				Rule clonedRule = cloneRule(rule);
-				this.getInstance().getRules().add(clonedRule);
-				ruleHome.setInstance(clonedRule);
-				ruleHome.persist();
+				if (clonedRule != null) {
+					this.getInstance().getRules().add(clonedRule);
+					ruleHome.setInstance(clonedRule);
+					ruleHome.persist();
+				}
 			}
-			// this.update();
 		}
 		return result;
 	}
@@ -253,6 +251,9 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		Map<String, String> parametersMap = rule.getParametersMap();
 		Set<String> keySet = parametersMap.keySet();
 
+		Set<String> deletedCollection = new HashSet<String>();
+		boolean missingParams = false;
+
 		for (String key : keySet) {
 			String encodedParams = parametersMap.get(key);
 			String[] splitted = encodedParams.split("\\|");
@@ -271,28 +272,55 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 				DocDefCollection clonedDocDefCollection = this.getInstance()
 						.retrieveDocDefCollectionByName(
 								docDefCollection.getName());
-				clonedParam = clonedParam.concat(clonedDocDefCollection.getId()
-						.toString());
+				//
+				if (clonedDocDefCollection != null) {
+					clonedParam = clonedParam.concat(clonedDocDefCollection
+							.getId().toString());
+				} else {
+					deletedCollection.add(docDefCollection.getName());
+					missingParams = true;
+				}
+				//
 			}
 			clonedParam = clonedParam.concat("|");
 			Object fieldDef = ruleParametersResolver.resolveFieldDef(field);
 			if (fieldDef instanceof Property) {
-				clonedParam = clonedParam.concat(Property.class.getName() + ":"
-						+ ((Property) fieldDef).getName());
+				DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
+
+				if (!deletedCollection.contains(docDefCollection.getName())) {
+					clonedParam = clonedParam.concat(Property.class.getName()
+							+ ":" + ((Property) fieldDef).getName());
+				} else {
+					missingParams = true;
+				}
 			} else if (fieldDef instanceof PropertyDef) {
 				PropertyDef clonedPropertyDef = this.getInstance()
 						.retrievePropertyDefByName(
 								((PropertyDef) fieldDef).getName());
-				clonedParam = clonedParam.concat(PropertyDef.class.getName()
-						+ ":" + clonedPropertyDef.getId().toString());
+				//
+				if (clonedPropertyDef != null) {
+					clonedParam = clonedParam.concat(PropertyDef.class
+							.getName()
+							+ ":"
+							+ clonedPropertyDef.getId().toString());
+				} else {
+					missingParams = true;
+				}
+				//
 			} else if (fieldDef instanceof EmbeddedProperty) {
 				EmbeddedProperty clonedEmbeddedProperty = this.getInstance()
 						.retrieveEmbeddedPropertyByName(
 								((EmbeddedProperty) fieldDef).getName());
-				clonedParam = clonedParam.concat(EmbeddedProperty.class
-						.getName())
-						+ ":"
-						+ clonedEmbeddedProperty.getId().toString();
+				//
+				if (clonedEmbeddedProperty != null) {
+					clonedParam = clonedParam.concat(EmbeddedProperty.class
+							.getName())
+							+ ":"
+							+ clonedEmbeddedProperty.getId().toString();
+				} else {
+					missingParams = true;
+				}
+				//
 			}
 
 			clonedRule.getParametersMap().put(key, clonedParam);
@@ -327,6 +355,18 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		clonedRule.setErrorMessage(rule.getErrorMessage());
 		clonedRule.setWarningMessage(rule.getWarningMessage());
 
-		return clonedRule;
+		if (!missingParams) {
+			return clonedRule;
+		} else {
+			// FacesMessages
+			// .instance()
+			// .add(Severity.WARN,
+			// "ATTENZIONE! Non è stato possibile clonare una regola perchè alcune fonti necessarie a valorizzare i parametri sono state eliminate o modificate in modo non adeguato ad essere utilizzate");
+			return null;
+		}
+	}
+
+	public SlotDef getModel() {
+		return model;
 	}
 }
