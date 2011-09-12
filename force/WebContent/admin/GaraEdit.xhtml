@@ -37,7 +37,15 @@
                                cols="80"
                                value="#{garaHome.instance.requisitoEconomico}"/>
             </s:decorate>
-
+            <s:decorate id="settoreField" template="/layout/edit.xhtml">
+                <ui:define name="label">Settore</ui:define>
+                <h:selectOneMenu value="#{garaHome.instance.settore}"
+                                 defaultLabel="seleziona">
+                    <s:selectItems noSelectionLabel="-- Seleziona"
+                                   value="#{settoreList.resultList}" var="r" label="#{r.nome}" />
+                                <s:convertEntity />
+                </h:selectOneMenu>
+            </s:decorate>
             <s:decorate id="catmerField" template="/layout/edit.xhtml">
                 <ui:define name="label">Categorie Merceologiche</ui:define>
 	                <rich:pickList value="#{garaHome.instance.categorieMerceologicheAsList}" sourceListWidth="150" targetListWidth="150" listsHeight="200"> 
