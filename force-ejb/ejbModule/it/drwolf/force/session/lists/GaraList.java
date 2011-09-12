@@ -26,6 +26,7 @@ public class GaraList extends EntityQuery<Gara> {
 
 	public GaraList() {
 		this.setEjbql(GaraList.EJBQL);
+		this.setOrder("dataScadenza");
 		this.setRestrictionExpressionStrings(Arrays
 				.asList(GaraList.RESTRICTIONS));
 	}

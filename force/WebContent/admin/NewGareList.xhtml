@@ -12,7 +12,7 @@
 
     <h:form id="gareNuove" >
     <rich:panel>
-        <f:facet name="header">Elenco delle nuove gare inserite nell'osservatorio'</f:facet>
+        <f:facet name="header">Elenco delle nuove gare inserite</f:facet>
     <div class="results" id="newGareList">
 
     <h:outputText value="La ricerca non ha prodotto nessun risultato."
@@ -21,6 +21,7 @@
     <rich:dataTable id="newGareList"
                 var="_gara"
               value="#{garaList.garaNuove}"
+               rows="10"
            rendered="#{not empty garaList.garaNuove}">
         <h:column>
             <f:facet name="header">
@@ -36,31 +37,39 @@
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">
                     <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Importo"/>
-                    <ui:param name="propertyPath" value="gara.importo"/>
+                    <ui:param name="propertyLabel" value="Provenienza"/>
+                    <ui:param name="propertyPath" value="gara.fonte.nome"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_gara.importo} €"/>
+            <h:outputText value="#{_gara.fonte.nome} (#{_gara.fonte.tipo})"/>
         </h:column>
         <h:column>
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">
                     <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Data Pubblicazione"/>
+                    <ui:param name="propertyLabel" value="Data Inizio"/>
                     <ui:param name="propertyPath" value="gara.dataPubblicazione"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_gara.dataPubblicazione}"/>
+            <h:outputText value="#{_gara.dataPubblicazione}">
+                <f:convertDateTime pattern="dd/MM/yyyy"/>
+            </h:outputText>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{garaList}"/>
+                    <ui:param name="propertyLabel" value="Data Fine"/>
+                    <ui:param name="propertyPath" value="gara.dataScadenza"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_gara.dataScadenza}">
+                <f:convertDateTime pattern="dd/MM/yyyy"/>
+            </h:outputText>
         </h:column>
         <rich:column styleClass="action">
-            <f:facet name="header">Action</f:facet>
-            <s:link view="/admin/#{empty from ? 'Gara' : from}.xhtml"
-                   value="#{empty from ? 'Vedi' : 'Select'}"
-             propagation="#{empty from ? 'none' : 'default'}"
-                      id="garaViewId">
-                <f:param name="garaId"
-                        value="#{_gara.id}"/>
-            </s:link>
+            <f:facet name="header">Azioni</f:facet>
+            <h:outputLink value="#{_gara.link}" target="_blank">Vedi</h:outputLink>
             #{' '}
             <s:link view="/admin/GaraEdit.xhtml"
                    value="Gestisci"
@@ -74,6 +83,7 @@
              
         </rich:column>
     </rich:dataTable>
+    <rich:datascroller for="newGareList" />    
 
     </div>
     </rich:panel>
