@@ -19,7 +19,7 @@
 
 
 
-            <s:decorate id="oggettoField" template="/layout/edit.xhtml">
+            <s:decorate id="oggettoField" template="/layout/display.xhtml">
                 <ui:define name="label">Oggetto</ui:define>
                 <h:outputText value="#{garaHome.instance.oggetto}" />
             </s:decorate>
@@ -87,13 +87,24 @@
              <s:button view="/admin/SlotDefTemplateList.xhtml"
                     id="create"
                     propagation="none"
-
-                    value="Seleziona modello">
+                    value="Associa Busta" rendered="#{garaHome.instance.slotDef==null}">
                    	<f:param name="model" value="#{true}"/>
             		<f:param name="mode" value="GENERAL"/>
             		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
             		<f:param name="garaId" value="#{garaHome.garaId}"/>
-              </s:button>
+             </s:button>
+               
+             <s:button view="/admin/SlotDefView.xhtml"
+                    id="slotEdit"
+                    propagation="none"
+                    value="Modifica Busta" rendered="#{garaHome.instance.slotDef!=null}">
+                   	<f:param name="model" value="#{false}"/>
+            		<f:param name="mode" value="GENERAL"/>
+            		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
+            		<f:param name="slotDefId" value="#{garaHome.instance.slotDef.id}"/>
+            		<f:param name="garaId" value="#{garaHome.garaId}"/>
+               </s:button>
+>>>>>>> branch 'master' of ssh://stefanoraffini@code2.drwolf.it/repositories/git-root/force
 
 
         </div>

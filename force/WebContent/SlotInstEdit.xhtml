@@ -145,7 +145,6 @@
 									<a:repeat
 										value="#{slotInstEditBean.primaryDocs[coll.docDefCollection.id]}"
 										var="item">
-										
 										<s:div styleClass="fileItem">
 										<rich:toolTip direction="top-left">
 									 		<img src="/force/tn?id=#{item.document.id}&amp;name=imgpreview"/>
@@ -177,8 +176,8 @@
 												reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}"
 												disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}"/>
 										</a:region>
+
 										</s:div>
-										
 									</a:repeat>
 
 								</rich:panel>

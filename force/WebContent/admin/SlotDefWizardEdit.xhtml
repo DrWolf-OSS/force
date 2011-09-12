@@ -211,15 +211,15 @@
         
         	<h:commandButton id="assign"
                           value="Associa alla gara"
-                         action="#{garaHome.persistAssosiation()}"
+                         action="#{slotDefGaraAssociationtBean.persistAssociation()}"
                        disabled="#{!slotDefHome.wired}"
-                       rendered="#{garaHome.garaId != null}"/>
+                       rendered="#{garaHome.garaId!=null and garaHome.instance.slotDef==null}"/>
 
             <h:commandButton id="save"
                           value="Salva"
                          action="#{slotDefEditBean.save()}"
                        disabled="#{!slotDefHome.wired}"
-                       rendered="#{!slotDefHome.managed}"/>
+                       rendered="#{!slotDefHome.managed and garaHome.garaId == null}"/>
 
             <h:commandButton id="update"
                           value="Aggiorna"
@@ -231,24 +231,6 @@
                          action="#{slotDefHome.remove}"
                       immediate="true"
                        rendered="#{slotDefHome.managed}"/>
-
-            <s:button id="cancelEdit"
-                   value="Annulla"
-             propagation="end"
-                    view="/#{empty from ? 'SlotDefList.xhtml' : from}"
-                rendered="#{slotDefHome.managed}">
-                <f:param name="mode" value="#{slotDefParameters.mode}"/>
-                <f:param name="model" value="#{slotDefParameters.model}"/>
-            </s:button>
-
-            <s:button id="cancelAdd"
-                   value="Annulla"
-             propagation="end"
-                    view="/#{empty from ? 'SlotDefList.xhtml' : from}"
-                rendered="#{!slotDefHome.managed}">
-                <f:param name="mode" value="#{slotDefParameters.mode}"/>
-                <f:param name="model" value="#{slotDefParameters.model}"/>
-            </s:button>
 
         </div>
 

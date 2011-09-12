@@ -14,6 +14,8 @@ import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.pagebeans.support.PropertiesSourceContainer;
+import it.drwolf.slot.pagebeans.support.PropertyContainer;
+import it.drwolf.slot.ruleverifier.VerifierParameterDef;
 import it.drwolf.slot.session.RuleHome;
 import it.drwolf.slot.session.SlotDefHome;
 import it.drwolf.slot.session.SlotInstHome;
@@ -498,5 +500,41 @@ public class SlotDefEditBean {
 		Rule rule = ruleHome.getInstance();
 		return rule.getEmbeddedParametersMap().get(paramName);
 	}
+
+	//
+	//
+	public List<Rule> retrieveReferencedRulesByPropertyName(String propertyName) {
+		SlotDef slotDef = slotDefHome.getInstance();
+		SlotDef slotDefModel = slotDefHome.getModel();
+		if (slotDefModel == null) {
+			Set<Rule> rules = slotDef.getRules();
+			for (Rule rule : rules) {
+				//
+			}
+		} else {
+			Set<Rule> rules = slotDefModel.getRules();
+		}
+		return null;
+	}
+
+	private boolean isReferencedProperty(String propertyName, Rule rule) {
+		ruleHome.setInstance(rule);
+		ruleEditBean.init();
+
+		List<VerifierParameterDef> inParams = rule.getVerifier().getInParams();
+		HashMap<String, PropertyContainer> targetPropertyMap = ruleEditBean
+				.getTargetPropertyMap();
+
+		Iterator<VerifierParameterDef> iterator = inParams.iterator();
+		while (iterator.hasNext()) {
+			VerifierParameterDef parameter = iterator.next();
+			PropertyContainer propertyContainer = targetPropertyMap
+					.get(parameter.getName());
+
+		}
+		return false;
+	}
+	//
+	//
 
 }
