@@ -525,11 +525,11 @@
 						<s:convertEntity/>
              		</h:selectOneMenu>
 	            </s:decorate>
-	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.conditional}" id="condPD">
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef!=null}" id="condPD">
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
 					</ui:define>
-					<h:selectOneMenu  value="#{slotDefEditBean.collection.conditionalPropertyDef}" converter="propertyDefConverter" disabled="#{slotDefEditBean.conditional}">
+					<h:selectOneMenu  value="#{slotDefEditBean.collection.conditionalPropertyDef}" converter="propertyDefConverter" disabled="#{slotDefEditBean.conditional and slotDefParameters.wizard}">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>

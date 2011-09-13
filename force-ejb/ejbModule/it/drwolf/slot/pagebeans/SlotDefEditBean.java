@@ -343,6 +343,11 @@ public class SlotDefEditBean {
 
 	public void editColl(DocDefCollection coll) {
 		this.collection = coll;
+		if (this.collection.getConditionalPropertyDef() != null) {
+			this.conditional = true;
+		} else {
+			this.conditional = false;
+		}
 	}
 
 	public DocDefCollection getCollection() {
