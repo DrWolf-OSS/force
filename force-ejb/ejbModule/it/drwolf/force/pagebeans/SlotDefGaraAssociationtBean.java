@@ -25,7 +25,7 @@ public class SlotDefGaraAssociationtBean {
 	@In(create = true)
 	private GaraHome garaHome;
 
-	public void initSlotDefValues() {
+	private void initSlotDefValues() {
 		if (garaHome.getGaraId() != null && slotDefHome.getSlotDefId() == null
 				&& slotDefHome.getInstance() != null) {
 			slotDefHome.getInstance().setName(
@@ -48,6 +48,11 @@ public class SlotDefGaraAssociationtBean {
 			}
 		}
 		return "failed";
+	}
+
+	public void useSlotDef(SlotDef slotDefToClone) {
+		slotDefHome.slotDefClone(slotDefToClone);
+		initSlotDefValues();
 	}
 
 }

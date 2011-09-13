@@ -44,7 +44,7 @@
             <h:commandLink action="#{slotDefHome.slotDefClone(_slotDef)}" value="Clona" rendered="#{slotDefParameters.model}"/>
             <s:fragment rendered="#{slotDefParameters.from != null}">
         	#{' '}
-        	<h:commandLink value="Usa" action="#{slotDefHome.slotDefClone(_slotDef)}" />
+        	<h:commandLink value="Usa" action="#{slotDefGaraAssociationtBean.useSlotDef(_slotDef)}" />
         	</s:fragment>
         </rich:column>
     </rich:dataTable>
