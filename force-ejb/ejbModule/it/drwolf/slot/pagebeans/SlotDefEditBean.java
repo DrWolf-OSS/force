@@ -504,17 +504,25 @@ public class SlotDefEditBean {
 	//
 	//
 	public List<Rule> retrieveReferencedRulesByPropertyName(String propertyName) {
+		List<Rule> referencedRules = new ArrayList<Rule>();
 		SlotDef slotDef = slotDefHome.getInstance();
 		SlotDef slotDefModel = slotDefHome.getModel();
 		if (slotDefModel == null) {
 			Set<Rule> rules = slotDef.getRules();
 			for (Rule rule : rules) {
-				//
+				if (isReferencedProperty(propertyName, rule)) {
+					referencedRules.add(rule);
+				}
 			}
 		} else {
 			Set<Rule> rules = slotDefModel.getRules();
+			for (Rule rule : rules) {
+				if (isReferencedProperty(propertyName, rule)) {
+					referencedRules.add(rule);
+				}
+			}
 		}
-		return null;
+		return referencedRules;
 	}
 
 	private boolean isReferencedProperty(String propertyName, Rule rule) {
@@ -530,10 +538,93 @@ public class SlotDefEditBean {
 			VerifierParameterDef parameter = iterator.next();
 			PropertyContainer propertyContainer = targetPropertyMap
 					.get(parameter.getName());
-
+			if (propertyContainer != null
+					&& propertyContainer.getName().equals(propertyName)) {
+				return true;
+			}
 		}
 		return false;
 	}
+
+	public List<Rule> retrieveReferencedRulesByCollectionName(
+			String collectionName) {
+		List<Rule> referencedRules = new ArrayList<Rule>();
+		SlotDef slotDef = slotDefHome.getInstance();
+		SlotDef slotDefModel = slotDefHome.getModel();
+		if (slotDefModel == null) {
+			Set<Rule> rules = slotDef.getRules();
+			for (Rule rule : rules) {
+				if (isReferencedProperty(collectionName, rule)) {
+					referencedRules.add(rule);
+				}
+			}
+		} else {
+			Set<Rule> rules = slotDefModel.getRules();
+			for (Rule rule : rules) {
+				if (isReferencedProperty(collectionName, rule)) {
+					referencedRules.add(rule);
+				}
+			}
+		}
+		return referencedRules;
+	}
+
+	private boolean isReferencedCollection(String propertyName, Rule rule) {
+		ruleHome.setInstance(rule);
+		ruleEditBean.init();
+
+		List<VerifierParameterDef> inParams = rule.getVerifier().getInParams();
+		HashMap<String, PropertiesSourceContainer> targetPropertiesSourceMap = ruleEditBean
+				.getTargetPropertiesSourceMap();
+		Iterator<VerifierParameterDef> iterator = inParams.iterator();
+		while (iterator.hasNext()) {
+			VerifierParameterDef parameter = iterator.next();
+			PropertiesSourceContainer propertiesSourceContainer = targetPropertiesSourceMap
+					.get(parameter.getName());
+			if (propertiesSourceContainer != null
+					&& propertiesSourceContainer.getDocDefCollection() != null
+					&& propertiesSourceContainer.getDocDefCollection()
+							.getName().equals(propertyName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public List<Rule> retrieveReferencedRules(Object obj) {
+		List<Rule> referencedRules = new ArrayList<Rule>();
+		SlotDef slotDef = slotDefHome.getInstance();
+		SlotDef slotDefModel = slotDefHome.getModel();
+
+		Set<Rule> rules;
+		if (slotDefModel == null) {
+			rules = slotDef.getRules();
+		} else {
+			rules = slotDefModel.getRules();
+		}
+
+		for (Rule rule : rules) {
+			if (obj instanceof PropertyDef) {
+				PropertyDef propertyDef = (PropertyDef) obj;
+				if (isReferencedProperty(propertyDef.getName(), rule)) {
+					referencedRules.add(rule);
+				}
+			} else if (obj instanceof EmbeddedProperty) {
+				EmbeddedProperty embeddedProperty = (EmbeddedProperty) obj;
+				if (isReferencedProperty(embeddedProperty.getName(), rule)) {
+					referencedRules.add(rule);
+				}
+			} else if (obj instanceof DocDefCollection) {
+				DocDefCollection docDefCollection = (DocDefCollection) obj;
+				if (isReferencedCollection(docDefCollection.getName(), rule)) {
+					referencedRules.add(rule);
+				}
+			}
+		}
+
+		return referencedRules;
+	}
+
 	//
 	//
 

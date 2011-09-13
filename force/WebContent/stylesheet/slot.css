@@ -86,4 +86,9 @@ a:HOVER {
 .ptext{
 	width: 100%;
 }
+
+.disabledLink{
+	/*color: #7F9DB9 !important;*/
+	color: #C0C0C0 !important;
+}
 /* --- */

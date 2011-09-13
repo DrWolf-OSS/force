@@ -98,6 +98,13 @@
 							<h:outputText value="#{eprop.value}" />
 						</s:fragment>
 					</rich:column>
+					<rich:column>
+						<f:facet name="header">Regole in cui è coinvolta</f:facet>
+						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(eprop)}" rowKeyVar="idx">
+							<h:outputText value="Regola #{rule.id}" />
+							<h:outputText value=", " rendered="#{idx lt slotDefEditBean.retrieveReferencedRules(eprop).size()-1}"/>
+						</a:repeat>
+					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
             
@@ -134,6 +141,13 @@
 					<rich:column>
 						<f:facet name="header">Vincolante per le richieste</f:facet>
 						<h:outputText value="#{!slotDefEditBean.getReferencedCollectionsNames(prop).equals('') ? slotDefEditBean.getReferencedCollectionsNames(prop) : ''}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">Regole in cui è coinvolta</f:facet>
+						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(prop)}" rowKeyVar="idx">
+							<h:outputText value="Regola #{rule.id}" />
+							<h:outputText value=", " rendered="#{idx lt slotDefEditBean.retrieveReferencedRules(prop).size()-1}"/>
+						</a:repeat>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -177,6 +191,13 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 						</h:outputText>
 					</rich:column>
+					<rich:column>
+						<f:facet name="header">Regole in cui è coinvolta</f:facet>
+						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(coll)}" rowKeyVar="idx">
+							<h:outputText value="Regola #{rule.id}"/>
+							<h:outputText value=", " rendered="#{idx lt slotDefEditBean.retrieveReferencedRules(coll).size()-1}"/>
+						</a:repeat>
+					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
 			
@@ -189,7 +210,8 @@
 				<ui:define name="label">
 	                <h:outputText value="" />
 				</ui:define>
-				<s:button value="Modifica Informazioni" view="/admin/SlotDefWizardEdit.xhtml" propagation="none">
+				<s:button value="Modifica Informazioni" view="/admin/SlotDefWizardEdit.xhtml" propagation="none"
+							action="#{slotDefEditBean.checkReference()}">
 					<f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
 					<f:param name="mode" value="#{slotDefParameters.mode}"/>
 		          	<f:param name="model" value="#{slotDefParameters.model}"/>

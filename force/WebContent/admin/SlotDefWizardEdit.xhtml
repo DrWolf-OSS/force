@@ -76,6 +76,13 @@
 							<h:outputText value="#{eprop.value}" />
 						</s:fragment>
 					</rich:column>
+					<rich:column>
+						<f:facet name="header">Regole in cui è coinvolta</f:facet>
+						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(eprop)}" rowKeyVar="idx">
+							<h:outputText value="Regola #{rule.id}" />
+							<h:outputText value=", " rendered="#{idx lt slotDefEditBean.retrieveReferencedRules(eprop).size()-1}"/>
+						</a:repeat>
+					</rich:column>
 					<rich:column styleClass="action">
 						<f:facet name="header">Azioni</f:facet>
 		                <a:commandLink value="Modifica" action="#{slotDefEditBean.editEmbeddedProp(eprop)}" 
@@ -83,7 +90,9 @@
 		            			reRender="embeddedPropPanel"/>
 		                #{' '}
 						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(eprop)}" 
-            						disabled="#{slotDefHome.referenced}" reRender="epropTable"/>
+            						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}"
+            						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(eprop) ? 'disabledLink' : ''}"
+            						reRender="epropTable"/>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -122,6 +131,13 @@
 						<f:facet name="header">Vincolante per le richieste</f:facet>
 						<h:outputText value="#{!slotDefEditBean.getReferencedCollectionsNames(prop).equals('') ? slotDefEditBean.getReferencedCollectionsNames(prop) : ''}" />
 					</rich:column>
+					<rich:column>
+						<f:facet name="header">Regole in cui è coinvolta</f:facet>
+						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(prop)}" rowKeyVar="idx">
+							<h:outputText value="Regola #{rule.id}" />
+							<h:outputText value=", " rendered="#{idx lt slotDefEditBean.retrieveReferencedRules(prop).size()-1}"/>
+						</a:repeat>
+					</rich:column>
 					<rich:column styleClass="action">
 						<f:facet name="header">Azioni</f:facet>
 		                <a:commandLink value="Modifica" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" 
@@ -130,7 +146,9 @@
 		                #{' '}
 						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeProp(prop)}" 
 		                				onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
-		                				disabled="#{slotDefHome.referenced}" reRender="propTable,collTable"/>
+		                				disabled="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}"
+		                				styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(prop) ? 'disabledLink' : ''}" 
+		                				reRender="propTable,collTable"/>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -174,12 +192,21 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 						</h:outputText>
 					</rich:column>
+					<rich:column>
+						<f:facet name="header">Regole in cui è coinvolta</f:facet>
+						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(coll)}" rowKeyVar="idx">
+							<h:outputText value="Regola #{rule.id}"/>
+							<h:outputText value=", " rendered="#{idx lt slotDefEditBean.retrieveReferencedRules(coll).size()-1}"/>
+						</a:repeat>
+					</rich:column>
 					<rich:column styleClass="action">
 						<f:facet name="header">Azioni</f:facet>
 	                		<a:commandLink value="Modifica" action="#{slotDefEditBean.editColl(coll)}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel"/>
 							#{'  '}
 							<a:commandLink value="Elimina" action="#{slotDefEditBean.removeColl(coll)}" 
-									disabled="#{slotDefHome.referenced}" reRender="collTable"/>
+									disabled="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}" 
+									styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(coll) ? 'disabledLink' : ''}"
+									reRender="collTable"/>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -194,9 +221,9 @@
 	                <h:outputText value="" />
 				</ui:define>
 				<a:commandButton value="Aggiungi informazione #{slotDefParameters.mode == 'PRIMARY' ? 'sull azienda' : ''}" 
-							onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
+							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
 							action="#{slotDefEditBean.newProperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel" rendered="#{slotDefParameters.mode != 'GENERAL'}"/>
-				<a:commandButton value="Aggiungi richiesta" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
+				<a:commandButton value="Aggiungi richiesta" onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
 							action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collTypePanel')}.show()" reRender="collPanel"/>
 				<a:commandButton value="Aggiungi informazioni relative alla gara" action="#{slotDefEditBean.newEmbeddedProperty()}" 
 							oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel" rendered="#{slotDefParameters.mode != 'PRIMARY'}"/>
