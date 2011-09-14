@@ -337,7 +337,10 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Tipologia del dato" />
 					</ui:define>
-					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.propertyDef.dataType}" required="true">
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.propertyDef.dataType}" 
+							required="true"
+							disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.propertyDef) or
+										(slotDefEditBean.propertyDef.id!=null and slotDefHome.referenced)}">
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type.value()}" noSelectionLabel="-- seleziona un tipo --"/>
 					<a:support event="onchange" reRender="pf"/>
              		</h:selectOneMenu>
@@ -355,7 +358,9 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Accetta valori multipli" />
 					</ui:define>
-					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.multiple}" >
+					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.multiple}" 
+										disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.propertyDef) or
+										(slotDefEditBean.propertyDef.id!=null and slotDefHome.referenced)}">
 						<a:support event="onchange" reRender="pf"/>
 					</h:selectBooleanCheckbox>
 	            </s:decorate>
@@ -365,7 +370,9 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Dizionario associato" />
 					</ui:define>
-					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}" required="#{slotDefEditBean.propertyDef.multiple or slotDefEditBean.conditional}">
+					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}" 
+									required="#{slotDefEditBean.propertyDef.multiple or slotDefEditBean.conditional}"
+									disabled="#{slotDefEditBean.propertyDef.id!=null and slotDefHome.referenced}">
                     		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.propertyDef.dataType)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- seleziona un dizionario --"/>
 							<s:convertEntity/>
@@ -409,7 +416,9 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Tipologia del dato" />
 					</ui:define>
-					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.dataType}" required="true">
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.dataType}" 
+								required="true" 
+								disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.embeddedProperty)}">
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type.value()}"
 							noSelectionLabel="-- seleziona un tipo --"/>
 						<s:convertEnum/>
@@ -421,7 +430,8 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Accetta valori multipli" />
 					</ui:define>
-					<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.multiple}" >
+					<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.multiple}" 
+								disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.embeddedProperty)}">
 						<a:support event="onchange" action="#{slotDefEditBean.embeddedProperty.clean}" reRender="epForm"/>
 					</h:selectBooleanCheckbox>
 	            </s:decorate>
@@ -432,7 +442,8 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Dizionario associato" />
 					</ui:define>
-					<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dictionary}" required="#{slotDefEditBean.embeddedProperty.multiple}">
+					<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dictionary}" required="#{slotDefEditBean.embeddedProperty.multiple}"
+								disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.embeddedProperty)}">
                     		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.embeddedProperty.dataType)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- seleziona un dizionario --"/>
 							<s:convertEntity/>
@@ -548,9 +559,12 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Tipo di documento" />
 					</ui:define>
-					<h:selectOneMenu id="cDocDef" value="#{slotDefEditBean.collection.docDef}" required="true">
+					<h:selectOneMenu id="cDocDef" value="#{slotDefEditBean.collection.docDef}" 
+								required="true"
+								disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.collection) or
+											(slotDefEditBean.collection.id!=null and slotDefHome.referenced)}">
                     	<s:selectItems value="#{docDefList.resultList}" 
-						var="docDef" label="#{docDef.name}" noSelectionLabel="-- seleziona una tipologia di documento --"/>
+										var="docDef" label="#{docDef.name}" noSelectionLabel="-- seleziona una tipologia di documento --"/>
 						<s:convertEntity/>
              		</h:selectOneMenu>
 	            </s:decorate>
@@ -558,7 +572,9 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
 					</ui:define>
-					<h:selectOneMenu  value="#{slotDefEditBean.collection.conditionalPropertyDef}" converter="propertyDefConverter" disabled="#{slotDefEditBean.conditional and slotDefParameters.wizard}">
+					<h:selectOneMenu  value="#{slotDefEditBean.collection.conditionalPropertyDef}" 
+								converter="propertyDefConverter" 
+								disabled="#{slotDefEditBean.conditional and slotDefParameters.wizard}">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
