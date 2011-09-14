@@ -88,7 +88,28 @@ a:HOVER {
 }
 
 .disabledLink{
-	/*color: #7F9DB9 !important;*/
-	color: #C0C0C0 !important;
+	color: #7F9DB9 !important;
+	/*color: #C0C0C0 !important;*/
 }
+
+.invalidRow{
+	background-color: #E5E5E5;
+	text-decoration: line-through;
+}
+
+.invalidRow.action{
+	text-decoration: none;
+}
+
+.invalidRow.action a:LINK {
+	text-decoration: none;
+	/*color: #606060;*/
+}
+
+/*
+.invalidRow.action.disabledLink a:LINK {
+	text-decoration: none;
+	color: #606060;
+}
+*/
 /* --- */
