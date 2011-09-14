@@ -34,14 +34,19 @@
             <f:facet name="header">
 				<h:outputText value="Nome" />
             </f:facet>
-            <s:link value="#{_slotDef.name}" view="/admin/SlotDefView.xhtml" propagation="none">
+            <s:link value="#{_slotDef.name}" 
+            	view="/admin/SlotDefView.xhtml" 
+            	propagation="none"
+            	rendered="#{not slotDefParameters.from.equals('/admin/GaraEdit.xhtml')}">
             	<f:param name="slotDefId" value="#{_slotDef.id}"/>
             	<f:param name="mode" value="#{slotDefParameters.mode}"/>    	
             </s:link>
+            <h:outputText value="#{_slotDef.name}" rendered="#{slotDefParameters.from.equals('/admin/GaraEdit.xhtml')}" />
         </h:column>
         <rich:column styleClass="action">
             <f:facet name="header">Azioni</f:facet>
-            <h:commandLink action="#{slotDefHome.slotDefClone(_slotDef)}" value="Clona" rendered="#{slotDefParameters.model}"/>
+            <h:commandLink action="#{slotDefHome.slotDefClone(_slotDef)}" value="Clona" 
+            		rendered="#{slotDefParameters.model and not slotDefParameters.from.equals('/admin/GaraEdit.xhtml')}"/>
             <s:fragment rendered="#{slotDefParameters.from != null}">
         	#{' '}
         	<h:commandLink value="Usa" action="#{slotDefGaraAssociationtBean.useSlotDef(_slotDef)}" />

@@ -91,17 +91,19 @@
             					styleClass="#{not eprop.active ? 'disabledLink' : ''}"
 		            			reRender="embeddedPropPanel"/>
 		                #{' '}
-						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(eprop)}" 
+						<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(eprop)}" 
             						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}"
             						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(eprop) ? 'disabledLink' : ''}"
             						reRender="epropTable"
             						rendered="#{not slotDefHome.referenced}"/>
             						
-            			<a:commandLink value="#{eprop.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(eprop)}"
+            			<a:commandLink id="invalidate" value="#{eprop.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(eprop)}"
             						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}"
             						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(eprop) ? 'disabledLink' : ''}"
             						reRender="epropTable"
             						rendered="#{slotDefHome.referenced}"/>
+            			<rich:toolTip for="#{slotDefHome.referenced ? 'invalidate' : 'delete'}" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}">
+            			L'informazione è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -155,18 +157,20 @@
 				                		styleClass="#{not prop.active ? 'disabledLink' : ''}"
 		                				reRender="propPanel"/>
 		                #{' '}
-						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeProp(prop)}" 
+						<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeProp(prop)}" 
 		                				onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
 		                				disabled="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}"
 		                				styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(prop) ? 'disabledLink' : ''}"
 		                				rendered="#{not slotDefHome.referenced}"
 		                				reRender="propTable,collTable"/>
 		                				
-		                <a:commandLink value="#{prop.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(prop)}"
+		                <a:commandLink id="invalidate" value="#{prop.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(prop)}"
             						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}"
             						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(prop) ? 'disabledLink' : ''}"
             						reRender="propTable,collTable"
             						rendered="#{slotDefHome.referenced}"/>
+            			<rich:toolTip for="#{slotDefHome.referenced ? 'invalidate' : 'delete'}" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}">
+            			L'informazione è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
             						
 					</rich:column>
 				</rich:dataTable>
@@ -225,17 +229,19 @@
 	                					disabled="#{not coll.active}" 
 										styleClass="#{not coll.active ? 'disabledLink' : ''}"/>
 							#{'  '}
-							<a:commandLink value="Elimina" action="#{slotDefEditBean.removeColl(coll)}" 
+							<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeColl(coll)}" 
 									disabled="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}" 
 									styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(coll) ? 'disabledLink' : ''}"
 									reRender="collTable"
 									rendered="#{not slotDefHome.referenced}"/>
 									
-						 	<a:commandLink value="#{coll.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(coll)}"
+						 	<a:commandLink id="invalidate" value="#{coll.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(coll)}"
             						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}"
             						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(coll) ? 'disabledLink' : ''}"
             						reRender="collTable"
             						rendered="#{slotDefHome.referenced}"/>
+            				<rich:toolTip for="#{slotDefHome.referenced ? 'invalidate' : 'delete'}" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}">
+            				La richiesta è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
