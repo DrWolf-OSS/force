@@ -13,6 +13,7 @@ import it.drwolf.slot.enums.CollectionQuantifier;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.interfaces.Definition;
 import it.drwolf.slot.pagebeans.support.PropertiesSourceContainer;
 import it.drwolf.slot.pagebeans.support.PropertyContainer;
 import it.drwolf.slot.ruleverifier.VerifierParameterDef;
@@ -237,7 +238,10 @@ public class SlotDefEditBean {
 	public String save() {
 		boolean names = checkNames();
 		boolean references = checkCollectionReferences();
-		boolean embeddedValues = checkEmbeddedPropertyValues();
+		boolean embeddedValues = true;
+		if (!slotDefHome.getInstance().isTemplate()) {
+			embeddedValues = checkEmbeddedPropertyValues();
+		}
 		if (names && references && embeddedValues) {
 			return slotDefHome.persist();
 		} else {
@@ -248,7 +252,10 @@ public class SlotDefEditBean {
 	public String update() {
 		boolean names = checkNames();
 		boolean references = checkCollectionReferences();
-		boolean embeddedValues = checkEmbeddedPropertyValues();
+		boolean embeddedValues = true;
+		if (!slotDefHome.getInstance().isTemplate()) {
+			embeddedValues = checkEmbeddedPropertyValues();
+		}
 		if (names && references && embeddedValues) {
 			Set<PropertyDef> newPropertyDefs = new HashSet<PropertyDef>();
 			Set<DocDefCollection> newDocDefCollections = new HashSet<DocDefCollection>();
@@ -315,14 +322,22 @@ public class SlotDefEditBean {
 	}
 
 	public void removeProp(PropertyDef prop) {
+		removeReferencesFromCollections(prop, false);
+		slotDefHome.getInstance().getPropertyDefs().remove(prop);
+	}
+
+	private void removeReferencesFromCollections(PropertyDef prop,
+			boolean invalidateCollections) {
 		Set<DocDefCollection> referencedCollections = this
 				.getReferencedCollections(prop);
 		for (DocDefCollection collection : referencedCollections) {
 			collection.getConditionalPropertyInst().setPropertyDef(null);
 			collection.setConditionalPropertyInst(null);
 			collection.setConditionalPropertyDef(null);
+			if (invalidateCollections) {
+				collection.setActive(false);
+			}
 		}
-		slotDefHome.getInstance().getPropertyDefs().remove(prop);
 	}
 
 	public void editProp(PropertyDef prop) {
@@ -508,27 +523,28 @@ public class SlotDefEditBean {
 
 	//
 	//
-	public List<Rule> retrieveReferencedRulesByPropertyName(String propertyName) {
-		List<Rule> referencedRules = new ArrayList<Rule>();
-		SlotDef slotDef = slotDefHome.getInstance();
-		SlotDef slotDefModel = slotDefHome.getModel();
-		if (slotDefModel == null) {
-			Set<Rule> rules = slotDef.getRules();
-			for (Rule rule : rules) {
-				if (isReferencedProperty(propertyName, rule)) {
-					referencedRules.add(rule);
-				}
-			}
-		} else {
-			Set<Rule> rules = slotDefModel.getRules();
-			for (Rule rule : rules) {
-				if (isReferencedProperty(propertyName, rule)) {
-					referencedRules.add(rule);
-				}
-			}
-		}
-		return referencedRules;
-	}
+	// public List<Rule> retrieveReferencedRulesByPropertyName(String
+	// propertyName) {
+	// List<Rule> referencedRules = new ArrayList<Rule>();
+	// SlotDef slotDef = slotDefHome.getInstance();
+	// SlotDef slotDefModel = slotDefHome.getModel();
+	// if (slotDefModel == null) {
+	// Set<Rule> rules = slotDef.getRules();
+	// for (Rule rule : rules) {
+	// if (isReferencedProperty(propertyName, rule)) {
+	// referencedRules.add(rule);
+	// }
+	// }
+	// } else {
+	// Set<Rule> rules = slotDefModel.getRules();
+	// for (Rule rule : rules) {
+	// if (isReferencedProperty(propertyName, rule)) {
+	// referencedRules.add(rule);
+	// }
+	// }
+	// }
+	// return referencedRules;
+	// }
 
 	private boolean isReferencedProperty(String propertyName, Rule rule) {
 		ruleHome.setInstance(rule);
@@ -551,28 +567,28 @@ public class SlotDefEditBean {
 		return false;
 	}
 
-	public List<Rule> retrieveReferencedRulesByCollectionName(
-			String collectionName) {
-		List<Rule> referencedRules = new ArrayList<Rule>();
-		SlotDef slotDef = slotDefHome.getInstance();
-		SlotDef slotDefModel = slotDefHome.getModel();
-		if (slotDefModel == null) {
-			Set<Rule> rules = slotDef.getRules();
-			for (Rule rule : rules) {
-				if (isReferencedProperty(collectionName, rule)) {
-					referencedRules.add(rule);
-				}
-			}
-		} else {
-			Set<Rule> rules = slotDefModel.getRules();
-			for (Rule rule : rules) {
-				if (isReferencedProperty(collectionName, rule)) {
-					referencedRules.add(rule);
-				}
-			}
-		}
-		return referencedRules;
-	}
+	// public List<Rule> retrieveReferencedRulesByCollectionName(
+	// String collectionName) {
+	// List<Rule> referencedRules = new ArrayList<Rule>();
+	// SlotDef slotDef = slotDefHome.getInstance();
+	// SlotDef slotDefModel = slotDefHome.getModel();
+	// if (slotDefModel == null) {
+	// Set<Rule> rules = slotDef.getRules();
+	// for (Rule rule : rules) {
+	// if (isReferencedProperty(collectionName, rule)) {
+	// referencedRules.add(rule);
+	// }
+	// }
+	// } else {
+	// Set<Rule> rules = slotDefModel.getRules();
+	// for (Rule rule : rules) {
+	// if (isReferencedProperty(collectionName, rule)) {
+	// referencedRules.add(rule);
+	// }
+	// }
+	// }
+	// return referencedRules;
+	// }
 
 	private boolean isReferencedCollection(String propertyName, Rule rule) {
 		ruleHome.setInstance(rule);
@@ -632,5 +648,18 @@ public class SlotDefEditBean {
 
 	//
 	//
+
+	public void invalidate(Object obj) {
+		Definition def = (Definition) obj;
+		if (def.isActive()) {
+			if (obj instanceof PropertyDef) {
+				PropertyDef pDef = (PropertyDef) obj;
+				removeReferencesFromCollections(pDef, true);
+			}
+			def.setActive(false);
+		} else {
+			def.setActive(true);
+		}
+	}
 
 }

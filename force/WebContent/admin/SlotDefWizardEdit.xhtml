@@ -92,7 +92,14 @@
 						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(eprop)}" 
             						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}"
             						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(eprop) ? 'disabledLink' : ''}"
-            						reRender="epropTable"/>
+            						reRender="epropTable"
+            						rendered="#{not slotDefHome.referenced}"/>
+            						
+            			<a:commandLink value="#{eprop.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(eprop)}"
+            						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}"
+            						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(eprop) ? 'disabledLink' : ''}"
+            						reRender="epropTable"
+            						rendered="#{slotDefHome.referenced}"/>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -147,8 +154,16 @@
 						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeProp(prop)}" 
 		                				onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
 		                				disabled="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}"
-		                				styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(prop) ? 'disabledLink' : ''}" 
+		                				styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(prop) ? 'disabledLink' : ''}"
+		                				rendered="#{not slotDefHome.referenced}"
 		                				reRender="propTable,collTable"/>
+		                				
+		                <a:commandLink value="#{prop.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(prop)}"
+            						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}"
+            						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(prop) ? 'disabledLink' : ''}"
+            						reRender="propTable,collTable"
+            						rendered="#{slotDefHome.referenced}"/>
+            						
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -206,7 +221,14 @@
 							<a:commandLink value="Elimina" action="#{slotDefEditBean.removeColl(coll)}" 
 									disabled="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}" 
 									styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(coll) ? 'disabledLink' : ''}"
-									reRender="collTable"/>
+									reRender="collTable"
+									rendered="#{not slotDefHome.referenced}"/>
+									
+						 	<a:commandLink value="#{coll.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(coll)}"
+            						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}"
+            						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(coll) ? 'disabledLink' : ''}"
+            						reRender="collTable"
+            						rendered="#{slotDefHome.referenced}"/>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -421,38 +443,38 @@
 							<s:fragment rendered="#{not slotDefEditBean.embeddedProperty.multiple}">
 							<h:inputText value="#{slotDefEditBean.embeddedProperty.stringValue}"
 								rendered="#{(slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' or slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'LINK') and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
-								required="true"
+								required="#{not slotDefParameters.model}"
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
 							<h:inputText value="#{slotDefEditBean.embeddedProperty.integerValue}"
 								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'INTEGER' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
-								required="true"
+								required="#{not slotDefParameters.model}"
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
 							<a:region>
 							<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.booleanValue}"
 								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'BOOLEAN'}"
-								required="true"
+								required="#{not slotDefParameters.model}"
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}">
 							</h:selectBooleanCheckbox>
 							</a:region>
 							<rich:calendar id="subscriptionDate" mode="client"
 								value="#{slotDefEditBean.embeddedProperty.dateValue}" datePattern="dd/MM/yyyy"
 								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'DATE' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
-								required="true"
+								required="#{not slotDefParameters.model}"
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
 							
-							<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.stringValue}" required="true"
+							<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.stringValue}" required="#{not slotDefParameters.model}"
 										rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 										valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
 	             			</h:selectOneMenu>
-	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.integerValue}" required="true"
+	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.integerValue}" required="#{not slotDefParameters.model}"
 	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'INTEGER' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
 	             			</h:selectOneMenu>
-	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dateValue}"  required="true"
+	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dateValue}"  required="#{not slotDefParameters.model}"
 	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'DATE' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
@@ -462,7 +484,7 @@
 	             			</s:fragment>
 	             			
 	             			<s:fragment rendered="#{slotDefEditBean.embeddedProperty.multiple and slotDefEditBean.embeddedProperty.dictionary != null}">
-	             			<rich:pickList value="#{slotDefEditBean.embeddedProperty.valuesAsList}" required="true">
+	             			<rich:pickList value="#{slotDefEditBean.embeddedProperty.valuesAsList}" required="#{not slotDefParameters.model}">
 								<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" var="value" label="#{value}" />
 							</rich:pickList>
 							</s:fragment>

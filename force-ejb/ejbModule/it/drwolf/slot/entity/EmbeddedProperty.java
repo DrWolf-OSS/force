@@ -3,6 +3,7 @@ package it.drwolf.slot.entity;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.DataInstance;
+import it.drwolf.slot.interfaces.Definition;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,7 +24,8 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
-public class EmbeddedProperty implements DataDefinition, DataInstance {
+public class EmbeddedProperty implements DataDefinition, DataInstance,
+		Definition {
 
 	private Long id;
 
@@ -44,6 +46,8 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 	private Dictionary dictionary;
 
 	private Set<String> values = new HashSet<String>();
+
+	private boolean active = Boolean.TRUE;
 
 	@Id
 	@GeneratedValue
@@ -223,6 +227,14 @@ public class EmbeddedProperty implements DataDefinition, DataInstance {
 		this.setDateValue(null);
 		this.setBooleanValue(null);
 		this.getValues().clear();
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }
