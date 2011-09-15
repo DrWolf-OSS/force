@@ -17,16 +17,6 @@
             <f:facet name="header">#{aziendaHome.managed ? 'Modifica' : 'Aggiungi'} Azienda</f:facet>
 
 
-
-            <s:decorate id="alfrescoGroupIdField" template="/layout/edit.xhtml">
-                <ui:define name="label">Alfresco group id</ui:define>
-                <h:inputTextarea id="alfrescoGroupId"
-                               cols="80"
-                               rows="3"
-                              value="#{aziendaHome.instance.alfrescoGroupId}"/>
-            </s:decorate>
-
-
             <s:decorate id="capField" template="/layout/edit.xhtml">
                 <ui:define name="label">Cap</ui:define>
                 <h:inputTextarea id="cap"
@@ -120,7 +110,6 @@
                 <h:inputTextarea id="localita"
                                cols="80"
                                rows="3"
-                           required="true"
                               value="#{aziendaHome.instance.localita}"/>
             </s:decorate>
 
@@ -194,23 +183,13 @@
                          action="#{aziendaHome.update}"
                        rendered="#{aziendaHome.managed}"/>
 
-            <h:commandButton id="delete"
-                          value="Elmina"
-                         action="#{aziendaHome.remove}"
-                      immediate="true"
-                       rendered="#{aziendaHome.managed}"/>
 
             <s:button id="cancelEdit"
                    value="Annulla"
              propagation="end"
-                    view="/admin/Azienda.xhtml"
+                    view="/home.xhtml"
                 rendered="#{aziendaHome.managed}"/>
 
-            <s:button id="cancelAdd"
-                   value="Annulla"
-             propagation="end"
-                    view="/admin/#{empty aziendaFrom ? 'AziendaList' : aziendaFrom}.xhtml"
-                rendered="#{!aziendaHome.managed}"/>
 
         </div>
     </h:form>

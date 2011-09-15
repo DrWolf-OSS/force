@@ -64,7 +64,7 @@ public class Starter {
 		endDate.set(2100, 1, 1);
 
 		this.heartbeat.startFetcher(Calendar.getInstance().getTime(), new Long(
-				5 * 60 * 1000), endDate.getTime());
+				30 * 60 * 1000), endDate.getTime());
 
 	}
 }

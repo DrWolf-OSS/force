@@ -198,26 +198,7 @@
             </f:facet>
             <h:outputText value="#{_azienda.emailReferente}"/>
         </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Fax"/>
-                    <ui:param name="propertyPath" value="azienda.fax"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.fax}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Forma giuridica id"/>
-                    <ui:param name="propertyPath" value="azienda.formaGiuridica.id"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.formaGiuridica.id}"/>
-        </h:column>
+ 
         <h:column>
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">
@@ -291,7 +272,7 @@
         </h:column>
         <rich:column styleClass="action">
             <f:facet name="header">Action</f:facet>
-            <s:link view="/#{empty from ? 'Azienda' : from}.xhtml"
+            <s:link view="/admin/#{empty from ? 'Azienda' : from}.xhtml"
                    value="#{empty from ? 'View' : 'Select'}"
              propagation="#{empty from ? 'none' : 'default'}"
                       id="aziendaViewId">
@@ -299,7 +280,7 @@
                         value="#{_azienda.id}"/>
             </s:link>
             #{' '}
-            <s:link view="/AziendaEdit.xhtml"
+            <s:link view="/admin/AziendaEdit.xhtml"
                    value="Edit"
              propagation="none"
                       id="aziendaEdit"

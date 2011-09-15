@@ -11,7 +11,7 @@
 <ui:define name="body">
 
     <rich:panel>
-        <f:facet name="header">Azienda Details</f:facet>
+        <f:facet name="header">Dettagli Azienda</f:facet>
 
 
         <s:decorate id="alfrescoGroupId" template="/layout/display.xhtml">
@@ -100,13 +100,13 @@
 
     <div class="actionButtons">
 
-        <s:button view="/AziendaEdit.xhtml"
+        <s:button view="/admin/AziendaEdit.xhtml"
                     id="edit"
-                 value="Edit"/>
+                 value="Modifica"/>
 
-        <s:button view="/#{empty aziendaFrom ? 'AziendaList' : aziendaFrom}.xhtml"
+        <s:button view="/admin/#{empty aziendaFrom ? 'AziendaList' : aziendaFrom}.xhtml"
                     id="done"
-                 value="Done"/>
+                 value="Fatto"/>
 
     </div>
 

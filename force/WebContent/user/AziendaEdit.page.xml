@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns="http://jboss.com/products/seam/pages"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
+      no-conversation-view-id="/AziendaList.xhtml"
+      login-required="true">
+
+   <begin-conversation join="true" flush-mode="MANUAL"/>
+
+   <action execute="#{aziendaHome.wire}"/>
+
+   <param name="aziendaFrom"/>
+   <param name="aziendaId" value="#{aziendaHome.aziendaId}"/>
+   <param name="formaGiuridicaFrom"/>
+   <param name="formaGiuridicaId" value="#{formaGiuridicaHome.formaGiuridicaId}"/>
+
+   <param name="settoreFrom"/>
+   <param name="settoreId" value="#{settoreHome.settoreId}"/>
+   <param name="slotDefFrom"/>
+   <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+
+
+
+
+   <navigation from-action="#{aziendaHome.persist}">
+      <rule if-outcome="persisted">
+         <end-conversation/>
+         <redirect view-id="/user/Azienda.xhtml"/>
+      </rule>
+   </navigation>
+
+   <navigation from-action="#{aziendaHome.update}">
+      <rule if-outcome="updated">
+         <end-conversation/>
+         <redirect view-id="/user/Azienda.xhtml"/>
+      </rule>
+   </navigation>
+
+
+</page>

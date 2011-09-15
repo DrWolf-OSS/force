@@ -12,7 +12,7 @@
 
 <ui:define name="body">
 <h:panelGrid columns="2" width="100%" columnClasses="controlPanelclass,controlPanelclass">
-<rich:panel>
+<rich:panel >
      <f:facet name="header"><s:span>
      <s:link value="Vedi tutto" view="/user/Azienda.xhtml" styleClass="topCommandLink">
       <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
@@ -22,9 +22,21 @@
             <ui:define name="label">Ragione Sociale</ui:define>
             <h:outputText value="#{aziendaHome.instance.ragioneSociale}"/>
      </s:decorate>
+     <s:decorate id="ragsoc" template="/layout/display.xhtml">
+            <ui:define name="label">Partita IVA</ui:define>
+            <h:outputText value="#{aziendaHome.instance.partitaIva}"/>
+     </s:decorate>
+     <s:decorate id="ragsoc" template="/layout/display.xhtml">
+            <ui:define name="label">Forma giuridica</ui:define>
+            <h:outputText value="#{aziendaHome.instance.formaGiuridica.nome}"/>
+     </s:decorate>
      <s:decorate id="indirizzo" template="/layout/display.xhtml">
             <ui:define name="label">Indirizzo</ui:define>
             <h:outputText value="#{aziendaHome.instance.indirizzo}"/>
+     </s:decorate>
+     <s:decorate id="indirizzo" template="/layout/display.xhtml">
+            <ui:define name="label">Comune</ui:define>
+            <h:outputText value="#{aziendaHome.instance.comune}"/>
      </s:decorate>
      <s:decorate id="emailImp" template="/layout/display.xhtml">
             <ui:define name="label">e-mail Impresa</ui:define>
@@ -34,10 +46,15 @@
             <ui:define name="label">Referente</ui:define>
             <h:outputText value="#{aziendaHome.instance.referente}"/>
      </s:decorate>
+     <s:decorate id="referente" template="/layout/display.xhtml">
+            <ui:define name="label">CF Referente</ui:define>
+            <h:outputText value="#{aziendaHome.instance.codiceFiscale}"/>
+     </s:decorate>
      <s:decorate id="emailref" template="/layout/display.xhtml">
             <ui:define name="label">e-mail Referente</ui:define>
             <h:outputText value="#{aziendaHome.instance.emailReferente}"/>
      </s:decorate>
+
     <div style="clear:both"/>
 </rich:panel>
 <rich:panel>
@@ -197,9 +214,18 @@
         <h:outputText value="#{gara.dataScadenza}"></h:outputText>
     </rich:column>
     <rich:column>
-        <f:facet name="header">Importo</f:facet>
-        <h:outputText value="#{gara.importo}"></h:outputText>
+        <f:facet name="header">Importanza</f:facet>
+        <h:graphicImage value="/img/rating2stars.png" />
     </rich:column>
+    <rich:column>
+        <f:facet name="header">Azioni</f:facet>
+        <s:link view="/user/Gara.xhtml"
+                   value="Dettaglio"
+             propagation="none"
+                      id="gara">
+                <f:param name="garaId"
+                        value="#{gara.id}"/>
+            </s:link>    </rich:column>
     </rich:dataTable>
     
 </rich:panel>

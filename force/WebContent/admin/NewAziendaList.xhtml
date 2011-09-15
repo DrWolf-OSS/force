@@ -192,25 +192,16 @@
             </f:facet>
             <h:outputText value="#{_azienda.emailReferente}"/>
         </h:column>
+
         <h:column>
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">
                     <ui:param name="entityList" value="#{newAziendaList}"/>
-                    <ui:param name="propertyLabel" value="Fax"/>
-                    <ui:param name="propertyPath" value="azienda.fax"/>
+                    <ui:param name="propertyLabel" value="Forma giuridica"/>
+                    <ui:param name="propertyPath" value="azienda.formaGiuridica.nome"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_azienda.fax}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{newAziendaList}"/>
-                    <ui:param name="propertyLabel" value="Forma giuridica id"/>
-                    <ui:param name="propertyPath" value="azienda.formaGiuridica.id"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.formaGiuridica.id}"/>
+            <h:outputText value="#{_azienda.formaGiuridica.nome}"/>
         </h:column>
         <h:column>
             <f:facet name="header">

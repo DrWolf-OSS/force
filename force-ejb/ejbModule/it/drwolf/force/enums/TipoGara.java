@@ -2,7 +2,8 @@ package it.drwolf.force.enums;
 
 public enum TipoGara {
 
-	NUOVA("Nuova"), GESTITA("Gestita"), SCADUTA("Scaduta");
+	NUOVA("Nuova"), GESTITA("Gestita"), SCADUTA("Scaduta"), SCARTATA(
+			"Scartata	");
 
 	private String testo;
 
