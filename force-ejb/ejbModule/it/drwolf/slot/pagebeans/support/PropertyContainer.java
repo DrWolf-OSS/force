@@ -63,6 +63,17 @@ public class PropertyContainer {
 		return "";
 	}
 
+	public String getName() {
+		if (property != null) {
+			return property.getName();
+		} else if (propertyDef != null) {
+			return propertyDef.getName();
+		} else if (embeddedProperty != null) {
+			return embeddedProperty.getName();
+		}
+		return "";
+	}
+
 	public DataType getType() {
 		if (propertyDef != null) {
 			return propertyDef.getDataType();

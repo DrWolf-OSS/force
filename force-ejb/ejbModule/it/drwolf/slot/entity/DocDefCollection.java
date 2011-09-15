@@ -2,6 +2,7 @@ package it.drwolf.slot.entity;
 
 import it.drwolf.slot.entity.listeners.DocDefCollectionListener;
 import it.drwolf.slot.enums.CollectionQuantifier;
+import it.drwolf.slot.interfaces.Definition;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -17,7 +18,7 @@ import org.hibernate.validator.NotNull;
 
 @Entity
 @EntityListeners(value = DocDefCollectionListener.class)
-public class DocDefCollection {
+public class DocDefCollection implements Definition {
 
 	private Long id;
 
@@ -36,6 +37,8 @@ public class DocDefCollection {
 	private PropertyInst conditionalPropertyInst;
 
 	private CollectionQuantifier quantifier;
+
+	private boolean active = Boolean.TRUE;
 
 	@Id
 	@GeneratedValue
@@ -121,6 +124,14 @@ public class DocDefCollection {
 
 	public void setQuantifier(CollectionQuantifier quantifier) {
 		this.quantifier = quantifier;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 	// @Transient

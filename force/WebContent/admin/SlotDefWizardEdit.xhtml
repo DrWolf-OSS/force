@@ -45,20 +45,20 @@
 				</ui:define>
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.embeddedPropertiesAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.embeddedPropertiesAsList}" var="eprop" 
-						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" style="width:1024px">
-					<rich:column style="width:200px">
+						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" style="width:1024px" >
+					<rich:column style="width:200px" styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{eprop.name}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Tipologia di dato</f:facet>
 						<h:outputText value="#{eprop.dataType.value()}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Multipla</f:facet>
 						<h:outputText value="#{eprop.multiple ? 'sì' : 'no'}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Valore</f:facet>
 						<s:fragment rendered="#{not eprop.multiple}">
 							<h:outputText value="#{eprop.stringValue}"
@@ -76,14 +76,34 @@
 							<h:outputText value="#{eprop.value}" />
 						</s:fragment>
 					</rich:column>
-					<rich:column styleClass="action">
+					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Regole in cui è coinvolta</f:facet>
+						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(eprop)}" rowKeyVar="idx">
+							<h:outputText value="Regola #{rule.id}" />
+							<h:outputText value=", " rendered="#{idx lt slotDefEditBean.retrieveReferencedRules(eprop).size()-1}"/>
+						</a:repeat>
+					</rich:column>
+					<rich:column styleClass="action #{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Azioni</f:facet>
 		                <a:commandLink value="Modifica" action="#{slotDefEditBean.editEmbeddedProp(eprop)}" 
 		            			oncomplete="#{rich:component('embeddedPropPanel')}.show()"
+		            			disabled="#{not eprop.active}"
+            					styleClass="#{not eprop.active ? 'disabledLink' : ''}"
 		            			reRender="embeddedPropPanel"/>
 		                #{' '}
-						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(eprop)}" 
-            						disabled="#{slotDefHome.referenced}" reRender="epropTable"/>
+						<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(eprop)}" 
+            						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}"
+            						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(eprop) ? 'disabledLink' : ''}"
+            						reRender="epropTable"
+            						rendered="#{not slotDefHome.referenced}"/>
+            						
+            			<a:commandLink id="invalidate" value="#{eprop.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(eprop)}"
+            						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}"
+            						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(eprop) ? 'disabledLink' : ''}"
+            						reRender="epropTable"
+            						rendered="#{slotDefHome.referenced}"/>
+            			<rich:toolTip for="#{slotDefHome.referenced ? 'invalidate' : 'delete'}" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}">
+            			L'informazione è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -98,39 +118,60 @@
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.propertyDefsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
 						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" style="width:1024px">
-					<rich:column style="width:200px">
+					<rich:column style="width:200px" styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{prop.name}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Tipologia di dato</f:facet>
 						<h:outputText value="#{prop.dataType.value()}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Obbligatoria</f:facet>
 						<h:outputText value="#{prop.required ? 'sì' : 'no'}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Multipla</f:facet>
 						<h:outputText value="#{prop.multiple ? 'sì' : 'no'}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Dizionario associato</f:facet>
 						<h:outputText value="#{prop.dictionary!=null ? prop.dictionary.name : ''}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Vincolante per le richieste</f:facet>
 						<h:outputText value="#{!slotDefEditBean.getReferencedCollectionsNames(prop).equals('') ? slotDefEditBean.getReferencedCollectionsNames(prop) : ''}" />
 					</rich:column>
-					<rich:column styleClass="action">
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Regole in cui è coinvolta</f:facet>
+						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(prop)}" rowKeyVar="idx">
+							<h:outputText value="Regola #{rule.id}" />
+							<h:outputText value=", " rendered="#{idx lt slotDefEditBean.retrieveReferencedRules(prop).size()-1}"/>
+						</a:repeat>
+					</rich:column>
+					<rich:column styleClass="action #{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Azioni</f:facet>
 		                <a:commandLink value="Modifica" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" 
 		                		        onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
+		                		        disabled="#{not prop.active}"
+				                		styleClass="#{not prop.active ? 'disabledLink' : ''}"
 		                				reRender="propPanel"/>
 		                #{' '}
-						<a:commandLink value="Elimina" action="#{slotDefEditBean.removeProp(prop)}" 
+						<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeProp(prop)}" 
 		                				onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
-		                				disabled="#{slotDefHome.referenced}" reRender="propTable,collTable"/>
+		                				disabled="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}"
+		                				styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(prop) ? 'disabledLink' : ''}"
+		                				rendered="#{not slotDefHome.referenced}"
+		                				reRender="propTable,collTable"/>
+		                				
+		                <a:commandLink id="invalidate" value="#{prop.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(prop)}"
+            						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}"
+            						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(prop) ? 'disabledLink' : ''}"
+            						reRender="propTable,collTable"
+            						rendered="#{slotDefHome.referenced}"/>
+            			<rich:toolTip for="#{slotDefHome.referenced ? 'invalidate' : 'delete'}" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}">
+            			L'informazione è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
+            						
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -145,23 +186,23 @@
 				<h:outputText value="Nessuna richiesta definita" rendered="#{empty slotDefHome.instance.docDefCollectionsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.docDefCollectionsAsList}" var="coll" 
 						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" style="width:1024px">
-					<rich:column style="width:200px">
+					<rich:column style="width:200px" styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{coll.name}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Tipo di documento</f:facet>
 						<h:outputText value="#{coll.docDef.name}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Quantità</f:facet>
 						<h:outputText value="#{coll.quantifier.value()}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Informazione vincolante</f:facet>
 						<h:outputText value="#{coll.conditionalPropertyDef!=null ? coll.conditionalPropertyDef.name : ''}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Valore informazione vincolante</f:facet>
 						<h:outputText value="#{coll.conditionalPropertyInst.stringValue}"
 								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
@@ -174,12 +215,33 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 						</h:outputText>
 					</rich:column>
-					<rich:column styleClass="action">
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Regole in cui è coinvolta</f:facet>
+						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(coll)}" rowKeyVar="idx">
+							<h:outputText value="Regola #{rule.id}"/>
+							<h:outputText value=", " rendered="#{idx lt slotDefEditBean.retrieveReferencedRules(coll).size()-1}"/>
+						</a:repeat>
+					</rich:column>
+					<rich:column styleClass="action #{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Azioni</f:facet>
-	                		<a:commandLink value="Modifica" action="#{slotDefEditBean.editColl(coll)}" oncomplete="#{rich:component('collPanel')}.show()" reRender="collPanel"/>
+	                		<a:commandLink value="Modifica" action="#{slotDefEditBean.editColl(coll)}" oncomplete="#{rich:component('collPanel')}.show()" 
+	                					reRender="collPanel"
+	                					disabled="#{not coll.active}" 
+										styleClass="#{not coll.active ? 'disabledLink' : ''}"/>
 							#{'  '}
-							<a:commandLink value="Elimina" action="#{slotDefEditBean.removeColl(coll)}" 
-									disabled="#{slotDefHome.referenced}" reRender="collTable"/>
+							<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeColl(coll)}" 
+									disabled="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}" 
+									styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(coll) ? 'disabledLink' : ''}"
+									reRender="collTable"
+									rendered="#{not slotDefHome.referenced}"/>
+									
+						 	<a:commandLink id="invalidate" value="#{coll.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(coll)}"
+            						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}"
+            						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(coll) ? 'disabledLink' : ''}"
+            						reRender="collTable"
+            						rendered="#{slotDefHome.referenced}"/>
+            				<rich:toolTip for="#{slotDefHome.referenced ? 'invalidate' : 'delete'}" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}">
+            				La richiesta è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -194,9 +256,9 @@
 	                <h:outputText value="" />
 				</ui:define>
 				<a:commandButton value="Aggiungi informazione #{slotDefParameters.mode == 'PRIMARY' ? 'sull azienda' : ''}" 
-							onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
+							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
 							action="#{slotDefEditBean.newProperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel" rendered="#{slotDefParameters.mode != 'GENERAL'}"/>
-				<a:commandButton value="Aggiungi richiesta" onclick="if(#{slotDefHome.referenced}){if(!confirm('Lo Slot ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
+				<a:commandButton value="Aggiungi richiesta" onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
 							action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collTypePanel')}.show()" reRender="collPanel"/>
 				<a:commandButton value="Aggiungi informazioni relative alla gara" action="#{slotDefEditBean.newEmbeddedProperty()}" 
 							oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel" rendered="#{slotDefParameters.mode != 'PRIMARY'}"/>
@@ -281,7 +343,10 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Tipologia del dato" />
 					</ui:define>
-					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.propertyDef.dataType}" required="true">
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.propertyDef.dataType}" 
+							required="true"
+							disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.propertyDef) or
+										(slotDefEditBean.propertyDef.id!=null and slotDefHome.referenced)}">
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type.value()}" noSelectionLabel="-- seleziona un tipo --"/>
 					<a:support event="onchange" reRender="pf"/>
              		</h:selectOneMenu>
@@ -299,7 +364,9 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Accetta valori multipli" />
 					</ui:define>
-					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.multiple}" >
+					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.multiple}" 
+										disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.propertyDef) or
+										(slotDefEditBean.propertyDef.id!=null and slotDefHome.referenced)}">
 						<a:support event="onchange" reRender="pf"/>
 					</h:selectBooleanCheckbox>
 	            </s:decorate>
@@ -309,7 +376,9 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Dizionario associato" />
 					</ui:define>
-					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}" required="#{slotDefEditBean.propertyDef.multiple or slotDefEditBean.conditional}">
+					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}" 
+									required="#{slotDefEditBean.propertyDef.multiple or slotDefEditBean.conditional}"
+									disabled="#{slotDefEditBean.propertyDef.id!=null and slotDefHome.referenced}">
                     		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.propertyDef.dataType)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- seleziona un dizionario --"/>
 							<s:convertEntity/>
@@ -353,7 +422,9 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Tipologia del dato" />
 					</ui:define>
-					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.dataType}" required="true">
+					<h:selectOneMenu id="pDataType" value="#{slotDefEditBean.embeddedProperty.dataType}" 
+								required="true" 
+								disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.embeddedProperty)}">
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type.value()}"
 							noSelectionLabel="-- seleziona un tipo --"/>
 						<s:convertEnum/>
@@ -365,7 +436,8 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Accetta valori multipli" />
 					</ui:define>
-					<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.multiple}" >
+					<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.multiple}" 
+								disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.embeddedProperty)}">
 						<a:support event="onchange" action="#{slotDefEditBean.embeddedProperty.clean}" reRender="epForm"/>
 					</h:selectBooleanCheckbox>
 	            </s:decorate>
@@ -376,7 +448,8 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Dizionario associato" />
 					</ui:define>
-					<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dictionary}" required="#{slotDefEditBean.embeddedProperty.multiple}">
+					<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dictionary}" required="#{slotDefEditBean.embeddedProperty.multiple}"
+								disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.embeddedProperty)}">
                     		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.embeddedProperty.dataType)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- seleziona un dizionario --"/>
 							<s:convertEntity/>
@@ -394,38 +467,38 @@
 							<s:fragment rendered="#{not slotDefEditBean.embeddedProperty.multiple}">
 							<h:inputText value="#{slotDefEditBean.embeddedProperty.stringValue}"
 								rendered="#{(slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' or slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'LINK') and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
-								required="true"
+								required="#{not slotDefParameters.model}"
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
 							<h:inputText value="#{slotDefEditBean.embeddedProperty.integerValue}"
 								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'INTEGER' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
-								required="true"
+								required="#{not slotDefParameters.model}"
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
 							<a:region>
 							<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.booleanValue}"
 								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'BOOLEAN'}"
-								required="true"
+								required="#{not slotDefParameters.model}"
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}">
 							</h:selectBooleanCheckbox>
 							</a:region>
 							<rich:calendar id="subscriptionDate" mode="client"
 								value="#{slotDefEditBean.embeddedProperty.dateValue}" datePattern="dd/MM/yyyy"
 								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'DATE' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
-								required="true"
+								required="#{not slotDefParameters.model}"
 								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
 							
-							<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.stringValue}" required="true"
+							<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.stringValue}" required="#{not slotDefParameters.model}"
 										rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 										valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
 	             			</h:selectOneMenu>
-	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.integerValue}" required="true"
+	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.integerValue}" required="#{not slotDefParameters.model}"
 	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'INTEGER' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
 	             			</h:selectOneMenu>
-	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dateValue}"  required="true"
+	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dateValue}"  required="#{not slotDefParameters.model}"
 	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'DATE' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
@@ -435,7 +508,7 @@
 	             			</s:fragment>
 	             			
 	             			<s:fragment rendered="#{slotDefEditBean.embeddedProperty.multiple and slotDefEditBean.embeddedProperty.dictionary != null}">
-	             			<rich:pickList value="#{slotDefEditBean.embeddedProperty.valuesAsList}" required="true">
+	             			<rich:pickList value="#{slotDefEditBean.embeddedProperty.valuesAsList}" required="#{not slotDefParameters.model}">
 								<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" var="value" label="#{value}" />
 							</rich:pickList>
 							</s:fragment>
@@ -492,17 +565,22 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Tipo di documento" />
 					</ui:define>
-					<h:selectOneMenu id="cDocDef" value="#{slotDefEditBean.collection.docDef}" required="true">
+					<h:selectOneMenu id="cDocDef" value="#{slotDefEditBean.collection.docDef}" 
+								required="true"
+								disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.collection) or
+											(slotDefEditBean.collection.id!=null and slotDefHome.referenced)}">
                     	<s:selectItems value="#{docDefList.resultList}" 
-						var="docDef" label="#{docDef.name}" noSelectionLabel="-- seleziona una tipologia di documento --"/>
+										var="docDef" label="#{docDef.name}" noSelectionLabel="-- seleziona una tipologia di documento --"/>
 						<s:convertEntity/>
              		</h:selectOneMenu>
 	            </s:decorate>
-	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.conditional}" id="condPD">
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef!=null}" id="condPD">
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
 					</ui:define>
-					<h:selectOneMenu  value="#{slotDefEditBean.collection.conditionalPropertyDef}" converter="propertyDefConverter" disabled="#{slotDefEditBean.conditional}">
+					<h:selectOneMenu  value="#{slotDefEditBean.collection.conditionalPropertyDef}" 
+								converter="propertyDefConverter" 
+								disabled="#{slotDefEditBean.conditional and slotDefParameters.wizard}">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>

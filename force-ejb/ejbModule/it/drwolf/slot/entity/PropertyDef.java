@@ -2,6 +2,7 @@ package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.interfaces.Definition;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 @Entity
-public class PropertyDef implements DataDefinition {
+public class PropertyDef implements DataDefinition, Definition {
 
 	private Long id;
 
@@ -31,6 +32,8 @@ public class PropertyDef implements DataDefinition {
 	private boolean multiple = Boolean.FALSE;
 
 	private String uuid = UUID.randomUUID().toString();
+
+	private boolean active = Boolean.TRUE;
 
 	public PropertyDef(String name, DataType type) {
 		super();
@@ -160,6 +163,14 @@ public class PropertyDef implements DataDefinition {
 	@Transient
 	public String getUuid() {
 		return uuid;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }

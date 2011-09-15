@@ -18,9 +18,6 @@
    
    <param name="garaId" value="#{garaHome.garaId}"/>
 
-	<action execute="#{slotDefGaraAssociationtBean.initSlotDefValues()}" if="#{garaHome.garaId!=null}"/>
-
-
    <navigation from-action="#{slotDefHome.remove}">
       <rule if-outcome="removed">
          <end-conversation/>

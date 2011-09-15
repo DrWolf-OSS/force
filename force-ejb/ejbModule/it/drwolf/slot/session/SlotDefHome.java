@@ -282,6 +282,7 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 				}
 				//
 			}
+
 			clonedParam = clonedParam.concat("|");
 			Object fieldDef = ruleParametersResolver.resolveFieldDef(field);
 			if (fieldDef instanceof Property) {

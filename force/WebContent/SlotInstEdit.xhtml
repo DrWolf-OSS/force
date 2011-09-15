@@ -26,6 +26,7 @@
 
 				<s:div id="embeddedProperties">
 					<c:forEach var="dataInstance" items="#{slotInstEditBean.embeddedProperties}">
+					<s:fragment rendered="#{dataInstance.active}">
 					<s:decorate template="/layout/display.xhtml">
 						<ui:define name="label">
 							<h:outputText value="#{dataInstance.dataDefinition.label}" />
@@ -50,11 +51,13 @@
 							<h:outputText value="#{dataInstance.value}" />
 						</s:fragment>
 					</s:decorate>
+					</s:fragment>
 					</c:forEach>
 				</s:div>
 
 				<s:div id="properties">
 					<c:forEach var="dataInstance" items="#{slotInstEditBean.propertyInsts}">
+					<s:fragment rendered="#{dataInstance.propertyDef.active}">
 						<s:decorate template="/layout/edit.xhtml">
 							<ui:define name="label">
 								<h:outputText value="#{dataInstance.dataDefinition.label}" />
@@ -116,6 +119,7 @@
 							</s:fragment>
 	             			
 						</s:decorate>
+					</s:fragment>
 					</c:forEach>	
 				</s:div>
 				
@@ -124,9 +128,9 @@
 
 				<s:div id="collections">
 					<h:panelGrid columns="2">
-						<c:forEach var="coll"
-							items="#{slotInstEditBean.docInstCollections}">
-							
+						<c:forEach var="coll" items="#{slotInstEditBean.docInstCollections}">
+
+						<s:fragment rendered="#{coll.docDefCollection.active}">	
 						<s:decorate template="/layout/display.xhtml" 
 								rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
 										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
@@ -183,8 +187,9 @@
 								</rich:panel>
 							</s:div>
 						</s:decorate>
-
-
+						</s:fragment>
+						
+						<s:fragment rendered="#{coll.docDefCollection.active}">
 						<s:div id="infoPanel_#{coll.docDefCollection.id}"
 							rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
 										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
@@ -336,6 +341,7 @@
 								</a:region>
 							</rich:panel>
 						</s:div>
+						</s:fragment>
 
 						</c:forEach>
 					</h:panelGrid>
