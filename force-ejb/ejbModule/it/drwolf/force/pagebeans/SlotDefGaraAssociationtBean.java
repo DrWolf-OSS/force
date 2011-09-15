@@ -25,11 +25,21 @@ public class SlotDefGaraAssociationtBean {
 	@In(create = true)
 	private GaraHome garaHome;
 
+	// private static final int LENGHT_LIMIT = 150;
+
+	// private static final String SPACER = "_";
+
 	private void initSlotDefValues() {
 		if (garaHome.getGaraId() != null && slotDefHome.getSlotDefId() == null
 				&& slotDefHome.getInstance() != null) {
-			slotDefHome.getInstance().setName(
-					garaHome.getInstance().getOggetto().trim());
+			String oggetto = garaHome.getInstance().getOggetto().trim();
+			slotDefHome.getInstance().setName(oggetto);
+
+			// String normalized = AlfrescoWrapper.normalizeFolderName(oggetto,
+			// SlotDefGaraAssociationtBean.LENGHT_LIMIT,
+			// SlotDefGaraAssociationtBean.SPACER);
+
+			// slotDefHome.getInstance().setName(normalized);
 		}
 	}
 

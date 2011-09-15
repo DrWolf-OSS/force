@@ -22,6 +22,8 @@ public class SlotInst {
 
 	private Set<PropertyInst> propertyInsts = new HashSet<PropertyInst>();
 
+	private String nodeRef;
+
 	// private Set<MultiplePropertyInst> multiPropertyInsts = new
 	// HashSet<MultiplePropertyInst>();
 
@@ -72,6 +74,14 @@ public class SlotInst {
 
 	public void setOwnerId(String owner) {
 		this.ownerId = owner;
+	}
+
+	public String getNodeRef() {
+		return nodeRef;
+	}
+
+	public void setNodeRef(String nodeRef) {
+		this.nodeRef = nodeRef;
 	}
 
 	// @OrderBy("propertyDef")

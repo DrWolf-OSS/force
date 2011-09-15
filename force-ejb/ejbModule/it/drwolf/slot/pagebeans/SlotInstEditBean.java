@@ -149,7 +149,8 @@ public class SlotInstEditBean {
 	@In(create = true)
 	private CertsController certsController;
 
-	// private List<MultiplePropertyInst> multiplePropertyInsts;
+	private static final int LENGHT_LIMIT = 150;
+	private static final String SPACER = " ";
 
 	private void resetFlags() {
 		verifiable = true;
@@ -394,12 +395,25 @@ public class SlotInstEditBean {
 	}
 
 	private AlfrescoFolder retrieveSlotFolder() {
+		if (slotInstHome.getInstance().getNodeRef() != null
+				&& !slotInstHome.getInstance().getNodeRef().equals("")) {
+			return (AlfrescoFolder) alfrescoUserIdentity.getSession()
+					.getObject(slotInstHome.getInstance().getNodeRef());
+		}
+
 		AlfrescoFolder groupFolder = alfrescoWrapper.findOrCreateFolder(
 				preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH.name()),
 				alfrescoUserIdentity.getActiveGroup().getShortName());
 
 		AlfrescoFolder slotFolder = alfrescoWrapper.findOrCreateFolder(
-				groupFolder, slotInstHome.getInstance().getSlotDef().getName());
+				groupFolder,
+				slotInstHome.getInstance().getSlotDef().getId()
+						+ " "
+						+ AlfrescoWrapper.normalizeFolderName(slotInstHome
+								.getInstance().getSlotDef().getName(),
+								SlotInstEditBean.LENGHT_LIMIT,
+								SlotInstEditBean.SPACER));
+		slotInstHome.getInstance().setNodeRef(slotFolder.getId());
 		return slotFolder;
 	}
 
