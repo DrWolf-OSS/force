@@ -79,11 +79,18 @@
                          action="#{garaHome.attivaGara()}"
                        rendered="#{garaHome.instance.new}"/>
 
+            <h:commandButton id="scarta"
+                          value="Scarta"
+                         action="#{garaHome.scartaGara()}"
+                        onclick="if (!confirm('Sei sicuro di voler scartare la gara in oggetto?')) return false"
+                       rendered="#{garaHome.instance.new}"/>
+                       
             <h:commandButton id="update"
                           value="Save"
                          action="#{garaHome.update}"
                        rendered="#{garaHome.instance.active}"/>
             
+           <s:div rendered="#{garaHome.instance.active}">
              <s:button view="/admin/SlotDefTemplateList.xhtml"
                     id="create"
                     propagation="none"
@@ -105,7 +112,7 @@
             		<f:param name="slotDefId" value="#{garaHome.instance.slotDef.id}"/>
             		<f:param name="garaId" value="#{garaHome.garaId}"/>
                </s:button>
-
+            </s:div>
 
         </div>
     </h:form>

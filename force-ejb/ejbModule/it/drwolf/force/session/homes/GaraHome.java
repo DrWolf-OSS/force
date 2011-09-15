@@ -60,6 +60,12 @@ public class GaraHome extends EntityHome<Gara> {
 		return super.persist();
 	}
 
+	public String scartaGara() {
+		this.getInstance().setType(TipoGara.SCARTATA.getNome());
+		this.persist();
+		return "OK";
+	}
+
 	public void setGaraId(Integer id) {
 		this.setId(id);
 	}

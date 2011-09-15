@@ -12,10 +12,16 @@
    <param name="garaFrom"/>
    <param name="garaId" value="#{garaHome.garaId}"/>
 
-<navigation from-action="#{garaHome.attivaGara()}">
+    <navigation from-action="#{garaHome.attivaGara()}">
       <rule if-outcome="OK">
          <end-conversation/>
          <redirect view-id="/admin/ActiveGareList.xhtml"/>
       </rule>
-   </navigation>
+    </navigation>
+    <navigation from-action="#{garaHome.scartaGara()}">
+      <rule if-outcome="OK">
+         <end-conversation/>
+         <redirect view-id="/admin/NewGareList.xhtml"/>
+      </rule>
+    </navigation>
 </page>
