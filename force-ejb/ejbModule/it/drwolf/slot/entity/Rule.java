@@ -2,6 +2,7 @@ package it.drwolf.slot.entity;
 
 import it.drwolf.slot.entity.listeners.RuleListener;
 import it.drwolf.slot.enums.RuleType;
+import it.drwolf.slot.interfaces.Deactivable;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 @EntityListeners(value = RuleListener.class)
-public class Rule {
+public class Rule implements Deactivable {
 
 	private Long id;
 
@@ -45,6 +46,8 @@ public class Rule {
 	private String errorMessage;
 
 	private String warningMessage;
+
+	private boolean active = true;
 
 	@Id
 	@GeneratedValue
@@ -134,6 +137,16 @@ public class Rule {
 	public List<RuleParameterInst> getEmbeddedParametersAsList() {
 		return new ArrayList<RuleParameterInst>(this.getEmbeddedParametersMap()
 				.values());
+	}
+
+	@Transient
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+
 	}
 
 }

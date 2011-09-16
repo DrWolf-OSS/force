@@ -2,7 +2,7 @@ package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
-import it.drwolf.slot.interfaces.Definition;
+import it.drwolf.slot.interfaces.Deactivable;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 @Entity
-public class PropertyDef implements DataDefinition, Definition {
+public class PropertyDef implements DataDefinition, Deactivable {
 
 	private Long id;
 

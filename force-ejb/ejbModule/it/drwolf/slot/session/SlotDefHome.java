@@ -212,12 +212,16 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		String result = super.persist();
 		if (result.equals("persisted") && this.model != null) {
 			for (Rule rule : this.model.getRules()) {
-				Rule clonedRule = cloneRule(rule);
-				if (clonedRule != null) {
-					this.getInstance().getRules().add(clonedRule);
-					ruleHome.setInstance(clonedRule);
-					ruleHome.persist();
+				//
+				if (rule.isActive()) {
+					Rule clonedRule = cloneRule(rule);
+					if (clonedRule != null) {
+						this.getInstance().getRules().add(clonedRule);
+						ruleHome.setInstance(clonedRule);
+						ruleHome.persist();
+					}
 				}
+				//
 			}
 		}
 		return result;
