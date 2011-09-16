@@ -335,7 +335,11 @@ public class SlotDefEditBean {
 			collection.setConditionalPropertyInst(null);
 			collection.setConditionalPropertyDef(null);
 			if (invalidateCollections) {
-				collection.setActive(false);
+				if (collection.getId() != null) {
+					collection.setActive(false);
+				} else {
+					removeColl(collection);
+				}
 			}
 		}
 	}
