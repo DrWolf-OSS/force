@@ -527,7 +527,7 @@
 				<div style="clear: both" />
 				<a:commandButton value="Confirm"
 					action="#{slotInstEditBean.addActiveItemToDatas}"
-					reRender="editPanelForm, infoPanel_#{slotInstEditBean.activeCollectionId}" 
+					reRender="editPanelForm, infoPanel_#{slotInstEditBean.activeCollectionId}, primaryRegion_#{slotInstEditBean.activeCollectionId}" 
 					oncomplete="if(!epfinvalid){#{rich:component('editPanel')}.hide();}#{rich:component('waitPanel')}.hide();"
 					onclick="#{rich:component('waitPanel')}.show();"/>
 				<a:region>

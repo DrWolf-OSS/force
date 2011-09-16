@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,6 +71,21 @@ public class AlfrescoWrapper {
 		}
 		return ref.startsWith(AlfrescoWrapper.NODEREF_PREFIX) ? new ObjectIdImpl(
 				ref) : new ObjectIdImpl(AlfrescoWrapper.NODEREF_PREFIX + ref);
+	}
+
+	public static String normalizeFolderName(String oggetto, int lenghtLimit,
+			String spacer) {
+		String normalized = Normalizer.normalize(oggetto, Normalizer.Form.NFD);
+		normalized = normalized.trim().replaceAll("\\W+", spacer).trim();
+		int length = normalized.length();
+		if (length > lenghtLimit) {
+			normalized = normalized.substring(0, lenghtLimit);
+		}
+		int last = normalized.lastIndexOf(spacer);
+		if (last == length - 1) {
+			normalized = normalized.substring(0, length - 1);
+		}
+		return normalized;
 	}
 
 	@In

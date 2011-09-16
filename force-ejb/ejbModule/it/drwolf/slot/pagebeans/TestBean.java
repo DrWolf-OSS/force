@@ -522,4 +522,8 @@ public class TestBean {
 		}
 	}
 
+	public void testName() {
+
+	}
+
 }

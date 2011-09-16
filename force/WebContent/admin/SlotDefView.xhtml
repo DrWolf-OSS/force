@@ -68,19 +68,19 @@
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.embeddedPropertiesAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.embeddedPropertiesAsList}" var="eprop" 
 						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" style="width:1024px">
-					<rich:column style="width:200px">
+					<rich:column style="width:200px" styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{eprop.name}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Tipologia di dato</f:facet>
 						<h:outputText value="#{eprop.dataType.value()}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Multipla</f:facet>
 						<h:outputText value="#{eprop.multiple ? 'sì' : 'no'}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Valore</f:facet>
 						<s:fragment rendered="#{not eprop.multiple}">
 							<h:outputText value="#{eprop.stringValue}"
@@ -98,7 +98,7 @@
 							<h:outputText value="#{eprop.value}" />
 						</s:fragment>
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Regole in cui è coinvolta</f:facet>
 						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(eprop)}" rowKeyVar="idx">
 							<h:outputText value="Regola #{rule.id}" />
@@ -118,31 +118,31 @@
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.propertyDefsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
 						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" style="width:1024px">
-					<rich:column style="width:200px">
+					<rich:column style="width:200px" styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{prop.name}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Tipologia di dato</f:facet>
 						<h:outputText value="#{prop.dataType.value()}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Obbligatoria</f:facet>
 						<h:outputText value="#{prop.required ? 'sì' : 'no'}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Multipla</f:facet>
 						<h:outputText value="#{prop.multiple ? 'sì' : 'no'}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Dizionario associato</f:facet>
 						<h:outputText value="#{prop.dictionary!=null ? prop.dictionary.name : ''}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Vincolante per le richieste</f:facet>
 						<h:outputText value="#{!slotDefEditBean.getReferencedCollectionsNames(prop).equals('') ? slotDefEditBean.getReferencedCollectionsNames(prop) : ''}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Regole in cui è coinvolta</f:facet>
 						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(prop)}" rowKeyVar="idx">
 							<h:outputText value="Regola #{rule.id}" />
@@ -162,23 +162,23 @@
 				<h:outputText value="Nessuna richiesta definita" rendered="#{empty slotDefHome.instance.docDefCollectionsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.docDefCollectionsAsList}" var="coll" 
 						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" style="width:1024px">
-					<rich:column style="width:200px">
+					<rich:column style="width:200px" styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{coll.name}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Tipo di documento</f:facet>
 						<h:outputText value="#{coll.docDef.name}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Quantità</f:facet>
 						<h:outputText value="#{coll.quantifier.value()}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Informazione vincolante</f:facet>
 						<h:outputText value="#{coll.conditionalPropertyDef!=null ? coll.conditionalPropertyDef.name : ''}" />
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Valore informazione vincolante</f:facet>
 						<h:outputText value="#{coll.conditionalPropertyInst.stringValue}"
 								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
@@ -191,7 +191,7 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 						</h:outputText>
 					</rich:column>
-					<rich:column>
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Regole in cui è coinvolta</f:facet>
 						<a:repeat var="rule" value="#{slotDefEditBean.retrieveReferencedRules(coll)}" rowKeyVar="idx">
 							<h:outputText value="Regola #{rule.id}"/>

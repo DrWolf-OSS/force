@@ -149,7 +149,8 @@ public class SlotInstEditBean {
 	@In(create = true)
 	private CertsController certsController;
 
-	// private List<MultiplePropertyInst> multiplePropertyInsts;
+	private static final int LENGHT_LIMIT = 150;
+	private static final String SPACER = " ";
 
 	public void addActiveItemToDatas() {
 		if (!this.datas.get(this.activeCollectionId).contains(
@@ -737,15 +738,39 @@ public class SlotInstEditBean {
 		return primaryDocs;
 	}
 
+	// private AlfrescoFolder retrieveSlotFolder() {
+	// AlfrescoFolder groupFolder = this.alfrescoWrapper.findOrCreateFolder(
+	// this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
+	// .name()), this.alfrescoUserIdentity.getActiveGroup()
+	// .getShortName());
+	//
+	// AlfrescoFolder slotFolder = this.alfrescoWrapper.findOrCreateFolder(
+	// groupFolder, this.slotInstHome.getInstance().getSlotDef()
+	// .getName());
+	// return slotFolder;
+	// }
+
 	private AlfrescoFolder retrieveSlotFolder() {
+		if ((this.slotInstHome.getInstance().getNodeRef() != null)
+				&& !this.slotInstHome.getInstance().getNodeRef().equals("")) {
+			return (AlfrescoFolder) this.alfrescoUserIdentity.getSession()
+					.getObject(this.slotInstHome.getInstance().getNodeRef());
+		}
+
 		AlfrescoFolder groupFolder = this.alfrescoWrapper.findOrCreateFolder(
 				this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
 						.name()), this.alfrescoUserIdentity.getActiveGroup()
 						.getShortName());
 
 		AlfrescoFolder slotFolder = this.alfrescoWrapper.findOrCreateFolder(
-				groupFolder, this.slotInstHome.getInstance().getSlotDef()
-						.getName());
+				groupFolder,
+				this.slotInstHome.getInstance().getSlotDef().getId()
+						+ " "
+						+ AlfrescoWrapper.normalizeFolderName(this.slotInstHome
+								.getInstance().getSlotDef().getName(),
+								SlotInstEditBean.LENGHT_LIMIT,
+								SlotInstEditBean.SPACER));
+		this.slotInstHome.getInstance().setNodeRef(slotFolder.getId());
 		return slotFolder;
 	}
 
