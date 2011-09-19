@@ -63,6 +63,7 @@ public class AziendaHome extends EntityHome<Azienda> {
 					.findOrCreateFolder(
 							this.alfrescoWrapper.getMainProjectFolder(),
 							groupName);
+
 			String pwd = UUID.randomUUID().toString().substring(5, 13);
 			// creo l'utente con l'email del referente
 			HashMap<String, String> args = new HashMap<String, String>();

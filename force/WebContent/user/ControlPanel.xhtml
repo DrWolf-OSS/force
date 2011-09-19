@@ -59,7 +59,7 @@
 </rich:panel>
 <rich:panel>
     <f:facet name="header"><s:span>
-    <s:link value="Vedi tutto" view="/SlotInstEdit.xhtml" styleClass="topCommandLink">
+    <s:link value="Vedi tutto" view="/SlotInstEdit.xhtml" styleClass="topCommandLink" propagation="none">
         <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
         <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
         <f:param name="aziendaId" value="#{userSession.aziendaId}"/>

@@ -93,6 +93,11 @@ public class ControlPanelBean {
 		// per farlo procedo nel seguente modo:
 		// prelevo con una query cmis tutti i documenti che sono nella cartella
 		// dello slot primary che sono scabili
+
+		//
+		this.slotInstEditBean.init();
+		//
+
 		ArrayList<String> ids = this.alfrescoWrapper
 				.getDocumentIdsInFolderByAspect("slot:expirable",
 						this.userSession.getPrimarySlotFolder().getId(),
