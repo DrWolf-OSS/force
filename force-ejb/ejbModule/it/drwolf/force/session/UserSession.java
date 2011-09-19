@@ -10,8 +10,10 @@ import it.drwolf.slot.alfresco.webscripts.model.AuthorityType;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.entitymanager.PreferenceManager;
+import it.drwolf.slot.pagebeans.SlotInstEditBean;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
+import it.drwolf.slot.session.SlotDefHome;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -57,6 +59,9 @@ public class UserSession implements Serializable {
 	private AlfrescoWrapper alfrescoWrapper;
 
 	@In(create = true)
+	SlotInstEditBean slotInstEditBean;
+
+	@In(create = true)
 	private Preferences preferences;
 
 	private SlotDef primarySlotDef;
@@ -71,6 +76,12 @@ public class UserSession implements Serializable {
 												// primary dell'azienda
 
 	private boolean llpp = false;
+
+	//
+	@In(create = true)
+	SlotDefHome slotDefHome;
+
+	//
 
 	private void assignGroups() {
 		AlfrescoWebScriptClient alfrescoWebScriptClient = new AlfrescoWebScriptClient(
@@ -159,6 +170,9 @@ public class UserSession implements Serializable {
 									this.identity.getCredentials()
 											.getUsername()).getSingleResult();
 					this.setPrimarySlotDef(azienda.getSettore().getSlotDef());
+					//
+					this.slotDefHome.setInstance(this.primarySlotDef);
+					// /
 					this.setAziendaId(azienda.getId());
 					if (azienda.getSettore().getNome().equals("Edilizia")) {
 						this.setLlpp(true);
@@ -189,14 +203,14 @@ public class UserSession implements Serializable {
 							.name()), this.alfrescoUserIdentity
 							.getActiveGroup().getShortName());
 
-			this.primarySlotFolder = this.alfrescoWrapper.findOrCreateFolder(
-					this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
-							.name())
-							+ "/"
-							+ this.alfrescoUserIdentity.getActiveGroup()
-									.getShortName(), this.getPrimarySlotDef()
-							.getName());
-
+			// this.primarySlotFolder = this.alfrescoWrapper.findOrCreateFolder(
+			// this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
+			// .name())
+			// + "/"
+			// + this.alfrescoUserIdentity.getActiveGroup()
+			// .getShortName(), this.getPrimarySlotDef()
+			// .getName());
+			this.primarySlotFolder = this.slotInstEditBean.retrieveSlotFolder();
 		}
 
 	}
