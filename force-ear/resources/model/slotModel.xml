@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<model name="slot:model" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+	<description>SLOT Custom model</description>
+	<author>Dr Wolf srl</author>
+	<version>1.0</version>
+
+
+	<imports>
+
+		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+	</imports>
+
+	<namespaces>
+		<namespace uri="http://www.drwolf.it/alfresco/slot/model/1.0" prefix="slot" />
+	</namespaces>
+
+	<aspects>
+		
+		<aspect name="slot:expirable">
+			<title>Scadibile</title>
+			<properties>
+				<property name="slot:expirationDate">
+					<title>Data di Scadenza</title>
+					<type>d:date</type>
+					<mandatory>true</mandatory>
+				</property>
+			</properties>
+		</aspect>
+		<aspect name="slot:person">
+			<title>Persona</title>
+			<properties>
+				<property name="slot:personName">
+					<title>Nome</title>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="slot:personSurname">
+					<title>Cognome</title>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="slot:personBirthDate">
+					<title>Data di Nascita</title>
+					<type>d:date</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="slot:personBirthPlace">
+					<title>Luogo di Nascita</title>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="slot:personCodiceFiscale">
+					<title>Codice Fiscale</title>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+				</property>
+			</properties>
+		</aspect>
+		
+
+	</aspects>
+	
+
+</model>
