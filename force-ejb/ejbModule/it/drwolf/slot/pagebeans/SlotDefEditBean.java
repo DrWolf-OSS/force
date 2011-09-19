@@ -13,7 +13,7 @@ import it.drwolf.slot.enums.CollectionQuantifier;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.interfaces.DataDefinition;
-import it.drwolf.slot.interfaces.Definition;
+import it.drwolf.slot.interfaces.Deactivable;
 import it.drwolf.slot.pagebeans.support.PropertiesSourceContainer;
 import it.drwolf.slot.pagebeans.support.PropertyContainer;
 import it.drwolf.slot.ruleverifier.VerifierParameterDef;
@@ -315,6 +315,8 @@ public class SlotDefEditBean {
 
 	public void removeEmbeddedProp(EmbeddedProperty embeddedProp) {
 		slotDefHome.getInstance().getEmbeddedProperties().remove(embeddedProp);
+		//
+		deactiveReferencedRules(embeddedProp);
 	}
 
 	public void editEmbeddedProp(EmbeddedProperty embeddedProp) {
@@ -324,6 +326,12 @@ public class SlotDefEditBean {
 	public void removeProp(PropertyDef prop) {
 		removeReferencesFromCollections(prop, false);
 		slotDefHome.getInstance().getPropertyDefs().remove(prop);
+		//
+		if (prop.getId() == null) {
+			deactiveReferencedRules(prop);
+		} else {
+			removeReferencedRules(prop);
+		}
 	}
 
 	private void removeReferencesFromCollections(PropertyDef prop,
@@ -335,7 +343,14 @@ public class SlotDefEditBean {
 			collection.setConditionalPropertyInst(null);
 			collection.setConditionalPropertyDef(null);
 			if (invalidateCollections) {
-				collection.setActive(false);
+				if (collection.getId() != null && slotDefHome.isReferenced()) {
+					collection.setActive(false);
+				} else {
+					// se lo SlotDef non è referenziato o la collection è stata
+					// appena creata (e quindi sicuramente non referenziata
+					// anche se lo SlotDef lo fosse) posso eliminarla del tutto
+					this.removeColl(collection);
+				}
 			}
 		}
 	}
@@ -354,6 +369,8 @@ public class SlotDefEditBean {
 	public void removeColl(DocDefCollection coll) {
 		slotDefHome.getInstance().getDocDefCollections().remove(coll);
 		coll.setSlotDef(null);
+		//
+		deactiveReferencedRules(coll);
 	}
 
 	public void editColl(DocDefCollection coll) {
@@ -627,17 +644,20 @@ public class SlotDefEditBean {
 		for (Rule rule : rules) {
 			if (obj instanceof PropertyDef) {
 				PropertyDef propertyDef = (PropertyDef) obj;
-				if (isReferencedProperty(propertyDef.getName(), rule)) {
+				if (isReferencedProperty(propertyDef.getName(), rule)
+						&& rule.isActive()) {
 					referencedRules.add(rule);
 				}
 			} else if (obj instanceof EmbeddedProperty) {
 				EmbeddedProperty embeddedProperty = (EmbeddedProperty) obj;
-				if (isReferencedProperty(embeddedProperty.getName(), rule)) {
+				if (isReferencedProperty(embeddedProperty.getName(), rule)
+						&& rule.isActive()) {
 					referencedRules.add(rule);
 				}
 			} else if (obj instanceof DocDefCollection) {
 				DocDefCollection docDefCollection = (DocDefCollection) obj;
-				if (isReferencedCollection(docDefCollection.getName(), rule)) {
+				if (isReferencedCollection(docDefCollection.getName(), rule)
+						&& rule.isActive()) {
 					referencedRules.add(rule);
 				}
 			}
@@ -646,11 +666,47 @@ public class SlotDefEditBean {
 		return referencedRules;
 	}
 
+	// Le regole settate come inattive sono quelle del modello clonato, che nel
+	// momento del save non saranno poi copiate.
+	//
+	// Nel caso le regole referenziate siano quelle proprie dello SlotDef (e che
+	// quindi è già stato persistito) questo metodo è impossibile che sia
+	// invocato perchè è stato impedito da interfaccia di eliminare un elemento
+	// che è referenziato da una regola
+	private void deactiveReferencedRules(Object obj) {
+		List<Rule> referencedRules = retrieveReferencedRules(obj);
+		for (Rule rule : referencedRules) {
+			rule.setActive(false);
+		}
+	}
+
+	private void removeReferencedRules(Object obj) {
+		List<Rule> referencedRules = retrieveReferencedRules(obj);
+		for (Rule rule : referencedRules) {
+			slotDefHome.getInstance().getRules().remove(rule);
+			rule.setSlotDef(null);
+		}
+	}
+
+	// per stamparli facile nel confirm javascript nella pagina
+	public String retrieveReferencedRulesLabel(Object obj) {
+		String out = "";
+		List<Rule> referencedRules = retrieveReferencedRules(obj);
+		for (int i = 0; i < referencedRules.size(); i++) {
+			Rule rule = referencedRules.get(i);
+			out = out.concat("Regola " + rule.getId());
+			if (i < referencedRules.size() - 1) {
+				out = out.concat(", ");
+			}
+		}
+		return out;
+	}
+
 	//
 	//
 
 	public void invalidate(Object obj) {
-		Definition def = (Definition) obj;
+		Deactivable def = (Deactivable) obj;
 		if (def.isActive()) {
 			if (obj instanceof PropertyDef) {
 				PropertyDef pDef = (PropertyDef) obj;

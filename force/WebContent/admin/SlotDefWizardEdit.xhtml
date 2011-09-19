@@ -24,7 +24,7 @@
 
             <s:decorate id="nameField" template="/layout/edit.xhtml">
                 <ui:define name="label">Nome</ui:define>
-                <h:inputText id="name" value="#{slotDefHome.instance.name}" required="true" style="width:255px"/>
+                <h:inputTextarea id="name" value="#{slotDefHome.instance.name}" required="true" style="width:525px" />
             </s:decorate>
             
             <s:decorate id="typeField" template="/layout/edit.xhtml" rendered="#{slotDefParameters.mode == 'Normal'}">
@@ -92,17 +92,16 @@
 		            			reRender="embeddedPropPanel"/>
 		                #{' '}
 						<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(eprop)}" 
-            						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}"
-            						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(eprop) ? 'disabledLink' : ''}"
-            						reRender="epropTable"
-            						rendered="#{not slotDefHome.referenced}"/>
+            						onclick="if(!confRules('#{slotDefEditBean.retrieveReferencedRulesLabel(eprop)}')){return false;}"
+            						reRender="epropTable,propTable,collTable"
+            						rendered="#{not slotDefHome.referenced or eprop.id==null}"/>
             						
             			<a:commandLink id="invalidate" value="#{eprop.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(eprop)}"
             						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}"
             						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(eprop) ? 'disabledLink' : ''}"
             						reRender="epropTable"
-            						rendered="#{slotDefHome.referenced}"/>
-            			<rich:toolTip for="#{slotDefHome.referenced ? 'invalidate' : 'delete'}" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}">
+            						rendered="#{slotDefHome.referenced and eprop.id!=null}"/>
+            			<rich:toolTip for="invalidate" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}">
             			L'informazione è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
 					</rich:column>
 				</rich:dataTable>
@@ -151,25 +150,26 @@
 					</rich:column>
 					<rich:column styleClass="action #{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Azioni</f:facet>
-		                <a:commandLink value="Modifica" action="#{slotDefEditBean.editProp(prop)}" oncomplete="#{rich:component('propPanel')}.show()" 
-		                		        onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
+		                <a:commandLink value="Modifica" 
+		                				action="#{slotDefEditBean.editProp(prop)}" 
+		                				oncomplete="#{rich:component('propPanel')}.show()" 
 		                		        disabled="#{not prop.active}"
 				                		styleClass="#{not prop.active ? 'disabledLink' : ''}"
 		                				reRender="propPanel"/>
 		                #{' '}
 						<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeProp(prop)}" 
-		                				onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
-		                				disabled="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}"
-		                				styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(prop) ? 'disabledLink' : ''}"
-		                				rendered="#{not slotDefHome.referenced}"
-		                				reRender="propTable,collTable"/>
+		                				onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}; if(!confRules('#{slotDefEditBean.retrieveReferencedRulesLabel(prop)}')){return false;}"
+		                				rendered="#{not slotDefHome.referenced or prop.id==null}"
+		                				reRender="propTable,collTable,epropTable"/>
 		                				
-		                <a:commandLink id="invalidate" value="#{prop.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(prop)}"
+		                <a:commandLink id="invalidate" value="#{prop.active ? 'Invalida' : 'Riattiva'}" 
+		                			onclick="if(!confInvalidate('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
+		                			action="#{slotDefEditBean.invalidate(prop)}"
             						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}"
             						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(prop) ? 'disabledLink' : ''}"
             						reRender="propTable,collTable"
-            						rendered="#{slotDefHome.referenced}"/>
-            			<rich:toolTip for="#{slotDefHome.referenced ? 'invalidate' : 'delete'}" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}">
+            						rendered="#{slotDefHome.referenced and prop.id!=null}"/>
+            			<rich:toolTip for="invalidate" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}">
             			L'informazione è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
             						
 					</rich:column>
@@ -230,17 +230,16 @@
 										styleClass="#{not coll.active ? 'disabledLink' : ''}"/>
 							#{'  '}
 							<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeColl(coll)}" 
-									disabled="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}" 
-									styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(coll) ? 'disabledLink' : ''}"
-									reRender="collTable"
-									rendered="#{not slotDefHome.referenced}"/>
+									onclick="if(!confRules('#{slotDefEditBean.retrieveReferencedRulesLabel(coll)}')){return false;}"
+									reRender="epropTable,propPanel,collTable"
+									rendered="#{not slotDefHome.referenced or coll.id==null}"/>
 									
 						 	<a:commandLink id="invalidate" value="#{coll.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(coll)}"
             						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}"
             						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(coll) ? 'disabledLink' : ''}"
             						reRender="collTable"
-            						rendered="#{slotDefHome.referenced}"/>
-            				<rich:toolTip for="#{slotDefHome.referenced ? 'invalidate' : 'delete'}" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}">
+            						rendered="#{slotDefHome.referenced and coll.id!=null}"/>
+            				<rich:toolTip for="invalidate" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}">
             				La richiesta è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
 					</rich:column>
 				</rich:dataTable>
@@ -257,11 +256,20 @@
 				</ui:define>
 				<a:commandButton value="Aggiungi informazione #{slotDefParameters.mode == 'PRIMARY' ? 'sull azienda' : ''}" 
 							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
-							action="#{slotDefEditBean.newProperty()}" oncomplete="#{rich:component('propPanel')}.show()" reRender="pf,propPanel" rendered="#{slotDefParameters.mode != 'GENERAL'}"/>
-				<a:commandButton value="Aggiungi richiesta" onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
-							action="#{slotDefEditBean.newCollection()}" oncomplete="#{rich:component('collTypePanel')}.show()" reRender="collPanel"/>
-				<a:commandButton value="Aggiungi informazioni relative alla gara" action="#{slotDefEditBean.newEmbeddedProperty()}" 
-							oncomplete="#{rich:component('embeddedPropPanel')}.show()" reRender="embeddedPropPanel" rendered="#{slotDefParameters.mode != 'PRIMARY'}"/>
+							action="#{slotDefEditBean.newProperty()}" 
+							oncomplete="#{rich:component('propPanel')}.show()" 
+							rendered="#{slotDefParameters.mode != 'GENERAL'}"
+							reRender="pf,propPanel"/>
+				<a:commandButton value="Aggiungi richiesta" 
+							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
+							action="#{slotDefEditBean.newCollection()}" 
+							oncomplete="#{rich:component('collTypePanel')}.show()" 
+							reRender="collPanel"/>
+				<a:commandButton value="Aggiungi informazione relativa alla gara" 
+							action="#{slotDefEditBean.newEmbeddedProperty()}" 
+							oncomplete="#{rich:component('embeddedPropPanel')}.show()" 
+							rendered="#{slotDefParameters.mode != 'PRIMARY'}"
+							reRender="embeddedPropPanel"/>
 			</s:decorate>
 			
             <div style="clear:both">
@@ -305,15 +313,56 @@
 			</f:facet>
 			<a:form id="ctpf">
 			<s:div style="text-align: center">
-				<a:commandButton action="#{slotDefEditBean.setConditional(false)}" oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('collPanel')}.show();"
-								value="Aggiungi richiesta comune" reRender="collPanel,propPanel"/>
+				<a:commandButton action="#{slotDefEditBean.setConditional(false)}" 
+							value="Aggiungi richiesta comune" 
+							oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('collPanel')}.show();"
+							reRender="collPanel,propPanel"/>
 				#{' '}
-				<a:commandButton action="#{slotDefEditBean.newConditionaProperty()}" oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('propPanel')}.show();"
-								value="Aggiungi richiesta vincolata" reRender="pf,collPanel,propPanel"/>
+				<a:commandButton action="#{slotDefEditBean.newConditionaProperty()}" 
+							value="Aggiungi richiesta vincolata" 
+							oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('selectCondProp')}.show();"
+							reRender="pf,collPanel,propPanel"/>
 	        <div style="clear:both"/>
 	        </s:div>
 	        <a:region>
 			<a:commandButton value="Annulla" oncomplete="#{rich:component('collTypePanel')}.hide()" reRender="pf,propPanel,collPanel"/>
+			</a:region>
+			</a:form>
+		</rich:modalPanel>
+		
+		
+		<rich:modalPanel id="selectCondProp" autosized="true" minWidth="500"
+				resizeable="false">
+			<f:facet name="header">
+				<h:outputText value="Scegli l'informazione vincolante" />
+			</f:facet>
+			<a:form id="scp">
+				<ui:param name="customType" value="p" />
+				<s:decorate template="/layout/edit.xhtml" id="condPD">
+	                <ui:define name="label">
+	                	<h:outputText value="Informazione vincolante" />
+					</ui:define>
+					<h:selectOneMenu  value="#{slotDefEditBean.collection.conditionalPropertyDef}" 
+								converter="propertyDefConverter">
+     					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
+									var="propertyDef"  noSelectionLabel="-- select a value --" 
+									itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
+									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
+						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="scp"/>
+					</h:selectOneMenu>
+	            </s:decorate>
+			<s:div>
+	        <div style="clear:both"/>
+	        </s:div>
+	        <a:commandButton value="Ok" 
+	        			oncomplete="#{rich:component('selectCondProp')}.hide();#{rich:component('collPanel')}.show();" 
+	        			reRender="pf,propPanel,collPanel"/>
+	        <a:commandButton value="Definisci una nuova informazione" 
+	        			oncomplete="#{rich:component('selectCondProp')}.hide();#{rich:component('propPanel')}.show();" 
+	        			disabled="#{slotDefEditBean.collection.conditionalPropertyDef != null}"
+	        			reRender="pf,propPanel,collPanel"/>
+	        <a:region>
+			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('selectCondProp')}.hide()" reRender="pf,propPanel,collPanel"/>
 			</a:region>
 			</a:form>
 		</rich:modalPanel>
@@ -648,7 +697,31 @@
 		<script type="text/javascript">
 		function conf(c){
 			if(c!=''){
-				if(!confirm('L\'informazione è condizionale per le richieste: "'+c+'".\nSicuro di voler continuare?')){
+				if(!confirm('L\'informazione è condizionale per le richieste: "'+c+'". Le richieste verranno mantenute ma perderanno il vincolo condizionale e diventeranno quindi obbligatorie.' + 
+						'\nL\'eliminazione delle richieste, se necessaria, deve essere fatta manualmente una per una.\nContinuare?')){
+					return false;
+				}else{
+					return true;
+				}
+			}
+			return true;
+		}
+
+		function confInvalidate(c){
+			if(c!=''){
+				if(!confirm('L\'informazione è condizionale per le richieste: "'+c+'". Le richieste verranno invalidate insieme all\'informazione.' + 
+						'\nContinuare?')){
+					return false;
+				}else{
+					return true;
+				}
+			}
+			return true;
+		}
+
+		function confRules(c){
+			if(c!=''){
+				if(!confirm('L\'informazione è coinvolta nelle regole: "'+c+'". In questo caso anche le regole verranno eliminate.\nContinuare?')){
 					return false;
 				}else{
 					return true;

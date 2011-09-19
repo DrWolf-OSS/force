@@ -62,9 +62,9 @@
         <s:button view="/admin/SlotDefWizardEdit.xhtml"
                     id="create"
            propagation="none"
-                 value="Crea un nuovo modello">
+                 value="#{slotDefParameters.from.equals('/admin/GaraEdit.xhtml') ? 'Crea una nuova Busta Amministrativa' : 'Crea un nuovo Modello'}">
             <f:param name="slotDefId"/>
-            <f:param name="model" value="#{true}"/>
+            <f:param name="model" value="#{slotDefParameters.from.equals('/admin/GaraEdit.xhtml') ? false : true}"/>
             <f:param name="wizard" value="#{true}"/>
             <f:param name="mode" value="#{slotDefParameters.mode}"/>
             <f:param name="from" value="/admin/SlotDefTemplateList.xhtml"/>

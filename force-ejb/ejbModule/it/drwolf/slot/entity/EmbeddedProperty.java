@@ -3,7 +3,7 @@ package it.drwolf.slot.entity;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.DataInstance;
-import it.drwolf.slot.interfaces.Definition;
+import it.drwolf.slot.interfaces.Deactivable;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,7 +25,7 @@ import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 public class EmbeddedProperty implements DataDefinition, DataInstance,
-		Definition {
+		Deactivable {
 
 	private Long id;
 
