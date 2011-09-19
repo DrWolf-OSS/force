@@ -375,66 +375,7 @@
 			</div>
 		</a:form>
 
-		<rich:tabPanel switchType="ajax">
-
-			<rich:tab label="Doc inst collections">
-				<h:form styleClass="association" id="docInstCollectionsChildren">
-
-					<h:outputText
-						value="There are no docInstCollections associated with this slotInst."
-						rendered="#{empty slotInstHome.docInstCollections}" />
-
-					<rich:dataTable value="#{slotInstHome.docInstCollections}"
-						var="_docInstCollection"
-						rendered="#{not empty slotInstHome.docInstCollections}"
-						rowClasses="rvgRowOne,rvgRowTwo" id="docInstCollectionsTable">
-						<rich:column sortBy="#{_docInstCollection.id}">
-							<f:facet name="header">Id</f:facet>
-							<h:outputText value="#{_docInstCollection.id}" />
-						</rich:column>
-					</rich:dataTable>
-
-				</h:form>
-
-				<f:subview rendered="#{slotInstHome.managed}"
-					id="docInstCollections">
-					<div class="actionButtons">
-					<s:button value="Add docInstCollection"
-						id="adddocInstCollection" 
-						view="/DocInstCollectionEdit.xhtml" propagation="none">
-						<f:param name="slotInstId" value="#{slotInstHome.instance.id}" />
-						<f:param name="docInstCollectionFrom" value="SlotInst" />
-					</s:button></div>
-				</f:subview>
-			</rich:tab>
-
-			<rich:tab label="Slot def">
-				<div class="association" id="slotDefParent"><h:outputText
-					value="There is no slotDef associated with this slotInst."
-					rendered="#{slotInstHome.instance.slotDef == null}" /> <rich:dataTable
-					var="_slotDef" value="#{slotInstHome.instance.slotDef}"
-					rendered="#{slotInstHome.instance.slotDef != null}"
-					rowClasses="rvgRowOne,rvgRowTwo" id="slotDefTable">
-					<h:column>
-						<f:facet name="header">Id</f:facet>
-						<h:outputText value="#{_slotDef.id}" />
-					</h:column>
-					<h:column>
-						<f:facet name="header">Name</f:facet>
-						<h:outputText value="#{_slotDef.name}" />
-					</h:column>
-				</rich:dataTable>
-
-				<div class="actionButtons"><s:button
-					id="#{slotInstHome.instance.slotDef != null ? 'changeParent' : 'selectParent'}"
-					value="#{slotInstHome.instance.slotDef != null ? 'Change' : 'Select'} slotDef"
-					view="/SlotDefList.xhtml">
-					<f:param name="from" value="SlotInstEdit" />
-				</s:button></div>
-
-				</div>
-			</rich:tab>
-		</rich:tabPanel>
+			
 
 		<rich:modalPanel id="uploadPanel" autosized="true">
 			<f:facet name="header">
