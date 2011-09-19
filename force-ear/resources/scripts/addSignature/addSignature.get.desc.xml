@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>Add Signature</shortname>
+  <description>Add signature to document</description>
+  <url>/addSignature?target={targetArgument}&amp;name={nameArgument}</url>
+  <authentication>user</authentication>
+</webscript>

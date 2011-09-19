@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>Embed Content</shortname>
+  <description>Add content as a child to a digital signed document</description>
+  <url>/embedContent?target={targetArgument}&amp;content={contentArgument}&amp;name={nameArgument}</url>
+  <authentication>user</authentication>
+</webscript>
