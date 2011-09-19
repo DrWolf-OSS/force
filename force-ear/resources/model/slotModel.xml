@@ -17,7 +17,96 @@
 	<namespaces>
 		<namespace uri="http://www.drwolf.it/alfresco/slot/model/1.0" prefix="slot" />
 	</namespaces>
-
+    <constraints>
+        <constraint name="slot:CertificazioneList" type="LIST">
+            <parameter name="allowedValues">
+                <list>
+                    <value>ISO 9001:08</value>
+                    <value>ISO 14001</value>
+                    <value>EMAS</value>
+                    <value>ISO 14040 LCA</value>
+                    <value>EPD</value>
+                    <value>ISO 14064 Gas serra</value>
+                    <value>EN 16001</value>
+                    <value>ISO 22000</value>
+                    <value>ISO TS 22002 e PAS220</value>
+                    <value>ISO 22005</value>
+                    <value>ISO 24114</value>
+                    <value>UNI 11381</value>
+                    <value>UNI EN 15593</value>
+                    <value>UNI 11034</value>
+                    <value>UNI 10865</value>
+                    <value>UNI 10670</value>
+                    <value>UNI 10881</value>
+                    <value>UNI 10600</value>
+                    <value>UNI 10668</value>
+                    <value>UNI EN 14804</value>
+                    <value>UNI 10891</value>
+                    <value>ISO 27001</value>
+                    <value>ISO 20000</value>
+                    <value>ISO 22716</value>
+                </list>
+            </parameter>
+        </constraint>
+        <constraint name="slot:SOACodeList" type="LIST">
+            <parameter name="allowedValues">
+                <list>
+                    <value>OG 1</value>
+                    <value>OG 2</value>
+                    <value>OG 3</value>
+                    <value>OG 4</value>
+                    <value>OG 5</value>
+                    <value>OG 6</value>
+                    <value>OG 7</value>
+                    <value>OG 8</value>
+                    <value>OG 9</value>
+                    <value>OG 10</value>
+                    <value>OG 11</value>
+                    <value>OG 12</value>
+                    <value>OG 13</value>
+                    <value>OS 1</value>
+                    <value>OS 2-A</value>
+                    <value>OS 2-B</value>
+                    <value>OS 3</value>
+                    <value>OS 4</value>
+                    <value>OS 5</value>
+                    <value>OS 6</value>
+                    <value>OS 7</value>
+                    <value>OS 8</value>
+                    <value>OS 9</value>
+                    <value>OS 10</value>
+                    <value>OS 11</value>
+                    <value>OS 12-A</value>
+                    <value>OS 12-B</value>
+                    <value>OS 13</value>
+                    <value>OS 14</value>
+                    <value>OS 15</value>
+                    <value>OS 16</value>
+                    <value>OS 17</value>
+                    <value>OS 18-A</value>
+                    <value>OS 18-B</value>
+                    <value>OS 19</value>
+                    <value>OS 20-A</value>
+                    <value>OS 20B</value>
+                    <value>OS 21</value>
+                    <value>OS 22</value>
+                    <value>OS 23</value>
+                    <value>OS 24</value>
+                    <value>OS 25</value>
+                    <value>OS 26</value>
+                    <value>OS 27</value>
+                    <value>OS 28</value>
+                    <value>OS 29</value>
+                    <value>OS 30</value>
+                    <value>OS 31</value>
+                    <value>OS 32</value>
+                    <value>OS 33</value>
+                    <value>OS 34</value>
+                    <value>OS 35</value>
+                </list>
+            </parameter>
+        </constraint>
+    </constraints>
 	<aspects>
 		
 		<aspect name="slot:expirable">
@@ -60,9 +149,62 @@
 				</property>
 			</properties>
 		</aspect>
-		
-
+		<aspect name="slot:procura">
+		  <title>Procura</title>
+		  <properties>
+		      <property name="slot:procuraCode">
+		          <title>Numero Procura</title>
+		          <type>d:text</type>
+		          <mandatory>true</mandatory>
+		      </property>
+		  </properties>
+		</aspect>
+        <aspect name="slot:bilancio">
+            <title>Bilancio</title>
+            <properties>
+                <property name="slot:fatturatoBilancio">
+                    <title>Fatturato</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="slot:annoBilancio">
+                    <title>Anno</title>
+                    <type>d:date</type>
+                    <mandatory>true</mandatory>
+                </property>
+            </properties>
+        </aspect>
+        <aspect name="slot:soa">
+            <title>SOA</title>
+            <properties>
+                <property name="slot:SOACode">
+                    <title>Codici</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <multiple>true</multiple>
+                    <constraints>
+                        <constraint ref="slot:SOACodeList" />
+                    </constraints>
+                </property>
+            </properties>
+        </aspect>
+        <aspect name="slot:certificazioni">
+            <title>Certificazioni</title>
+            <properties>
+                <property name="slot:CertificazioneCodeVincolato">
+                    <title>Tipo di Certificazione (elenco)</title>
+                    <type>d:text</type>
+                    <mandatory>false</mandatory>
+                    <constraints>
+                        <constraint ref="slot:CertificazioneList"/>
+                    </constraints>
+                </property>
+                <property name="slot:CertificazioneCodiceLibero">
+                    <title>Tipo di Certificazione (libero)</title>
+                    <type>d:text</type>
+                    <mandatory>false</mandatory>
+                </property>
+            </properties>
+        </aspect>
 	</aspects>
-	
-
 </model>
