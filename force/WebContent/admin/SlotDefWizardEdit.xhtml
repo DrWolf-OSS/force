@@ -13,6 +13,8 @@
 <ui:define name="body">
 
     <h:form id="slotDef" styleClass="edit">
+    
+    	<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
 
         <rich:panel>
             <f:facet name="header">#{slotDefHome.managed ? 'Modifica' : 'Creazione'} #{slotDefParameters.model ? 'modello di' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Busta di Riferimento' : 'Busta Amministrativa'}</f:facet>
@@ -281,18 +283,21 @@
         
         	<h:commandButton id="assign"
                           value="Associa alla gara"
+                           onclick="dirty = false;"
                          action="#{slotDefGaraAssociationtBean.persistAssociation()}"
                        disabled="#{!slotDefHome.wired}"
                        rendered="#{garaHome.garaId!=null and garaHome.instance.slotDef==null}"/>
 
             <h:commandButton id="save"
                           value="Salva"
+                           onclick="dirty = false;"
                          action="#{slotDefEditBean.save()}"
                        disabled="#{!slotDefHome.wired}"
                        rendered="#{!slotDefHome.managed and garaHome.garaId == null}"/>
 
             <h:commandButton id="update"
                           value="Aggiorna"
+                        onclick="dirty = false;"
                          action="#{slotDefEditBean.update()}"
                        rendered="#{slotDefHome.managed}"/>
 
@@ -300,7 +305,8 @@
                           value="Elimina"
                          action="#{slotDefHome.remove}"
                       immediate="true"
-                       rendered="#{slotDefHome.managed}"/>
+                       rendered="#{slotDefHome.managed}"
+                       disabled="#{slotDefHome.referenced}"/>
 
         </div>
 
@@ -694,7 +700,7 @@
 			</a:form>
 		</rich:modalPanel>
 		
-		<script type="text/javascript">
+		<script type="text/javascript">	
 		function conf(c){
 			if(c!=''){
 				if(!confirm('L\'informazione è condizionale per le richieste: "'+c+'". Le richieste verranno mantenute ma perderanno il vincolo condizionale e diventeranno quindi obbligatorie.' + 
@@ -731,6 +737,7 @@
 		}
 		</script>
 		
+			
 </ui:define>
 
 </ui:composition>

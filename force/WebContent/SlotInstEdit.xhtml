@@ -12,6 +12,7 @@
 	<ui:define name="body">
 
 		<a:form id="slotInst" styleClass="edit">
+		<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
 			<rich:panel>
 				<f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Edit' : 'Create'} Slot inst #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
 
@@ -355,14 +356,17 @@
 			<div class="actionButtons">
 			<h:commandButton id="save"
 				value="Save" action="#{slotInstEditBean.save()}"
+				onclick="dirty = false;"
 				rendered="#{slotInstHome.id == null}"
 				styleClass="modal" />
 			<h:commandButton id="update"
 				value="Save" action="#{slotInstEditBean.update()}"
+				onclick="dirty = false;"
 				rendered="#{slotInstHome.id != null}" 
 				styleClass="modal"/>
 			<h:commandButton id="delete"
 				value="Delete" action="#{slotInstHome.remove}" immediate="true"
+				onclick="dirty = false;"
 				rendered="#{slotInstHome.managed}" 
 				styleClass="modal"/>
 			<s:button id="cancelEdit"

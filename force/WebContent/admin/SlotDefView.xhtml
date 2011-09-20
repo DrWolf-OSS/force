@@ -47,6 +47,12 @@
                 <ui:define name="label">Modello</ui:define>
                	<h:outputText value="#{slotDefHome.instance.template ? 'Sì' : 'No' }" />
             </s:decorate>
+            
+                        
+            <s:decorate template="/layout/display.xhtml">
+                <ui:define name="label">Referenziato da gare</ui:define>
+                <h:outputText value="#{slotDefGaraAssociationtBean.slotDefReferencedBySomeGara ? 'Sì' : 'No'}" />
+            </s:decorate>
 
             <s:decorate id="nameField" template="/layout/display.xhtml">
                 <ui:define name="label">Nome</ui:define>

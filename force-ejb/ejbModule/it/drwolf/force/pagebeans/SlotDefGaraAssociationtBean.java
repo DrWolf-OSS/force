@@ -3,8 +3,11 @@ package it.drwolf.force.pagebeans;
 import it.drwolf.force.entity.Gara;
 import it.drwolf.force.session.homes.GaraHome;
 import it.drwolf.slot.entity.SlotDef;
+import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.pagebeans.SlotDefEditBean;
 import it.drwolf.slot.session.SlotDefHome;
+
+import java.util.List;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
@@ -25,21 +28,11 @@ public class SlotDefGaraAssociationtBean {
 	@In(create = true)
 	private GaraHome garaHome;
 
-	// private static final int LENGHT_LIMIT = 150;
-
-	// private static final String SPACER = "_";
-
-	private void initSlotDefValues() {
+	public void initSlotDefValues() {
 		if (garaHome.getGaraId() != null && slotDefHome.getSlotDefId() == null
 				&& slotDefHome.getInstance() != null) {
 			String oggetto = garaHome.getInstance().getOggetto().trim();
 			slotDefHome.getInstance().setName(oggetto);
-
-			// String normalized = AlfrescoWrapper.normalizeFolderName(oggetto,
-			// SlotDefGaraAssociationtBean.LENGHT_LIMIT,
-			// SlotDefGaraAssociationtBean.SPACER);
-
-			// slotDefHome.getInstance().setName(normalized);
 		}
 	}
 
@@ -63,6 +56,23 @@ public class SlotDefGaraAssociationtBean {
 	public void useSlotDef(SlotDef slotDefToClone) {
 		slotDefHome.slotDefClone(slotDefToClone);
 		initSlotDefValues();
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean isSlotDefReferencedBySomeGara() {
+		if (this.slotDefHome.getInstance() != null
+				&& this.slotDefHome.getInstance().getId() != null) {
+			List<SlotInst> resultList = this.slotDefHome
+					.getEntityManager()
+					.createQuery(
+							"select id from Gara g where g.slotDef=:slotDef")
+					.setParameter("slotDef", this.slotDefHome.getInstance())
+					.setMaxResults(1).getResultList();
+			if (resultList != null && !resultList.isEmpty()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

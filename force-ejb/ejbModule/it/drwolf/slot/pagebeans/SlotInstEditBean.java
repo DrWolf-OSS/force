@@ -751,11 +751,22 @@ public class SlotInstEditBean {
 	// }
 
 	public AlfrescoFolder retrieveSlotFolder() {
+		AlfrescoFolder slotFolder = null;
 		if ((this.slotInstHome.getInstance() != null)
 				&& (this.slotInstHome.getInstance().getNodeRef() != null)
 				&& !this.slotInstHome.getInstance().getNodeRef().equals("")) {
-			return (AlfrescoFolder) this.alfrescoUserIdentity.getSession()
-					.getObject(this.slotInstHome.getInstance().getNodeRef());
+			try {
+				slotFolder = (AlfrescoFolder) this.alfrescoUserIdentity
+						.getSession().getObject(
+								this.slotInstHome.getInstance().getNodeRef());
+			} catch (CmisObjectNotFoundException e) {
+				e.printStackTrace();
+			}
+
+			if (slotFolder != null) {
+				return slotFolder;
+			}
+
 		}
 
 		AlfrescoFolder groupFolder = this.alfrescoWrapper.findOrCreateFolder(
@@ -763,7 +774,7 @@ public class SlotInstEditBean {
 						.name()), this.alfrescoUserIdentity.getActiveGroup()
 						.getShortName());
 
-		AlfrescoFolder slotFolder = this.alfrescoWrapper.findOrCreateFolder(
+		slotFolder = this.alfrescoWrapper.findOrCreateFolder(
 				groupFolder,
 				this.slotDefHome.getInstance().getId()
 						+ " "
