@@ -5,4 +5,6 @@ public interface Deactivable {
 	boolean isActive();
 
 	void setActive(boolean active);
+
+	public Long getId();
 }

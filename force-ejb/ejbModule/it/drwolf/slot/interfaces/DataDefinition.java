@@ -4,9 +4,9 @@ import it.drwolf.slot.enums.DataType;
 
 import java.util.List;
 
-public interface DataDefinition {
+public interface DataDefinition extends Definition {
 
-	public String getLabel();
+	// public String getLabel();
 
 	public DataType getDataType();
 

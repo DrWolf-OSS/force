@@ -1,6 +1,7 @@
 package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.Deactivable;
 
@@ -21,7 +22,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Cascade;
 
 @Entity
-public class PropertyDef implements DataDefinition, Deactivable {
+public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	private Long id;
 

@@ -2,7 +2,9 @@ package it.drwolf.slot.entity;
 
 import it.drwolf.slot.entity.listeners.DocDefCollectionListener;
 import it.drwolf.slot.enums.CollectionQuantifier;
+import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.Deactivable;
+import it.drwolf.slot.interfaces.Definition;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -18,7 +20,7 @@ import org.hibernate.validator.NotNull;
 
 @Entity
 @EntityListeners(value = DocDefCollectionListener.class)
-public class DocDefCollection implements Deactivable {
+public class DocDefCollection implements Deactivable, Definition, Conditionable {
 
 	private Long id;
 
@@ -132,6 +134,11 @@ public class DocDefCollection implements Deactivable {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	@Transient
+	public String getLabel() {
+		return this.getName();
 	}
 
 }
