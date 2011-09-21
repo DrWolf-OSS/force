@@ -98,40 +98,46 @@ public class ControlPanelBean {
 		this.slotInstEditBean.init();
 		//
 
-		ArrayList<String> ids = this.alfrescoWrapper
-				.getDocumentIdsInFolderByAspect("slot:expirable",
-						this.userSession.getPrimarySlotFolder().getId(),
-						"slot:expirationDate", 2);
-		this.inScadenza = new ArrayList<DocInstCollection>();
-		this.inScadenzaFC = new HashMap<Long, List<FileContainer>>();
-		HashSet<Property> properties = new HashSet<Property>();
-		properties.add(this.customModelController
-				.getProperty("slot:expirationDate"));
-		for (DocInstCollection docs : this.slotInstEditBean
-				.getDocInstCollections()) {
-			DocInstCollection docInst = new DocInstCollection(
-					docs.getSlotInst(), docs.getDocDefCollection());
-			List<FileContainer> fileContainers = new ArrayList<FileContainer>();
-			boolean added = false;
-			for (DocInst doc : docs.getDocInsts()) {
-				for (String id : ids) {
-					if (doc.getNodeRef().equals(id)) {
-						added = true;
-						docInst.getDocInsts().add(doc);
-						AlfrescoDocument ad = (AlfrescoDocument) this.alfrescoUserIdentity
-								.getSession().getObject(doc.getNodeRef());
-						FileContainer fc = new FileContainer(ad, properties,
-								false);
-						fileContainers.add(fc);
+		// PALA
+		// Il PrimarySlotInst potrebbe non essere ancora stato istanziato!
+		if (userSession.getPrimarySlotInst() != null) {
+			ArrayList<String> ids = this.alfrescoWrapper
+					.getDocumentIdsInFolderByAspect("slot:expirable",
+							this.userSession.getPrimarySlotFolder().getId(),
+							"slot:expirationDate", 2);
+			this.inScadenza = new ArrayList<DocInstCollection>();
+			this.inScadenzaFC = new HashMap<Long, List<FileContainer>>();
+			HashSet<Property> properties = new HashSet<Property>();
+			properties.add(this.customModelController
+					.getProperty("slot:expirationDate"));
+			for (DocInstCollection docs : this.slotInstEditBean
+					.getDocInstCollections()) {
+				DocInstCollection docInst = new DocInstCollection(
+						docs.getSlotInst(), docs.getDocDefCollection());
+				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
+				boolean added = false;
+				for (DocInst doc : docs.getDocInsts()) {
+					for (String id : ids) {
+						if (doc.getNodeRef().equals(id)) {
+							added = true;
+							docInst.getDocInsts().add(doc);
+							AlfrescoDocument ad = (AlfrescoDocument) this.alfrescoUserIdentity
+									.getSession().getObject(doc.getNodeRef());
+							FileContainer fc = new FileContainer(ad,
+									properties, false);
+							fileContainers.add(fc);
+						}
 					}
 				}
-			}
-			if (added) {
-				this.inScadenza.add(docInst);
-				this.inScadenzaFC.put(docInst.getDocDefCollection().getId(),
-						fileContainers);
+				if (added) {
+					this.inScadenza.add(docInst);
+					this.inScadenzaFC.put(
+							docInst.getDocDefCollection().getId(),
+							fileContainers);
+				}
 			}
 		}
+		//
 	}
 
 	public void setInScadenza(ArrayList<DocInstCollection> inscadenza) {

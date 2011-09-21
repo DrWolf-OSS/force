@@ -26,7 +26,6 @@ import it.drwolf.slot.interfaces.DataInstance;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.FileContainer;
 import it.drwolf.slot.pagebeans.support.ValueChangeListener;
-import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 import it.drwolf.slot.ruleverifier.ParameterCoordinates;
 import it.drwolf.slot.ruleverifier.RuleParametersResolver;
@@ -158,7 +157,10 @@ public class SlotInstEditBean {
 			try {
 				DocInstCollection instCollection = this
 						.findInstCollection(this.activeCollectionId);
-				AlfrescoFolder slotFolder = this.retrieveSlotFolder();
+				//
+				AlfrescoFolder slotFolder = this.slotInstHome
+						.retrieveOrCreateSlotFolder();
+				//
 				this.storeOnAlfresco(this.activeFileContainer, instCollection,
 						slotFolder);
 				this.datas.get(this.activeCollectionId).add(
@@ -738,53 +740,41 @@ public class SlotInstEditBean {
 		return primaryDocs;
 	}
 
-	// private AlfrescoFolder retrieveSlotFolder() {
+	// public AlfrescoFolder retrieveSlotFolder() {
+	// AlfrescoFolder slotFolder = null;
+	// if ((this.slotInstHome.getInstance() != null)
+	// && (this.slotInstHome.getInstance().getNodeRef() != null)
+	// && !this.slotInstHome.getInstance().getNodeRef().equals("")) {
+	// try {
+	// slotFolder = (AlfrescoFolder) this.alfrescoUserIdentity
+	// .getSession().getObject(
+	// this.slotInstHome.getInstance().getNodeRef());
+	// } catch (CmisObjectNotFoundException e) {
+	// e.printStackTrace();
+	// }
+	//
+	// if (slotFolder != null) {
+	// return slotFolder;
+	// }
+	//
+	// }
+	//
 	// AlfrescoFolder groupFolder = this.alfrescoWrapper.findOrCreateFolder(
 	// this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
 	// .name()), this.alfrescoUserIdentity.getActiveGroup()
 	// .getShortName());
 	//
-	// AlfrescoFolder slotFolder = this.alfrescoWrapper.findOrCreateFolder(
-	// groupFolder, this.slotInstHome.getInstance().getSlotDef()
-	// .getName());
+	// slotFolder = this.alfrescoWrapper.findOrCreateFolder(
+	// groupFolder,
+	// this.slotDefHome.getInstance().getId()
+	// + " "
+	// + AlfrescoWrapper.normalizeFolderName(this.slotDefHome
+	// .getInstance().getName(),
+	// SlotInstEditBean.LENGHT_LIMIT,
+	// SlotInstEditBean.SPACER));
+	// this.slotInstHome.getInstance().setNodeRef(slotFolder.getId());
 	// return slotFolder;
 	// }
-
-	public AlfrescoFolder retrieveSlotFolder() {
-		AlfrescoFolder slotFolder = null;
-		if ((this.slotInstHome.getInstance() != null)
-				&& (this.slotInstHome.getInstance().getNodeRef() != null)
-				&& !this.slotInstHome.getInstance().getNodeRef().equals("")) {
-			try {
-				slotFolder = (AlfrescoFolder) this.alfrescoUserIdentity
-						.getSession().getObject(
-								this.slotInstHome.getInstance().getNodeRef());
-			} catch (CmisObjectNotFoundException e) {
-				e.printStackTrace();
-			}
-
-			if (slotFolder != null) {
-				return slotFolder;
-			}
-
-		}
-
-		AlfrescoFolder groupFolder = this.alfrescoWrapper.findOrCreateFolder(
-				this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
-						.name()), this.alfrescoUserIdentity.getActiveGroup()
-						.getShortName());
-
-		slotFolder = this.alfrescoWrapper.findOrCreateFolder(
-				groupFolder,
-				this.slotDefHome.getInstance().getId()
-						+ " "
-						+ AlfrescoWrapper.normalizeFolderName(this.slotDefHome
-								.getInstance().getName(),
-								SlotInstEditBean.LENGHT_LIMIT,
-								SlotInstEditBean.SPACER));
-		this.slotInstHome.getInstance().setNodeRef(slotFolder.getId());
-		return slotFolder;
-	}
 
 	private List<VerifierParameterInst> retrieveValueInsts(
 			Rule rule,
@@ -953,7 +943,10 @@ public class SlotInstEditBean {
 		this.slotInstHome.getInstance().setPropertyInsts(
 				new HashSet<PropertyInst>(this.propertyInsts));
 
-		AlfrescoFolder slotFolder = this.retrieveSlotFolder();
+		//
+		AlfrescoFolder slotFolder = this.slotInstHome
+				.retrieveOrCreateSlotFolder();
+		//
 
 		Set<Long> keySet = this.datas.keySet();
 		for (Long key : keySet) {
@@ -1103,7 +1096,10 @@ public class SlotInstEditBean {
 		Set<DocInstCollection> persistedDocInstCollections = instance
 				.getDocInstCollections();
 
-		AlfrescoFolder slotFolder = this.retrieveSlotFolder();
+		//
+		AlfrescoFolder slotFolder = this.slotInstHome
+				.retrieveOrCreateSlotFolder();
+		//
 
 		for (DocInstCollection instCollection : persistedDocInstCollections) {
 			// entityManager.merge(instCollection);

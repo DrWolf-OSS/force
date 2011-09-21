@@ -54,6 +54,9 @@ public class AlfrescoWrapper {
 
 	public static final String NODEREF_PREFIX = "workspace://SpacesStore/";
 
+	public static final int LENGHT_LIMIT = 150;
+	public static final String SPACER = " ";
+
 	// public static final String DRAWINGS_FOLDER_REF =
 	// "6880b7a5-ba84-464c-a328-f5428426b450";
 
