@@ -327,7 +327,13 @@ public class SlotDefEditBean {
 	public void removeEmbeddedProp(EmbeddedProperty embeddedProp) {
 		slotDefHome.getInstance().getEmbeddedProperties().remove(embeddedProp);
 		//
-		deactiveReferencedRules(embeddedProp);
+		// deactiveReferencedRules(embeddedProp);
+		//
+		if (embeddedProp.getId() == null) {
+			deactiveReferencedRules(embeddedProp);
+		} else {
+			removeReferencedRules(embeddedProp);
+		}
 	}
 
 	public void editEmbeddedProp(EmbeddedProperty embeddedProp) {
