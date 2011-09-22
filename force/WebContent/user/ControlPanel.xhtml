@@ -254,50 +254,6 @@
 </rich:panel>
 <rich:panel>
     <f:facet name="header"><s:span>
-    <s:link value="Vedi tutto" view="/user/CommesseEdit.xhtml" styleClass="topCommandLink">
-        <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
-        <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
-        <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
-    </s:link>
-    <h:outputText value="Le tue Commesse" /></s:span></f:facet>
-     <rich:dataTable id="commessaList"
-                var="_commessa"
-              value="#{commessaList.commesseForAzienda}"
-           rendered="#{not empty commessaList.commesseForAzienda}">
-           <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{commessaList}"/>
-                    <ui:param name="propertyLabel" value="Descrizione"/>
-                    <ui:param name="propertyPath" value="commessa.descrizione"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_commessa.descrizione}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{commessaList}"/>
-                    <ui:param name="propertyLabel" value="Importo"/>
-                    <ui:param name="propertyPath" value="commessa.importo"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_commessa.importo} €"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{commessaList}"/>
-                    <ui:param name="propertyLabel" value="Data commessa"/>
-                    <ui:param name="propertyPath" value="commessa.dataCommessa"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_commessa.dataCommessa}"/>
-        </h:column>
-        </rich:dataTable>   
-</rich:panel>
-<rich:panel>
-    <f:facet name="header"><s:span>
     <s:link value="Vedi tutto" view="/user/CatMerEdit.xhtml" styleClass="topCommandLink">
         <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
     </s:link>
