@@ -5,6 +5,8 @@ import it.drwolf.slot.entity.PropertyInst;
 
 public interface Conditionable extends Deactivable {
 
+	public Long getId();
+
 	public PropertyDef getConditionalPropertyDef();
 
 	public void setConditionalPropertyDef(PropertyDef conditionalPropertyDef);

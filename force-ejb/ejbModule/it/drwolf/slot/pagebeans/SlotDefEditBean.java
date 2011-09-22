@@ -516,9 +516,9 @@ public class SlotDefEditBean {
 				this.getConditionedPropertyDefs(propertyDef)));
 	}
 
-	private String enqueueNames(Set<Definition> Definitions) {
+	private String enqueueNames(Set<Definition> definitions) {
 		String names = "";
-		Iterator<Definition> iterator = Definitions.iterator();
+		Iterator<Definition> iterator = definitions.iterator();
 		int count = 0;
 		while (iterator.hasNext()) {
 			Definition def = iterator.next();

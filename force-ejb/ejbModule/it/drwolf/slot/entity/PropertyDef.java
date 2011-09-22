@@ -5,7 +5,9 @@ import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.Deactivable;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -16,6 +18,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
@@ -43,6 +46,8 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 	private String uuid = UUID.randomUUID().toString();
 
 	private boolean active = Boolean.TRUE;
+
+	private Set<PropertyDef> conditionedPropertyDefs = new HashSet<PropertyDef>();
 
 	public PropertyDef(String name, DataType type) {
 		super();
@@ -199,6 +204,16 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	public void setConditionalPropertyInst(PropertyInst conditionalPropertyInst) {
 		this.conditionalPropertyInst = conditionalPropertyInst;
+	}
+
+	@OneToMany(mappedBy = "conditionalPropertyDef")
+	public Set<PropertyDef> getConditionedPropertyDefs() {
+		return conditionedPropertyDefs;
+	}
+
+	public void setConditionedPropertyDefs(
+			Set<PropertyDef> conditionedPropertyDefs) {
+		this.conditionedPropertyDefs = conditionedPropertyDefs;
 	}
 
 }
