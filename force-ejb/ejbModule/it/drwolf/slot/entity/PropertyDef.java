@@ -5,6 +5,7 @@ import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.Deactivable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,6 +49,8 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 	private boolean active = Boolean.TRUE;
 
 	private Set<PropertyDef> conditionedPropertyDefs = new HashSet<PropertyDef>();
+
+	private Set<DocDefCollection> conditionedDocDefCollections = new HashSet<DocDefCollection>();
 
 	public PropertyDef(String name, DataType type) {
 		super();
@@ -214,6 +217,27 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 	public void setConditionedPropertyDefs(
 			Set<PropertyDef> conditionedPropertyDefs) {
 		this.conditionedPropertyDefs = conditionedPropertyDefs;
+	}
+
+	@OneToMany(mappedBy = "conditionalPropertyDef")
+	public Set<DocDefCollection> getConditionedDocDefCollections() {
+		return conditionedDocDefCollections;
+	}
+
+	public void setConditionedDocDefCollections(
+			Set<DocDefCollection> conditionedDocDefCollections) {
+		this.conditionedDocDefCollections = conditionedDocDefCollections;
+	}
+
+	@Transient
+	public List<PropertyDef> getConditionedPropertyDefsAsList() {
+		return new ArrayList<PropertyDef>(this.conditionedPropertyDefs);
+	}
+
+	@Transient
+	public List<DocDefCollection> getConditionedDocDefCollectionsAsList() {
+		return new ArrayList<DocDefCollection>(
+				this.conditionedDocDefCollections);
 	}
 
 }

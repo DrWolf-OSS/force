@@ -58,7 +58,7 @@
 
 				<s:div id="properties">
 					<c:forEach var="dataInstance"  items="#{slotInstEditBean.propertyInsts}">
-					<s:div id="s_#{dataInstance.propertyDef.id}" rendered="#{dataInstance.propertyDef.active}">
+					<s:div id="p_#{dataInstance.propertyDef.id}" rendered="#{dataInstance.propertyDef.active}">
 						<s:decorate template="/layout/edit.xhtml"						
 								rendered="#{dataInstance.propertyDef.conditionalPropertyDef == null or 
 										(dataInstance.propertyDef.conditionalPropertyDef != null 

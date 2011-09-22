@@ -1415,7 +1415,7 @@ public class SlotInstEditBean {
 			while (iterator.hasNext()) {
 				Conditionable def = iterator.next();
 				if (count == 0) {
-					names = names.concat("s_" + def.getId().toString());
+					names = names.concat("p_" + def.getId().toString());
 					count++;
 				} else if (count > 0) {
 					names = names.concat(", " + def.getId());

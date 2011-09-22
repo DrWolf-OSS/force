@@ -158,16 +158,16 @@
 					</rich:column>
 					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Vincolante per le informazioni</f:facet>
-						<a:repeat var="pr" value="#{slotDefEditBean.getConditionedPropertyDefs(prop)}" rowKeyVar="idx">
+						<a:repeat var="pr" value="#{prop.conditionedPropertyDefsAsList}" rowKeyVar="idx">
 							<h:outputText value="#{pr.label}" />
-							<h:outputText value=", " rendered="#{idx lt slotDefEditBean.getConditionedPropertyDefs(prop).size()-1}"/>
+							<h:outputText value=", " rendered="#{idx lt prop.conditionedPropertyDefsAsList.size()-1}"/>
 						</a:repeat>
 					</rich:column>
 					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Vincolante per le richieste</f:facet>
-						<a:repeat var="coll" value="#{slotDefEditBean.getConditionedCollections(prop)}" rowKeyVar="idx">
+						<a:repeat var="coll" value="#{prop.conditionedDocDefCollectionsAsList}" rowKeyVar="idx">
 							<h:outputText value="#{coll.label}" />
-							<h:outputText value=", " rendered="#{idx lt slotDefEditBean.getConditionedCollections(prop).size()-1}"/>
+							<h:outputText value=", " rendered="#{idx lt prop.conditionedDocDefCollectionsAsList.size()-1}"/>
 						</a:repeat>
 					</rich:column>
 					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">

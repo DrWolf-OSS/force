@@ -354,8 +354,8 @@ public class SlotDefEditBean {
 
 	private void removeReferencesFromCollections(PropertyDef prop,
 			boolean invalidateCollections) {
-		List<DocDefCollection> referencedCollections = this
-				.getConditionedCollections(prop);
+		// List<DocDefCollection> referencedCollections = this
+		// .getConditionedCollections(prop);
 		// for (DocDefCollection collection : referencedCollections) {
 		// collection.getConditionalPropertyInst().setPropertyDef(null);
 		// collection.setConditionalPropertyInst(null);
@@ -371,16 +371,19 @@ public class SlotDefEditBean {
 		// }
 		// }
 		// }
-		this.removeConditionalReferences(new ArrayList<Conditionable>(
-				referencedCollections), invalidateCollections);
+		this.removeConditionalReferences(
+				new ArrayList<Conditionable>(prop
+						.getConditionedDocDefCollections()),
+				invalidateCollections);
 	}
 
 	private void removeReferencesFromProperties(PropertyDef prop,
 			boolean invalidateProperties) {
-		List<PropertyDef> conditionedPropertyDefs = this
-				.getConditionedPropertyDefs(prop);
-		this.removeConditionalReferences(new ArrayList<Conditionable>(
-				conditionedPropertyDefs), invalidateProperties);
+		// List<PropertyDef> conditionedPropertyDefs = this
+		// .getConditionedPropertyDefs(prop);
+		this.removeConditionalReferences(
+				new ArrayList<Conditionable>(prop.getConditionedPropertyDefs()),
+				invalidateProperties);
 	}
 
 	// private void removeReferencesFromCollections(PropertyDef prop,
@@ -437,8 +440,8 @@ public class SlotDefEditBean {
 
 	public void editProp(PropertyDef prop) {
 		this.propertyDef = prop;
-		if (getConditionedCollections(prop).isEmpty()
-				&& getConditionedPropertyDefs(prop).isEmpty()) {
+		if (prop.getConditionedDocDefCollections().isEmpty()
+				&& prop.getConditionedPropertyDefs().isEmpty()) {
 			this.conditional = false;
 		} else {
 			this.conditional = true;
@@ -508,12 +511,12 @@ public class SlotDefEditBean {
 
 	public String getReferencedCollectionsNames(PropertyDef propertyDef) {
 		return enqueueNames((Set<Definition>) new HashSet<Definition>(
-				this.getConditionedCollections(propertyDef)));
+				propertyDef.getConditionedDocDefCollections()));
 	}
 
 	public String getReferencedPropertyNames(PropertyDef propertyDef) {
 		return enqueueNames((Set<Definition>) new HashSet<Definition>(
-				this.getConditionedPropertyDefs(propertyDef)));
+				propertyDef.getConditionedPropertyDefs()));
 	}
 
 	private String enqueueNames(Set<Definition> definitions) {
@@ -533,40 +536,42 @@ public class SlotDefEditBean {
 		return names;
 	}
 
-	public List<DocDefCollection> getConditionedCollections(
-			PropertyDef propertyDef) {
-		List<DocDefCollection> referencedDocDefCollections = new ArrayList<DocDefCollection>();
-		Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
-				.getDocDefCollections();
-		Iterator<DocDefCollection> iterator = docDefCollections.iterator();
-		while (iterator.hasNext()) {
-			DocDefCollection docDefCollection = iterator.next();
-			PropertyDef conditionalPropertyDef = docDefCollection
-					.getConditionalPropertyDef();
-			if (conditionalPropertyDef != null
-					&& conditionalPropertyDef.equals(propertyDef)) {
-				referencedDocDefCollections.add(docDefCollection);
-			}
-		}
-		return referencedDocDefCollections;
-	}
+	// public List<DocDefCollection> getConditionedCollections(
+	// PropertyDef propertyDef) {
+	// List<DocDefCollection> referencedDocDefCollections = new
+	// ArrayList<DocDefCollection>();
+	// Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
+	// .getDocDefCollections();
+	// Iterator<DocDefCollection> iterator = docDefCollections.iterator();
+	// while (iterator.hasNext()) {
+	// DocDefCollection docDefCollection = iterator.next();
+	// PropertyDef conditionalPropertyDef = docDefCollection
+	// .getConditionalPropertyDef();
+	// if (conditionalPropertyDef != null
+	// && conditionalPropertyDef.equals(propertyDef)) {
+	// referencedDocDefCollections.add(docDefCollection);
+	// }
+	// }
+	// return referencedDocDefCollections;
+	// }
 
-	public List<PropertyDef> getConditionedPropertyDefs(PropertyDef propertyDef) {
-		List<PropertyDef> referencedPropertyDef = new ArrayList<PropertyDef>();
-		Set<PropertyDef> propertyDefs = slotDefHome.getInstance()
-				.getPropertyDefs();
-		Iterator<PropertyDef> iterator = propertyDefs.iterator();
-		while (iterator.hasNext()) {
-			PropertyDef pDef = iterator.next();
-			PropertyDef conditionalPropertyDef = pDef
-					.getConditionalPropertyDef();
-			if (conditionalPropertyDef != null
-					&& conditionalPropertyDef.equals(propertyDef)) {
-				referencedPropertyDef.add(pDef);
-			}
-		}
-		return referencedPropertyDef;
-	}
+	// public List<PropertyDef> getConditionedPropertyDefs(PropertyDef
+	// propertyDef) {
+	// List<PropertyDef> referencedPropertyDef = new ArrayList<PropertyDef>();
+	// Set<PropertyDef> propertyDefs = slotDefHome.getInstance()
+	// .getPropertyDefs();
+	// Iterator<PropertyDef> iterator = propertyDefs.iterator();
+	// while (iterator.hasNext()) {
+	// PropertyDef pDef = iterator.next();
+	// PropertyDef conditionalPropertyDef = pDef
+	// .getConditionalPropertyDef();
+	// if (conditionalPropertyDef != null
+	// && conditionalPropertyDef.equals(propertyDef)) {
+	// referencedPropertyDef.add(pDef);
+	// }
+	// }
+	// return referencedPropertyDef;
+	// }
 
 	public void checkReference() {
 		if (slotDefHome.isReferenced()) {
