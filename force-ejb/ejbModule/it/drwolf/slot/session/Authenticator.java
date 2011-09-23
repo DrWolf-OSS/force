@@ -1,8 +1,17 @@
 package it.drwolf.slot.session;
 
+import it.drwolf.force.session.AdminUserSession;
 import it.drwolf.force.session.UserSession;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
+import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
+import it.drwolf.slot.alfresco.webscripts.model.Authority;
+import it.drwolf.slot.alfresco.webscripts.model.AuthorityType;
+import it.drwolf.slot.entitymanager.PreferenceManager;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
@@ -30,8 +39,48 @@ public class Authenticator {
 	@In(create = true)
 	AlfrescoInfo alfrescoInfo;
 
+	@In(create = true)
+	PreferenceManager preferenceManager;
+
 	@In
 	private UserSession userSession;
+
+	@In
+	private AdminUserSession adminUserSession;
+
+	private void assignGroups() {
+		AlfrescoWebScriptClient alfrescoWebScriptClient = new AlfrescoWebScriptClient(
+				this.identity.getCredentials().getUsername(), this.identity
+						.getCredentials().getPassword(),
+				this.alfrescoInfo.getRepositoryUri());
+
+		List<Authority> userGroups = new ArrayList<Authority>();
+		List<Authority> groups = alfrescoWebScriptClient.getGroupsList("*", "");
+		for (Authority group : groups) {
+			List<Authority> users = alfrescoWebScriptClient
+					.getListOfChildAuthorities(group.getShortName(),
+							AuthorityType.USER.name());
+			Iterator<Authority> iterator = users.iterator();
+			boolean found = false;
+			while (iterator.hasNext() && (found == false)) {
+				Authority user = iterator.next();
+				if (user.getShortName().equals(
+						this.identity.getCredentials().getUsername())) {
+					userGroups.add(group);
+					found = true;
+				}
+			}
+		}
+		this.alfrescoUserIdentity.setGroups(userGroups);
+
+		// SETTO A MERDA il primo della lista come activeGroup
+		this.alfrescoUserIdentity.setActiveGroup(userGroups.get(0));
+		System.out.println("---> "
+				+ this.identity.getCredentials().getUsername()
+				+ " entered as \""
+				+ this.alfrescoUserIdentity.getActiveGroup().getShortName()
+				+ "\" member");
+	}
 
 	public boolean authenticate() {
 		this.log.info("authenticating {0}", this.credentials.getUsername());
@@ -54,17 +103,43 @@ public class Authenticator {
 		if (this.alfrescoUserIdentity.authenticate(this.identity
 				.getCredentials().getUsername(), this.identity.getCredentials()
 				.getPassword(), this.alfrescoInfo.getRepositoryUri())) {
-
-			try {
-				this.userSession.init();
+			this.assignGroups();
+			if (this.alfrescoUserIdentity.isMemberOf(this.preferenceManager
+					.getPreference("FORCE_ADMIN").getStringValue())) {
+				this.identity.addRole("ADMIN");
+				this.adminUserSession.init();
 				return true;
-			} catch (Exception e) {
-				e.printStackTrace();
-				return true;
+			} else {
+				AlfrescoWebScriptClient awsc = new AlfrescoWebScriptClient(
+						this.alfrescoInfo.getAdminUser(),
+						this.alfrescoInfo.getAdminPwd(),
+						this.alfrescoInfo.getRepositoryUri());
+				List<Authority> lista = awsc.getListOfChildAuthorities(
+						this.preferenceManager
+								.getPreference("FORCE_USER_GROUP")
+								.getStringValue(), "GROUP");
+				for (Authority authority : lista) {
+					if (authority.getShortName().equals(
+							this.alfrescoUserIdentity.getActiveGroup()
+									.getShortName())) {
+						this.identity.addRole("AZIENDE");
+						// una volta individuata l'azienda inizializzo la
+						// sessione Utente
+						this.userSession.init();
+						return true;
+					}
+				}
+				return false;
 			}
-
 		} else {
 			return false;
 		}
+	}
+
+	public boolean isLoggedIn() {
+		if (this.identity.hasRole("ADMIN") || this.identity.hasRole("AZIENDE")) {
+			return true;
+		}
+		return false;
 	}
 }

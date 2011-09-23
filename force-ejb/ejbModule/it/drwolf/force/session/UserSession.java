@@ -4,20 +4,13 @@ import it.drwolf.force.entity.Azienda;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
-import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
-import it.drwolf.slot.alfresco.webscripts.model.Authority;
-import it.drwolf.slot.alfresco.webscripts.model.AuthorityType;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
-import it.drwolf.slot.entitymanager.PreferenceManager;
 import it.drwolf.slot.pagebeans.SlotInstEditBean;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.persistence.EntityManager;
 
@@ -52,9 +45,6 @@ public class UserSession implements Serializable {
 	AlfrescoInfo alfrescoInfo;
 
 	@In(create = true)
-	PreferenceManager preferenceManager;
-
-	@In(create = true)
 	private AlfrescoWrapper alfrescoWrapper;
 
 	@In(create = true)
@@ -81,40 +71,6 @@ public class UserSession implements Serializable {
 	// SlotDefHome slotDefHome;
 
 	//
-
-	private void assignGroups() {
-		AlfrescoWebScriptClient alfrescoWebScriptClient = new AlfrescoWebScriptClient(
-				this.identity.getCredentials().getUsername(), this.identity
-						.getCredentials().getPassword(),
-				this.alfrescoInfo.getRepositoryUri());
-
-		List<Authority> userGroups = new ArrayList<Authority>();
-		List<Authority> groups = alfrescoWebScriptClient.getGroupsList("*", "");
-		for (Authority group : groups) {
-			List<Authority> users = alfrescoWebScriptClient
-					.getListOfChildAuthorities(group.getShortName(),
-							AuthorityType.USER.name());
-			Iterator<Authority> iterator = users.iterator();
-			boolean found = false;
-			while (iterator.hasNext() && (found == false)) {
-				Authority user = iterator.next();
-				if (user.getShortName().equals(
-						this.identity.getCredentials().getUsername())) {
-					userGroups.add(group);
-					found = true;
-				}
-			}
-		}
-		this.alfrescoUserIdentity.setGroups(userGroups);
-
-		// SETTO A MERDA il primo della lista come activeGroup
-		this.alfrescoUserIdentity.setActiveGroup(userGroups.get(0));
-		System.out.println("---> "
-				+ this.identity.getCredentials().getUsername()
-				+ " entered as \""
-				+ this.alfrescoUserIdentity.getActiveGroup().getShortName()
-				+ "\" member");
-	}
 
 	public Azienda getAzienda() {
 		return (Azienda) this.entityManager
@@ -143,77 +99,53 @@ public class UserSession implements Serializable {
 	}
 
 	public void init() {
-		this.assignGroups();
-		if (this.alfrescoUserIdentity.isMemberOf(this.preferenceManager
-				.getPreference("FORCE_ADMIN").getStringValue())) {
-			this.identity.addRole("ADMIN");
-		} else {
-			AlfrescoWebScriptClient awsc = new AlfrescoWebScriptClient(
-					this.alfrescoInfo.getAdminUser(),
-					this.alfrescoInfo.getAdminPwd(),
-					this.alfrescoInfo.getRepositoryUri());
-			List<Authority> lista = awsc.getListOfChildAuthorities(
-					this.preferenceManager.getPreference("FORCE_USER_GROUP")
-							.getStringValue(), "GROUP");
-			for (Authority authority : lista) {
-				if (authority.getShortName().equals(
-						this.alfrescoUserIdentity.getActiveGroup()
-								.getShortName())) {
-					this.identity.addRole("AZIENDE");
-					// devo prendere l'id dello slotdef associato
-					Azienda azienda = (Azienda) this.entityManager
-							.createQuery(
-									"from Azienda where emailReferente = :username")
-							.setParameter(
-									"username",
-									this.identity.getCredentials()
-											.getUsername()).getSingleResult();
-					this.setPrimarySlotDef(azienda.getSettore().getSlotDef());
-					//
-					// this.slotDefHome.setInstance(this.primarySlotDef);
-					// /
-					this.setAziendaId(azienda.getId());
-					if (azienda.getSettore().getNome().equals("Edilizia")) {
-						this.setLlpp(true);
-					}
-					SlotInst slonInst;
-					try {
-						slonInst = (SlotInst) this.entityManager
-								.createQuery(
-										"from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
-								.setParameter("slotDef",
-										azienda.getSettore().getSlotDef())
-								.setParameter("ownerId",
-										azienda.getAlfrescoGroupId())
-								.getSingleResult();
-						if (slonInst != null) {
-							this.setPrimarySlotInst(slonInst);
-						}
-					} catch (Exception e) {
-						// Non è ancora stato creato uno slotInst
-						System.out
-								.println("---> Più di uno slot inst primary!!!!!");
-					}
-					break;
-				}
-
-			}
-			// prelevo la cartella principale:
-			this.groupFolder = this.alfrescoWrapper.findOrCreateFolder(
-					this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
-							.name()), this.alfrescoUserIdentity
-							.getActiveGroup().getShortName());
-
-			// PALA
-			// Se il Primary SlotInst è stato creato il nodeRef della cartella è
-			// settato on SlotInst.nodeRef
-			if (this.primarySlotInst != null) {
-				this.primarySlotFolder = (AlfrescoFolder) this.alfrescoUserIdentity
-						.getSession().getObject(
-								this.primarySlotInst.getNodeRef());
-			}
+		// devo prendere l'id dello slotdef associato
+		Azienda azienda = (Azienda) this.entityManager
+				.createQuery("from Azienda where emailReferente = :username")
+				.setParameter("username",
+						this.identity.getCredentials().getUsername())
+				.getSingleResult();
+		if (azienda.getSettore().getNome().equals("Edilizia")) {
+			this.setLlpp(true);
 		}
+		// una volta individuata l'azienda devo vedere se ha delle
+		// categorie merceologiche già settate o delle SOA
+		if (this.llpp && (azienda.getSOA().size() == 0)) {
+			// mando l'impresa alla pagina di edit delle SOA
+		}
+		this.setPrimarySlotDef(azienda.getSettore().getSlotDef());
+		//
+		// this.slotDefHome.setInstance(this.primarySlotDef);
+		// /
+		this.setAziendaId(azienda.getId());
+		SlotInst slonInst;
+		try {
+			slonInst = (SlotInst) this.entityManager
+					.createQuery(
+							"from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
+					.setParameter("slotDef", azienda.getSettore().getSlotDef())
+					.setParameter("ownerId", azienda.getAlfrescoGroupId())
+					.getSingleResult();
+			if (slonInst != null) {
+				this.setPrimarySlotInst(slonInst);
+			}
+		} catch (Exception e) {
+			// Non è ancora stato creato uno slotInst
+			System.out.println("---> Più di uno slot inst primary!!!!!");
+		}
+		// prelevo la cartella principale:
+		this.groupFolder = this.alfrescoWrapper.findOrCreateFolder(
+				this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
+						.name()), this.alfrescoUserIdentity.getActiveGroup()
+						.getShortName());
 
+		// PALA
+		// Se il Primary SlotInst è stato creato il nodeRef della cartella è
+		// settato on SlotInst.nodeRef
+		if (this.primarySlotInst != null) {
+			this.primarySlotFolder = (AlfrescoFolder) this.alfrescoUserIdentity
+					.getSession().getObject(this.primarySlotInst.getNodeRef());
+		}
 	}
 
 	// Lo SlotInst può essere null all'inizo della Session ed essere
