@@ -66,6 +66,9 @@ a:HOVER {
    float:right;
 }
 
+.linkMenuBar a {
+    color: #FFF;
+}
 /* customType = p */
 .pname {
 	vertical-align: top;

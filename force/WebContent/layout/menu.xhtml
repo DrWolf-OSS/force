@@ -191,7 +191,7 @@
         </rich:menuItem>
     </rich:dropDownMenu>
     <!-- @newMenuItem@ -->
-    <rich:toolBarGroup location="right">
+    <rich:toolBarGroup location="right" styleClass="linkMenuBar">
         <h:outputText id="menuWelcomeId" value="Autenticato come: #{credentials.username} " rendered="#{identity.loggedIn}"/>
         <s:link id="menuAddId" view="/AddAzienda.xhtml" value="Registrati" rendered="#{not identity.loggedIn}" propagation="none"/>
         <s:link id="menuLoginId" view="/login.xhtml" value="Login" rendered="#{not identity.loggedIn}" propagation="none"/>
