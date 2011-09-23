@@ -119,20 +119,28 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 
 		for (EmbeddedProperty embeddedProperty : slotDef
 				.getEmbeddedProperties()) {
-			EmbeddedProperty clonedEmbeddedProperty = cloneEmbeddedProperty(embeddedProperty);
-			clonedSlotDef.getEmbeddedProperties().add(clonedEmbeddedProperty);
+			if (embeddedProperty.isActive()) {
+				EmbeddedProperty clonedEmbeddedProperty = cloneEmbeddedProperty(embeddedProperty);
+				clonedSlotDef.getEmbeddedProperties().add(
+						clonedEmbeddedProperty);
+			}
 		}
 
 		for (PropertyDef propertyDef : slotDef.getPropertyDefs()) {
-			PropertyDef clonedPropertyDef = clonePropertyDef(propertyDef);
-			clonedSlotDef.getPropertyDefs().add(clonedPropertyDef);
+			if (propertyDef.isActive()) {
+				PropertyDef clonedPropertyDef = clonePropertyDef(propertyDef);
+				clonedSlotDef.getPropertyDefs().add(clonedPropertyDef);
+			}
 		}
 
 		for (DocDefCollection collection : slotDef.getDocDefCollections()) {
-			DocDefCollection clonedDocDefCollection = cloneDocDefCollection(
-					collection, clonedSlotDef);
-			clonedDocDefCollection.setSlotDef(clonedSlotDef);
-			clonedSlotDef.getDocDefCollections().add(clonedDocDefCollection);
+			if (collection.isActive()) {
+				DocDefCollection clonedDocDefCollection = cloneDocDefCollection(
+						collection, clonedSlotDef);
+				clonedDocDefCollection.setSlotDef(clonedSlotDef);
+				clonedSlotDef.getDocDefCollections()
+						.add(clonedDocDefCollection);
+			}
 		}
 		this.setInstance(clonedSlotDef);
 	}

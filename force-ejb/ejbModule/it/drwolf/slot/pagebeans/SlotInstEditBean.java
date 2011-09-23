@@ -21,6 +21,7 @@ import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.exceptions.WrongDataTypeException;
+import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.DataInstance;
 import it.drwolf.slot.interfaces.IRuleVerifier;
@@ -338,7 +339,7 @@ public class SlotInstEditBean {
 		}
 	}
 
-	public void cleanConditionalCollection(PropertyInst propertyInst) {
+	public void cleanConditionedElements(PropertyInst propertyInst) {
 
 		Object value = this.valueChangeListener.getValue();
 		if ((value == null)
@@ -370,6 +371,32 @@ public class SlotInstEditBean {
 						|| !conditionalValue.equals(propertyInst.getValue())) {
 					this.cleanCollection(instCollection.getDocDefCollection()
 							.getId());
+				}
+			}
+		}
+
+		// Repplicato per le Property
+		Iterator<PropertyInst> iterator2 = this.propertyInsts.iterator();
+		while (iterator2.hasNext()) {
+			PropertyInst instProperty = iterator2.next();
+			if ((instProperty.getPropertyDef().getConditionalPropertyDef() != null)
+					&& instProperty.getPropertyDef()
+							.getConditionalPropertyDef().getId()
+							.equals(propertyInst.getPropertyDef().getId())) {
+				Object conditionalValue = instProperty.getPropertyDef()
+						.getConditionalPropertyInst().getValue();
+				// TODO: riguardare questo caso!!!
+				// Se alla proprietà che condiziona la collection è stato
+				// cambiato DataType e non è stata aggiornata la definizione
+				// della collection che la referenzia aggiornando il valore
+				// della
+				// property, "ConditionalPropertyInst().getValue()" restituirà
+				// null. In questo caso cancello cmq il contenuto della
+				// collection perchè i valori non matchano
+				if ((conditionalValue == null)
+						|| !conditionalValue.equals(propertyInst.getValue())) {
+					// this.cleanCollection(instProperty.getPropertyDef().getId());
+					instProperty.clean();
 				}
 			}
 		}
@@ -1373,6 +1400,30 @@ public class SlotInstEditBean {
 			System.out.println(document.getName()
 					+ " non è firmato digitalmente");
 		}
+	}
+
+	public String buildIdsToRerender(PropertyDef propertyDef) {
+		return enqueueNames(new HashSet<Conditionable>(
+				propertyDef.getConditionedPropertyDefs()));
+	}
+
+	private String enqueueNames(Set<Conditionable> conditionables) {
+		String names = "";
+		if (conditionables != null) {
+			Iterator<Conditionable> iterator = conditionables.iterator();
+			int count = 0;
+			while (iterator.hasNext()) {
+				Conditionable def = iterator.next();
+				if (count == 0) {
+					names = names.concat("p_" + def.getId().toString());
+					count++;
+				} else if (count > 0) {
+					names = names.concat(", " + def.getId());
+					count++;
+				}
+			}
+		}
+		return names;
 	}
 
 }

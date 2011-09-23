@@ -14,7 +14,7 @@
 		<a:form id="slotInst" styleClass="edit">
 		<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
 			<rich:panel>
-				<f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Edit' : 'Create'} Slot inst #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
+				<f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Modifica' : 'Crea'} Busta #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
 
 				<ui:repeat var="message" value="#{slotInstEditBean.slotMessages}">
 					<h:graphicImage value="/img/msgerror.png"
@@ -57,15 +57,19 @@
 				</s:div>
 
 				<s:div id="properties">
-					<c:forEach var="dataInstance" items="#{slotInstEditBean.propertyInsts}">
-					<s:fragment rendered="#{dataInstance.propertyDef.active}">
-						<s:decorate template="/layout/edit.xhtml">
+					<c:forEach var="dataInstance"  items="#{slotInstEditBean.propertyInsts}">
+					<s:div id="p_#{dataInstance.propertyDef.id}" rendered="#{dataInstance.propertyDef.active}">
+						<s:decorate template="/layout/edit.xhtml"						
+								rendered="#{dataInstance.propertyDef.conditionalPropertyDef == null or 
+										(dataInstance.propertyDef.conditionalPropertyDef != null 
+										and slotInstEditBean.findPropertyInstByDefId(dataInstance.propertyDef.conditionalPropertyDef.id).value.equals(dataInstance.propertyDef.conditionalPropertyInst.value))}">
 							<ui:define name="label">
 								<h:outputText value="#{dataInstance.dataDefinition.label}" />
 							</ui:define>
 							
 							<s:fragment rendered="#{not dataInstance.dataDefinition.multiple}">
-							<h:inputText value="#{dataInstance.stringValue}"
+							<!--  -->
+							<h:inputText value="#{dataInstance.stringValue}" 
 								rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
 								disabled="#{not dataInstance.dataDefinition.editable}" />
@@ -78,7 +82,8 @@
 								rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}"
 								required="#{dataInstance.dataDefinition.required}"
 								disabled="#{not dataInstance.dataDefinition.editable}">
-								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}"
+										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
 							</h:selectBooleanCheckbox>
 							</a:region>
 							<rich:calendar id="subscriptionDate" mode="client"
@@ -86,32 +91,36 @@
 								rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
 								disabled="#{not dataInstance.dataDefinition.editable}" />
-							
+
 							<a:region>
 							<h:selectOneMenu value="#{dataInstance.stringValue}" required="#{dataInstance.dataDefinition.required}"
 										rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues != null}"
 										valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
-												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
-								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}" 
+										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"
 	             						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
-												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
-								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}"
+										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{dataInstance.dateValue}"  required="#{dataInstance.dataDefinition.required}"
 	             						rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
-												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 								<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
-								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionalCollection(dataInstance)}" reRender="collections"/>
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}"
+										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
 	             			</h:selectOneMenu>
-	             			</a:region>
-	             			</s:fragment>
+	             			<!--  --></a:region>
+	             		</s:fragment>
+	             		
 	             			
 	             			<s:fragment rendered="#{dataInstance.dataDefinition.multiple}">
 							<rich:pickList value="#{dataInstance.valuesAsList}" required="#{dataInstance.dataDefinition.required}">
@@ -120,8 +129,8 @@
 							</s:fragment>
 	             			
 						</s:decorate>
-					</s:fragment>
-					</c:forEach>	
+					</s:div>
+					</c:forEach>
 				</s:div>
 				
 
@@ -142,7 +151,7 @@
 							<s:div id="primaryRegion_#{coll.docDefCollection.id}" 
 								rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
 										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
-								<rich:panel rendered="#{slotDefHome.instance.type != 'PRIMARY'}">
+								<rich:panel rendered="#{slotDefHome.instance.type != 'PRIMARY'}" styleClass="nestedPanel">
 									<f:facet name="header">
 										<h:outputText value="Available #{coll.docDefCollection.docDef.name} on primary slot" />
 									</f:facet>
@@ -203,7 +212,7 @@
 								<h:outputText value="#{message.text}" />
 								<br />
 							</ui:repeat>
-							<rich:panel>
+							<rich:panel styleClass="nestedPanel">
 								<f:facet name="header">
 									<h:outputText value="Uploaded Files Info" />
 								</f:facet>
@@ -447,17 +456,17 @@
 						<h:selectOneMenu value="#{dataInstance.stringValue}" required="#{dataInstance.dataDefinition.required}"
 									rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues != null}">
                     		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
-											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
              			</h:selectOneMenu>
              			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"
              						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues != null}" >
                     		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
-											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
              			</h:selectOneMenu>
              			<h:selectOneMenu value="#{dataInstance.dateValue}"  required="#{dataInstance.dataDefinition.required}"
              						rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues != null}">
                     		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
-											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" /> 
              			</h:selectOneMenu>
              			</s:fragment>

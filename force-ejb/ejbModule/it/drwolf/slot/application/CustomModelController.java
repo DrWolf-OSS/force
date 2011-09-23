@@ -11,11 +11,11 @@ import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -80,9 +80,12 @@ public class CustomModelController {
 			String modifiedModel = addIdValueToXml(originalModel);
 
 			slotModel = serializer.read(SlotModel.class, modifiedModel);
+
+			//
+			setPositionToProperties();
 			//
 			initMap();
-			//
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -184,7 +187,7 @@ public class CustomModelController {
 	}
 
 	public Set<Property> getProperties(Set<String> aspectIds) {
-		Set<Property> properties = new HashSet<Property>();
+		Set<Property> properties = new TreeSet<Property>();
 		// Recupero tutte le properties.
 		// Essendo un set anche se un aspect è applicato più volte (essendo
 		// settato come mandatory su un altro) le sue properties vengono
@@ -203,8 +206,20 @@ public class CustomModelController {
 		}
 	}
 
+	private void setPositionToProperties() {
+		List<Aspect> aspects = this.slotModel.getAspects();
+		int count = 0;
+		for (Aspect aspect : aspects) {
+			List<Property> properties = aspect.getProperties();
+			for (Property property : properties) {
+				property.setPosition(count);
+				count++;
+			}
+		}
+	}
+
 	private Set<Property> retrieveAllProperties(Aspect aspect) {
-		Set<Property> properties = new HashSet<Property>();
+		Set<Property> properties = new TreeSet<Property>();
 		// Aspect aspect = this.getAspect(aspectId);
 		if (aspect != null) {
 			properties.addAll(aspect.getProperties());
@@ -229,8 +244,8 @@ public class CustomModelController {
 				Constraint constraint = iterator.next();
 				if (constraint.getType().equals(Constraint.LIST)
 						&& constraint.getName().equals(constraintName)) {
-					return new Dictionary(constraintName, constraint.getParameter()
-							.getList(), dataType);
+					return new Dictionary(constraintName, constraint
+							.getParameter().getList(), dataType);
 				}
 			}
 		}

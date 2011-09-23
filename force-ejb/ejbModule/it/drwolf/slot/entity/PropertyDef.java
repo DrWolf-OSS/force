@@ -1,12 +1,17 @@
 package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.Deactivable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -14,10 +19,14 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Cascade;
+
 @Entity
-public class PropertyDef implements DataDefinition, Deactivable {
+public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	private Long id;
 
@@ -29,11 +38,19 @@ public class PropertyDef implements DataDefinition, Deactivable {
 
 	private Dictionary dictionary;
 
+	private PropertyDef conditionalPropertyDef;
+
+	private PropertyInst conditionalPropertyInst;
+
 	private boolean multiple = Boolean.FALSE;
 
 	private String uuid = UUID.randomUUID().toString();
 
 	private boolean active = Boolean.TRUE;
+
+	private Set<PropertyDef> conditionedPropertyDefs = new HashSet<PropertyDef>();
+
+	private Set<DocDefCollection> conditionedDocDefCollections = new HashSet<DocDefCollection>();
 
 	public PropertyDef(String name, DataType type) {
 		super();
@@ -171,6 +188,56 @@ public class PropertyDef implements DataDefinition, Deactivable {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	@ManyToOne(cascade = CascadeType.PERSIST)
+	public PropertyDef getConditionalPropertyDef() {
+		return conditionalPropertyDef;
+	}
+
+	public void setConditionalPropertyDef(PropertyDef conditionalPropertyDef) {
+		this.conditionalPropertyDef = conditionalPropertyDef;
+	}
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+	public PropertyInst getConditionalPropertyInst() {
+		return conditionalPropertyInst;
+	}
+
+	public void setConditionalPropertyInst(PropertyInst conditionalPropertyInst) {
+		this.conditionalPropertyInst = conditionalPropertyInst;
+	}
+
+	@OneToMany(mappedBy = "conditionalPropertyDef")
+	public Set<PropertyDef> getConditionedPropertyDefs() {
+		return conditionedPropertyDefs;
+	}
+
+	public void setConditionedPropertyDefs(
+			Set<PropertyDef> conditionedPropertyDefs) {
+		this.conditionedPropertyDefs = conditionedPropertyDefs;
+	}
+
+	@OneToMany(mappedBy = "conditionalPropertyDef")
+	public Set<DocDefCollection> getConditionedDocDefCollections() {
+		return conditionedDocDefCollections;
+	}
+
+	public void setConditionedDocDefCollections(
+			Set<DocDefCollection> conditionedDocDefCollections) {
+		this.conditionedDocDefCollections = conditionedDocDefCollections;
+	}
+
+	@Transient
+	public List<PropertyDef> getConditionedPropertyDefsAsList() {
+		return new ArrayList<PropertyDef>(this.conditionedPropertyDefs);
+	}
+
+	@Transient
+	public List<DocDefCollection> getConditionedDocDefCollectionsAsList() {
+		return new ArrayList<DocDefCollection>(
+				this.conditionedDocDefCollections);
 	}
 
 }

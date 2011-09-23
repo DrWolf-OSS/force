@@ -106,6 +106,10 @@ a:HOVER {
 	/*color: #606060;*/
 }
 
+.nestedPanel{
+	background-color:#FFFFFF;
+}
+
 /*
 .invalidRow.action.disabledLink a:LINK {
 	text-decoration: none;

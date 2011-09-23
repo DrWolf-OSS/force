@@ -140,8 +140,35 @@
 						<h:outputText value="#{prop.dictionary!=null ? prop.dictionary.name : ''}" />
 					</rich:column>
 					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Informazione vincolante</f:facet>
+						<h:outputText value="#{prop.conditionalPropertyDef!=null ? prop.conditionalPropertyDef.name : ''}" />
+					</rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Valore informazione vincolante</f:facet>
+						<h:outputText value="#{prop.conditionalPropertyInst.stringValue}"
+								rendered="#{prop.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
+						<h:outputText value="#{prop.conditionalPropertyInst.integerValue}"
+								rendered="#{prop.conditionalPropertyInst.dataDefinition.dataType == 'INTEGER'}" />
+						<h:outputText value="#{prop.conditionalPropertyInst.booleanValue ? 'true' : 'false'}"
+								rendered="#{prop.conditionalPropertyInst.dataDefinition.dataType == 'BOOLEAN'}" />
+						<h:outputText value="#{prop.conditionalPropertyInst.dateValue}"
+								rendered="#{prop.conditionalPropertyInst.dataDefinition.dataType == 'DATE'}">
+							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Vincolante per le informazioni</f:facet>
+						<a:repeat var="pr" value="#{prop.conditionedPropertyDefsAsList}" rowKeyVar="idx">
+							<h:outputText value="#{pr.label}" />
+							<h:outputText value=", " rendered="#{idx lt prop.conditionedPropertyDefsAsList.size()-1}"/>
+						</a:repeat>
+					</rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Vincolante per le richieste</f:facet>
-						<h:outputText value="#{!slotDefEditBean.getReferencedCollectionsNames(prop).equals('') ? slotDefEditBean.getReferencedCollectionsNames(prop) : ''}" />
+						<a:repeat var="coll" value="#{prop.conditionedDocDefCollectionsAsList}" rowKeyVar="idx">
+							<h:outputText value="#{coll.label}" />
+							<h:outputText value=", " rendered="#{idx lt prop.conditionedDocDefCollectionsAsList.size()-1}"/>
+						</a:repeat>
 					</rich:column>
 					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Regole in cui è coinvolta</f:facet>
@@ -162,7 +189,7 @@
 						<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeProp(prop)}" 
 		                				onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}; if(!confRules('#{slotDefEditBean.retrieveReferencedRulesLabel(prop)}')){return false;}"
 		                				rendered="#{not slotDefHome.referenced or prop.id==null}"
-		                				reRender="propTable,collTable,epropTable"/>
+		                				reRender="collTable,propTable,epropTable"/>
 		                				
 		                <a:commandLink id="invalidate" value="#{prop.active ? 'Invalida' : 'Riattiva'}" 
 		                			onclick="if(!confInvalidate('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
@@ -233,7 +260,7 @@
 							#{'  '}
 							<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeColl(coll)}" 
 									onclick="if(!confRules('#{slotDefEditBean.retrieveReferencedRulesLabel(coll)}')){return false;}"
-									reRender="epropTable,propPanel,collTable"
+									reRender="epropTable,propPanel,collTable,propTable"
 									rendered="#{not slotDefHome.referenced or coll.id==null}"/>
 									
 						 	<a:commandLink id="invalidate" value="#{coll.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(coll)}"
@@ -296,7 +323,7 @@
                        rendered="#{!slotDefHome.managed and garaHome.garaId == null}"/>
 
             <h:commandButton id="update"
-                          value="Aggiorna"
+                          value="Salva"
                         onclick="dirty = false;"
                          action="#{slotDefEditBean.update()}"
                        rendered="#{slotDefHome.managed}"/>
@@ -377,7 +404,7 @@
        <rich:modalPanel id="propPanel" autosized="true" minWidth="600"
 				resizeable="false">
 			<f:facet name="header">
-				<h:outputText value="Add Property" />
+				<h:outputText value="Descrizione dell'informazione" />
 			</f:facet>
 			<a:form id="pf">
 				<script type="text/javascript">
@@ -425,7 +452,59 @@
 						<a:support event="onchange" reRender="pf"/>
 					</h:selectBooleanCheckbox>
 	            </s:decorate>
+	            
+	            
+	            <s:decorate template="/layout/edit.xhtml" >
+	                <ui:define name="label">
+	                	<h:outputText value="Informazione vincolante" />
+					</ui:define>
+					<h:selectOneMenu  value="#{slotDefEditBean.propertyDef.conditionalPropertyDef}" 
+								converter="propertyDefConverter">
+     					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
+									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
+									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN') or propertyDef.uuid==slotDefEditBean.propertyDef.uuid}"/>
+						<a:support event="onchange" actionListener="#{slotDefEditBean.propertyDefConditionalPropertyListener}" reRender="pf"/>
+					</h:selectOneMenu>
+	            </s:decorate>
 					</a:region>
+					
+				
+				<s:decorate  template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.conditionalPropertyDef != null}" >	            	
+	                <ui:define name="label">
+	                	<h:outputText value="Valore vincolante" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.propertyDef.conditionalPropertyInst.stringValue}"
+							rendered="#{slotDefEditBean.propertyDef.conditionalPropertyDef.dataType == 'STRING' and slotDefEditBean.propertyDef.conditionalPropertyDef.dictionaryValues == null}"
+							required="#{slotDefEditBean.propertyDef.conditionalPropertyDef != null}"/>
+						<h:inputText value="#{slotDefEditBean.propertyDef.conditionalPropertyInst.integerValue}"
+							rendered="#{slotDefEditBean.propertyDef.conditionalPropertyDef.dataType == 'INTEGER' and slotDefEditBean.propertyDef.conditionalPropertyDef.dictionaryValues == null}"
+							required="#{slotDefEditBean.propertyDef.conditionalPropertyDef != null}"/>
+						<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.conditionalPropertyInst.booleanValue}"
+							rendered="#{slotDefEditBean.propertyDef.conditionalPropertyDef.dataType == 'BOOLEAN'}"
+							required="#{slotDefEditBean.propertyDef.conditionalPropertyDef != null}"/>
+						<rich:calendar id="subscriptionDate" mode="client"
+							value="#{slotDefEditBean.propertyDef.conditionalPropertyInst.dateValue}" datePattern="dd/MM/yyyy"
+							rendered="#{slotDefEditBean.propertyDef.conditionalPropertyDef.dataType == 'DATE' and slotDefEditBean.propertyDef.conditionalPropertyDef.dictionaryValues == null}"
+							required="#{slotDefEditBean.propertyDef.conditionalPropertyDef != null}"/>
+							
+						
+						<h:selectOneMenu value="#{slotDefEditBean.propertyDef.conditionalPropertyInst.stringValue}" required="#{slotDefEditBean.propertyDef.conditionalPropertyDef != null}"
+									rendered="#{slotDefEditBean.propertyDef.conditionalPropertyDef.dataType == 'STRING' and slotDefEditBean.propertyDef.conditionalPropertyDef.dictionaryValues != null}">
+                    		<s:selectItems value="#{slotDefEditBean.propertyDef.conditionalPropertyDef.dictionaryValues}" 
+											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
+             			</h:selectOneMenu>
+             			<h:selectOneMenu value="#{slotDefEditBean.propertyDef.conditionalPropertyInst.integerValue}" required="#{slotDefEditBean.propertyDef.conditionalPropertyDef != null}"
+									rendered="#{slotDefEditBean.propertyDef.conditionalPropertyDef.dataType == 'INTEGER' and slotDefEditBean.propertyDef.conditionalPropertyDef.dictionaryValues != null}">
+                    		<s:selectItems value="#{slotDefEditBean.propertyDef.conditionalPropertyDef.dictionaryValues}" 
+											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
+             			</h:selectOneMenu>
+             			<h:selectOneMenu value="#{slotDefEditBean.propertyDef.conditionalPropertyInst.dateValue}"  required="#{slotDefEditBean.propertyDef.conditionalPropertyDef != null}"
+             						rendered="#{slotDefEditBean.propertyDef.conditionalPropertyDef.dataType == 'DATE' and slotDefEditBean.propertyDef.conditionalPropertyDef.dictionaryValues != null}">
+                    		<s:selectItems value="#{slotDefEditBean.propertyDef.conditionalPropertyDef.dictionaryValues}" 
+											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
+							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+             			</h:selectOneMenu>
+	            </s:decorate>
 	            
 	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
@@ -439,6 +518,7 @@
 							<s:convertEntity/>
              		</h:selectOneMenu>
 	            </s:decorate>
+
 	        </s:div>
 	        <div style="clear:both"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();}" 
@@ -456,7 +536,7 @@
 		<rich:modalPanel id="embeddedPropPanel" autosized="true" minWidth="600"
 				resizeable="false">
 			<f:facet name="header">
-				<h:outputText value="Add Embedded Property" />
+				<h:outputText value="Descrizione dell'informazione" />
 			</f:facet>
 			<a:form id="epForm">
 				<script type="text/javascript">
@@ -545,19 +625,19 @@
 										rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 										valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
-												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.integerValue}" required="#{not slotDefParameters.model}"
 	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'INTEGER' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
-												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{slotDefEditBean.embeddedProperty.dateValue}"  required="#{not slotDefParameters.model}"
 	             						rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'DATE' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" 
-												var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 								<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 	             			</h:selectOneMenu>
 	             			</s:fragment>
@@ -667,17 +747,17 @@
 						<h:selectOneMenu value="#{slotDefEditBean.collection.conditionalPropertyInst.stringValue}" required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"
 									rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'STRING' and slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues != null}">
                     		<s:selectItems value="#{slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues}" 
-											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
              			</h:selectOneMenu>
              			<h:selectOneMenu value="#{slotDefEditBean.collection.conditionalPropertyInst.integerValue}" required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"
 									rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'INTEGER' and slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues != null}">
                     		<s:selectItems value="#{slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues}" 
-											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
              			</h:selectOneMenu>
              			<h:selectOneMenu value="#{slotDefEditBean.collection.conditionalPropertyInst.dateValue}"  required="#{slotDefEditBean.collection.conditionalPropertyDef != null}"
              						rendered="#{slotDefEditBean.collection.conditionalPropertyDef.dataType == 'DATE' and slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues != null}">
                     		<s:selectItems value="#{slotDefEditBean.collection.conditionalPropertyDef.dictionaryValues}" 
-											var="value" label="#{value}" noSelectionLabel="-- select a value --"/>
+											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
              			</h:selectOneMenu>
 	            </s:decorate>

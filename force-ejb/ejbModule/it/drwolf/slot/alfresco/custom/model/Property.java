@@ -12,7 +12,7 @@ import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 @Root
-public class Property implements DataDefinition {
+public class Property implements DataDefinition, Comparable<Property> {
 
 	@Attribute
 	private String name;
@@ -34,6 +34,8 @@ public class Property implements DataDefinition {
 
 	@ElementList(required = false)
 	private List<Constraint> constraints;
+
+	private int position;
 
 	public String getName() {
 		return name;
@@ -159,6 +161,23 @@ public class Property implements DataDefinition {
 			}
 		}
 		return null;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
+
+	public int compareTo(Property o) {
+		if (o.getPosition() < this.getPosition()) {
+			return 1;
+		} else if (o.getPosition() > this.getPosition()) {
+			return -1;
+		}
+		return 0;
 	}
 
 }
