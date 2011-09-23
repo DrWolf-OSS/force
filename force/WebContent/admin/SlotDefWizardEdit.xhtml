@@ -12,7 +12,7 @@
 
 <ui:define name="body">
 
-    <h:form id="slotDef" styleClass="edit">
+    <h:form id="slotDef" styleClass="edit" onkeypress="dirty=true">
     
     	<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
 
@@ -94,11 +94,12 @@
 		            			reRender="embeddedPropPanel"/>
 		                #{' '}
 						<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeEmbeddedProp(eprop)}" 
-            						onclick="if(!confRules('#{slotDefEditBean.retrieveReferencedRulesLabel(eprop)}')){return false;}"
+            						onclick="if(!confRules('#{slotDefEditBean.retrieveReferencedRulesLabel(eprop)}')){return false;}else{dirty=true;}"
             						reRender="epropTable,propTable,collTable"
             						rendered="#{not slotDefHome.referenced or eprop.id==null}"/>
             						
             			<a:commandLink id="invalidate" value="#{eprop.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(eprop)}"
+            						onclick="dirty=true"
             						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}"
             						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(eprop) ? 'disabledLink' : ''}"
             						reRender="epropTable"
@@ -187,12 +188,12 @@
 		                				reRender="propPanel"/>
 		                #{' '}
 						<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeProp(prop)}" 
-		                				onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}; if(!confRules('#{slotDefEditBean.retrieveReferencedRulesLabel(prop)}')){return false;}"
+		                				onclick="if(!conf('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}; if(!confRules('#{slotDefEditBean.retrieveReferencedRulesLabel(prop)}')){return false;}else{dirty=true;}"
 		                				rendered="#{not slotDefHome.referenced or prop.id==null}"
 		                				reRender="collTable,propTable,epropTable"/>
 		                				
 		                <a:commandLink id="invalidate" value="#{prop.active ? 'Invalida' : 'Riattiva'}" 
-		                			onclick="if(!confInvalidate('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}"
+		                			onclick="if(!confInvalidate('#{slotDefEditBean.getReferencedCollectionsNames(prop)}')){return false;}else{dirty=true;}"
 		                			action="#{slotDefEditBean.invalidate(prop)}"
             						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}"
             						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(prop) ? 'disabledLink' : ''}"
@@ -259,11 +260,12 @@
 										styleClass="#{not coll.active ? 'disabledLink' : ''}"/>
 							#{'  '}
 							<a:commandLink id="delete" value="Elimina" action="#{slotDefEditBean.removeColl(coll)}" 
-									onclick="if(!confRules('#{slotDefEditBean.retrieveReferencedRulesLabel(coll)}')){return false;}"
+									onclick="if(!confRules('#{slotDefEditBean.retrieveReferencedRulesLabel(coll)}')){return false;}else{dirty=true;}"
 									reRender="epropTable,propPanel,collTable,propTable"
 									rendered="#{not slotDefHome.referenced or coll.id==null}"/>
 									
 						 	<a:commandLink id="invalidate" value="#{coll.active ? 'Invalida' : 'Riattiva'}" action="#{slotDefEditBean.invalidate(coll)}"
+						 			onclick="dirty=true"
             						disabled="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}"
             						styleClass="#{not empty slotDefEditBean.retrieveReferencedRules(coll) ? 'disabledLink' : ''}"
             						reRender="collTable"
@@ -344,7 +346,7 @@
 			<f:facet name="header">
 				<h:outputText value="Scegli la tipologia di richiesta" />
 			</f:facet>
-			<a:form id="ctpf">
+			<a:form id="ctpf" onkeypress="dirty=true">
 			<s:div style="text-align: center">
 				<a:commandButton action="#{slotDefEditBean.setConditional(false)}" 
 							value="Aggiungi richiesta comune" 
@@ -369,7 +371,7 @@
 			<f:facet name="header">
 				<h:outputText value="Scegli l'informazione vincolante" />
 			</f:facet>
-			<a:form id="scp">
+			<a:form id="scp" onkeypress="dirty=true">
 				<ui:param name="customType" value="p" />
 				<s:decorate template="/layout/edit.xhtml" id="condPD">
 	                <ui:define name="label">
@@ -406,7 +408,7 @@
 			<f:facet name="header">
 				<h:outputText value="Descrizione dell'informazione" />
 			</f:facet>
-			<a:form id="pf">
+			<a:form id="pf" onkeypress="dirty=true">
 				<script type="text/javascript">
 					var pinvalid = false;
 				</script>
@@ -538,7 +540,7 @@
 			<f:facet name="header">
 				<h:outputText value="Descrizione dell'informazione" />
 			</f:facet>
-			<a:form id="epForm">
+			<a:form id="epForm" onkeypress="dirty=true">
 				<script type="text/javascript">
 					var epinvalid = false;
 				</script>
@@ -643,7 +645,8 @@
 	             			</s:fragment>
 	             			
 	             			<s:fragment rendered="#{slotDefEditBean.embeddedProperty.multiple and slotDefEditBean.embeddedProperty.dictionary != null}">
-	             			<rich:pickList value="#{slotDefEditBean.embeddedProperty.valuesAsList}" required="#{not slotDefParameters.model}">
+	             			<rich:pickList value="#{slotDefEditBean.embeddedProperty.valuesAsList}" required="#{not slotDefParameters.model}"
+	             							onlistchanged="dirty=true">
 								<s:selectItems value="#{slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues}" var="value" label="#{value}" />
 							</rich:pickList>
 							</s:fragment>
@@ -665,7 +668,7 @@
 			<f:facet name="header">
 				<h:outputText value="Descrizione della Richiesta" />
 			</f:facet>
-			<a:form id="cpf">
+			<a:form id="cpf" onkeypress="dirty=true">
 				<script type="text/javascript">
 					var cinvalid = false;
 				</script>
