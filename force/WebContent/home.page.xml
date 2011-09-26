@@ -3,20 +3,19 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd">
       
+    <action execute="#{authenticator.isLoggedIn()}"/>
 
-   <navigation from-action="#{authenticator.loggedIn}">
+   <navigation from-action="#{authenticator.isLoggedIn()}">
        <rule if="#{identity.hasRole('AZIENDE')}">
          <redirect view-id="/user/ControlPanel.xhtml">
             <param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
             <param name="slotInstId" value="#{userSession.primarySlotInst.id}"/>
             <param name="aziendaId" value="#{userSession.aziendaId}" />
          </redirect>
-         
       </rule>
        <rule if="#{identity.hasRole('ADMIN')}">
          <redirect view-id="/admin/ControlPanel.xhtml">
          </redirect>
-         
       </rule>
    </navigation>
 

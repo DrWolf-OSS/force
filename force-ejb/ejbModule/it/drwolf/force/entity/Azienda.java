@@ -237,7 +237,10 @@ public class Azienda implements Serializable {
 
 	@Transient
 	public List<SOA> getSOAAsList() {
-		return new ArrayList<SOA>(this.getSOA());
+		if (this.getSOA() != null) {
+			return new ArrayList<SOA>(this.getSOA());
+		}
+		return new ArrayList<SOA>();
 
 	}
 

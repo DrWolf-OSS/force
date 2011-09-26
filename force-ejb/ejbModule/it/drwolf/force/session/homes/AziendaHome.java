@@ -130,6 +130,20 @@ public class AziendaHome extends EntityHome<Azienda> {
 		return Arrays.asList(PosizioneCNA.values());
 	}
 
+	public boolean haveCM() {
+		if (this.getInstance().getCategorieMerceologicheAsList().size() > 0) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean haveSoa() {
+		if (this.getInstance().getSOAAsList().size() > 0) {
+			return true;
+		}
+		return false;
+	}
+
 	public String inserisciAzienda() {
 		try {
 			this.getInstance().setStato(StatoAzienda.NUOVA.toString());

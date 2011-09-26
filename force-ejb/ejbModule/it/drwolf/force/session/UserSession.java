@@ -55,9 +55,9 @@ public class UserSession implements Serializable {
 
 	private SlotDef primarySlotDef;
 
-	private SlotInst primarySlotInst;
+	private SlotInst primarySlotInst = null;
 
-	private Integer aziendaId;
+	private Azienda azienda;
 
 	private AlfrescoFolder groupFolder; // cartella di alfresco dell'azienda
 
@@ -66,6 +66,18 @@ public class UserSession implements Serializable {
 
 	private boolean llpp = false;
 
+	public String checkStatus() {
+		if (this.isLlpp() && (this.azienda.getSOA().size() == 0)) {
+			return "GO_TO_SOA";
+		} else if (!this.isLlpp()
+				&& (this.azienda.getCategorieMerceologiche().size() == 0)) {
+			return "GO_TO_CM";
+		} else if (this.getPrimarySlotInst() == null) {
+			return "GO_TO_SLOTINST";
+		}
+		return "GO";
+	}
+
 	//
 	// @In(create = true)
 	// SlotDefHome slotDefHome;
@@ -73,13 +85,7 @@ public class UserSession implements Serializable {
 	//
 
 	public Azienda getAzienda() {
-		return (Azienda) this.entityManager
-				.createQuery("from Azienda where id = :id")
-				.setParameter("id", this.getAziendaId()).getSingleResult();
-	}
-
-	public Integer getAziendaId() {
-		return this.aziendaId;
+		return this.azienda;
 	}
 
 	public AlfrescoFolder getGroupFolder() {
@@ -95,6 +101,10 @@ public class UserSession implements Serializable {
 	}
 
 	public SlotInst getPrimarySlotInst() {
+		if (this.primarySlotInst == null) {
+			// retrieveSlotInst..
+			// sett
+		}
 		return this.primarySlotInst;
 	}
 
@@ -117,7 +127,7 @@ public class UserSession implements Serializable {
 		//
 		// this.slotDefHome.setInstance(this.primarySlotDef);
 		// /
-		this.setAziendaId(azienda.getId());
+		this.setAzienda(azienda);
 		SlotInst slonInst;
 		try {
 			slonInst = (SlotInst) this.entityManager
@@ -173,8 +183,8 @@ public class UserSession implements Serializable {
 		return this.llpp;
 	}
 
-	public void setAziendaId(Integer aziendaId) {
-		this.aziendaId = aziendaId;
+	public void setAzienda(Azienda azienda) {
+		this.azienda = azienda;
 	}
 
 	public void setGroupFolder(AlfrescoFolder groupFolder) {

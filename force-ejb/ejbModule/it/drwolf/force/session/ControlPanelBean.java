@@ -71,7 +71,7 @@ public class ControlPanelBean {
 		ArrayList<Gara> elenco = (ArrayList<Gara>) this.entityManager
 				.createQuery(
 						" select distinct  g from Azienda a join a.categorieMerceologiche cm join cm.gare g where a.id = :a")
-				.setParameter("a", this.userSession.getAziendaId())
+				.setParameter("a", this.userSession.getAzienda().getId())
 				.getResultList();
 		return elenco;
 	}
@@ -100,7 +100,7 @@ public class ControlPanelBean {
 
 		// PALA
 		// Il PrimarySlotInst potrebbe non essere ancora stato istanziato!
-		if (userSession.getPrimarySlotInst() != null) {
+		if (this.userSession.getPrimarySlotInst() != null) {
 			ArrayList<String> ids = this.alfrescoWrapper
 					.getDocumentIdsInFolderByAspect("slot:expirable",
 							this.userSession.getPrimarySlotFolder().getId(),

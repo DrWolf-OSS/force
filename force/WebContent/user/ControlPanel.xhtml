@@ -54,8 +54,8 @@
             <ui:define name="label">e-mail Referente</ui:define>
             <h:outputText value="#{aziendaHome.instance.emailReferente}"/>
      </s:decorate>
-
-    <div style="clear:both"/>
+    
+    <br style="clear:both; height: 500px;"/>
 </rich:panel>
 <rich:panel>
     <f:facet name="header"><s:span>
@@ -72,7 +72,7 @@
     <c:forEach var="coll"
                items="#{controlPanelBean.inScadenza}">
                     <s:div id="infoPanel_#{coll.docDefCollection.id}">  
-                           <h:outputText value="#{coll.docDefCollection.name}" />
+                          <strong><h:outputText value="#{coll.docDefCollection.name}" /></strong>
                            
                            <a:repeat value="#{controlPanelBean.inScadenzaFC[coll.docDefCollection.id]}"
                                      var="item">

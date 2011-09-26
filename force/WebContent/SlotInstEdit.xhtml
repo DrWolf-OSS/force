@@ -10,7 +10,24 @@
 	xmlns:rich="http://richfaces.org/rich" template="/layout/template.xhtml">
 
 	<ui:define name="body">
-
+        <rich:modalPanel id="panel" width="350" height="100" showWhenRendered="#{not slotInstHome.idDefined}">
+        <f:facet name="header">
+            <h:panelGroup>
+                <h:outputText value="Attenzione"></h:outputText>
+            </h:panelGroup>
+        </f:facet>
+         <f:facet name="controls">
+            <h:panelGroup>
+                <h:graphicImage value="/img/close.png" styleClass="hidelink" id="hidelink"/>
+                <rich:componentControl for="panel" attachTo="hidelink" operation="hide" event="onclick"/>
+            </h:panelGroup>
+        </f:facet>
+        <h:outputText value="Completa la registrazione inseredo la tua documentazione"></h:outputText>
+        <br/>
+         <h:commandButton id="chiudiPanel"
+                   value="Chiudi"/>
+          <rich:componentControl for="panel" attachTo="chiudiPanel" operation="hide" event="onclick"/>
+    </rich:modalPanel>
 		<a:form id="slotInst" styleClass="edit">
 		<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
 			<rich:panel>
