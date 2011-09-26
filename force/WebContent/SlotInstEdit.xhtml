@@ -28,7 +28,7 @@
                    value="Chiudi"/>
           <rich:componentControl for="panel" attachTo="chiudiPanel" operation="hide" event="onclick"/>
     </rich:modalPanel>
-		<a:form id="slotInst" styleClass="edit">
+		<a:form id="slotInst" styleClass="edit" onkeypress="dirty=true">
 		<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
 			<rich:panel>
 				<f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Modifica' : 'Crea'} Busta #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
@@ -107,7 +107,8 @@
 								value="#{dataInstance.dateValue}" datePattern="dd/MM/yyyy"
 								rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
-								disabled="#{not dataInstance.dataDefinition.editable}" />
+								disabled="#{not dataInstance.dataDefinition.editable}" 
+								onchanged="dirty=true"/>
 
 							<a:region>
 							<h:selectOneMenu value="#{dataInstance.stringValue}" required="#{dataInstance.dataDefinition.required}"
@@ -116,14 +117,16 @@
 	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}" 
+										oncomplete="dirty=true"
 										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
 	             			</h:selectOneMenu>
-	             			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"
+	             			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"             						
 	             						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues != null}"
 	             						valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}"
+										oncomplete="dirty=true"
 										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{dataInstance.dateValue}"  required="#{dataInstance.dataDefinition.required}"
@@ -133,6 +136,7 @@
 												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 								<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}"
+										oncomplete="dirty=true"
 										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
 	             			</h:selectOneMenu>
 	             			<!--  --></a:region>
@@ -140,7 +144,9 @@
 	             		
 	             			
 	             			<s:fragment rendered="#{dataInstance.dataDefinition.multiple}">
-							<rich:pickList value="#{dataInstance.valuesAsList}" required="#{dataInstance.dataDefinition.required}">
+							<rich:pickList value="#{dataInstance.valuesAsList}"
+										required="#{dataInstance.dataDefinition.required}"
+										onlistchanged="dirty=true">
 								<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" var="value" label="#{value}" />
 							</rich:pickList>
 							</s:fragment>
@@ -205,7 +211,8 @@
 												id="addPrimaryDoc_#{coll.docDefCollection.id}"
 												action="#{slotInstEditBean.addDocFromPrimary(coll.docDefCollection.id,item)}"
 												reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}"
-												disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}"/>
+												disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}"
+												onclick="dirty=true"/>
 										</a:region>
 
 										</s:div>
@@ -347,7 +354,8 @@
 									<a:region>
 										<a:commandButton value="Remove"
 											action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}"
-											reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}" />
+											reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}" 
+											onclick="dirty=true"/>
 										<a:commandButton value="Edit"
 											action="#{slotInstEditBean.editItem(coll.docDefCollection.id, item)}" 
 											reRender="editPanel" 
@@ -411,7 +419,7 @@
 			<f:facet name="header">
 				<h:outputText value="Upload dialog" />
 			</f:facet>
-			<a:form>
+			<a:form onkeypress="dirty=true">
 				<rich:fileUpload id="fileUpload"
 					fileUploadListener="#{slotInstEditBean.listener}" acceptedTypes="*"
 					noDuplicate="false" autoclear="false" immediateUpload="true"
@@ -430,7 +438,7 @@
 			<f:facet name="header">
 				<h:outputText value="Edit dialog" />
 			</f:facet>
-			<a:form id="editPanelForm">
+			<a:form id="editPanelForm" onkeypress="dirty=true">
 
 					<script type="text/javascript">
 					var epfinvalid = false;
@@ -468,27 +476,31 @@
 							value="#{dataInstance.dateValue}" datePattern="dd/MM/yyyy"
 							rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues == null}"
 							required="#{dataInstance.dataDefinition.required}"
-							disabled="#{not dataInstance.dataDefinition.editable}" />
+							disabled="#{not dataInstance.dataDefinition.editable}" 
+							onchanged="dirty=true"/>
 						
 						<h:selectOneMenu value="#{dataInstance.stringValue}" required="#{dataInstance.dataDefinition.required}"
-									rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues != null}">
+									rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues != null}"
+									onchange="dirty=true">
                     		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
 											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
              			</h:selectOneMenu>
              			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"
-             						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues != null}" >
+             						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues != null}" 
+             						onchange="dirty=true">
                     		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
 											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
              			</h:selectOneMenu>
              			<h:selectOneMenu value="#{dataInstance.dateValue}"  required="#{dataInstance.dataDefinition.required}"
-             						rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues != null}">
+             						rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues != null}"
+             						onchange="dirty=true">
                     		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
 											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" /> 
              			</h:selectOneMenu>
              			</s:fragment>
              			<s:fragment rendered="#{dataInstance.dataDefinition.multiple}">
-             			<rich:pickList value="#{dataInstance.values}" required="#{dataInstance.dataDefinition.required}">
+             			<rich:pickList value="#{dataInstance.values}" required="#{dataInstance.dataDefinition.required}" onlistchanged="dirty=true">
 							<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" var="value" label="#{value}" />
 						</rich:pickList>
              			</s:fragment>

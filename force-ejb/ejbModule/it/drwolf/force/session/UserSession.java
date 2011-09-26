@@ -102,8 +102,10 @@ public class UserSession implements Serializable {
 
 	public SlotInst getPrimarySlotInst() {
 		if (this.primarySlotInst == null) {
-			// retrieveSlotInst..
-			// sett
+			SlotInst slotInst = this.retriveSlotInst();
+			if (slotInst != null) {
+				this.setPrimarySlotInst(slotInst);
+			}
 		}
 		return this.primarySlotInst;
 	}
@@ -128,21 +130,7 @@ public class UserSession implements Serializable {
 		// this.slotDefHome.setInstance(this.primarySlotDef);
 		// /
 		this.setAzienda(azienda);
-		SlotInst slonInst;
-		try {
-			slonInst = (SlotInst) this.entityManager
-					.createQuery(
-							"from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
-					.setParameter("slotDef", azienda.getSettore().getSlotDef())
-					.setParameter("ownerId", azienda.getAlfrescoGroupId())
-					.getSingleResult();
-			if (slonInst != null) {
-				this.setPrimarySlotInst(slonInst);
-			}
-		} catch (Exception e) {
-			// Non è ancora stato creato uno slotInst
-			System.out.println("---> Più di uno slot inst primary!!!!!");
-		}
+		SlotInst slonInst = this.retriveSlotInst();
 		// prelevo la cartella principale:
 		this.groupFolder = this.alfrescoWrapper.findOrCreateFolder(
 				this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
@@ -156,6 +144,10 @@ public class UserSession implements Serializable {
 			this.primarySlotFolder = (AlfrescoFolder) this.alfrescoUserIdentity
 					.getSession().getObject(this.primarySlotInst.getNodeRef());
 		}
+	}
+
+	public boolean isLlpp() {
+		return this.llpp;
 	}
 
 	// Lo SlotInst può essere null all'inizo della Session ed essere
@@ -179,8 +171,25 @@ public class UserSession implements Serializable {
 	// }
 	// }
 
-	public boolean isLlpp() {
-		return this.llpp;
+	private SlotInst retriveSlotInst() {
+		SlotInst slonInst = null;
+		try {
+			slonInst = (SlotInst) this.entityManager
+					.createQuery(
+							"from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
+					.setParameter("slotDef",
+							this.getAzienda().getSettore().getSlotDef())
+					.setParameter("ownerId",
+							this.getAzienda().getAlfrescoGroupId())
+					.getSingleResult();
+			if (slonInst != null) {
+				this.setPrimarySlotInst(slonInst);
+			}
+		} catch (Exception e) {
+			// Non è ancora stato creato uno slotInst
+			System.out.println("---> Più di uno slot inst primary!!!!!");
+		}
+		return slonInst;
 	}
 
 	public void setAzienda(Azienda azienda) {

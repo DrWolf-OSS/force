@@ -1,7 +1,7 @@
 /**
  * 
  */
-var dirty = true;
+var dirty = false;
 function goodbye(e) {
 	if(dirty){
 		if(!e) e = window.event;
