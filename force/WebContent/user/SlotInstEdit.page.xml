@@ -42,7 +42,7 @@
    <navigation from-action="#{slotInstEditBean.update()}">
       <rule if-outcome="updated">
          <end-conversation before-redirect="true"/>
-         <redirect view-id="/SlotInstEdit.xhtml">
+         <redirect>
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
@@ -55,7 +55,7 @@
       </rule>
       <rule if-outcome="warning">
       	 <end-conversation before-redirect="true"/>
-         <redirect view-id="/SlotInstEdit.xhtml">
+         <redirect>
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>

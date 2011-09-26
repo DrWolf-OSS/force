@@ -100,7 +100,7 @@
 	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}" 
-										oncomplete="dirty=true"
+										oncomplete="dirty=true;"
 										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"             						
