@@ -13,11 +13,11 @@
     <h:form id="slotDefSearch" styleClass="edit">
 
     <rich:panel>
-        <f:facet name="header">Elenco #{slotDefParameters.model ? 'modelli' : ''} #{slotDefParameters.mode=='Primary' ? 'Buste di Riferimento' : 'Buste Amministrative'}</f:facet>
+        <f:facet name="header">Elenco #{slotDefParameters.model ? 'modelli' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Buste di Riferimento' : 'Buste Amministrative'}</f:facet>
     <div class="results" id="slotDefList">
 
     <h:outputText value="The slotDef search returned no results."
-               rendered="#{empty slotDefList.resultList}"/>
+               rendered="#{empty slotDefsByParams}"/>
 
     <rich:dataTable id="slotDefList"
                 var="_slotDef"

@@ -62,6 +62,12 @@
             </f:facet>
             <h:outputText value="#{_slotInst.slotDef.id}"/>
         </h:column>
+         <h:column>
+            <f:facet name="header">
+                <h:outputText value="Owner" />
+            </f:facet>
+            <h:outputText value="#{_slotInst.ownerId}"/>
+        </h:column>
         <rich:column styleClass="action">
             <f:facet name="header">Action</f:facet>
             <s:link view="/#{empty from ? 'SlotInst' : from}.xhtml"
@@ -72,7 +78,7 @@
                         value="#{_slotInst.id}"/>
             </s:link>
             #{' '}
-            <s:link view="/SlotInstEdit.xhtml"
+            <s:link view="/user/SlotInstEdit.xhtml"
                    value="Edit"
              propagation="none"
                       id="slotInstEdit"

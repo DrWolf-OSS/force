@@ -13,9 +13,9 @@
 
 		<a:form id="slotInst" styleClass="edit" onkeypress="dirty=true">
 		<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
-			<rich:panel>
+			<rich:panel style="width:1124px">
 				<f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Modifica' : 'Crea'} Busta #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
-
+				
 				<ui:repeat var="message" value="#{slotInstEditBean.slotMessages}">
 					<h:graphicImage value="/img/msgerror.png"
 						rendered="#{message.type == 'ERROR'}" />
@@ -37,7 +37,7 @@
 							rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"/>
 						<h:outputText value="#{dataInstance.integerValue}"
 							rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER'}" />
-						<h:outputText value="#{dataInstance.booleanValue ? 'true' : 'false'}"
+						<h:outputText value="#{dataInstance.booleanValue ? 'Sì' : 'No'}"
 							rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}" />
 						<h:outputText value="#{dataInstance.dateValue}"
 							rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}">
@@ -139,8 +139,8 @@
 					</c:forEach>
 				</s:div>
 				
-
-				<div style="clear: both" />
+				<div style="clear: both"><span class="required">*</span>
+				campi obbligatori</div>
 
 				<s:div id="collections">
 					<h:panelGrid columns="2">
@@ -152,14 +152,15 @@
 										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
 							<ui:define name="label">
 								<h:outputText value="#{coll.docDefCollection.name}" />
+								<s:span styleClass="required" rendered="#{coll.docDefCollection.min ge 1}">*</s:span>
 							</ui:define>
 									
 							<s:div id="primaryRegion_#{coll.docDefCollection.id}" 
 								rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
 										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
-								<rich:panel rendered="#{slotDefHome.instance.type != 'PRIMARY'}" styleClass="nestedPanel">
+								<rich:panel rendered="#{slotDefHome.instance.type != 'PRIMARY'}" styleClass="nestedPanel primaryRegionPanel">
 									<f:facet name="header">
-										<h:outputText value="Available #{coll.docDefCollection.docDef.name} on primary slot" />
+										<h:outputText value="Documenti di tipo #{coll.docDefCollection.docDef.name} disponibili nella Busta di Riferimento" />
 									</f:facet>
 
 									<a:repeat
@@ -170,7 +171,7 @@
 									 		<img src="/force/tn?id=#{item.document.id}&amp;name=imgpreview"/>
 										</rich:toolTip>
 										<ui:define name="label">
-											<h:outputText value="File Name" />
+											<h:outputText value="Nome del file" />
 										</ui:define>
 										<h:graphicImage value="/img/mimetype/document-pdf.png" rendered="#{item.mimetype.contains('pdf')}" styleClass="fileIcon"/>
 										<h:graphicImage value="/img/mimetype/document-word.png" rendered="#{item.mimetype.contains('word')}" styleClass="fileIcon"/>
@@ -219,11 +220,11 @@
 								<h:outputText value="#{message.text}" />
 								<br />
 							</ui:repeat>
-							<rich:panel styleClass="nestedPanel">
+							<rich:panel styleClass="nestedPanel infoPanel">
 								<f:facet name="header">
-									<h:outputText value="Uploaded Files Info" />
+									<h:outputText value="Informazioni sui documenti caricati" />
 								</f:facet>
-								<h:outputText value="No files uploaded"
+								<h:outputText value="Nessun documento caricato"
 									rendered="#{slotInstEditBean.datas[coll.docDefCollection.id] == null or (empty slotInstEditBean.datas[coll.docDefCollection.id])}" />
 
 								<a:repeat id="fileGrid_#{coll.docDefCollection.id}"								
@@ -247,7 +248,7 @@
 									 		<img src="/force/tn?id=#{item.document.id}&amp;name=imgpreview"/>
 										</rich:toolTip>
 										<ui:define name="label">
-											<h:outputText value="File Name" />
+											<h:outputText value="Nome del file" />
 										</ui:define>
 										<h:graphicImage value="/img/mimetype/document-pdf.png" rendered="#{item.mimetype.contains('pdf')}" styleClass="fileIcon"/>
 										<h:graphicImage value="/img/mimetype/document-word.png" rendered="#{item.mimetype.contains('word')}" styleClass="fileIcon"/>
@@ -270,9 +271,9 @@
 									</s:decorate>
 									<s:decorate template="/layout/display.xhtml">
 										<ui:define name="label">
-											<h:outputText value="Signed" />
+											<h:outputText value="Firmato digitalmente" />
 										</ui:define>
-										<h:outputText value="#{item.document.hasAspect('P:dw:signed') ? 'Yes' : 'No'}"/>
+										<h:outputText value="#{item.document.hasAspect('P:dw:signed') ? 'Sì' : 'No'}"/>
 										<rich:toolTip mode="client" rendered="#{item.document.hasAspect('P:dw:signed')}">
 											<s:span>
 												<a:repeat var="sign" value="#{item.signatures}" rowKeyVar="key">										
@@ -284,7 +285,7 @@
 													</s:decorate>
 													<s:decorate template="/layout/display.xhtml">
 														<ui:define name="label">
-															<h:outputText value="Signature" />
+															<h:outputText value="Firma" />
 														</ui:define>
 														<h:outputText value="#{sign.sign}" />
 													</s:decorate>
@@ -296,7 +297,7 @@
 													</s:decorate>
 													<s:decorate template="/layout/display.xhtml">
 														<ui:define name="label">
-															<h:outputText value="Expiration date" />
+															<h:outputText value="Data di scadenza" />
 														</ui:define>
 														<h:outputText value="#{sign.expiry}" >
 															<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
@@ -319,7 +320,7 @@
 												rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"/>
 											<h:outputText value="#{dataInstance.integerValue}"
 												rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER'}" />
-											<h:outputText value="#{dataInstance.booleanValue ? 'true' : 'false'}"
+											<h:outputText value="#{dataInstance.booleanValue ? 'Sì' : 'No'}"
 												rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}" />
 											<h:outputText value="#{dataInstance.dateValue}"
 												rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}">
@@ -335,11 +336,11 @@
 																	
 									<div style="clear: both" />
 									<a:region>
-										<a:commandButton value="Remove"
+										<a:commandButton value="Elimina"
 											action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}"
 											reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}" 
 											onclick="dirty=true"/>
-										<a:commandButton value="Edit"
+										<a:commandButton value="Modifica"
 											action="#{slotInstEditBean.editItem(coll.docDefCollection.id, item)}" 
 											reRender="editPanel" 
 											oncomplete="#{rich:component('editPanel')}.show()"
@@ -351,7 +352,7 @@
 
 								<a:region>
 									<a:commandButton id="addNewFile_#{coll.docDefCollection.id}"
-										value="add new file"
+										value="Aggiungi un nuovo file"
 										action="#{slotInstEditBean.setActiveCollectionId(coll.docDefCollection.id)}"
 										onclick="#{rich:component('uploadPanel')}.show()"
 										reRender="primaryRegion_#{coll.docDefCollection.id}"
@@ -366,31 +367,31 @@
 				</s:div>
 
 				<div style="clear: both"><span class="required">*</span>
-				required fields</div>
+				campi obbligatori</div>
 
 			</rich:panel>
 
 			<div class="actionButtons">
 			<h:commandButton id="save"
-				value="Save" action="#{slotInstEditBean.save()}"
+				value="Salva" action="#{slotInstEditBean.save()}"
 				onclick="dirty = false;"
 				rendered="#{slotInstHome.id == null}"
 				styleClass="modal" />
 			<h:commandButton id="update"
-				value="Save" action="#{slotInstEditBean.update()}"
+				value="Salva" action="#{slotInstEditBean.update()}"
 				onclick="dirty = false;"
 				rendered="#{slotInstHome.id != null}" 
 				styleClass="modal"/>
 			<h:commandButton id="delete"
-				value="Delete" action="#{slotInstHome.remove}" immediate="true"
+				value="Elimina" action="#{slotInstHome.remove}" immediate="true"
 				onclick="dirty = false;"
 				rendered="#{slotInstHome.managed}" 
 				styleClass="modal"/>
 			<s:button id="cancelEdit"
-				value="Cancel" propagation="end" view="/SlotInst.xhtml"
+				value="Annulla" propagation="end" view="/SlotInst.xhtml"
 				rendered="#{slotInstHome.managed}" />
 			<s:button id="cancelAdd"
-				value="Cancel" propagation="end"
+				value="Annulla" propagation="end"
 				view="/#{empty slotInstFrom ? 'SlotInstList' : slotInstFrom}.xhtml"
 				rendered="#{!slotInstHome.managed}" />
 			</div>
@@ -400,7 +401,7 @@
 
 		<rich:modalPanel id="uploadPanel" autosized="true">
 			<f:facet name="header">
-				<h:outputText value="Upload dialog" />
+				<h:outputText value="Caricamento file" />
 			</f:facet>
 			<a:form onkeypress="dirty=true">
 				<rich:fileUpload id="fileUpload"
@@ -413,13 +414,13 @@
 				</rich:fileUpload>
 			</a:form>
 			<div style="clear: both" />
-			<a:commandButton value="Cancel"
+			<a:commandButton value="Annulla"
 				onclick="#{rich:component('uploadPanel')}.hide()" />
 		</rich:modalPanel>
 
 		<rich:modalPanel id="editPanel" autosized="true" minWidth="550">
 			<f:facet name="header">
-				<h:outputText value="Edit dialog" />
+				<h:outputText value="Finestra di modifica" />
 			</f:facet>
 			<a:form id="editPanelForm" onkeypress="dirty=true">
 
@@ -429,7 +430,7 @@
 
 				<s:decorate template="/layout/display.xhtml">
 					<ui:define name="label">
-						<h:outputText value="File Name" />
+						<h:outputText value="Nome del file" />
 					</ui:define>
 					<h:outputText value="#{slotInstEditBean.activeFileContainer.fileName}" />
 				</s:decorate>
@@ -491,13 +492,13 @@
 				</ui:repeat>
 				
 				<div style="clear: both" />
-				<a:commandButton value="Confirm"
+				<a:commandButton value="Conferma"
 					action="#{slotInstEditBean.addActiveItemToDatas}"
 					reRender="editPanelForm, infoPanel_#{slotInstEditBean.activeCollectionId}, primaryRegion_#{slotInstEditBean.activeCollectionId}" 
 					oncomplete="if(!epfinvalid){#{rich:component('editPanel')}.hide();}#{rich:component('waitPanel')}.hide();"
 					onclick="#{rich:component('waitPanel')}.show();"/>
 				<a:region>
-				<a:commandButton value="Cancel" onclick="#{rich:component('editPanel')}.hide()"/>
+				<a:commandButton value="Annulla" onclick="#{rich:component('editPanel')}.hide()"/>
 				</a:region>
 			</a:form>
 		</rich:modalPanel>

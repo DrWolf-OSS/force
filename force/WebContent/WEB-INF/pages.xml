@@ -18,6 +18,8 @@
     <page view-id="/admin/*" login-required="true">
     	<restrict>#{s:hasRole('ADMIN')}</restrict>
     </page>
+    
+    <page view-id="/user/*" login-required="true"/>
     <!--  -->
     
     <exception class="org.jboss.seam.framework.EntityNotFoundException">    

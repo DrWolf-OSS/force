@@ -110,6 +110,14 @@ a:HOVER {
 	background-color:#FFFFFF;
 }
 
+.primaryRegionPanel{
+	width: 450px;
+}
+
+.infoPanel{
+	width: 450px; 
+}
+
 /*
 .invalidRow.action.disabledLink a:LINK {
 	text-decoration: none;
@@ -130,7 +138,6 @@ a:HOVER {
     background-image: url(/force/img/sfondo_sb2.gif);
     background-position: left top;
     background-repeat: repeat-y;
-    overflow: hidden;
 }
 
 #contenitore {
@@ -142,7 +149,6 @@ a:HOVER {
     background-image: url(/Immagini/sfondo_sb.gif);
     background-position: top right;
     background-repeat: repeat-y;
-    overflow: hidden;
 }
 .titolo_cna {position:absolute;left:165px;top:24px;color:#ffffff;line-height:150%;font-size:125%;}
 .titolo_cna h1 { display:inline; margin:0px; padding:0px; font-size:190%; font-weight:normal; }
