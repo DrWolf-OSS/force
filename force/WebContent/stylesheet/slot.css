@@ -16,6 +16,7 @@ a:HOVER {
 }
 
 .fileItem{
+	background-color: #FFFFFF;
 	padding: 10px;
 	margin: 2px;
 	margin-bottom: 10px;
@@ -117,6 +118,18 @@ a:HOVER {
 .infoPanel{
 	width: 450px; 
 }
+
+.summaryGrid{
+	width: 100%;
+	padding: 15px;
+}
+
+.summaryItem{
+	display: table;
+    width: 22%;
+    float: left;
+}
+
 
 /*
 .invalidRow.action.disabledLink a:LINK {

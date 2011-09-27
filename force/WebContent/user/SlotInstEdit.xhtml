@@ -7,13 +7,38 @@
 	xmlns:c="http://java.sun.com/jstl/core"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:a="http://richfaces.org/a4j"
-	xmlns:rich="http://richfaces.org/rich" template="/layout/template.xhtml">
+	xmlns:rich="http://richfaces.org/rich" 
+	template="/layout/template.xhtml">
 
 	<ui:define name="body">
 
 		<a:form id="slotInst" styleClass="edit" onkeypress="dirty=true">
 		<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
-			<rich:panel style="width:1124px">
+		
+		
+			<rich:simpleTogglePanel id="summaryPanel" switchType="client" opened="true">
+				<f:facet name="header">Pannello riassuntivo Richieste</f:facet>			
+				<h:panelGrid styleClass="summaryGrid" columns="4">
+					<a:repeat value="#{slotInstEditBean.docInstCollections}" var="coll">
+						<s:fragment rendered="#{coll.docDefCollection.active}">
+							<s:span styleClass="fileItem summaryItem"
+									rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
+											(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
+								<h:graphicImage value="/img/pin.png"  styleClass="fileIcon" rendered="#{coll.docDefCollection.min ge 1 and slotInstEditBean.datas[coll.docDefCollection.id].size lt coll.docDefCollection.min}"/>
+								<h:graphicImage value="/img/pin-white.png"  styleClass="fileIcon" rendered="#{coll.docDefCollection.min == null and slotInstEditBean.datas[coll.docDefCollection.id].size le 0}"/>
+								<h:graphicImage value="/img/tick.png"  styleClass="fileIcon" 
+												rendered="#{coll.docDefCollection.min == null and slotInstEditBean.datas[coll.docDefCollection.id].size ge 1 or
+												coll.docDefCollection.min != null and slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.min}"/>
+								<h:outputText value="#{coll.docDefCollection.name}"/>
+							</s:span>
+						</s:fragment>
+					</a:repeat>
+				</h:panelGrid>
+			</rich:simpleTogglePanel>
+			
+			<rich:spacer height="10"></rich:spacer>
+			
+			<rich:panel>
 				<f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Modifica' : 'Crea'} Busta #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
 				
 				<ui:repeat var="message" value="#{slotInstEditBean.slotMessages}">
@@ -83,7 +108,7 @@
 								required="#{dataInstance.dataDefinition.required}"
 								disabled="#{not dataInstance.dataDefinition.editable}">
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}"
-										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
+										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections, summaryPanel"/>
 							</h:selectBooleanCheckbox>
 							</a:region>
 							<rich:calendar id="subscriptionDate" mode="client"
@@ -101,7 +126,7 @@
 												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}" 
 										oncomplete="dirty=true;"
-										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
+										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections, summaryPanel"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"             						
 	             						rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues != null}"
@@ -110,7 +135,7 @@
 												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}"
 										oncomplete="dirty=true"
-										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
+										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections, summaryPanel"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{dataInstance.dateValue}"  required="#{dataInstance.dataDefinition.required}"
 	             						rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues != null}"
@@ -120,7 +145,7 @@
 								<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}"
 										oncomplete="dirty=true"
-										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections"/>
+										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections, summaryPanel"/>
 	             			</h:selectOneMenu>
 	             			<!--  --></a:region>
 	             		</s:fragment>
@@ -158,7 +183,7 @@
 							<s:div id="primaryRegion_#{coll.docDefCollection.id}" 
 								rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
 										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
-								<rich:panel rendered="#{slotDefHome.instance.type != 'PRIMARY'}" styleClass="nestedPanel primaryRegionPanel">
+								<rich:panel rendered="#{slotDefHome.instance.type != 'PRIMARY'}" styleClass="primaryRegionPanel">
 									<f:facet name="header">
 										<h:outputText value="Documenti di tipo #{coll.docDefCollection.docDef.name} disponibili nella Busta di Riferimento" />
 									</f:facet>
@@ -194,7 +219,7 @@
 											<a:commandButton value=">>"
 												id="addPrimaryDoc_#{coll.docDefCollection.id}"
 												action="#{slotInstEditBean.addDocFromPrimary(coll.docDefCollection.id,item)}"
-												reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}"
+												reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}, summaryPanel"
 												disabled="#{slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.max}"
 												onclick="dirty=true"/>
 										</a:region>
@@ -220,7 +245,7 @@
 								<h:outputText value="#{message.text}" />
 								<br />
 							</ui:repeat>
-							<rich:panel styleClass="nestedPanel infoPanel">
+							<rich:panel styleClass="infoPanel">
 								<f:facet name="header">
 									<h:outputText value="Informazioni sui documenti caricati" />
 								</f:facet>
@@ -338,7 +363,7 @@
 									<a:region>
 										<a:commandButton value="Elimina"
 											action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}"
-											reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}" 
+											reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}, summaryPanel" 
 											onclick="dirty=true"/>
 										<a:commandButton value="Modifica"
 											action="#{slotInstEditBean.editItem(coll.docDefCollection.id, item)}" 
@@ -494,7 +519,7 @@
 				<div style="clear: both" />
 				<a:commandButton value="Conferma"
 					action="#{slotInstEditBean.addActiveItemToDatas}"
-					reRender="editPanelForm, infoPanel_#{slotInstEditBean.activeCollectionId}, primaryRegion_#{slotInstEditBean.activeCollectionId}" 
+					reRender="editPanelForm, infoPanel_#{slotInstEditBean.activeCollectionId}, primaryRegion_#{slotInstEditBean.activeCollectionId}, summaryPanel" 
 					oncomplete="if(!epfinvalid){#{rich:component('editPanel')}.hide();}#{rich:component('waitPanel')}.hide();"
 					onclick="#{rich:component('waitPanel')}.show();"/>
 				<a:region>

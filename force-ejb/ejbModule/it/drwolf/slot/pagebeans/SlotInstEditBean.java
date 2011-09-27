@@ -288,6 +288,11 @@ public class SlotInstEditBean {
 		}
 	}
 
+	public String buildIdsToRerender(PropertyDef propertyDef) {
+		return this.enqueueNames(new HashSet<Conditionable>(propertyDef
+				.getConditionedPropertyDefs()));
+	}
+
 	private boolean checkCollectionsSize() {
 		boolean passed = true;
 
@@ -429,6 +434,16 @@ public class SlotInstEditBean {
 		}
 	}
 
+	private void cloneValuesOnPropertyInst(PropertyInst source,
+			PropertyInst target) {
+		target.setValues(new HashSet<String>(source.getValues()));
+		target.setStringValue(source.getStringValue());
+		target.setIntegerValue(source.getIntegerValue());
+		target.setDateValue(source.getDateValue());
+		target.setBooleanValue(source.getBooleanValue());
+		// this.propertyInsts.add(target);
+	}
+
 	private String copyDocumentOnAlfresco(AlfrescoDocument document,
 			DocInstCollection instCollection,
 			List<DocumentPropertyInst> documentProperties, Folder slotFolder) {
@@ -471,6 +486,25 @@ public class SlotInstEditBean {
 	public void editItem(Long docDefCollectionId, FileContainer container) {
 		this.activeCollectionId = docDefCollectionId;
 		this.activeFileContainer = container;
+	}
+
+	private String enqueueNames(Set<Conditionable> conditionables) {
+		String names = "";
+		if (conditionables != null) {
+			Iterator<Conditionable> iterator = conditionables.iterator();
+			int count = 0;
+			while (iterator.hasNext()) {
+				Conditionable def = iterator.next();
+				if (count == 0) {
+					names = names.concat("p_" + def.getId().toString());
+					count++;
+				} else if (count > 0) {
+					names = names.concat(", " + def.getId());
+					count++;
+				}
+			}
+		}
+		return names;
 	}
 
 	private void extractAndEmbedContent(AlfrescoDocument document,
@@ -548,6 +582,19 @@ public class SlotInstEditBean {
 		while (iterator.hasNext()) {
 			PropertyInst propertyInst = iterator.next();
 			if (propertyInst.getPropertyDef().getId().equals(propertyDefId)) {
+				return propertyInst;
+			}
+		}
+		return null;
+	}
+
+	private PropertyInst findTmpPropertyInst(PropertyDef propertyDef) {
+		Iterator<PropertyInst> iterator = this.propertyInsts.iterator();
+		while (iterator.hasNext()) {
+			PropertyInst propertyInst = iterator.next();
+			if (propertyInst.getPropertyDef().getId()
+					.equals(propertyDef.getId())) {
+				iterator.remove();
 				return propertyInst;
 			}
 		}
@@ -664,7 +711,7 @@ public class SlotInstEditBean {
 				PropertyInst tmpPropertyInst = new PropertyInst();
 				tmpPropertyInst.setPropertyDef(opInst.getPropertyDef());
 
-				cloneValuesOnPropertyInst(opInst, tmpPropertyInst);
+				this.cloneValuesOnPropertyInst(opInst, tmpPropertyInst);
 				this.propertyInsts.add(tmpPropertyInst);
 			}
 
@@ -719,19 +766,6 @@ public class SlotInstEditBean {
 			this.verify();
 		}
 
-		//
-		// this.entityManager.clear();
-
-	}
-
-	private void cloneValuesOnPropertyInst(PropertyInst source,
-			PropertyInst target) {
-		target.setValues(new HashSet<String>(source.getValues()));
-		target.setStringValue(source.getStringValue());
-		target.setIntegerValue(source.getIntegerValue());
-		target.setDateValue(source.getDateValue());
-		target.setBooleanValue(source.getBooleanValue());
-		// this.propertyInsts.add(target);
 	}
 
 	public void listener(UploadEvent event) {
@@ -794,42 +828,6 @@ public class SlotInstEditBean {
 		}
 		return primaryDocs;
 	}
-
-	// public AlfrescoFolder retrieveSlotFolder() {
-	// AlfrescoFolder slotFolder = null;
-	// if ((this.slotInstHome.getInstance() != null)
-	// && (this.slotInstHome.getInstance().getNodeRef() != null)
-	// && !this.slotInstHome.getInstance().getNodeRef().equals("")) {
-	// try {
-	// slotFolder = (AlfrescoFolder) this.alfrescoUserIdentity
-	// .getSession().getObject(
-	// this.slotInstHome.getInstance().getNodeRef());
-	// } catch (CmisObjectNotFoundException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// if (slotFolder != null) {
-	// return slotFolder;
-	// }
-	//
-	// }
-	//
-	// AlfrescoFolder groupFolder = this.alfrescoWrapper.findOrCreateFolder(
-	// this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
-	// .name()), this.alfrescoUserIdentity.getActiveGroup()
-	// .getShortName());
-	//
-	// slotFolder = this.alfrescoWrapper.findOrCreateFolder(
-	// groupFolder,
-	// this.slotDefHome.getInstance().getId()
-	// + " "
-	// + AlfrescoWrapper.normalizeFolderName(this.slotDefHome
-	// .getInstance().getName(),
-	// SlotInstEditBean.LENGHT_LIMIT,
-	// SlotInstEditBean.SPACER));
-	// this.slotInstHome.getInstance().setNodeRef(slotFolder.getId());
-	// return slotFolder;
-	// }
 
 	private List<VerifierParameterInst> retrieveValueInsts(
 			Rule rule,
@@ -1155,7 +1153,7 @@ public class SlotInstEditBean {
 			PropertyInst tmpPropertyInst = this.findTmpPropertyInst(opInst
 					.getPropertyDef());
 			opInst.clean();
-			cloneValuesOnPropertyInst(tmpPropertyInst, opInst);
+			this.cloneValuesOnPropertyInst(tmpPropertyInst, opInst);
 		}
 		//
 
@@ -1439,43 +1437,6 @@ public class SlotInstEditBean {
 			System.out.println(document.getName()
 					+ " non è firmato digitalmente");
 		}
-	}
-
-	public String buildIdsToRerender(PropertyDef propertyDef) {
-		return enqueueNames(new HashSet<Conditionable>(
-				propertyDef.getConditionedPropertyDefs()));
-	}
-
-	private String enqueueNames(Set<Conditionable> conditionables) {
-		String names = "";
-		if (conditionables != null) {
-			Iterator<Conditionable> iterator = conditionables.iterator();
-			int count = 0;
-			while (iterator.hasNext()) {
-				Conditionable def = iterator.next();
-				if (count == 0) {
-					names = names.concat("p_" + def.getId().toString());
-					count++;
-				} else if (count > 0) {
-					names = names.concat(", " + def.getId());
-					count++;
-				}
-			}
-		}
-		return names;
-	}
-
-	private PropertyInst findTmpPropertyInst(PropertyDef propertyDef) {
-		Iterator<PropertyInst> iterator = this.propertyInsts.iterator();
-		while (iterator.hasNext()) {
-			PropertyInst propertyInst = iterator.next();
-			if (propertyInst.getPropertyDef().getId()
-					.equals(propertyDef.getId())) {
-				iterator.remove();
-				return propertyInst;
-			}
-		}
-		return null;
 	}
 
 }
