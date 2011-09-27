@@ -1,7 +1,6 @@
 package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
-import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
@@ -27,7 +26,6 @@ import it.drwolf.slot.interfaces.DataInstance;
 import it.drwolf.slot.interfaces.IRuleVerifier;
 import it.drwolf.slot.pagebeans.support.FileContainer;
 import it.drwolf.slot.pagebeans.support.ValueChangeListener;
-import it.drwolf.slot.prefs.Preferences;
 import it.drwolf.slot.ruleverifier.ParameterCoordinates;
 import it.drwolf.slot.ruleverifier.RuleParametersResolver;
 import it.drwolf.slot.ruleverifier.VerifierMessage;
@@ -83,6 +81,7 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage.Severity;
 import org.richfaces.event.UploadEvent;
@@ -90,6 +89,7 @@ import org.richfaces.model.UploadItem;
 
 @Name("slotInstEditBean")
 @Scope(ScopeType.CONVERSATION)
+@Transactional
 public class SlotInstEditBean {
 
 	@In(create = true)
@@ -107,11 +107,11 @@ public class SlotInstEditBean {
 	@In(create = true)
 	private AlfrescoUserIdentity alfrescoUserIdentity;
 
-	@In(create = true)
-	private AlfrescoWrapper alfrescoWrapper;
-
-	@In(create = true)
-	private Preferences preferences;
+	// @In(create = true)
+	// private AlfrescoWrapper alfrescoWrapper;
+	//
+	// @In(create = true)
+	// private Preferences preferences;
 
 	@In(create = true)
 	private RuleParametersResolver ruleParametersResolver;
@@ -151,6 +151,9 @@ public class SlotInstEditBean {
 
 	private static final int LENGHT_LIMIT = 150;
 	private static final String SPACER = " ";
+
+	// @In(create = true)
+	// PropertyInstsBean propertyInstsBean;
 
 	public void addActiveItemToDatas() {
 		if (!this.datas.get(this.activeCollectionId).contains(
@@ -283,6 +286,11 @@ public class SlotInstEditBean {
 							+ document.getName());
 			e.printStackTrace();
 		}
+	}
+
+	public String buildIdsToRerender(PropertyDef propertyDef) {
+		return this.enqueueNames(new HashSet<Conditionable>(propertyDef
+				.getConditionedPropertyDefs()));
 	}
 
 	private boolean checkCollectionsSize() {
@@ -426,6 +434,16 @@ public class SlotInstEditBean {
 		}
 	}
 
+	private void cloneValuesOnPropertyInst(PropertyInst source,
+			PropertyInst target) {
+		target.setValues(new HashSet<String>(source.getValues()));
+		target.setStringValue(source.getStringValue());
+		target.setIntegerValue(source.getIntegerValue());
+		target.setDateValue(source.getDateValue());
+		target.setBooleanValue(source.getBooleanValue());
+		// this.propertyInsts.add(target);
+	}
+
 	private String copyDocumentOnAlfresco(AlfrescoDocument document,
 			DocInstCollection instCollection,
 			List<DocumentPropertyInst> documentProperties, Folder slotFolder) {
@@ -468,6 +486,25 @@ public class SlotInstEditBean {
 	public void editItem(Long docDefCollectionId, FileContainer container) {
 		this.activeCollectionId = docDefCollectionId;
 		this.activeFileContainer = container;
+	}
+
+	private String enqueueNames(Set<Conditionable> conditionables) {
+		String names = "";
+		if (conditionables != null) {
+			Iterator<Conditionable> iterator = conditionables.iterator();
+			int count = 0;
+			while (iterator.hasNext()) {
+				Conditionable def = iterator.next();
+				if (count == 0) {
+					names = names.concat("p_" + def.getId().toString());
+					count++;
+				} else if (count > 0) {
+					names = names.concat(", " + def.getId());
+					count++;
+				}
+			}
+		}
+		return names;
 	}
 
 	private void extractAndEmbedContent(AlfrescoDocument document,
@@ -545,6 +582,19 @@ public class SlotInstEditBean {
 		while (iterator.hasNext()) {
 			PropertyInst propertyInst = iterator.next();
 			if (propertyInst.getPropertyDef().getId().equals(propertyDefId)) {
+				return propertyInst;
+			}
+		}
+		return null;
+	}
+
+	private PropertyInst findTmpPropertyInst(PropertyDef propertyDef) {
+		Iterator<PropertyInst> iterator = this.propertyInsts.iterator();
+		while (iterator.hasNext()) {
+			PropertyInst propertyInst = iterator.next();
+			if (propertyInst.getPropertyDef().getId()
+					.equals(propertyDef.getId())) {
+				iterator.remove();
 				return propertyInst;
 			}
 		}
@@ -650,8 +700,20 @@ public class SlotInstEditBean {
 			}
 
 		} else {
-			this.propertyInsts = new ArrayList<PropertyInst>(this.slotInstHome
-					.getInstance().getPropertyInsts());
+			// this.propertyInsts = new
+			// ArrayList<PropertyInst>(this.slotInstHome
+			// .getInstance().getPropertyInsts());
+			List<PropertyInst> originalPropertyInsts = new ArrayList<PropertyInst>(
+					this.slotInstHome.getInstance().getPropertyInsts());
+			//
+			this.propertyInsts = new ArrayList<PropertyInst>();
+			for (PropertyInst opInst : originalPropertyInsts) {
+				PropertyInst tmpPropertyInst = new PropertyInst();
+				tmpPropertyInst.setPropertyDef(opInst.getPropertyDef());
+
+				this.cloneValuesOnPropertyInst(opInst, tmpPropertyInst);
+				this.propertyInsts.add(tmpPropertyInst);
+			}
 
 			this.docInstCollections = new ArrayList<DocInstCollection>(
 					this.slotInstHome.getInstance().getDocInstCollections());
@@ -766,42 +828,6 @@ public class SlotInstEditBean {
 		}
 		return primaryDocs;
 	}
-
-	// public AlfrescoFolder retrieveSlotFolder() {
-	// AlfrescoFolder slotFolder = null;
-	// if ((this.slotInstHome.getInstance() != null)
-	// && (this.slotInstHome.getInstance().getNodeRef() != null)
-	// && !this.slotInstHome.getInstance().getNodeRef().equals("")) {
-	// try {
-	// slotFolder = (AlfrescoFolder) this.alfrescoUserIdentity
-	// .getSession().getObject(
-	// this.slotInstHome.getInstance().getNodeRef());
-	// } catch (CmisObjectNotFoundException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// if (slotFolder != null) {
-	// return slotFolder;
-	// }
-	//
-	// }
-	//
-	// AlfrescoFolder groupFolder = this.alfrescoWrapper.findOrCreateFolder(
-	// this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
-	// .name()), this.alfrescoUserIdentity.getActiveGroup()
-	// .getShortName());
-	//
-	// slotFolder = this.alfrescoWrapper.findOrCreateFolder(
-	// groupFolder,
-	// this.slotDefHome.getInstance().getId()
-	// + " "
-	// + AlfrescoWrapper.normalizeFolderName(this.slotDefHome
-	// .getInstance().getName(),
-	// SlotInstEditBean.LENGHT_LIMIT,
-	// SlotInstEditBean.SPACER));
-	// this.slotInstHome.getInstance().setNodeRef(slotFolder.getId());
-	// return slotFolder;
-	// }
 
 	private List<VerifierParameterInst> retrieveValueInsts(
 			Rule rule,
@@ -1120,6 +1146,17 @@ public class SlotInstEditBean {
 		}
 
 		this.entityManager.merge(instance);
+
+		//
+		Set<PropertyInst> persistedPropertyInsts = instance.getPropertyInsts();
+		for (PropertyInst opInst : persistedPropertyInsts) {
+			PropertyInst tmpPropertyInst = this.findTmpPropertyInst(opInst
+					.getPropertyDef());
+			opInst.clean();
+			this.cloneValuesOnPropertyInst(tmpPropertyInst, opInst);
+		}
+		//
+
 		Set<DocInstCollection> persistedDocInstCollections = instance
 				.getDocInstCollections();
 
@@ -1400,30 +1437,6 @@ public class SlotInstEditBean {
 			System.out.println(document.getName()
 					+ " non è firmato digitalmente");
 		}
-	}
-
-	public String buildIdsToRerender(PropertyDef propertyDef) {
-		return enqueueNames(new HashSet<Conditionable>(
-				propertyDef.getConditionedPropertyDefs()));
-	}
-
-	private String enqueueNames(Set<Conditionable> conditionables) {
-		String names = "";
-		if (conditionables != null) {
-			Iterator<Conditionable> iterator = conditionables.iterator();
-			int count = 0;
-			while (iterator.hasNext()) {
-				Conditionable def = iterator.next();
-				if (count == 0) {
-					names = names.concat("p_" + def.getId().toString());
-					count++;
-				} else if (count > 0) {
-					names = names.concat(", " + def.getId());
-					count++;
-				}
-			}
-		}
-		return names;
 	}
 
 }

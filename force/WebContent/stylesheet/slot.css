@@ -16,6 +16,7 @@ a:HOVER {
 }
 
 .fileItem{
+	background-color: #FFFFFF;
 	padding: 10px;
 	margin: 2px;
 	margin-bottom: 10px;
@@ -114,6 +115,26 @@ a:HOVER {
 	background-color:#FFFFFF;
 }
 
+.primaryRegionPanel{
+	width: 450px;
+}
+
+.infoPanel{
+	width: 450px; 
+}
+
+.summaryGrid{
+	width: 100%;
+	padding: 15px;
+}
+
+.summaryItem{
+	display: table;
+    width: 22%;
+    float: left;
+}
+
+
 /*
 .invalidRow.action.disabledLink a:LINK {
 	text-decoration: none;
@@ -134,7 +155,6 @@ a:HOVER {
     background-image: url(/force/img/sfondo_sb2.gif);
     background-position: left top;
     background-repeat: repeat-y;
-    overflow: hidden;
 }
 
 #contenitore {
@@ -146,7 +166,6 @@ a:HOVER {
     background-image: url(/Immagini/sfondo_sb.gif);
     background-position: top right;
     background-repeat: repeat-y;
-    overflow: hidden;
 }
 
 .controlPanelclass .rich-panel {

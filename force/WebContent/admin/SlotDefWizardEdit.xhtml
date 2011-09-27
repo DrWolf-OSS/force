@@ -16,7 +16,7 @@
     
     	<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
 
-        <rich:panel>
+        <rich:panel style="width:auto">
             <f:facet name="header">#{slotDefHome.managed ? 'Modifica' : 'Creazione'} #{slotDefParameters.model ? 'modello di' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Busta di Riferimento' : 'Busta Amministrativa'}</f:facet>
 
             <s:decorate id="templateField" template="/layout/edit.xhtml" rendered="#{not slotDefParameters.model}">
@@ -119,7 +119,7 @@
 				</ui:define>
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.propertyDefsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
-						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" style="width:1024px">
+						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" >
 					<rich:column style="width:200px" styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{prop.name}" />
