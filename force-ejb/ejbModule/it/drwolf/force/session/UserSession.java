@@ -97,6 +97,12 @@ public class UserSession implements Serializable {
 	}
 
 	public AlfrescoFolder getPrimarySlotFolder() {
+		if (this.primarySlotFolder == null) {
+			AlfrescoFolder slotFolder = this.retriveSlotFolder();
+			if (slotFolder != null) {
+				this.setPrimarySlotFolder(slotFolder);
+			}
+		}
 		return this.primarySlotFolder;
 	}
 
@@ -141,13 +147,20 @@ public class UserSession implements Serializable {
 		// Se il Primary SlotInst è stato creato il nodeRef della cartella è
 		// settato on SlotInst.nodeRef
 		if (this.primarySlotInst != null) {
-			this.primarySlotFolder = (AlfrescoFolder) this.alfrescoUserIdentity
-					.getSession().getObject(this.primarySlotInst.getNodeRef());
+			this.primarySlotFolder = this.retriveSlotFolder();
 		}
 	}
 
 	public boolean isLlpp() {
 		return this.llpp;
+	}
+
+	private AlfrescoFolder retriveSlotFolder() {
+		if (this.getPrimarySlotInst() != null) {
+			return (AlfrescoFolder) this.alfrescoUserIdentity.getSession()
+					.getObject(this.getPrimarySlotInst().getNodeRef());
+		}
+		return null;
 	}
 
 	// Lo SlotInst può essere null all'inizo della Session ed essere

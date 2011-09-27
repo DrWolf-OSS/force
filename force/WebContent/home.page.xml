@@ -10,7 +10,7 @@
          <redirect view-id="/user/ControlPanel.xhtml">
             <param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
             <param name="slotInstId" value="#{userSession.primarySlotInst.id}"/>
-            <param name="aziendaId" value="#{userSession.aziendaId}" />
+            <param name="aziendaId" value="#{userSession.azienda.id}" />
          </redirect>
       </rule>
        <rule if="#{identity.hasRole('ADMIN')}">

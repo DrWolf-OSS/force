@@ -138,7 +138,7 @@
                 id="CatMer"
                 includePageParams="false"
                 propagation="none">
-                <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+                <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
            </s:link>
         </rich:menuItem>
         <rich:menuItem rendered="#{userSession.llpp}">
@@ -147,7 +147,7 @@
                 id="SOA"
                 includePageParams="false"
                 propagation="none">
-                <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+                <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
            </s:link>
         </rich:menuItem>
         <rich:menuItem>
@@ -156,7 +156,7 @@
                 id="tobed"
                 includePageParams="false"
                 propagation="none">
-                <f:param name="aziendaId" value="#{userSession.aziendaId}"/>
+                <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
             </s:link>
         </rich:menuItem>
         <rich:menuItem>

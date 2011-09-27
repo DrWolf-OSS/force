@@ -68,12 +68,26 @@ public class ControlPanelBean {
 	}
 
 	public List<Gara> getSelectedGare() {
-		ArrayList<Gara> elenco = (ArrayList<Gara>) this.entityManager
-				.createQuery(
-						" select distinct  g from Azienda a join a.categorieMerceologiche cm join cm.gare g where a.id = :a")
-				.setParameter("a", this.userSession.getAzienda().getId())
-				.getResultList();
-		return elenco;
+		ArrayList<Gara> lista = new ArrayList<Gara>();
+		if (this.userSession.getAzienda().getCategorieMerceologicheAsList()
+				.size() > 0) {
+			ArrayList<Gara> elenco = (ArrayList<Gara>) this.entityManager
+					.createQuery(
+							" select distinct  g from Azienda a join a.categorieMerceologiche cm join cm.gare g where a.id = :a")
+					.setParameter("a", this.userSession.getAzienda().getId())
+					.getResultList();
+			lista.addAll(elenco);
+		}
+		if (this.userSession.getAzienda().getSOAAsList().size() > 0) {
+			ArrayList<Gara> elenco = (ArrayList<Gara>) this.entityManager
+					.createQuery(
+							" select distinct  g from Azienda a join a.SOA soa join soa.gare g where a.id = :a")
+					.setParameter("a", this.userSession.getAzienda().getId())
+					.getResultList();
+			lista.addAll(elenco);
+
+		}
+		return lista;
 	}
 
 	public List<SlotInst> getSlotInst() {

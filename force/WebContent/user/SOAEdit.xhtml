@@ -36,7 +36,7 @@
         <br />
         <h:outputText value="Completa questa fase"></h:outputText>
         <br/>
-          <s:button id="chiudiPanel"
+          <h:commandButton  id="chiudiPanel"
                    value="Chiudi"/>
           <rich:componentControl for="panel" attachTo="chiudiPanel" operation="hide" event="onclick"/>
     </rich:modalPanel>
@@ -57,11 +57,8 @@
 
             <h:commandButton id="save"
                           value="Salva"
-                         action="#{aziendaHome.persist()}"
+                         action="#{aziendaHome.update()}"
                          />
-            <s:button id="cancelEdit"
-                   value="Fatto"
-                    view="/home.xhtml"/>
         </div>
 </h:form>
 

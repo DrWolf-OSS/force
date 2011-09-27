@@ -10,7 +10,7 @@
 	xmlns:rich="http://richfaces.org/rich" template="/layout/template.xhtml">
 
 	<ui:define name="body">
-        <rich:modalPanel id="panel" width="350" height="100" showWhenRendered="#{not slotInstHome.idDefined}">
+        <rich:modalPanel id="panel" width="350" height="100" showWhenRendered="#{not slotInstHome.idDefined and slotDefHome.instance.type.name() == 'PRIMARY'}">
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Attenzione"></h:outputText>

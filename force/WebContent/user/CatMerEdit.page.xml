@@ -7,4 +7,13 @@
    <begin-conversation join="true"/>
    <action execute="#{aziendaHome.wire}"/>
    <param name="aziendaId" value="#{aziendaHome.aziendaId}"/>
+    <navigation from-action="#{aziendaHome.update()}">
+        <rule if-outcome="updated">
+            <redirect view-id="/user/ControlPanel.xhtml">
+               <param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
+               <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+               <param name="aziendaId" value="#{aziendaHome.instance.id}"/>
+           </redirect>
+        </rule>
+    </navigation>
 </page>

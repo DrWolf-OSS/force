@@ -5,7 +5,7 @@
       login-required="true">
 
    <begin-conversation join="true"/>
-   <param name="aziendaId" value="#{aziendaHome.aziendaId}"/>
+   <param name="aziendaId" value="#{aziendaHome.instance.id}"/>
    <param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
    <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
  
@@ -16,14 +16,14 @@
         <redirect view-id="/user/SOAEdit.xhtml">
 	       <param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
 	       <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
-	       <param name="aziendaId" value="#{aziendaHome.aziendaId}"/>
+	       <param name="aziendaId" value="#{aziendaHome.instance.id}"/>
        </redirect>
     </rule>
     <rule if-outcome="GO_TO_CM">
         <redirect view-id="/user/CatMerEdit.xhtml">
            <param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
            <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
-           <param name="aziendaId" value="#{aziendaHome.aziendaId}"/>
+           <param name="aziendaId" value="#{aziendaHome.instance.id}"/>
        </redirect>
     </rule>
     <rule if-outcome="GO_TO_SLOTINST">
@@ -31,7 +31,7 @@
         <redirect view-id="/SlotInstEdit.xhtml">
            <param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
            <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
-           <param name="aziendaId" value="#{aziendaHome.aziendaId}"/>
+           <param name="aziendaId" value="#{aziendaHome.instance.id}"/>
        </redirect>
     </rule>
   </navigation>   
