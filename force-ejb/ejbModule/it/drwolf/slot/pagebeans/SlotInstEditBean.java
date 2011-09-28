@@ -495,12 +495,10 @@ public class SlotInstEditBean {
 			int count = 0;
 			while (iterator.hasNext()) {
 				Conditionable def = iterator.next();
-				if (count == 0) {
-					names = names.concat("p_" + def.getId().toString());
-					count++;
-				} else if (count > 0) {
-					names = names.concat(", " + def.getId());
-					count++;
+				names = names.concat("p_" + def.getId().toString() + ",");
+				count++;
+				if (count == conditionables.size()) {
+					names = names.substring(0, names.length() - 1);
 				}
 			}
 		}
