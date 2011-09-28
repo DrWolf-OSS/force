@@ -11,7 +11,18 @@
 	template="/layout/template.xhtml">
 
 	<ui:define name="body">
-
+    <rich:modalPanel id="panel" width="350" height="100" showWhenRendered="#{not slotInstHome.idDefined and slotDefHome.instance.type.name() == 'PRIMARY'}">
+        <f:facet name="header">
+            <h:panelGroup>
+                <h:outputText value="Attenzione"></h:outputText>
+            </h:panelGroup>
+        </f:facet>
+        <h:outputText value="Completa la registrazione inserendo la tua documentazione"></h:outputText>
+        <br/>
+         <h:commandButton id="chiudiPanel"
+                   value="Chiudi"/>
+          <rich:componentControl for="panel" attachTo="chiudiPanel" operation="hide" event="onclick"/>
+    </rich:modalPanel>
 		<a:form id="slotInst" styleClass="edit" onkeypress="dirty=true">
 		<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
 		
