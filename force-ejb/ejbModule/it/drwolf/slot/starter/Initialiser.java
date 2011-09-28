@@ -62,6 +62,26 @@ public class Initialiser {
 		}
 	}
 
+	private void createTipoPartecipazioneDictonary(EntityManager entityManager) {
+		List res = entityManager
+				.createQuery("from Dictionary d where d.name = :name")
+				.setParameter("name",
+						"Dizionario sulle Tipologie di Partecipazione")
+				.getResultList();
+
+		if (res.size() == 0) {
+			Dictionary dictionary = new Dictionary();
+			dictionary.setName("Dizionario sulle Tipologie di Partecipazione");
+			dictionary.setDataType(DataType.STRING);
+			dictionary.getValues().add("Singola");
+			dictionary.getValues().add("ATI Costituenda");
+			dictionary.getValues().add("ATI Costituita");
+			dictionary.getValues().add("Consorzio");
+			dictionary.getValues().add("G.E.I.E.");
+			entityManager.persist(dictionary);
+		}
+	}
+
 	@Observer("org.jboss.seam.postInitialization")
 	@Asynchronous
 	@Transactional
@@ -81,6 +101,7 @@ public class Initialiser {
 		this.checkParams(entityManager);
 
 		this.createLavoroDisabileDictionary(entityManager);
+		this.createTipoPartecipazioneDictonary(entityManager);
 		System.out.println("---> Checked");
 	}
 
