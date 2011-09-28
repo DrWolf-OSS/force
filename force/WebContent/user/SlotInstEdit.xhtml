@@ -11,21 +11,23 @@
 	template="/layout/template.xhtml">
 
 	<ui:define name="body">
-    <rich:modalPanel id="panel" width="350" height="100" showWhenRendered="#{not slotInstHome.idDefined and slotDefHome.instance.type.name() == 'PRIMARY'}">
-        <f:facet name="header">
-            <h:panelGroup>
-                <h:outputText value="Attenzione"></h:outputText>
-            </h:panelGroup>
-        </f:facet>
-        <h:outputText value="Completa la registrazione inserendo la tua documentazione"></h:outputText>
-        <br/>
-         <h:commandButton id="chiudiPanel"
-                   value="Chiudi"/>
-          <rich:componentControl for="panel" attachTo="chiudiPanel" operation="hide" event="onclick"/>
-    </rich:modalPanel>
+	
+	    <rich:modalPanel id="panel" width="350" height="100" showWhenRendered="#{not slotInstHome.idDefined and slotDefHome.instance.type.name() == 'PRIMARY'}">
+	        <f:facet name="header">
+	            <h:panelGroup>
+	                <h:outputText value="Attenzione"></h:outputText>
+	            </h:panelGroup>
+	        </f:facet>
+	        <h:outputText value="Completa la registrazione inserendo la tua documentazione"></h:outputText>
+	        <br/>
+	         <h:commandButton id="chiudiPanel"
+	                   value="Chiudi"/>
+	          <rich:componentControl for="panel" attachTo="chiudiPanel" operation="hide" event="onclick"/>
+	    </rich:modalPanel>
+	    
+	    
 		<a:form id="slotInst" styleClass="edit" onkeypress="dirty=true">
 		<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
-		
 		
 			<rich:simpleTogglePanel id="summaryPanel" switchType="client" opened="true">
 				<f:facet name="header">Pannello riassuntivo Richieste</f:facet>			
@@ -40,7 +42,7 @@
 								<h:graphicImage value="/img/tick.png"  styleClass="fileIcon" 
 												rendered="#{(coll.docDefCollection.min == null or coll.docDefCollection.min == 0) and slotInstEditBean.datas[coll.docDefCollection.id].size ge 1 or
 												(coll.docDefCollection.min != null and coll.docDefCollection.min !=0) and slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.min}"/>
-								<h:outputText value="#{coll.docDefCollection.name}"/>
+								<a href="#slotInst:c_#{coll.docDefCollection.id}">#{coll.docDefCollection.name}</a>
 							</s:span>
 						</s:fragment>
 					</a:repeat>
@@ -184,7 +186,8 @@
 						<c:forEach var="coll" items="#{slotInstEditBean.docInstCollections}">
 
 						<s:fragment rendered="#{coll.docDefCollection.active}">	
-						<s:decorate template="/layout/display.xhtml" 
+						<s:decorate template="/layout/display.xhtml"
+								id="c_#{coll.docDefCollection.id}"
 								rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
 										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
 							<ui:define name="label">

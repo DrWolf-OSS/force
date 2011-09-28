@@ -134,6 +134,19 @@ a:HOVER {
     float: left;
 }
 
+.summaryItem a:LINK{
+	color: #474747;
+}
+
+.summaryItem a:VISITED{
+	color: #474747;
+}
+
+.summaryItem a:HOVER{
+	color: #171717;
+	text-decoration: underline;
+}
+
 
 /*
 .invalidRow.action.disabledLink a:LINK {
