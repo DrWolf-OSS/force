@@ -36,10 +36,10 @@
 									rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
 											(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
 								<h:graphicImage value="/img/pin.png"  styleClass="fileIcon" rendered="#{coll.docDefCollection.min ge 1 and slotInstEditBean.datas[coll.docDefCollection.id].size lt coll.docDefCollection.min}"/>
-								<h:graphicImage value="/img/pin-white.png"  styleClass="fileIcon" rendered="#{coll.docDefCollection.min == null and slotInstEditBean.datas[coll.docDefCollection.id].size le 0}"/>
+								<h:graphicImage value="/img/pin-white.png"  styleClass="fileIcon" rendered="#{(coll.docDefCollection.min == null or coll.docDefCollection.min == 0) and slotInstEditBean.datas[coll.docDefCollection.id].size le 0}"/>
 								<h:graphicImage value="/img/tick.png"  styleClass="fileIcon" 
-												rendered="#{coll.docDefCollection.min == null and slotInstEditBean.datas[coll.docDefCollection.id].size ge 1 or
-												coll.docDefCollection.min != null and slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.min}"/>
+												rendered="#{(coll.docDefCollection.min == null or coll.docDefCollection.min == 0) and slotInstEditBean.datas[coll.docDefCollection.id].size ge 1 or
+												(coll.docDefCollection.min != null and coll.docDefCollection.min !=0) and slotInstEditBean.datas[coll.docDefCollection.id].size ge coll.docDefCollection.min}"/>
 								<h:outputText value="#{coll.docDefCollection.name}"/>
 							</s:span>
 						</s:fragment>
