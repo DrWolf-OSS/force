@@ -79,7 +79,7 @@
    <navigation from-action="#{slotInstHome.remove}">
       <rule if-outcome="removed">
          <end-conversation/>
-         <redirect view-id="/SlotInstList.xhtml"/>
+         <redirect view-id="/home.xhtml"/>
       </rule>
    </navigation>
    

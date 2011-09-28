@@ -1009,7 +1009,7 @@ public class SlotInstEditBean {
 							instCollection);
 
 				} catch (Exception e) {
-					FacesMessages.instance().add(
+					FacesMessages.instance().add(Severity.ERROR,
 							"Errors in Alfresco storage process");
 					// TODO: se il documento è stato creato farsi dare l'id e
 					// toglierlo per avere una garanzia "transazionale"

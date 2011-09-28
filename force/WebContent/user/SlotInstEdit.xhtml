@@ -424,16 +424,9 @@
 				styleClass="modal"/>
 			<h:commandButton id="delete"
 				value="Elimina" action="#{slotInstHome.remove}" immediate="true"
-				onclick="dirty = false;"
+				onclick="return confirm('Sicuro di voler eliminare la busta?'); dirty = false;"
 				rendered="#{slotInstHome.managed}" 
 				styleClass="modal"/>
-			<s:button id="cancelEdit"
-				value="Annulla" propagation="end" view="/SlotInst.xhtml"
-				rendered="#{slotInstHome.managed}" />
-			<s:button id="cancelAdd"
-				value="Annulla" propagation="end"
-				view="/#{empty slotInstFrom ? 'SlotInstList' : slotInstFrom}.xhtml"
-				rendered="#{!slotInstHome.managed}" />
 			</div>
 		</a:form>
 
