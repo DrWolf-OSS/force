@@ -15,8 +15,6 @@
     <h:form id="slotDef" styleClass="edit" onkeypress="dirty=true">
     
     	<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
-    	
-    	#{slotDefEditBean.conditioned}
 
         <rich:panel style="width:auto">
             <f:facet name="header">#{slotDefHome.managed ? 'Modifica' : 'Creazione'} #{slotDefParameters.model ? 'modello di' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Busta di Riferimento' : 'Busta Amministrativa'}</f:facet>
@@ -289,7 +287,7 @@
 				</ui:define>
 				<a:commandButton value="Aggiungi informazione #{slotDefParameters.mode == 'PRIMARY' ? 'sull azienda' : ''}" 
 							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
-							action="#{slotDefEditBean.newProperty()}" 
+							 
 							oncomplete="#{rich:component('propTypePanel')}.show()" 
 							
 							reRender="pf,propPanel"/>
@@ -350,7 +348,7 @@
 			</f:facet>
 			<a:form id="ctpf" onkeypress="dirty=true">
 			<s:div style="text-align: center">
-				<a:commandButton action="#{slotDefEditBean.setConditional(false)}" 
+				<a:commandButton action="#{slotDefEditBean.newStandardCollection()}" 
 							value="Aggiungi richiesta comune" 
 							oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('collPanel')}.show();"
 							reRender="collPanel,propPanel"/>
@@ -358,7 +356,7 @@
 				<a:commandButton action="#{slotDefEditBean.newConditionalPropertyForCollection()}" 
 							value="Aggiungi richiesta vincolata" 
 							oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('selectCondProp')}.show();"
-							reRender="pf,collPanel,propPanel"/>
+							reRender="pf,collPanel,propPanel,selectCondProp"/>
 	        <div style="clear:both"/>
 	        </s:div>
 	        <a:region>
@@ -375,7 +373,7 @@
 			</f:facet>
 			<a:form id="ptpf" onkeypress="dirty=true">
 			<s:div style="text-align: center">
-				<a:commandButton action="#{slotDefEditBean.setConditional(false)}" 
+				<a:commandButton action="#{slotDefEditBean.newStandardProperty()}" 
 							value="Aggiungi informazione standard" 
 							oncomplete="#{rich:component('propTypePanel')}.hide(); #{rich:component('propPanel')}.show();"
 							reRender="collPanel,propPanel"/>
@@ -406,7 +404,7 @@
 					</ui:define>
 					<h:selectOneMenu  value="#{slotDefEditBean.collection.conditionalPropertyDef}" 
 								converter="propertyDefConverter"
-								rendered="#{slotDefEditBean.conditioned == 'Collection'}">
+								rendered="#{slotDefEditBean.conditioned.equals('Collection')}">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" 
 									itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
@@ -416,7 +414,7 @@
 					
 					<h:selectOneMenu  value="#{slotDefEditBean.propertyDef.conditionalPropertyDef}" 
 								converter="propertyDefConverter"
-								rendered="#{slotDefEditBean.conditioned == 'Property'}">
+								rendered="#{slotDefEditBean.conditioned.equals('Property')}">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" 
 									itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
@@ -432,15 +430,17 @@
 	        			reRender="pf,propPanel,collPanel"
 	        			rendered="#{slotDefEditBean.conditioned == 'Collection'}"/>
 	       	<a:commandButton value="Ok" 
+	       				action="#{slotDefEditBean.setConditional(false)}"
 	        			oncomplete="#{rich:component('selectCondProp')}.hide();#{rich:component('propPanel')}.show();" 
 	        			reRender="pf,propPanel,collPanel"
 	        			rendered="#{slotDefEditBean.conditioned == 'Property'}"/>
 	        <a:commandButton value="Definisci una nuova informazione" 
 	        			oncomplete="#{rich:component('selectCondProp')}.hide();#{rich:component('propPanel')}.show();" 
-	        			disabled="#{slotDefEditBean.collection.conditionalPropertyDef != null}"
+	        			disabled="#{(slotDefEditBean.conditioned.equals('Collection') and slotDefEditBean.collection.conditionalPropertyDef != null) or
+	        						(slotDefEditBean.conditioned.equals('Property') and slotDefEditBean.propertyDef.conditionalPropertyDef != null)}"
 	        			reRender="pf,propPanel,collPanel"/>
 	        <a:region>
-			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('selectCondProp')}.hide()" reRender="pf,propPanel,collPanel"/>
+			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('selectCondProp')}.hide()" reRender="pf,propPanel,collPanel,selectCondProp"/>
 			</a:region>
 			</a:form>
 		</rich:modalPanel>
@@ -504,7 +504,8 @@
 	                	<h:outputText value="Informazione vincolante" />
 					</ui:define>
 					<h:selectOneMenu  value="#{slotDefEditBean.propertyDef.conditionalPropertyDef}" 
-								converter="propertyDefConverter">
+								converter="propertyDefConverter"
+								disabled="#{slotDefEditBean.conditional}">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN') or propertyDef.uuid==slotDefEditBean.propertyDef.uuid}"/>
@@ -553,7 +554,7 @@
 	            
 	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
-	                	<h:outputText value="Dizionario associato #{slotDefEditBean.conditioned}" />
+	                	<h:outputText value="Dizionario associato" />
 					</ui:define>
 					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}" 
 									required="#{slotDefEditBean.propertyDef.multiple or (slotDefEditBean.conditional and slotDefEditBean.conditioned == 'Property')}"
@@ -566,10 +567,17 @@
 
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();}" 
-							rendered="#{not (slotDefEditBean.conditional and slotDefParameters.wizard and not slotDefEditBean.edit)}"	reRender="pf,slotDef,condPD,scp"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionalProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();#{rich:component('collPanel')}.show();}" 
-							rendered="#{slotDefEditBean.conditional and slotDefParameters.wizard and not slotDefEditBean.edit}"	reRender="slotDef,cpf,pf,scp"/>
+			<a:commandButton value="Ok_addProperty" action="#{slotDefEditBean.addProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();}" 
+							rendered="#{not slotDefEditBean.conditional or slotDefEditBean.edit}"	
+							reRender="pf,slotDef,condPD,scp"/>
+			<a:commandButton value="Ok_addConditionalPropertyForCollection" action="#{slotDefEditBean.addConditionalPropertyForCollection()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();#{rich:component('collPanel')}.show();}" 
+							rendered="#{slotDefEditBean.conditional and slotDefParameters.wizard and not slotDefEditBean.edit and slotDefEditBean.conditioned.equals('Collection')}"	
+							reRender="slotDef,cpf,pf,scp"/>
+								
+			<a:commandButton value="Ok_addConditionalPropertyForProperty" action="#{slotDefEditBean.addConditionalPropertyForProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();#{rich:component('propPanel')}.show()}" 
+								rendered="#{slotDefEditBean.conditional == true and slotDefEditBean.conditioned.equals('Property')}"
+								reRender="pf,slotDef,condPD,scp"/>
+							
 			<a:region>
 			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('propPanel')}.hide()" reRender="pf,propPanel,collPanel, scp"/>
 			</a:region>
@@ -818,7 +826,7 @@
             	</s:decorate>
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionedCollection()}" oncomplete="if(!cinvalid){#{rich:component('collPanel')}.hide();}" reRender="cpf,pf,collTable,propTable,propPanel"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionedCollection()}" oncomplete="if(!cinvalid){#{rich:component('collPanel')}.hide();}" reRender="cpf,pf,collTable,propTable,propPanel,selectCondProp"/>
 			<a:region>
 			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('collPanel')}.hide()" reRender="cpf"/>
 			</a:region>

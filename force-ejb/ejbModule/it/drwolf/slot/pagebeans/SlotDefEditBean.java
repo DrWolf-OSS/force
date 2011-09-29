@@ -49,6 +49,7 @@ public class SlotDefEditBean {
 
 	private final static String CONDITIONED_PROPERTY = "Property";
 	private final static String CONDITIONED_COLLECTION = "Collection";
+	private final static String CONDITIONED_NONE = "none";
 
 	@In(create = true)
 	private SlotDefHome slotDefHome;
@@ -64,7 +65,7 @@ public class SlotDefEditBean {
 
 	private boolean conditional = Boolean.FALSE;
 	private boolean edit = Boolean.FALSE;
-	private String conditioned = "Collection";
+	private String conditioned = SlotDefEditBean.CONDITIONED_NONE;
 
 	private boolean dirty = Boolean.FALSE;
 
@@ -86,11 +87,23 @@ public class SlotDefEditBean {
 		}
 	}
 
-	public void addConditionalProperty() {
+	public void addConditionalPropertyForCollection() {
 		this.newCollection();
 		this.addProperty();
 		this.collection.setConditionalPropertyDef(this.propertyDef);
 		this.conditionalPropertyListener(null);
+
+		//
+		this.conditional = false;
+	}
+
+	public void addConditionalPropertyForProperty() {
+		this.addProperty();
+		PropertyDef conditionalPropertyDef = this.propertyDef;
+		this.propertyDef = new PropertyDef();
+		this.propertyDef.setConditionalPropertyDef(conditionalPropertyDef);
+		this.conditionalPropertyListener(null);
+		this.conditional = false;
 	}
 
 	public void addConditionedCollection() {
@@ -224,6 +237,7 @@ public class SlotDefEditBean {
 		this.propertyDef = new PropertyDef();
 		this.conditional = false;
 		this.edit = false;
+		this.conditioned = SlotDefEditBean.CONDITIONED_NONE;
 	}
 
 	public void conditionalPropertyListener(ActionEvent event) {
@@ -346,6 +360,11 @@ public class SlotDefEditBean {
 				.getConditionedPropertyDefs()));
 	}
 
+	@Factory("slotDefTypes")
+	public List<SlotDefType> getSlotDefTypes() {
+		return Arrays.asList(SlotDefType.values());
+	}
+
 	// private void removeReferencesFromCollections(PropertyDef prop,
 	// boolean invalidateCollections) {
 	// List<DocDefCollection> referencedCollections = this
@@ -366,11 +385,6 @@ public class SlotDefEditBean {
 	// }
 	// }
 	// }
-
-	@Factory("slotDefTypes")
-	public List<SlotDefType> getSlotDefTypes() {
-		return Arrays.asList(SlotDefType.values());
-	}
 
 	@Create
 	public void init() {
@@ -491,6 +505,18 @@ public class SlotDefEditBean {
 
 	public void newProperty() {
 		this.propertyDef = new PropertyDef();
+	}
+
+	public void newStandardCollection() {
+		this.newCollection();
+		this.conditional = false;
+		this.conditioned = SlotDefEditBean.CONDITIONED_NONE;
+	}
+
+	public void newStandardProperty() {
+		this.newProperty();
+		this.conditional = false;
+		this.conditioned = SlotDefEditBean.CONDITIONED_NONE;
 	}
 
 	public void propertyDefConditionalPropertyListener(ActionEvent event) {
