@@ -280,6 +280,8 @@ public class SlotDefEditBean {
 		} else {
 			this.conditional = false;
 		}
+		//
+		this.edit = true;
 	}
 
 	public void editEmbeddedProp(EmbeddedProperty embeddedProp) {

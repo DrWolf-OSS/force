@@ -498,14 +498,14 @@
 					</h:selectBooleanCheckbox>
 	            </s:decorate>
 	            
-	            
-	            <s:decorate template="/layout/edit.xhtml" >
+	       		
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{not slotDefEditBean.conditional or slotDefEditBean.edit}">
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
 					</ui:define>
 					<h:selectOneMenu  value="#{slotDefEditBean.propertyDef.conditionalPropertyDef}" 
 								converter="propertyDefConverter"
-								disabled="#{slotDefEditBean.conditional}">
+								disabled="#{not slotDefEditBean.conditioned.equals('none') and not slotDefEditBean.edit}">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN') or propertyDef.uuid==slotDefEditBean.propertyDef.uuid}"/>
@@ -557,7 +557,7 @@
 	                	<h:outputText value="Dizionario associato" />
 					</ui:define>
 					<h:selectOneMenu value="#{slotDefEditBean.propertyDef.dictionary}" 
-									required="#{slotDefEditBean.propertyDef.multiple or (slotDefEditBean.conditional and slotDefEditBean.conditioned == 'Property')}"
+									required="#{slotDefEditBean.propertyDef.multiple or (slotDefEditBean.conditional and not slotDefEditBean.conditioned.equals('none'))}"
 									disabled="#{slotDefEditBean.propertyDef.id!=null and slotDefHome.referenced}">
                     		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.propertyDef.dataType)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- seleziona un dizionario --"/>
@@ -763,13 +763,14 @@
 						<s:convertEntity/>
              		</h:selectOneMenu>
 	            </s:decorate>
-	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef!=null}" id="condPD">
+	            #{slotDefEditBean.conditioned} , #{slotDefEditBean.edit}
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef!=null or slotDefEditBean.edit}" id="condPD">
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
 					</ui:define>
 					<h:selectOneMenu  value="#{slotDefEditBean.collection.conditionalPropertyDef}" 
 								converter="propertyDefConverter" 
-								disabled="#{slotDefEditBean.conditional and slotDefParameters.wizard}">
+								disabled="#{not slotDefEditBean.conditioned.equals('none') and not slotDefEditBean.edit}">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
@@ -826,7 +827,7 @@
             	</s:decorate>
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionedCollection()}" oncomplete="if(!cinvalid){#{rich:component('collPanel')}.hide();}" reRender="cpf,pf,collTable,propTable,propPanel,selectCondProp"/>
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionedCollection()}" oncomplete="if(!cinvalid){#{rich:component('collPanel')}.hide();}" reRender="cpf,pf,collTable,propTable,propPanel,selectCondProp,collPanel"/>
 			<a:region>
 			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('collPanel')}.hide()" reRender="cpf"/>
 			</a:region>
