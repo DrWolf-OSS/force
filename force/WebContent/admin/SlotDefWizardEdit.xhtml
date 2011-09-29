@@ -458,7 +458,6 @@
 				<ui:param name="customType" value="p" />
 				<ui:param name="prefix" value="p" />
 			<s:div>
-	            <a:region>
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Nome dell'informazione #{slotDefEditBean.propertyDef.conditionalPropertyDef!=null ? 'Vincolata' : ''}"/>
@@ -466,6 +465,7 @@
 					<h:inputText value="#{slotDefEditBean.propertyDef.name}" required="true" styleClass="ptext"/>
 	            </s:decorate>
 	            
+	            <a:region>
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Tipologia del dato" />
@@ -475,9 +475,10 @@
 							disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.propertyDef) or
 										(slotDefEditBean.propertyDef.id!=null and slotDefHome.referenced)}">
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type.value()}" noSelectionLabel="-- seleziona un tipo --"/>
-					<a:support event="onchange" reRender="pf"/>
+					<a:support event="onchange" reRender="dictionary"/>
              		</h:selectOneMenu>
 	            </s:decorate>
+	            </a:region>
 	            
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
@@ -498,7 +499,7 @@
 					</h:selectBooleanCheckbox>
 	            </s:decorate>
 	            
-	       		
+	       		<a:region>
 	            <s:decorate template="/layout/edit.xhtml" rendered="#{not slotDefEditBean.conditional or slotDefEditBean.edit}">
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
@@ -509,12 +510,12 @@
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN') or propertyDef.uuid==slotDefEditBean.propertyDef.uuid}"/>
-						<a:support event="onchange" actionListener="#{slotDefEditBean.propertyDefConditionalPropertyListener}" reRender="pf"/>
+						<a:support event="onchange" actionListener="#{slotDefEditBean.propertyDefConditionalPropertyListener}" reRender="condValue"/>
 					</h:selectOneMenu>
 	            </s:decorate>
-					</a:region>
+				</a:region>	
 					
-				
+				<s:div id="condValue">
 				<s:decorate  template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.conditionalPropertyDef != null}" >	            	
 	                <ui:define name="label">
 	                	<h:outputText value="Valore vincolante" />
@@ -551,6 +552,7 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
              			</h:selectOneMenu>
 	            </s:decorate>
+	            </s:div>
 	            
 	            <s:decorate id="dictionary" template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
@@ -726,7 +728,8 @@
 				<ui:param name="customType" value="p" />
 				<ui:param name="prefix" value="c" />
 			<s:div>
-			<a:region>
+			
+			
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Nome della Richiesta"/>
@@ -749,6 +752,7 @@
 	            </s:decorate>
 	            </s:fragment>
 	            
+	            <a:region>
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Tipo di documento" />
@@ -762,6 +766,7 @@
 						<s:convertEntity/>
              		</h:selectOneMenu>
 	            </s:decorate>
+	            </a:region>
 	            
 	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef!=null or slotDefEditBean.edit}" id="condPD">
 	                <ui:define name="label">
@@ -776,7 +781,7 @@
 						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="cpf"/>
 					</h:selectOneMenu>
 	            </s:decorate>
-				</a:region>
+				
 				
 					
 	            <s:decorate  template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef != null}" id="condPI">	            	
@@ -816,6 +821,7 @@
              			</h:selectOneMenu>
 	            </s:decorate>
 	            
+	            <a:region>
 	            <s:decorate id="quantifier" template="/layout/edit.xhtml">
                 	<ui:define name="label">Quantità</ui:define>
                		<h:selectOneMenu value="#{slotDefEditBean.collection.quantifier}" required="true">
@@ -824,6 +830,7 @@
 						<s:convertEnum/>
              		</h:selectOneMenu>
             	</s:decorate>
+            	</a:region>
 	        </s:div>
 	        <div style="clear:both"/>
 			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionedCollection()}" oncomplete="if(!cinvalid){#{rich:component('collPanel')}.hide();}" reRender="cpf,pf,collTable,propTable,propPanel,selectCondProp,collPanel"/>
