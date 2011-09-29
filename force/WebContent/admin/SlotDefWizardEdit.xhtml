@@ -398,7 +398,7 @@
 			</f:facet>
 			<a:form id="scp" onkeypress="dirty=true">
 				<ui:param name="customType" value="p" />
-				<s:decorate template="/layout/edit.xhtml" id="condPD">
+				<s:decorate template="/layout/edit.xhtml" id="condPD" rendered="#{not slotDefEditBean.conditioned.equals('none')}">
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
 					</ui:define>
@@ -461,7 +461,7 @@
 	            <a:region>
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
-	                	<h:outputText value="Nome dell'informazione"/>
+	                	<h:outputText value="Nome dell'informazione #{slotDefEditBean.propertyDef.conditionalPropertyDef!=null ? 'Vincolata' : ''}"/>
 					</ui:define>
 					<h:inputText value="#{slotDefEditBean.propertyDef.name}" required="true" styleClass="ptext"/>
 	            </s:decorate>
@@ -567,16 +567,16 @@
 
 	        </s:div>
 	        <div style="clear:both"/>
-			<a:commandButton value="Ok_addProperty" action="#{slotDefEditBean.addProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();}" 
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();}" 
 							rendered="#{not slotDefEditBean.conditional or slotDefEditBean.edit}"	
 							reRender="pf,slotDef,condPD,scp"/>
-			<a:commandButton value="Ok_addConditionalPropertyForCollection" action="#{slotDefEditBean.addConditionalPropertyForCollection()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();#{rich:component('collPanel')}.show();}" 
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionalPropertyForCollection()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();#{rich:component('collPanel')}.show();}" 
 							rendered="#{slotDefEditBean.conditional and slotDefParameters.wizard and not slotDefEditBean.edit and slotDefEditBean.conditioned.equals('Collection')}"	
-							reRender="slotDef,cpf,pf,scp"/>
+							reRender="slotDef,cpf,pf,scp,collPanel"/>
 								
-			<a:commandButton value="Ok_addConditionalPropertyForProperty" action="#{slotDefEditBean.addConditionalPropertyForProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();#{rich:component('propPanel')}.show()}" 
+			<a:commandButton value="Ok" action="#{slotDefEditBean.addConditionalPropertyForProperty()}" oncomplete="if(!pinvalid){#{rich:component('propPanel')}.hide();#{rich:component('propPanel')}.show()}" 
 								rendered="#{slotDefEditBean.conditional == true and slotDefEditBean.conditioned.equals('Property')}"
-								reRender="pf,slotDef,condPD,scp"/>
+								reRender="pf,slotDef,condPD,scp,propPanel"/>
 							
 			<a:region>
 			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('propPanel')}.hide()" reRender="pf,propPanel,collPanel, scp"/>
@@ -717,7 +717,7 @@
 		<rich:modalPanel id="collPanel" autosized="true" minWidth="600"
 				resizeable="false">
 			<f:facet name="header">
-				<h:outputText value="Descrizione della Richiesta" />
+				<h:outputText value="Descrizione della Richiesta #{slotDefEditBean.collection.conditionalPropertyDef != null ? 'Vincolata' : ''}" />
 			</f:facet>
 			<a:form id="cpf" onkeypress="dirty=true">
 				<script type="text/javascript">
@@ -729,8 +729,7 @@
 			<a:region>
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
-	                	<h:outputText value="Nome della Richiesta" rendered="#{not slotDefEditBean.conditional}"/>
-	                	<h:outputText value="Nome della Richiesta Vincolata" rendered="#{slotDefEditBean.conditional}"/>
+	                	<h:outputText value="Nome della Richiesta"/>
 					</ui:define>
 					<h:inputText value="#{slotDefEditBean.collection.name}" required="true" styleClass="ptext"/>
 	            </s:decorate>
@@ -763,7 +762,7 @@
 						<s:convertEntity/>
              		</h:selectOneMenu>
 	            </s:decorate>
-	            #{slotDefEditBean.conditioned} , #{slotDefEditBean.edit}
+	            
 	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef!=null or slotDefEditBean.edit}" id="condPD">
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
