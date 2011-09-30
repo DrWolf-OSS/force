@@ -294,9 +294,11 @@ public class SlotDefEditBean {
 		this.propertyDef = prop;
 		if (prop.getConditionedDocDefCollections().isEmpty()
 				&& prop.getConditionedPropertyDefs().isEmpty()) {
-			this.conditional = false;
+			// this.conditional = false;
+			this.conditioned = SlotDefEditBean.CONDITIONED_PROPERTY;
 		} else {
-			this.conditional = true;
+			// this.conditional = true;
+			this.conditioned = SlotDefEditBean.CONDITIONED_NONE;
 		}
 		//
 		this.edit = true;

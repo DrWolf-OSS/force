@@ -601,7 +601,6 @@
 				<ui:param name="customType" value="p" />
 				<ui:param name="prefix" value="ep" />
 			<s:div id="embeddedPropValue">
-			<a:region>
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Nome dell'informazione" styleClass="ptext"/>
@@ -609,6 +608,7 @@
 					<h:inputText value="#{slotDefEditBean.embeddedProperty.name}" required="true"/>
 	            </s:decorate>
 
+				<a:region>
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Tipologia del dato" />
@@ -619,17 +619,19 @@
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type.value()}"
 							noSelectionLabel="-- seleziona un tipo --"/>
 						<s:convertEnum/>
-					<a:support event="onchange" action="#{slotDefEditBean.embeddedPropertyListener}" reRender="epForm"/>
+					<a:support event="onchange" action="#{slotDefEditBean.embeddedPropertyListener}" reRender="dictionary, epValue"/>
              		</h:selectOneMenu>
 	            </s:decorate>
+	            </a:region>
 	            
+	            <a:region>
 	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.dataType != 'BOOLEAN'}">
 	                <ui:define name="label">
 	                	<h:outputText value="Accetta valori multipli" />
 					</ui:define>
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.multiple}" 
 								disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.embeddedProperty)}">
-						<a:support event="onchange" action="#{slotDefEditBean.embeddedProperty.clean}" reRender="epForm"/>
+						<a:support event="onchange" action="#{slotDefEditBean.embeddedProperty.clean}" reRender="dictionary,epValue"/>
 					</h:selectBooleanCheckbox>
 	            </s:decorate>
 	            </a:region>
@@ -649,8 +651,8 @@
 	            </s:decorate>
 	            </a:region>
 	            
-	            <s:div rendered="#{slotDefEditBean.embeddedProperty.dataType != null}">
-		            <s:decorate template="/layout/edit.xhtml">
+	            <s:div  id="epValue">
+		            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.embeddedProperty.dataType != null}">
 		                <ui:define name="label">
 		                	<h:outputText value="Valore" />
 						</ui:define>
