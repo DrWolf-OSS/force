@@ -487,7 +487,7 @@
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.required}" />
 	            </s:decorate>
 
-	            
+	            <a:region>
 	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.propertyDef.dataType != 'BOOLEAN' and not slotDefEditBean.conditional}">
 	                <ui:define name="label">
 	                	<h:outputText value="Accetta valori multipli" />
@@ -495,9 +495,10 @@
 					<h:selectBooleanCheckbox value="#{slotDefEditBean.propertyDef.multiple}" 
 										disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.propertyDef) or
 										(slotDefEditBean.propertyDef.id!=null and slotDefHome.referenced)}">
-						<a:support event="onchange" reRender="pf"/>
+						<a:support event="onchange" reRender="dictionary"/>
 					</h:selectBooleanCheckbox>
 	            </s:decorate>
+	            </a:region>
 	            
 	       		<a:region>
 	            <s:decorate template="/layout/edit.xhtml" rendered="#{not slotDefEditBean.conditional or slotDefEditBean.edit}">
@@ -768,7 +769,9 @@
 	            </s:decorate>
 	            </a:region>
 	            
-	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef!=null or slotDefEditBean.edit}" id="condPD">
+	            <s:div id="condPD">
+	            <a:region>
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef!=null or slotDefEditBean.edit}" >
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
 					</ui:define>
@@ -778,13 +781,15 @@
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
-						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="cpf"/>
+						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="condPD, condPI"/>
 					</h:selectOneMenu>
 	            </s:decorate>
+	            </a:region>
+	            </s:div>
 				
 				
-					
-	            <s:decorate  template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef != null}" id="condPI">	            	
+				<s:div id="condPI">
+	            <s:decorate  template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef != null}" >	            	
 	                <ui:define name="label">
 	                	<h:outputText value="Valore vincolante" />
 					</ui:define>
@@ -820,6 +825,7 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
              			</h:selectOneMenu>
 	            </s:decorate>
+	            </s:div>	
 	            
 	            <a:region>
 	            <s:decorate id="quantifier" template="/layout/edit.xhtml">

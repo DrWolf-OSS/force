@@ -276,9 +276,11 @@ public class SlotDefEditBean {
 	public void editColl(DocDefCollection coll) {
 		this.collection = coll;
 		if (this.collection.getConditionalPropertyDef() != null) {
-			this.conditional = true;
+			// this.conditional = true;
+			this.conditioned = SlotDefEditBean.CONDITIONED_COLLECTION;
 		} else {
-			this.conditional = false;
+			// this.conditional = false;
+			this.conditioned = SlotDefEditBean.CONDITIONED_NONE;
 		}
 		//
 		this.edit = true;
