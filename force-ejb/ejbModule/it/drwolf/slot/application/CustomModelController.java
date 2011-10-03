@@ -3,6 +3,7 @@ package it.drwolf.slot.application;
 import it.drwolf.slot.alfresco.AlfrescoAdminIdentity;
 import it.drwolf.slot.alfresco.custom.model.Aspect;
 import it.drwolf.slot.alfresco.custom.model.Constraint;
+import it.drwolf.slot.alfresco.custom.model.Parameter;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.model.SlotModel;
 import it.drwolf.slot.entity.Dictionary;
@@ -45,52 +46,6 @@ public class CustomModelController {
 
 	// AspectId, Properties
 	private HashMap<String, Set<Property>> propertiesMap = new HashMap<String, Set<Property>>();
-
-	@Create
-	public void init() {
-		loadModel();
-	}
-
-	private void loadModel() {
-		try {
-			Strategy strategy = new CycleStrategy("id", "ref");
-			Serializer serializer = new Persister(strategy);
-			// Serializer serializer = new Persister();
-			Session session = alfrescoAdminIdentity.getSession();
-			AlfrescoDocument documentModel = (AlfrescoDocument) session
-					.getObjectByPath(preferences
-							.getValue(PreferenceKey.CUSTOM_MODEL_XML_PATH
-									.name())
-							+ "/"
-							+ preferences
-									.getValue(PreferenceKey.CUSTOM_MODEL_XML_NAME
-											.name()));
-
-			// leggo l'xml originale
-			StringBuilder stringBuilder = new StringBuilder();
-			String nl = System.getProperty("line.separator");
-			Scanner scanner = new Scanner(documentModel.getContentStream()
-					.getStream());
-			while (scanner.hasNextLine()) {
-				stringBuilder.append(scanner.nextLine() + nl);
-			}
-			String originalModel = stringBuilder.toString();
-
-			// aggiungo il campo id ai vari field
-			String modifiedModel = addIdValueToXml(originalModel);
-
-			slotModel = serializer.read(SlotModel.class, modifiedModel);
-
-			//
-			setPositionToProperties();
-			//
-			initMap();
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
 	// ATTENZIONE:
 	// Aggiungo ad ogni elemento con il campo "name" un campo "id" con lo stesso
@@ -137,18 +92,6 @@ public class CustomModelController {
 		return modifiedModel = modifiedModel.concat(subfix);
 	}
 
-	public void reloadModel() {
-		loadModel();
-	}
-
-	public SlotModel getSlotModel() {
-		return slotModel;
-	}
-
-	public void setSlotModel(SlotModel slotModel) {
-		this.slotModel = slotModel;
-	}
-
 	public Aspect getAspect(String aspectId) {
 		boolean found = false;
 		Iterator<Aspect> aspectIterator = this.slotModel.getAspects()
@@ -161,6 +104,22 @@ public class CustomModelController {
 			}
 		}
 		return null;
+	}
+
+	public Set<Property> getProperties(Set<String> aspectIds) {
+		Set<Property> properties = new TreeSet<Property>();
+		// Recupero tutte le properties.
+		// Essendo un set anche se un aspect è applicato più volte (essendo
+		// settato come mandatory su un altro) le sue properties vengono
+		// aggiunte una volta sola
+		for (String aspectId : aspectIds) {
+			properties.addAll(this.getProperties(aspectId));
+		}
+		return properties;
+	}
+
+	public Set<Property> getProperties(String aspectId) {
+		return this.propertiesMap.get(aspectId);
 	}
 
 	public Property getProperty(String propertyName) {
@@ -182,28 +141,108 @@ public class CustomModelController {
 		return null;
 	}
 
-	public Set<Property> getProperties(String aspectId) {
-		return this.propertiesMap.get(aspectId);
+	public SlotModel getSlotModel() {
+		return this.slotModel;
 	}
 
-	public Set<Property> getProperties(Set<String> aspectIds) {
-		Set<Property> properties = new TreeSet<Property>();
-		// Recupero tutte le properties.
-		// Essendo un set anche se un aspect è applicato più volte (essendo
-		// settato come mandatory su un altro) le sue properties vengono
-		// aggiunte una volta sola
-		for (String aspectId : aspectIds) {
-			properties.addAll(this.getProperties(aspectId));
-		}
-		return properties;
+	@Create
+	public void init() {
+		this.loadModel();
 	}
 
 	private void initMap() {
 		List<Aspect> aspects = this.getSlotModel().getAspects();
 		for (Aspect aspect : aspects) {
-			Set<Property> properties = retrieveAllProperties(aspect);
-			propertiesMap.put(aspect.getId(), properties);
+			Set<Property> properties = this.retrieveAllProperties(aspect);
+			this.propertiesMap.put(aspect.getId(), properties);
 		}
+	}
+
+	private void loadModel() {
+		try {
+			Strategy strategy = new CycleStrategy("id", "ref");
+			Serializer serializer = new Persister(strategy);
+			// Serializer serializer = new Persister();
+			Session session = this.alfrescoAdminIdentity.getSession();
+			AlfrescoDocument documentModel = (AlfrescoDocument) session
+					.getObjectByPath(this.preferences
+							.getValue(PreferenceKey.CUSTOM_MODEL_XML_PATH
+									.name())
+							+ "/"
+							+ this.preferences
+									.getValue(PreferenceKey.CUSTOM_MODEL_XML_NAME
+											.name()));
+
+			// leggo l'xml originale
+			StringBuilder stringBuilder = new StringBuilder();
+			String nl = System.getProperty("line.separator");
+			Scanner scanner = new Scanner(documentModel.getContentStream()
+					.getStream());
+			while (scanner.hasNextLine()) {
+				stringBuilder.append(scanner.nextLine() + nl);
+			}
+			String originalModel = stringBuilder.toString();
+
+			// aggiungo il campo id ai vari field
+			String modifiedModel = this.addIdValueToXml(originalModel);
+
+			this.slotModel = serializer.read(SlotModel.class, modifiedModel);
+
+			//
+			this.setPositionToProperties();
+			//
+			this.initMap();
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	// il DataType dev'essere passato perche' nell'xml del modello un costrait
+	// non e' associato esplicitamente a nessun DataType
+	public Dictionary makeDictionaryFromConstraint(String constraintName,
+			DataType dataType) {
+		List<Constraint> constraints = this.slotModel.getConstraints();
+		if (constraints != null) {
+			Iterator<Constraint> iterator = constraints.iterator();
+			while (iterator.hasNext()) {
+				Constraint constraint = iterator.next();
+				if (constraint.getType().equals(Constraint.LIST)
+						&& constraint.getName().equals(constraintName)) {
+					List<Parameter> parameters = constraint.getParameters();
+					Iterator<Parameter> iterator2 = parameters.iterator();
+					while (iterator2.hasNext()) {
+						Parameter parameter = iterator2.next();
+						if (parameter.getName()
+								.equals(Parameter.ALLOWED_VALUES)) {
+							return new Dictionary(constraintName,
+									parameter.getList(), dataType);
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public void reloadModel() {
+		this.loadModel();
+	}
+
+	private Set<Property> retrieveAllProperties(Aspect aspect) {
+		Set<Property> properties = new TreeSet<Property>();
+		// Aspect aspect = this.getAspect(aspectId);
+		if (aspect != null) {
+			properties.addAll(aspect.getProperties());
+			if (aspect.getMandatoryAspectIds() != null) {
+				for (String mandatoryAspectId : aspect.getMandatoryAspectIds()) {
+					properties.addAll(this.retrieveAllProperties(this
+							.getAspect("P:" + mandatoryAspectId)));
+				}
+			}
+		}
+		return properties;
 	}
 
 	private void setPositionToProperties() {
@@ -218,38 +257,8 @@ public class CustomModelController {
 		}
 	}
 
-	private Set<Property> retrieveAllProperties(Aspect aspect) {
-		Set<Property> properties = new TreeSet<Property>();
-		// Aspect aspect = this.getAspect(aspectId);
-		if (aspect != null) {
-			properties.addAll(aspect.getProperties());
-			if (aspect.getMandatoryAspectIds() != null) {
-				for (String mandatoryAspectId : aspect.getMandatoryAspectIds()) {
-					properties.addAll(retrieveAllProperties(this.getAspect("P:"
-							+ mandatoryAspectId)));
-				}
-			}
-		}
-		return properties;
-	}
-
-	// il DataType dev'essere passato perche' nell'xml del modello un costrait
-	// non e' associato esplicitamente a nessun DataType
-	public Dictionary makeDictionaryFromConstraint(String constraintName,
-			DataType dataType) {
-		List<Constraint> constraints = slotModel.getConstraints();
-		if (constraints != null) {
-			Iterator<Constraint> iterator = constraints.iterator();
-			while (iterator.hasNext()) {
-				Constraint constraint = iterator.next();
-				if (constraint.getType().equals(Constraint.LIST)
-						&& constraint.getName().equals(constraintName)) {
-					return new Dictionary(constraintName, constraint
-							.getParameter().getList(), dataType);
-				}
-			}
-		}
-		return null;
+	public void setSlotModel(SlotModel slotModel) {
+		this.slotModel = slotModel;
 	}
 
 }

@@ -1,7 +1,9 @@
 package it.drwolf.slot.alfresco.custom.model;
 
+import java.util.List;
+
 import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 @Root
@@ -18,31 +20,42 @@ public class Constraint {
 	@Attribute
 	private String type;
 
-	@Element
-	private Parameter parameter;
+	// @Element
+	// private Parameter parameter;
+
+	@ElementList(inline = true, entry = "parameter")
+	private List<Parameter> parameters;
 
 	public String getName() {
-		return name;
+		return this.name;
+	}
+
+	public List<Parameter> getParameters() {
+		return this.parameters;
+	}
+
+	public String getType() {
+		return this.type;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public String getType() {
-		return type;
+	public void setParameters(List<Parameter> parametersList) {
+		this.parameters = parametersList;
 	}
 
 	public void setType(String type) {
 		this.type = type;
 	}
 
-	public Parameter getParameter() {
-		return parameter;
-	}
-
-	public void setParameter(Parameter parameter) {
-		this.parameter = parameter;
-	}
+	// public Parameter getParameter() {
+	// return parameter;
+	// }
+	//
+	// public void setParameter(Parameter parameter) {
+	// this.parameter = parameter;
+	// }
 
 }
