@@ -26,6 +26,14 @@ public class Constraint {
 	@ElementList(inline = true, entry = "parameter")
 	private List<Parameter> parameters;
 
+	// @ElementMap(entry = "parameter", key = "name", attribute = true, inline =
+	// true, value = "value")
+	// private Map<String, String> map;
+
+	// public Map<String, String> getMap() {
+	// return this.map;
+	// }
+
 	public String getName() {
 		return this.name;
 	}
@@ -41,6 +49,10 @@ public class Constraint {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	// public void setMap(Map<String, String> map) {
+	// this.map = map;
+	// }
 
 	public void setParameters(List<Parameter> parametersList) {
 		this.parameters = parametersList;

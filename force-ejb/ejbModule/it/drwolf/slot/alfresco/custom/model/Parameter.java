@@ -12,6 +12,17 @@ public class Parameter {
 
 	public final static String ALLOWED_VALUES = "allowedValues";
 
+	public final static String EXPRESSION = "expression";
+	public final static String REQUIRES_MATCH = "requiresMatch";
+
+	public final static String MIN_LENGTH = "minLength";
+	public final static String MAX_LENGTH = "maxLength";
+
+	public final static String MIN_VALUE = "minValue";
+	public final static String MAX_VALUE = "maxValue";
+
+	public final static String CASE_SENSITIVE = "caseSensitive";
+
 	@Attribute
 	private String name;
 

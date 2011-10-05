@@ -110,7 +110,8 @@
 							<h:inputText value="#{dataInstance.stringValue}" 
 								rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
-								disabled="#{not dataInstance.dataDefinition.editable}" />
+								disabled="#{not dataInstance.dataDefinition.editable}">
+							</h:inputText>				
 							<h:inputText value="#{dataInstance.integerValue}"
 								rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
@@ -480,11 +481,13 @@
 						<h:inputText value="#{dataInstance.stringValue}"
 							rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues == null}"
 							required="#{dataInstance.dataDefinition.required}"
-							disabled="#{not dataInstance.dataDefinition.editable}" />
+							disabled="#{not dataInstance.dataDefinition.editable}" 
+							validator="#{dataInstance.property.validate}"/>
 						<h:inputText value="#{dataInstance.integerValue}"
 							rendered="#{dataInstance.dataDefinition.dataType== 'INTEGER' and dataInstance.dataDefinition.dictionaryValues == null}"
 							required="#{dataInstance.dataDefinition.required}"
-							disabled="#{not dataInstance.dataDefinition.editable}" />
+							disabled="#{not dataInstance.dataDefinition.editable}" 
+							validator="#{dataInstance.property.validate}"/>
 						<h:selectBooleanCheckbox value="#{dataInstance.booleanValue}"
 							rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}"
 							required="#{dataInstance.dataDefinition.required}"

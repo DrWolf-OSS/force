@@ -10,11 +10,11 @@ public interface DataDefinition extends Definition {
 
 	public DataType getDataType();
 
-	public boolean isRequired();
+	public List<String> getDictionaryValues();
 
 	public boolean isEditable();
 
 	public boolean isMultiple();
 
-	public List<String> getDictionaryValues();
+	public boolean isRequired();
 }
