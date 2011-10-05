@@ -452,10 +452,11 @@
 				onclick="#{rich:component('uploadPanel')}.hide()" />
 		</rich:modalPanel>
 
-		<rich:modalPanel id="editPanel" autosized="true" minWidth="550">
+		<rich:modalPanel id="editPanel" autosized="true" minWidth="560" domElementAttachment="body">
 			<f:facet name="header">
 				<h:outputText value="Finestra di modifica" />
 			</f:facet>
+			
 			<a:form id="editPanelForm" onkeypress="dirty=true">
 
 					<script type="text/javascript">
@@ -472,12 +473,14 @@
 				<ui:repeat var="dataInstance"
 					value="#{slotInstEditBean.activeFileContainer.documentProperties}">
 					
-					<s:decorate template="/layout/edit.xhtml">
+					<s:decorate template="/layout/edit.xhtml" id="diDecorator">
 					<ui:param name="prefix" value="epf" />
 						<ui:define name="label">
 							<h:outputText value="#{dataInstance.dataDefinition.label}" />
 						</ui:define>
+						
 						<s:fragment rendered="#{not dataInstance.dataDefinition.multiple}">
+						
 						<h:inputText value="#{dataInstance.stringValue}"
 							rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues == null}"
 							required="#{dataInstance.dataDefinition.required}"
@@ -519,6 +522,7 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" /> 
              			</h:selectOneMenu>
              			</s:fragment>
+             			
              			<s:fragment rendered="#{dataInstance.dataDefinition.multiple}">
              			<rich:pickList value="#{dataInstance.values}" required="#{dataInstance.dataDefinition.required}" onlistchanged="dirty=true">
 							<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" var="value" label="#{value}" />
@@ -537,6 +541,7 @@
 				<a:commandButton value="Annulla" onclick="#{rich:component('editPanel')}.hide()"/>
 				</a:region>
 			</a:form>
+			
 		</rich:modalPanel>
 
 	</ui:define>

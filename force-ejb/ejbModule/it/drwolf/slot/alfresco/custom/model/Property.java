@@ -2,11 +2,10 @@ package it.drwolf.slot.alfresco.custom.model;
 
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
+import it.drwolf.slot.validators.Validator;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
@@ -348,13 +347,15 @@ public class Property implements DataDefinition, Comparable<Property> {
 					requiresMatch = new Boolean(_rmp);
 				}
 			}
-			Pattern pattern = Pattern.compile(regex);
-			Matcher matcher = pattern.matcher(obj);
-			if ((matcher.matches() ^ requiresMatch)) {
-				FacesMessage message = new FacesMessage();
-				message.setSummary("Valore non valido!");
-				throw new ValidatorException(message);
-			}
+			// Pattern pattern = Pattern.compile(regex);
+			// Matcher matcher = pattern.matcher(obj);
+			// if ((matcher.matches() ^ requiresMatch)) {
+			// FacesMessage message = new FacesMessage();
+			// message.setSummary("Valore non valido!");
+			// throw new ValidatorException(message);
+			// }
+			Validator v = new Validator();
+			v.validateRegex(obj, regex, requiresMatch);
 		}
 	}
 }
