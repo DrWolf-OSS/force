@@ -45,6 +45,8 @@ public class Property implements DataDefinition, Comparable<Property> {
 
 	private int position;
 
+	private Validator validator = new Validator();
+
 	// Parameter.name , Parameter.value
 	// private Map<String, String> constraintParametersMap = new HashMap<String,
 	// String>();
@@ -256,18 +258,11 @@ public class Property implements DataDefinition, Comparable<Property> {
 			String _minl = minLengthParam.getValue();
 			try {
 				Integer minLength = new Integer(_minl);
-				if (value.length() < minLength) {
-					// failed = true;
-					FacesMessage message = new FacesMessage();
-					message.setSummary("La stringa deve essere lunga almeno "
-							+ minLength + " caratteri");
-					throw new ValidatorException(message);
-				}
+				this.validator.validateLength(value, minLength, null);
 			} catch (NumberFormatException e) {
-				FacesMessages
-						.instance()
-						.add(Severity.ERROR,
-								"Errore nella definizione del parametro minLength sul modello");
+				System.out
+						.println("Errore di modello nella definizione del parametro minLength della proprietà "
+								+ this.getName());
 			}
 		}
 
@@ -275,18 +270,11 @@ public class Property implements DataDefinition, Comparable<Property> {
 			String _maxl = maxLengthParam.getValue();
 			try {
 				Integer maxLength = new Integer(_maxl);
-				if (value.length() > maxLength) {
-					// failed = true;
-					FacesMessage message = new FacesMessage();
-					message.setSummary("La stringa deve essere lunga meno di "
-							+ maxLength + " caratteri");
-					throw new ValidatorException(message);
-				}
+				this.validator.validateLength(value, null, maxLength);
 			} catch (Exception e) {
-				FacesMessages
-						.instance()
-						.add(Severity.ERROR,
-								"Errore nella definizione del parametro maxLength sul modello");
+				System.out
+						.println("Errore di modello nella definizione del parametro maxLength della proprietà "
+								+ this.getName());
 			}
 		}
 
@@ -307,10 +295,9 @@ public class Property implements DataDefinition, Comparable<Property> {
 					throw new ValidatorException(message);
 				}
 			} catch (NumberFormatException e) {
-				FacesMessages
-						.instance()
-						.add(Severity.ERROR,
-								"Errore nella definizione del parametro minValue sul modello");
+				System.out
+						.println("Errore di modello nella definizione del parametro minValue della proprietà "
+								+ this.getName());
 			}
 		}
 
@@ -324,10 +311,9 @@ public class Property implements DataDefinition, Comparable<Property> {
 					throw new ValidatorException(message);
 				}
 			} catch (Exception e) {
-				FacesMessages
-						.instance()
-						.add(Severity.ERROR,
-								"Errore nella definizione del parametro maxValue sul modello");
+				System.out
+						.println("Errore di modello nella definizione del parametro maxValue della proprietà "
+								+ this.getName());
 			}
 		}
 	}
@@ -347,15 +333,7 @@ public class Property implements DataDefinition, Comparable<Property> {
 					requiresMatch = new Boolean(_rmp);
 				}
 			}
-			// Pattern pattern = Pattern.compile(regex);
-			// Matcher matcher = pattern.matcher(obj);
-			// if ((matcher.matches() ^ requiresMatch)) {
-			// FacesMessage message = new FacesMessage();
-			// message.setSummary("Valore non valido!");
-			// throw new ValidatorException(message);
-			// }
-			Validator v = new Validator();
-			v.validateRegex(obj, regex, requiresMatch);
+			this.validator.validateRegex(obj, regex, requiresMatch);
 		}
 	}
 }
