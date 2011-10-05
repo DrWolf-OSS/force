@@ -241,14 +241,7 @@ public class Property implements DataDefinition, Comparable<Property> {
 		}
 
 		if (this.getDataType().equals(DataType.INTEGER)) {
-			try {
-				Integer value = new Integer((String) obj);
-				this.validateMinMax(value);
-			} catch (NumberFormatException e) {
-				FacesMessage message = new FacesMessage();
-				message.setSummary("Il valore deve essere un numero intero!");
-				throw new ValidatorException(message);
-			}
+			this.validateMinMax((Integer) obj);
 		}
 
 	}
