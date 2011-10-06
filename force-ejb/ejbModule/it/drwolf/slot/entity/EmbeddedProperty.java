@@ -4,6 +4,7 @@ import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.DataInstance;
 import it.drwolf.slot.interfaces.Deactivable;
+import it.drwolf.slot.validators.Validator;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,12 +12,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.validator.ValidatorException;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
@@ -49,93 +54,180 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 
 	private boolean active = Boolean.TRUE;
 
-	@Id
-	@GeneratedValue
-	public Long getId() {
-		return id;
+	private Constraint constraint;
+
+	private Validator validator = new Validator();
+
+	@Transient
+	public void clean() {
+		this.setStringValue(null);
+		this.setIntegerValue(null);
+		this.setDateValue(null);
+		this.setBooleanValue(null);
+		this.getValues().clear();
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public Boolean getBooleanValue() {
+		return this.booleanValue;
 	}
 
-	public String getName() {
-		return name;
+	@ManyToOne
+	public Constraint getConstraint() {
+		return this.constraint;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	@Transient
+	public DataDefinition getDataDefinition() {
+		return this;
 	}
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type")
 	public DataType getDataType() {
-		return dataType;
+		return this.dataType;
 	}
 
-	public void setDataType(DataType type) {
-		this.dataType = type;
+	@Temporal(TemporalType.DATE)
+	public Date getDateValue() {
+		return this.dateValue;
 	}
 
-	public String getStringValue() {
-		return stringValue;
+	@Transient
+	public Dictionary getDictionary() {
+		return this.dictionary;
 	}
 
-	public void setStringValue(String stringValue) {
-		this.stringValue = stringValue;
+	@Transient
+	public List<String> getDictionaryValues() {
+		if (this.getDictionary() != null
+				&& !this.getDictionary().getValues().isEmpty()) {
+			return this.getDictionary().getValues();
+		}
+		return null;
+	}
+
+	@Id
+	@GeneratedValue
+	public Long getId() {
+		return this.id;
 	}
 
 	public Integer getIntegerValue() {
-		return integerValue;
+		return this.integerValue;
 	}
 
-	public void setIntegerValue(Integer integerValue) {
-		this.integerValue = integerValue;
+	@Transient
+	public String getLabel() {
+		return this.name;
 	}
 
-	public Boolean getBooleanValue() {
-		return booleanValue;
+	@Transient
+	public String getLinkValue() {
+		if (this.getStringValue().startsWith("http://")) {
+			return this.stringValue;
+		} else {
+			return "http://".concat(this.stringValue);
+		}
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public String getStringValue() {
+		return this.stringValue;
+	}
+
+	@Transient
+	public Object getValue() {
+		if (!this.isMultiple()) {
+			if (this.getDataType().equals(DataType.STRING)) {
+				return this.getStringValue();
+			} else if (this.getDataType().equals(DataType.INTEGER)) {
+				return this.getIntegerValue();
+			} else if (this.getDataType().equals(DataType.DATE)) {
+				return this.getDateValue();
+			} else if (this.getDataType().equals(DataType.BOOLEAN)) {
+				return this.getBooleanValue();
+			} else if (this.getDataType().equals(DataType.LINK)) {
+				return this.getStringValue();
+			}
+		} else {
+			return this.getValues();
+		}
+		return null;
+	}
+
+	@CollectionOfElements
+	public Set<String> getValues() {
+		return this.values;
+	}
+
+	@Transient
+	public List<String> getValuesAsList() {
+		return new ArrayList<String>(this.values);
+	}
+
+	public boolean isActive() {
+		return this.active;
+	}
+
+	@Transient
+	public boolean isEditable() {
+		return true;
+	}
+
+	public boolean isMultiple() {
+		return this.multiple;
+	}
+
+	@Transient
+	public boolean isRequired() {
+		return true;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 	public void setBooleanValue(Boolean booleanValue) {
 		this.booleanValue = booleanValue;
 	}
 
-	@Temporal(TemporalType.DATE)
-	public Date getDateValue() {
-		return dateValue;
+	public void setConstraint(Constraint constraint) {
+		this.constraint = constraint;
+	}
+
+	public void setDataType(DataType type) {
+		this.dataType = type;
 	}
 
 	public void setDateValue(Date dateValue) {
 		this.dateValue = dateValue;
 	}
 
-	@Transient
-	public String getLinkValue() {
-		if (this.getStringValue().startsWith("http://")) {
-			return stringValue;
-		} else {
-			return "http://".concat(stringValue);
-		}
+	public void setDictionary(Dictionary dictionary) {
+		this.dictionary = dictionary;
 	}
 
-	@Transient
-	public Object getValue() {
-		if (!this.isMultiple()) {
-			if (this.getDataType().equals(DataType.STRING))
-				return this.getStringValue();
-			else if (this.getDataType().equals(DataType.INTEGER))
-				return this.getIntegerValue();
-			else if (this.getDataType().equals(DataType.DATE))
-				return this.getDateValue();
-			else if (this.getDataType().equals(DataType.BOOLEAN))
-				return this.getBooleanValue();
-			else if (this.getDataType().equals(DataType.LINK))
-				return this.getStringValue();
-		} else {
-			return this.getValues();
-		}
-		return null;
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setIntegerValue(Integer integerValue) {
+		this.integerValue = integerValue;
+	}
+
+	public void setMultiple(boolean multiple) {
+		this.multiple = multiple;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setStringValue(String stringValue) {
+		this.stringValue = stringValue;
 	}
 
 	@Transient
@@ -155,64 +247,8 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 		}
 	}
 
-	@Transient
-	public DataDefinition getDataDefinition() {
-		return this;
-	}
-
-	@Transient
-	public String getLabel() {
-		return this.name;
-	}
-
-	@Transient
-	public boolean isRequired() {
-		return true;
-	}
-
-	@Transient
-	public boolean isEditable() {
-		return true;
-	}
-
-	@Transient
-	public List<String> getDictionaryValues() {
-		if (this.getDictionary() != null
-				&& !this.getDictionary().getValues().isEmpty()) {
-			return this.getDictionary().getValues();
-		}
-		return null;
-	}
-
-	public boolean isMultiple() {
-		return multiple;
-	}
-
-	public void setMultiple(boolean multiple) {
-		this.multiple = multiple;
-	}
-
-	@CollectionOfElements
-	public Set<String> getValues() {
-		return values;
-	}
-
 	public void setValues(Set<String> values) {
 		this.values = values;
-	}
-
-	@Transient
-	public Dictionary getDictionary() {
-		return dictionary;
-	}
-
-	public void setDictionary(Dictionary dictionary) {
-		this.dictionary = dictionary;
-	}
-
-	@Transient
-	public List<String> getValuesAsList() {
-		return new ArrayList<String>(this.values);
 	}
 
 	@Transient
@@ -220,21 +256,39 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 		this.values = new HashSet<String>(valuesAsList);
 	}
 
-	@Transient
-	public void clean() {
-		this.setStringValue(null);
-		this.setIntegerValue(null);
-		this.setDateValue(null);
-		this.setBooleanValue(null);
-		this.getValues().clear();
-	}
+	public void validate(FacesContext context, UIComponent component, Object obj)
+			throws ValidatorException {
 
-	public boolean isActive() {
-		return active;
-	}
+		if (this.getConstraint() != null) {
+			switch (this.getDataType()) {
+			case STRING:
+				if (this.getConstraint().getRegex() != null
+						&& !this.getConstraint().getRegex().equals("")) {
+					this.validator.validateRegex((String) obj, this
+							.getConstraint().getRegex(), this.getConstraint()
+							.getRequiresMatch());
+				}
 
-	public void setActive(boolean active) {
-		this.active = active;
+				if (this.getConstraint().getMinLength() != null
+						|| this.getConstraint().getMaxLength() != null) {
+					this.validator.validateLength((String) obj, this
+							.getConstraint().getMinLength(), this
+							.getConstraint().getMaxLength());
+				}
+				break;
+
+			case INTEGER:
+				if (this.getConstraint().getMinValue() != null
+						|| this.getConstraint().getMaxValue() != null) {
+					this.validator.validateMinMax((Integer) obj, this
+							.getConstraint().getMinValue(), this
+							.getConstraint().getMaxValue());
+				}
+
+			default:
+				break;
+			}
+		}
 	}
 
 }

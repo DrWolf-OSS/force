@@ -6,6 +6,10 @@ import it.drwolf.slot.interfaces.DataDefinition;
 
 import java.util.List;
 
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.validator.ValidatorException;
+
 public class VerifierParameterDef implements DataDefinition {
 
 	private String name;
@@ -41,82 +45,88 @@ public class VerifierParameterDef implements DataDefinition {
 		this.dictionary = dictionary;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public DataType getDataType() {
-		return dataType;
+		return this.dataType;
 	}
 
-	public void setDataType(DataType type) {
-		this.dataType = type;
+	public Dictionary getDictionary() {
+		return this.dictionary;
+	}
+
+	public List<String> getDictionaryValues() {
+		if (this.dictionary != null) {
+			return this.dictionary.getValues();
+		}
+		return null;
 	}
 
 	public String getLabel() {
 		if (this.label != null) {
-			return label;
+			return this.label;
 		}
-		return name;
+		return this.name;
 	}
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
-
-	public boolean isOptional() {
-		return optional;
-	}
-
-	public void setOptional(boolean optional) {
-		this.optional = optional;
-	}
-
-	public boolean isRuleEmbedded() {
-		return ruleEmbedded;
-	}
-
-	public void setRuleEmbedded(boolean ruleEmbedded) {
-		this.ruleEmbedded = ruleEmbedded;
-	}
-
-	public boolean isRequired() {
-		return !optional;
+	public String getName() {
+		return this.name;
 	}
 
 	public boolean isEditable() {
 		return true;
 	}
 
-	public List<String> getDictionaryValues() {
-		if (this.dictionary != null) {
-			return dictionary.getValues();
-		}
-		return null;
+	public boolean isMultiple() {
+		return this.multiple;
 	}
 
-	public boolean isMultiple() {
-		return multiple;
+	public boolean isOptional() {
+		return this.optional;
+	}
+
+	public boolean isRequired() {
+		return !this.optional;
+	}
+
+	public boolean isRuleEmbedded() {
+		return this.ruleEmbedded;
+	}
+
+	public void setDataType(DataType type) {
+		this.dataType = type;
+	}
+
+	public void setDictionary(Dictionary dictionary) {
+		this.dictionary = dictionary;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	public void setMultiple(boolean multiple) {
 		this.multiple = multiple;
 	}
 
-	public Dictionary getDictionary() {
-		return dictionary;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public void setDictionary(Dictionary dictionary) {
-		this.dictionary = dictionary;
+	public void setOptional(boolean optional) {
+		this.optional = optional;
+	}
+
+	public void setRuleEmbedded(boolean ruleEmbedded) {
+		this.ruleEmbedded = ruleEmbedded;
+	}
+
+	@Override
+	public String toString() {
+		return this.name;
+	}
+
+	public void validate(FacesContext context, UIComponent component, Object obj)
+			throws ValidatorException {
+		// TODO Auto-generated method stub
+
 	}
 }

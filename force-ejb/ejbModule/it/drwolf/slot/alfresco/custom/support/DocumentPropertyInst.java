@@ -43,52 +43,32 @@ public class DocumentPropertyInst implements DataInstance {
 		}
 	}
 
-	public String getStringValue() {
-		return stringValue;
-	}
-
-	public void setStringValue(String stringValue) {
-		this.stringValue = stringValue;
-	}
-
-	public Integer getIntegerValue() {
-		return integerValue;
-	}
-
-	public void setIntegerValue(Integer integerValue) {
-		this.integerValue = integerValue;
-	}
-
 	public Boolean getBooleanValue() {
-		return booleanValue;
+		return this.booleanValue;
 	}
 
-	public void setBooleanValue(Boolean booleanValue) {
-		this.booleanValue = booleanValue;
+	public DataDefinition getDataDefinition() {
+		return this.property;
 	}
 
 	public Date getDateValue() {
-		return dateValue;
+		return this.dateValue;
 	}
 
-	public void setDateValue(Date dateValue) {
-		this.dateValue = dateValue;
+	public Integer getIntegerValue() {
+		return this.integerValue;
+	}
+
+	public DataInstanceMultiplicity getMultiplicity() {
+		return this.multiplicity;
 	}
 
 	public Property getProperty() {
-		return property;
+		return this.property;
 	}
 
-	public void setProperty(Property property) {
-		this.property = property;
-	}
-
-	public List<String> getValues() {
-		return values;
-	}
-
-	public void setValues(List<String> values) {
-		this.values = values;
+	public String getStringValue() {
+		return this.stringValue;
 	}
 
 	// per le date, se non è nullo (e non dovrebbe esserlo), restituisco prima
@@ -96,63 +76,86 @@ public class DocumentPropertyInst implements DataInstance {
 	// d:date
 	public Object getValue() {
 		if (!this.getProperty().isMultiple()) {
-			if (this.getProperty().getDataType().equals(DataType.STRING))
+			if (this.getProperty().getDataType().equals(DataType.STRING)) {
 				return this.getStringValue();
-			else if (this.getProperty().getDataType().equals(DataType.INTEGER))
+			} else if (this.getProperty().getDataType()
+					.equals(DataType.INTEGER)) {
 				return this.getIntegerValue();
-			else if (this.getProperty().getDataType().equals(DataType.BOOLEAN))
+			} else if (this.getProperty().getDataType()
+					.equals(DataType.BOOLEAN)) {
 				return this.getBooleanValue();
-			else if (this.getProperty().getDataType().equals(DataType.DATE)) {
+			} else if (this.getProperty().getDataType().equals(DataType.DATE)) {
 				Calendar calendar = new GregorianCalendar();
 				calendar.setTime(this.getDateValue());
 				return calendar;
 			}
 		} else {
-			return values;
+			return this.values;
 		}
 		return null;
 	}
 
-	public void setValue(Object value) {
-		if (!this.property.isMultiple()) {
-			if (value instanceof String)
-				this.setStringValue((String) value);
-			else if (value instanceof BigInteger)
-				this.setIntegerValue(((BigInteger) value).intValue());
-			else if (value instanceof Boolean)
-				this.setBooleanValue((Boolean) value);
-			else if (value instanceof GregorianCalendar) {
-				this.setDateValue(((GregorianCalendar) value).getTime());
-			} else if (value instanceof Date)
-				this.setDateValue((Date) value);
-		} else {
-			// TODO:da fare in caso di proprietà multipla. Serve?
-		}
-	}
-
-	@Override
-	public String toString() {
-		return this.getValue().toString();
+	public List<String> getValues() {
+		return this.values;
 	}
 
 	public boolean isEditable() {
-		return editable;
+		return this.editable;
+	}
+
+	public void setBooleanValue(Boolean booleanValue) {
+		this.booleanValue = booleanValue;
+	}
+
+	public void setDateValue(Date dateValue) {
+		this.dateValue = dateValue;
 	}
 
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 	}
 
-	public DataDefinition getDataDefinition() {
-		return this.property;
-	}
-
-	public DataInstanceMultiplicity getMultiplicity() {
-		return multiplicity;
+	public void setIntegerValue(Integer integerValue) {
+		this.integerValue = integerValue;
 	}
 
 	public void setMultiplicity(DataInstanceMultiplicity multiplicity) {
 		this.multiplicity = multiplicity;
+	}
+
+	public void setProperty(Property property) {
+		this.property = property;
+	}
+
+	public void setStringValue(String stringValue) {
+		this.stringValue = stringValue;
+	}
+
+	public void setValue(Object value) {
+		if (!this.property.isMultiple()) {
+			if (value instanceof String) {
+				this.setStringValue((String) value);
+			} else if (value instanceof BigInteger) {
+				this.setIntegerValue(((BigInteger) value).intValue());
+			} else if (value instanceof Boolean) {
+				this.setBooleanValue((Boolean) value);
+			} else if (value instanceof GregorianCalendar) {
+				this.setDateValue(((GregorianCalendar) value).getTime());
+			} else if (value instanceof Date) {
+				this.setDateValue((Date) value);
+			}
+		} else {
+			// TODO:da fare in caso di proprietà multipla. Serve?
+		}
+	}
+
+	public void setValues(List<String> values) {
+		this.values = values;
+	}
+
+	@Override
+	public String toString() {
+		return this.getValue().toString();
 	}
 
 }

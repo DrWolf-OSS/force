@@ -110,12 +110,14 @@
 							<h:inputText value="#{dataInstance.stringValue}" 
 								rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
-								disabled="#{not dataInstance.dataDefinition.editable}">
+								disabled="#{not dataInstance.dataDefinition.editable}"
+								validator="#{dataInstance.dataDefinition.validate}">
 							</h:inputText>				
 							<h:inputText value="#{dataInstance.integerValue}"
 								rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
-								disabled="#{not dataInstance.dataDefinition.editable}" />
+								disabled="#{not dataInstance.dataDefinition.editable}"
+								validator="#{dataInstance.dataDefinition.validate}" />
 							<a:region>
 							<h:selectBooleanCheckbox value="#{dataInstance.booleanValue}"
 								rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}"
@@ -484,8 +486,8 @@
 						<h:inputText value="#{dataInstance.stringValue}"
 							rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues == null}"
 							required="#{dataInstance.dataDefinition.required}"
-							disabled="#{not dataInstance.dataDefinition.editable}" 
-							validator="#{dataInstance.property.validate}"/>
+							disabled="#{not dataInstance.dataDefinition.editable}"
+							validator="#{dataInstance.dataDefinition.validate}"/>
 						<h:inputText value="#{dataInstance.integerValue}"
 							rendered="#{dataInstance.dataDefinition.dataType== 'INTEGER' and dataInstance.dataDefinition.dictionaryValues == null}"
 							required="#{dataInstance.dataDefinition.required}"

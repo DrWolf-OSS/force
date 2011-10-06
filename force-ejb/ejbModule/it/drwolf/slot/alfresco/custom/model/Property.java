@@ -7,7 +7,6 @@ import it.drwolf.slot.validators.Validator;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
@@ -20,7 +19,8 @@ import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 @Root
-public class Property implements DataDefinition, Comparable<Property> {
+public class Property implements DataDefinition, Comparable<Property>,
+		javax.faces.validator.Validator {
 
 	@Attribute
 	private String name;
@@ -284,16 +284,13 @@ public class Property implements DataDefinition, Comparable<Property> {
 		Parameter minParam = this.getConstraintParameter(Parameter.MIN_VALUE);
 		Parameter maxParam = this.getConstraintParameter(Parameter.MAX_VALUE);
 
+		Integer min = null;
+		Integer max = null;
+
 		if (minParam != null) {
 			String _min = minParam.getValue();
 			try {
-				Integer min = new Integer(_min);
-				if (value < min) {
-					FacesMessage message = new FacesMessage();
-					message.setSummary("Il valore deve essere maggiore di "
-							+ min);
-					throw new ValidatorException(message);
-				}
+				min = new Integer(_min);
 			} catch (NumberFormatException e) {
 				System.out
 						.println("Errore di modello nella definizione del parametro minValue della proprietà "
@@ -304,18 +301,15 @@ public class Property implements DataDefinition, Comparable<Property> {
 		if (maxParam != null) {
 			String _max = maxParam.getValue();
 			try {
-				Integer max = new Integer(_max);
-				if (value > max) {
-					FacesMessage message = new FacesMessage();
-					message.setSummary("Il valore deve essere minore di " + max);
-					throw new ValidatorException(message);
-				}
+				max = new Integer(_max);
 			} catch (Exception e) {
 				System.out
 						.println("Errore di modello nella definizione del parametro maxValue della proprietà "
 								+ this.getName());
 			}
 		}
+
+		this.validator.validateMinMax(value, min, max);
 	}
 
 	private void validateRegex(String obj) {

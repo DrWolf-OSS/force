@@ -4,6 +4,7 @@ import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.Deactivable;
+import it.drwolf.slot.validators.Validator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,6 +12,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.validator.ValidatorException;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -52,46 +56,126 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	private Set<DocDefCollection> conditionedDocDefCollections = new HashSet<DocDefCollection>();
 
+	private Constraint constraint;
+
+	private Validator validator = new Validator();
+
+	public PropertyDef() {
+	}
+
 	public PropertyDef(String name, DataType type) {
 		super();
 		this.name = name;
 		this.dataType = type;
 	}
 
-	public PropertyDef() {
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof PropertyDef)) {
+			return false;
+		}
+		PropertyDef other = (PropertyDef) obj;
+		if (this.getId() == null) {
+			if (other.getId() != null) {
+				return false;
+			}
+		} else if (!this.getId().equals(other.getId())) {
+			return false;
+		}
+		if (this.getName() == null) {
+			if (other.getName() != null) {
+				return false;
+			}
+		} else if (!this.getName().equals(other.getName())) {
+			return false;
+		}
+		if (this.getDataType() != other.getDataType()) {
+			return false;
+		}
+		return true;
 	}
 
-	@Id
-	@GeneratedValue
-	public Long getId() {
-		return id;
+	@ManyToOne(cascade = CascadeType.PERSIST)
+	public PropertyDef getConditionalPropertyDef() {
+		return this.conditionalPropertyDef;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	@OneToOne(cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+	public PropertyInst getConditionalPropertyInst() {
+		return this.conditionalPropertyInst;
 	}
 
-	public String getName() {
-		return name;
+	@OneToMany(mappedBy = "conditionalPropertyDef")
+	public Set<DocDefCollection> getConditionedDocDefCollections() {
+		return this.conditionedDocDefCollections;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	@Transient
+	public List<DocDefCollection> getConditionedDocDefCollectionsAsList() {
+		return new ArrayList<DocDefCollection>(
+				this.conditionedDocDefCollections);
+	}
+
+	@OneToMany(mappedBy = "conditionalPropertyDef")
+	public Set<PropertyDef> getConditionedPropertyDefs() {
+		return this.conditionedPropertyDefs;
+	}
+
+	@Transient
+	public List<PropertyDef> getConditionedPropertyDefsAsList() {
+		return new ArrayList<PropertyDef>(this.conditionedPropertyDefs);
+	}
+
+	@ManyToOne
+	public Constraint getConstraint() {
+		return this.constraint;
 	}
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type")
 	public DataType getDataType() {
-		return dataType;
+		return this.dataType;
 	}
 
-	public void setDataType(DataType type) {
-		this.dataType = type;
+	@ManyToOne
+	public Dictionary getDictionary() {
+		return this.dictionary;
 	}
 
-	@Override
-	public String toString() {
-		return this.name + ":" + dataType;
+	@Transient
+	public List<String> getDictionaryValues() {
+		if (this.getDictionary() != null
+				&& !this.getDictionary().getValues().isEmpty()) {
+			return this.getDictionary().getValues();
+		}
+		return null;
+	}
+
+	@Id
+	@GeneratedValue
+	public Long getId() {
+		return this.id;
+	}
+
+	@Transient
+	public String getLabel() {
+		return this.name;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	@Transient
+	public String getUuid() {
+		return this.uuid;
 	}
 
 	@Override
@@ -109,41 +193,8 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 		return result;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof PropertyDef))
-			return false;
-		PropertyDef other = (PropertyDef) obj;
-		if (this.getId() == null) {
-			if (other.getId() != null)
-				return false;
-		} else if (!this.getId().equals(other.getId()))
-			return false;
-		if (this.getName() == null) {
-			if (other.getName() != null)
-				return false;
-		} else if (!this.getName().equals(other.getName()))
-			return false;
-		if (this.getDataType() != other.getDataType())
-			return false;
-		return true;
-	}
-
-	public boolean isRequired() {
-		return required;
-	}
-
-	public void setRequired(boolean required) {
-		this.required = required;
-	}
-
-	@Transient
-	public String getLabel() {
-		return this.name;
+	public boolean isActive() {
+		return this.active;
 	}
 
 	@Transient
@@ -151,77 +202,24 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 		return true;
 	}
 
-	@Transient
-	public List<String> getDictionaryValues() {
-		if (this.getDictionary() != null
-				&& !this.getDictionary().getValues().isEmpty()) {
-			return this.getDictionary().getValues();
-		}
-		return null;
-	}
-
-	@ManyToOne
-	public Dictionary getDictionary() {
-		return dictionary;
-	}
-
-	public void setDictionary(Dictionary dictionary) {
-		this.dictionary = dictionary;
-	}
-
 	public boolean isMultiple() {
-		return multiple;
+		return this.multiple;
 	}
 
-	public void setMultiple(boolean multiple) {
-		this.multiple = multiple;
-	}
-
-	@Transient
-	public String getUuid() {
-		return uuid;
-	}
-
-	public boolean isActive() {
-		return active;
+	public boolean isRequired() {
+		return this.required;
 	}
 
 	public void setActive(boolean active) {
 		this.active = active;
 	}
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
-	public PropertyDef getConditionalPropertyDef() {
-		return conditionalPropertyDef;
-	}
-
 	public void setConditionalPropertyDef(PropertyDef conditionalPropertyDef) {
 		this.conditionalPropertyDef = conditionalPropertyDef;
 	}
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	public PropertyInst getConditionalPropertyInst() {
-		return conditionalPropertyInst;
-	}
-
 	public void setConditionalPropertyInst(PropertyInst conditionalPropertyInst) {
 		this.conditionalPropertyInst = conditionalPropertyInst;
-	}
-
-	@OneToMany(mappedBy = "conditionalPropertyDef")
-	public Set<PropertyDef> getConditionedPropertyDefs() {
-		return conditionedPropertyDefs;
-	}
-
-	public void setConditionedPropertyDefs(
-			Set<PropertyDef> conditionedPropertyDefs) {
-		this.conditionedPropertyDefs = conditionedPropertyDefs;
-	}
-
-	@OneToMany(mappedBy = "conditionalPropertyDef")
-	public Set<DocDefCollection> getConditionedDocDefCollections() {
-		return conditionedDocDefCollections;
 	}
 
 	public void setConditionedDocDefCollections(
@@ -229,15 +227,77 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 		this.conditionedDocDefCollections = conditionedDocDefCollections;
 	}
 
-	@Transient
-	public List<PropertyDef> getConditionedPropertyDefsAsList() {
-		return new ArrayList<PropertyDef>(this.conditionedPropertyDefs);
+	public void setConditionedPropertyDefs(
+			Set<PropertyDef> conditionedPropertyDefs) {
+		this.conditionedPropertyDefs = conditionedPropertyDefs;
 	}
 
-	@Transient
-	public List<DocDefCollection> getConditionedDocDefCollectionsAsList() {
-		return new ArrayList<DocDefCollection>(
-				this.conditionedDocDefCollections);
+	public void setConstraint(Constraint constraint) {
+		this.constraint = constraint;
+	}
+
+	public void setDataType(DataType type) {
+		this.dataType = type;
+	}
+
+	public void setDictionary(Dictionary dictionary) {
+		this.dictionary = dictionary;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setMultiple(boolean multiple) {
+		this.multiple = multiple;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setRequired(boolean required) {
+		this.required = required;
+	}
+
+	@Override
+	public String toString() {
+		return this.name + ":" + this.dataType;
+	}
+
+	public void validate(FacesContext context, UIComponent component, Object obj)
+			throws ValidatorException {
+
+		if (this.getConstraint() != null) {
+			switch (this.getDataType()) {
+			case STRING:
+				if (this.getConstraint().getRegex() != null
+						&& !this.getConstraint().getRegex().equals("")) {
+					this.validator.validateRegex((String) obj, this
+							.getConstraint().getRegex(), this.getConstraint()
+							.getRequiresMatch());
+				}
+
+				if (this.getConstraint().getMinLength() != null
+						|| this.getConstraint().getMaxLength() != null) {
+					this.validator.validateLength((String) obj, this
+							.getConstraint().getMinLength(), this
+							.getConstraint().getMaxLength());
+				}
+				break;
+
+			case INTEGER:
+				if (this.getConstraint().getMinValue() != null
+						|| this.getConstraint().getMaxValue() != null) {
+					this.validator.validateMinMax((Integer) obj, this
+							.getConstraint().getMinValue(), this
+							.getConstraint().getMaxValue());
+				}
+
+			default:
+				break;
+			}
+		}
 	}
 
 }
