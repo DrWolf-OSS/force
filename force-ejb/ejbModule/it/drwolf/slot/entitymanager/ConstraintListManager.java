@@ -12,8 +12,8 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
 @Scope(ScopeType.CONVERSATION)
-@Name("dictionayListManager")
-public class DictionayListManager {
+@Name("constraintListManager")
+public class ConstraintListManager {
 
 	@In(create = true)
 	private EntityManager entityManager;
@@ -21,12 +21,11 @@ public class DictionayListManager {
 	@SuppressWarnings("unchecked")
 	public List<String> retrieveByType(DataType dataType) {
 		List<String> resultList = this.entityManager
-				.createQuery("from Dictionary d where d.dataType=:dataType")
+				.createQuery("from Constraint c where c.dataType=:dataType")
 				.setParameter("dataType", dataType).getResultList();
 		if (resultList != null) {
 			return resultList;
 		}
 		return null;
 	}
-
 }

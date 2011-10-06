@@ -83,6 +83,10 @@
 						<h:outputText value="#{eprop.dataType.value()}" />
 					</rich:column>
 					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Validatore</f:facet>
+						<h:outputText value="#{eprop.constraint != null ? eprop.constraint.name : ''}" />
+					</rich:column>
+					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Multipla</f:facet>
 						<h:outputText value="#{eprop.multiple ? 'sì' : 'no'}" />
 					</rich:column>
@@ -131,6 +135,10 @@
 					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Tipologia di dato</f:facet>
 						<h:outputText value="#{prop.dataType.value()}" />
+					</rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Validatore</f:facet>
+						<h:outputText value="#{prop.constraint != null ? prop.constraint.name : ''}" />
 					</rich:column>
 					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Obbligatoria</f:facet>

@@ -57,6 +57,10 @@
 						<h:outputText value="#{eprop.dataType.value()}" />
 					</rich:column>
 					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Validatore</f:facet>
+						<h:outputText value="#{eprop.constraint != null ? eprop.constraint.name : ''}" />
+					</rich:column>
+					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Multipla</f:facet>
 						<h:outputText value="#{eprop.multiple ? 'sì' : 'no'}" />
 					</rich:column>
@@ -127,6 +131,10 @@
 					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Tipologia di dato</f:facet>
 						<h:outputText value="#{prop.dataType.value()}" />
+					</rich:column>
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Validatore</f:facet>
+						<h:outputText value="#{prop.constraint != null ? prop.constraint.name : ''}" />
 					</rich:column>
 					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Obbligatoria</f:facet>
@@ -475,7 +483,21 @@
 							disabled="#{not empty slotDefEditBean.retrieveReferencedRules(slotDefEditBean.propertyDef) or
 										(slotDefEditBean.propertyDef.id!=null and slotDefHome.referenced)}">
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type.value()}" noSelectionLabel="-- seleziona un tipo --"/>
-					<a:support event="onchange" reRender="dictionary"/>
+					<a:support event="onchange" reRender="dictionary, pValidator"/>
+             		</h:selectOneMenu>
+	            </s:decorate>
+	            </a:region>
+	            
+	            <a:region>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Validatore" />
+					</ui:define>
+					<h:selectOneMenu id="pValidator" value="#{slotDefEditBean.propertyDef.constraint}"
+								disabled="#{slotDefEditBean.propertyDef.dictionary != null}">
+                    	<s:selectItems value="#{constraintListManager.retrieveByType(slotDefEditBean.propertyDef.dataType)}" var="constr" label="#{constr.name}" noSelectionLabel="-- seleziona un validatore --"/>
+                    	<s:convertEntity/>
+						<a:support event="onchange" reRender="dictionary"/>
              		</h:selectOneMenu>
 	            </s:decorate>
 	            </a:region>
@@ -565,6 +587,7 @@
                     		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.propertyDef.dataType)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- seleziona un dizionario --"/>
 							<s:convertEntity/>
+							<a:support event="onchange" reRender="pValidator" action="#{slotDefEditBean.resetPValidator()}"/>
              		</h:selectOneMenu>
 	            </s:decorate>
 
@@ -619,7 +642,21 @@
                     	<s:selectItems value="#{dataTypes}" var="type" label="#{type.value()}"
 							noSelectionLabel="-- seleziona un tipo --"/>
 						<s:convertEnum/>
-					<a:support event="onchange" action="#{slotDefEditBean.embeddedPropertyListener}" reRender="dictionary, epValue"/>
+					<a:support event="onchange" action="#{slotDefEditBean.embeddedPropertyListener}" reRender="dictionary, epValue,epValidator"/>
+             		</h:selectOneMenu>
+	            </s:decorate>
+	            </a:region>
+	            
+	            <a:region>
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Validatore" />
+					</ui:define>
+					<h:selectOneMenu id="epValidator" value="#{slotDefEditBean.embeddedProperty.constraint}"
+								disabled="#{slotDefEditBean.embeddedProperty.dictionary != null}">
+                    	<s:selectItems value="#{constraintListManager.retrieveByType(slotDefEditBean.embeddedProperty.dataType)}" var="constr" label="#{constr.name}" noSelectionLabel="-- seleziona un validatore --"/>
+                    	<s:convertEntity/>
+						<a:support event="onchange" reRender="dictionary,epValue"/>
              		</h:selectOneMenu>
 	            </s:decorate>
 	            </a:region>
@@ -646,7 +683,7 @@
                     		<s:selectItems value="#{dictionayListManager.retrieveByType(slotDefEditBean.embeddedProperty.dataType)}" 
 											var="dictionary" label="#{dictionary.name}" noSelectionLabel="-- seleziona un dizionario --"/>
 							<s:convertEntity/>
-					<a:support event="onchange" action="#{slotDefEditBean.embeddedProperty.clean}" reRender="epForm"/>
+					<a:support event="onchange" action="#{slotDefEditBean.onChangeEmbeddedPropertyDictionary()}"  reRender="epValue,epValidator"/>
              		</h:selectOneMenu>
 	            </s:decorate>
 	            </a:region>
@@ -661,11 +698,13 @@
 							<h:inputText value="#{slotDefEditBean.embeddedProperty.stringValue}"
 								rendered="#{(slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'STRING' or slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'LINK') and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
 								required="#{not slotDefParameters.model}"
-								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
+								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" 
+								validator="#{slotDefEditBean.embeddedProperty.validate}"/>
 							<h:inputText value="#{slotDefEditBean.embeddedProperty.integerValue}"
 								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'INTEGER' and slotDefEditBean.embeddedProperty.dataDefinition.dictionaryValues == null}"
 								required="#{not slotDefParameters.model}"
-								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" />
+								disabled="#{not slotDefEditBean.embeddedProperty.dataDefinition.editable}" 
+								validator="#{slotDefEditBean.embeddedProperty.validate}"/>
 							<a:region>
 							<h:selectBooleanCheckbox value="#{slotDefEditBean.embeddedProperty.booleanValue}"
 								rendered="#{slotDefEditBean.embeddedProperty.dataDefinition.dataType == 'BOOLEAN'}"

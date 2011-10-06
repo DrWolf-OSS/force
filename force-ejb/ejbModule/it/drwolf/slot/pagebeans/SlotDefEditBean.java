@@ -525,6 +525,13 @@ public class SlotDefEditBean {
 		this.conditioned = SlotDefEditBean.CONDITIONED_NONE;
 	}
 
+	public void onChangeEmbeddedPropertyDictionary() {
+		if (this.embeddedProperty != null) {
+			this.embeddedProperty.clean();
+			this.embeddedProperty.setConstraint(null);
+		}
+	}
+
 	public void propertyDefConditionalPropertyListener(ActionEvent event) {
 		if (this.propertyDef.getConditionalPropertyDef() != null) {
 			this.propertyDef.setConditionalPropertyInst(new PropertyInst(
@@ -543,38 +550,6 @@ public class SlotDefEditBean {
 			this.deactiveReferencedRules(coll);
 		} else {
 			this.removeReferencedRules(coll);
-		}
-	}
-
-	private void removeConditionalReferences(
-			List<Conditionable> conditionables, boolean cascade) {
-		for (Conditionable conditionable : conditionables) {
-			conditionable.getConditionalPropertyInst().setPropertyDef(null);
-			conditionable.setConditionalPropertyInst(null);
-			conditionable.setConditionalPropertyDef(null);
-			if (cascade) {
-				if (conditionable.getId() != null
-						&& this.slotDefHome.isReferenced()) {
-					conditionable.setActive(false);
-				} else {
-					// se lo SlotDef non è referenziato o la collection è stata
-					// appena creata (e quindi sicuramente non referenziata
-					// anche se lo SlotDef lo fosse) posso eliminarla del tutto
-					//
-					//
-					// Se una prop cancellata era condizionale per un elemento
-					// non ancora persistito o non ancora referenziato questo
-					// veniva eliminato.. mi pare un po' troppo e non necessario
-					// (così si mantiene comportamento uniforme a quando si crea
-					// slotDef la prima volta)
-					// if (conditionable instanceof DocDefCollection) {
-					// this.removeColl((DocDefCollection) conditionable);
-					// } else if (conditionable instanceof PropertyDef) {
-					// this.removeProp((PropertyDef) conditionable);
-					// }
-					//
-				}
-			}
 		}
 	}
 
@@ -614,6 +589,38 @@ public class SlotDefEditBean {
 	// }
 	// return referencedPropertyDef;
 	// }
+
+	private void removeConditionalReferences(
+			List<Conditionable> conditionables, boolean cascade) {
+		for (Conditionable conditionable : conditionables) {
+			conditionable.getConditionalPropertyInst().setPropertyDef(null);
+			conditionable.setConditionalPropertyInst(null);
+			conditionable.setConditionalPropertyDef(null);
+			if (cascade) {
+				if (conditionable.getId() != null
+						&& this.slotDefHome.isReferenced()) {
+					conditionable.setActive(false);
+				} else {
+					// se lo SlotDef non è referenziato o la collection è stata
+					// appena creata (e quindi sicuramente non referenziata
+					// anche se lo SlotDef lo fosse) posso eliminarla del tutto
+					//
+					//
+					// Se una prop cancellata era condizionale per un elemento
+					// non ancora persistito o non ancora referenziato questo
+					// veniva eliminato.. mi pare un po' troppo e non necessario
+					// (così si mantiene comportamento uniforme a quando si crea
+					// slotDef la prima volta)
+					// if (conditionable instanceof DocDefCollection) {
+					// this.removeColl((DocDefCollection) conditionable);
+					// } else if (conditionable instanceof PropertyDef) {
+					// this.removeProp((PropertyDef) conditionable);
+					// }
+					//
+				}
+			}
+		}
+	}
 
 	public void removeEmbeddedProp(EmbeddedProperty embeddedProp) {
 		this.slotDefHome.getInstance().getEmbeddedProperties()
@@ -680,6 +687,12 @@ public class SlotDefEditBean {
 		this.removeConditionalReferences(
 				new ArrayList<Conditionable>(prop.getConditionedPropertyDefs()),
 				invalidateProperties);
+	}
+
+	public void resetPValidator() {
+		if (this.propertyDef != null) {
+			this.propertyDef.setConstraint(null);
+		}
 	}
 
 	public List<Rule> retrieveReferencedRules(Object obj) {
@@ -795,12 +808,12 @@ public class SlotDefEditBean {
 		this.edit = edit;
 	}
 
+	//
+	//
+
 	public void setEmbeddedProperty(EmbeddedProperty embeddedProperty) {
 		this.embeddedProperty = embeddedProperty;
 	}
-
-	//
-	//
 
 	private void setKnownParameters() {
 		if (this.slotDefHome.getInstance().getId() == null) {
