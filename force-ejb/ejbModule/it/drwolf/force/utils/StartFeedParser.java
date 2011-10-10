@@ -28,7 +28,7 @@ public class StartFeedParser implements GaraFeedParserIF {
 		Pattern pSOA = Pattern.compile("^O[GS]\\s\\d");
 		ArrayList<String> categorie = new ArrayList<String>();
 		List<HtmlTableRow> rows = (List<HtmlTableRow>) this.page
-				.getByXPath("//tr[@class='cell']");
+				.getByXPath("//tr");
 		for (HtmlTableRow row : rows) {
 			for (HtmlTableCell cell : row.getCells()) {
 				String[] res = cell.asText().split(":");

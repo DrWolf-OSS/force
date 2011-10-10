@@ -64,7 +64,7 @@ public class Heartbeat {
 		}
 
 		ArrayList<Fonte> listaFonti = (ArrayList<Fonte>) entityManager
-				.createQuery("from Fonte").getResultList();
+				.createQuery("from Fonte where attiva = true").getResultList();
 		for (Fonte fonte : listaFonti) {
 			URL url = null;
 			try {
@@ -89,6 +89,7 @@ public class Heartbeat {
 					if (results.size() == 0) {
 						System.out.println("Nuova Gara : " + post.getTitle());
 						// nuova Gara. La inserisco
+						System.out.println(post.getLink());
 						Gara gara = new Gara(post.getTitle(), post.getLink(),
 								TipoGara.NUOVA.getNome(), fonte);
 						// devo prenderemi dal link i valori della gara che sono
@@ -149,9 +150,11 @@ public class Heartbeat {
 							}
 							if (!listaCategorie.isEmpty()) {
 								gara.setCategorieMerceologiche(listaCategorie);
+								gara.setType(TipoGara.GESTITA.name());
 							}
 							if (!listaSOA.isEmpty()) {
 								gara.setSOA(listaSOA);
+								gara.setType(TipoGara.GESTITA.name());
 							}
 						} else {
 							System.out

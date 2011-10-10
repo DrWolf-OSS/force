@@ -26,6 +26,8 @@ public class Fonte implements Serializable {
 
 	private String tipo;
 
+	private boolean attiva;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Integer getId() {
@@ -45,6 +47,15 @@ public class Fonte implements Serializable {
 	@Column
 	public String getUrl() {
 		return this.url;
+	}
+
+	@Column
+	public boolean isAttiva() {
+		return this.attiva;
+	}
+
+	public void setAttiva(boolean attiva) {
+		this.attiva = attiva;
 	}
 
 	public void setId(Integer id) {
