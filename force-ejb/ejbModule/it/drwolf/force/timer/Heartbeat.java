@@ -106,60 +106,59 @@ public class Heartbeat {
 						}
 
 						List<String> categorie = startFeed.getCategorie();
-						if (categorie.size() > 0) {
+						if (startFeed.haveCm()) {
 							System.out.println("trovate le categorie : "
-									+ categorie);
-							// ci sono della categorie
+									+ startFeed.getCM());
 							HashSet<CategoriaMerceologica> listaCategorie = new HashSet<CategoriaMerceologica>();
-							HashSet<SOA> listaSOA = new HashSet<SOA>();
-							for (String categoria : categorie) {
-								if (categoria.startsWith("OS")
-										|| categoria.startsWith("OG")) {
-									try {
-										SOA soa = (SOA) entityManager
-												.createQuery(
-														"from SOA where codice = :codice")
-												.setParameter("codice",
-														categoria)
-												.getSingleResult();
-										listaSOA.add(soa);
-									} catch (NoResultException e) {
-										e.printStackTrace();
-									} catch (NonUniqueResultException e) {
-										e.printStackTrace();
-									}
-								} else {
-									CategoriaMerceologica cm;
-									try {
-										cm = (CategoriaMerceologica) entityManager
-												.createQuery(
-														"from CategoriaMerceologica where categoria = lower(:categoria)")
-												.setParameter("categoria",
-														categoria.toLowerCase())
-												.getSingleResult();
-										listaCategorie.add(cm);
-									} catch (NoResultException e) {
-										System.out
-												.println("Categoria non trovata "
-														+ categoria);
-										e.printStackTrace();
-									} catch (NonUniqueResultException e) {
-										e.printStackTrace();
-									}
+							for (String element : startFeed.getCM()) {
+								try {
+									String cat = element.toLowerCase()
+											.replaceAll("\\W", "_");
+									// .replaceAll("\u2012", "-")
+									// .replaceAll("\u2013", "-")
+									// .replaceAll("\u2014", "-")
+									// .replaceAll("\u2015", "-")
+									// .replaceAll("\u2053", "-");
+									CategoriaMerceologica cm = (CategoriaMerceologica) entityManager
+											.createQuery(
+													"from CategoriaMerceologica where lower(categoria) like (:categoria)")
+											.setParameter("categoria",
+													cat.trim())
+											.getSingleResult();
+									listaCategorie.add(cm);
+								} catch (NoResultException e) {
+									System.out.println("Categoria non trovata"
+											+ element);
+									e.printStackTrace();
+								} catch (NonUniqueResultException e) {
+									e.printStackTrace();
 								}
 							}
-							if (!listaCategorie.isEmpty()) {
-								gara.setCategorieMerceologiche(listaCategorie);
-								gara.setType(TipoGara.GESTITA.name());
-							}
-							if (!listaSOA.isEmpty()) {
-								gara.setSOA(listaSOA);
-								gara.setType(TipoGara.GESTITA.name());
-							}
-						} else {
-							System.out
-									.println("Non sono riuscito ad individuare le categorie della gara");
+							gara.setCategorieMerceologiche(listaCategorie);
+							gara.setType(TipoGara.GESTITA.getNome());
 						}
+						if (startFeed.haveSoa()) {
+							System.out.println("trovate le soa : "
+									+ startFeed.getSOA());
+							HashSet<SOA> listaSOA = new HashSet<SOA>();
+							for (String element : startFeed.getSOA()) {
+								try {
+									SOA soa = (SOA) entityManager
+											.createQuery(
+													"from SOA where codice = :codice")
+											.setParameter("codice", element)
+											.getSingleResult();
+									listaSOA.add(soa);
+								} catch (NoResultException e) {
+									e.printStackTrace();
+								} catch (NonUniqueResultException e) {
+									e.printStackTrace();
+								}
+							}
+							gara.setSOA(listaSOA);
+							gara.setType(TipoGara.GESTITA.getNome());
+						}
+
 						entityManager.persist(gara);
 					}
 				}
