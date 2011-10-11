@@ -52,7 +52,13 @@ public class Gara implements Serializable {
 
 	private BigDecimal requisitoEconomico;
 
+	// Con questo si mappa lo stato della Gara (Nuova, Attiva, Scaduta,
+	// Scartata)
+	// sarebbe stato meglio chimarlo stato
 	private String type;
+
+	// Con questo si mappa la tipologia della gara (Aperta, Negoziata, etc)
+	private String tipoProcedura;
 
 	private Fonte fonte;
 
@@ -157,13 +163,18 @@ public class Gara implements Serializable {
 		return this.SOA;
 	}
 
-	// deve essere inserito anche un riferimento al settore?
-
 	@Transient
 	public List<SOA> getSOAAsList() {
 		return new ArrayList<SOA>(this.getSOA());
 
 	}
+
+	@Column
+	public String getTipoProcedura() {
+		return this.tipoProcedura;
+	}
+
+	// deve essere inserito anche un riferimento al settore?
 
 	@Column(nullable = false)
 	@NotNull
@@ -253,6 +264,10 @@ public class Gara implements Serializable {
 	@Transient
 	public void setSOAAsList(List<SOA> lista) {
 		this.setSOA(new HashSet<SOA>(lista));
+	}
+
+	public void setTipoProcedura(String tipologia) {
+		this.tipoProcedura = tipologia;
 	}
 
 	public void setType(String type) {

@@ -5,6 +5,7 @@ import it.drwolf.force.entity.Fonte;
 import it.drwolf.force.entity.Gara;
 import it.drwolf.force.entity.SOA;
 import it.drwolf.force.enums.TipoGara;
+import it.drwolf.force.enums.TipoProceduraGara;
 import it.drwolf.force.utils.StartFeedParser;
 
 import java.io.IOException;
@@ -103,6 +104,13 @@ public class Heartbeat {
 						Date dataFine = startFeed.getDataFine();
 						if (dataInizio != null) {
 							gara.setDataScadenza(dataFine);
+						}
+						if (startFeed.isAperta()) {
+							gara.setTipoProcedura(TipoProceduraGara.APERTA
+									.getNome());
+						} else if (startFeed.isNegoziata()) {
+							gara.setTipoProcedura(TipoProceduraGara.NEGOZIATA
+									.getNome());
 						}
 
 						List<String> categorie = startFeed.getCategorie();

@@ -42,6 +42,16 @@
             </f:facet>
             <h:outputText value="#{_gara.fonte.nome} (#{_gara.fonte.tipo})"/>
         </h:column>
+          <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{garaList}"/>
+                    <ui:param name="propertyLabel" value="Procedura"/>
+                    <ui:param name="propertyPath" value="gara.tipoProcedura"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_gara.tipoProcedura}"/>
+        </h:column>
         <h:column>
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">

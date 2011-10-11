@@ -1,12 +1,12 @@
 package it.drwolf.force.enums;
 
-public enum TipoGara {
+public enum TipoProceduraGara {
 
-	NUOVA("Nuova"), GESTITA("Gestita"), SCADUTA("Scaduta"), SCARTATA("Scartata");
+	APERTA("Aperta"), NEGOZIATA("Negoziata");
 
 	private String testo;
 
-	private TipoGara(String testo) {
+	private TipoProceduraGara(String testo) {
 		this.testo = testo;
 	}
 

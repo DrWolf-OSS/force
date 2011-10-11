@@ -64,6 +64,14 @@ public class StartFeedParser implements GaraFeedParserIF {
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
+		} else if (this.feedElements
+				.containsKey("Scadenza fase di manifestazione d'interesse:")) {
+			try {
+				return sdf.parse(this.feedElements
+						.get("Scadenza fase di manifestazione d'interesse:"));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
@@ -76,6 +84,15 @@ public class StartFeedParser implements GaraFeedParserIF {
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
+		} else if (this.feedElements
+				.containsKey("Inizio fase di manifestazione d'interesse:")) {
+			try {
+				return sdf.parse(this.feedElements
+						.get("Inizio fase di manifestazione d'interesse:"));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+
 		}
 		return null;
 	}
@@ -98,6 +115,24 @@ public class StartFeedParser implements GaraFeedParserIF {
 		return false;
 	}
 
+	public boolean isAperta() {
+		if (this.feedElements.containsKey("Procedura:")) {
+			if (this.feedElements.get("Procedura:").equals("Aperta")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isNegoziata() {
+		if (this.feedElements.containsKey("Procedura:")) {
+			if (this.feedElements.get("Procedura:").equals("Negoziata")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void parse(String url) {
 		WebClient wc = new WebClient();
 		Pattern pCM = Pattern.compile("^[A-Z0-9\\- ]+$");
@@ -110,8 +145,8 @@ public class StartFeedParser implements GaraFeedParserIF {
 				if (row.getCells().size() > 1) {
 					if (row.getCell(0).asText().endsWith(":")) {
 						// se finisce con i :
-						this.feedElements.put(row.getCell(0).asText(), row
-								.getCell(1).asText());
+						this.feedElements.put(row.getCell(0).asText().trim(),
+								row.getCell(1).asText().trim());
 					} else {
 						// provo a vedere se è una SOA o CM
 						String[] res = row.getCell(0).asText().split(":");
