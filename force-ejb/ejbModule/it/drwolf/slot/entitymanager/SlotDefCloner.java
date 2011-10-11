@@ -1,4 +1,4 @@
-package it.drwolf.slot.session;
+package it.drwolf.slot.entitymanager;
 
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.entity.DependentSlotDef;
@@ -9,31 +9,75 @@ import it.drwolf.slot.entity.PropertyInst;
 import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
-import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.ruleverifier.RuleParametersResolver;
+import it.drwolf.slot.session.RuleHome;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.framework.EntityHome;
+import org.jboss.seam.annotations.Scope;
 
-@Name("slotDefHome")
-public class SlotDefHome extends EntityHome<SlotDef> {
-
-	private static final long serialVersionUID = -8721399617784074986L;
+@Name("slotDefCloner")
+@Scope(ScopeType.EVENT)
+public class SlotDefCloner {
 
 	private SlotDef model;
+
+	private SlotDef cloned;
 
 	@In(create = true)
 	private RuleParametersResolver ruleParametersResolver;
 
+	// = (RuleParametersResolver) org.jboss.seam.Component
+	// .getInstance("ruleParametersResolver");
+
 	@In(create = true)
 	private RuleHome ruleHome;
+
+	public void clone(SlotDef slotDef) {
+		this.model = slotDef;
+		SlotDef clonedSlotDef = null;
+		if (slotDef instanceof DependentSlotDef) {
+			clonedSlotDef = new DependentSlotDef();
+		} else {
+			clonedSlotDef = new SlotDef();
+		}
+		clonedSlotDef.setName("Copia di " + slotDef.getName());
+		clonedSlotDef.setType(slotDef.getType());
+
+		for (EmbeddedProperty embeddedProperty : slotDef
+				.getEmbeddedProperties()) {
+			if (embeddedProperty.isActive()) {
+				EmbeddedProperty clonedEmbeddedProperty = this
+						.cloneEmbeddedProperty(embeddedProperty);
+				clonedSlotDef.getEmbeddedProperties().add(
+						clonedEmbeddedProperty);
+			}
+		}
+
+		for (PropertyDef propertyDef : slotDef.getPropertyDefs()) {
+			if (propertyDef.isActive()) {
+				PropertyDef clonedPropertyDef = this
+						.clonePropertyDef(propertyDef);
+				clonedSlotDef.getPropertyDefs().add(clonedPropertyDef);
+			}
+		}
+
+		for (DocDefCollection collection : slotDef.getDocDefCollections()) {
+			if (collection.isActive()) {
+				DocDefCollection clonedDocDefCollection = this
+						.cloneDocDefCollection(collection, clonedSlotDef);
+				clonedDocDefCollection.setSlotDef(clonedSlotDef);
+				clonedSlotDef.getDocDefCollections()
+						.add(clonedDocDefCollection);
+			}
+		}
+		this.cloned = clonedSlotDef;
+	}
 
 	private DocDefCollection cloneDocDefCollection(DocDefCollection collection,
 			SlotDef clonedSlotDef) {
@@ -85,11 +129,6 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		clonedEmbeddedProperty.setDataType(embeddedProperty.getDataType());
 		clonedEmbeddedProperty.setMultiple(embeddedProperty.isMultiple());
 
-		// clonedEmbeddedProperty.setStringValue(embeddedProperty.getStringValue());
-		// clonedEmbeddedProperty.setIntegerValue(embeddedProperty.getIntegerValue());
-		// clonedEmbeddedProperty.setBooleanValue(embeddedProperty.getBooleanValue());
-		// clonedEmbeddedProperty.setDateValue(embeddedProperty.getDateValue());
-
 		clonedEmbeddedProperty.setDictionary(embeddedProperty.getDictionary());
 		clonedEmbeddedProperty.setValues(new HashSet<String>());
 		return clonedEmbeddedProperty;
@@ -124,14 +163,14 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 					.resolveSourceDef(source);
 			if (sourceDef instanceof SlotDef) {
 				clonedParam = clonedParam.concat(SlotDef.class.getName()) + ":"
-						+ this.getInstance().getId().toString();
+						+ this.cloned.getId().toString();
 			} else if (sourceDef instanceof DocDefCollection) {
 				clonedParam = clonedParam.concat(DocDefCollection.class
 						.getName()) + ":";
 				DocDefCollection docDefCollection = (DocDefCollection) sourceDef;
-				DocDefCollection clonedDocDefCollection = this.getInstance()
-						.retrieveDocDefCollectionByName(
-								docDefCollection.getName());
+				DocDefCollection clonedDocDefCollection = this.cloned
+						.retrieveDocDefCollectionByName(docDefCollection
+								.getName());
 				//
 				if (clonedDocDefCollection != null) {
 					clonedParam = clonedParam.concat(clonedDocDefCollection
@@ -156,9 +195,9 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 					missingParams = true;
 				}
 			} else if (fieldDef instanceof PropertyDef) {
-				PropertyDef clonedPropertyDef = this.getInstance()
-						.retrievePropertyDefByName(
-								((PropertyDef) fieldDef).getName());
+				PropertyDef clonedPropertyDef = this.cloned
+						.retrievePropertyDefByName(((PropertyDef) fieldDef)
+								.getName());
 				//
 				if (clonedPropertyDef != null) {
 					clonedParam = clonedParam.concat(PropertyDef.class
@@ -170,9 +209,9 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 				}
 				//
 			} else if (fieldDef instanceof EmbeddedProperty) {
-				EmbeddedProperty clonedEmbeddedProperty = this.getInstance()
-						.retrieveEmbeddedPropertyByName(
-								((EmbeddedProperty) fieldDef).getName());
+				EmbeddedProperty clonedEmbeddedProperty = this.cloned
+						.retrieveEmbeddedPropertyByName(((EmbeddedProperty) fieldDef)
+								.getName());
 				//
 				if (clonedEmbeddedProperty != null) {
 					clonedParam = clonedParam.concat(EmbeddedProperty.class
@@ -212,7 +251,7 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		}
 
 		clonedRule.setMandatory(rule.isMandatory());
-		clonedRule.setSlotDef(this.getInstance());
+		clonedRule.setSlotDef(this.cloned);
 		clonedRule.setType(rule.getType());
 		clonedRule.setErrorMessage(rule.getErrorMessage());
 		clonedRule.setWarningMessage(rule.getWarningMessage());
@@ -228,170 +267,34 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		}
 	}
 
-	@Override
-	protected SlotDef createInstance() {
-		SlotDef slotDef = new SlotDef();
-		return slotDef;
+	public void cloneRules() {
+		if (this.model != null && this.cloned != null
+				&& this.cloned.getId() != null) {
+			for (Rule rule : this.model.getRules()) {
+				//
+				if (rule.isActive()) {
+					Rule clonedRule = this.cloneRule(rule);
+					if (clonedRule != null) {
+						this.cloned.getRules().add(clonedRule);
+						// this.ruleHome.setInstance(clonedRule);
+						// this.ruleHome.persist();
+					}
+				}
+				//
+			}
+		}
 	}
 
-	public SlotDef getDefinedInstance() {
-		return this.isIdDefined() ? this.getInstance() : null;
-	}
-
-	public List<DocDefCollection> getDocDefCollections() {
-		return this.getInstance() == null ? null
-				: new ArrayList<DocDefCollection>(this.getInstance()
-						.getDocDefCollections());
+	public SlotDef getCloned() {
+		return this.cloned;
 	}
 
 	public SlotDef getModel() {
 		return this.model;
 	}
 
-	public List<PropertyDef> getPropertyDefs() {
-		return this.getInstance() == null ? null : new ArrayList<PropertyDef>(
-				this.getInstance().getPropertyDefs());
-	}
-
-	public List<Rule> getRules() {
-		return this.getInstance() == null ? null : new ArrayList<Rule>(this
-				.getInstance().getRules());
-	}
-
-	public Long getSlotDefId() {
-		return (Long) this.getId();
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<SlotInst> getSlotInstsReferenced() {
-		if (this.getInstance().getId() != null) {
-			List<SlotInst> resultList = this.getEntityManager()
-					.createQuery("from SlotInst s where s.slotDef=:slotDef")
-					.setParameter("slotDef", this.getInstance())
-					.getResultList();
-			if (resultList != null) {
-				return resultList;
-			}
-		}
-		return new ArrayList<SlotInst>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public boolean isReferenced() {
-		if (this.getInstance().getId() != null) {
-			List<SlotInst> resultList = this
-					.getEntityManager()
-					.createQuery(
-							"select id from SlotInst s where s.slotDef=:slotDef")
-					.setParameter("slotDef", this.getInstance())
-					.setMaxResults(1).getResultList();
-			if (resultList != null && !resultList.isEmpty()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean isWired() {
-		return true;
-	}
-
-	public void load() {
-		if (this.isIdDefined()) {
-			this.wire();
-		}
-	}
-
-	@Override
-	public String persist() {
-		String result = super.persist();
-		if (result.equals("persisted") && this.model != null) {
-			for (Rule rule : this.model.getRules()) {
-				//
-				if (rule.isActive()) {
-					Rule clonedRule = this.cloneRule(rule);
-					if (clonedRule != null) {
-						this.getInstance().getRules().add(clonedRule);
-						this.ruleHome.setInstance(clonedRule);
-						this.ruleHome.persist();
-					}
-				}
-				//
-			}
-		}
-		return result;
-	}
-
-	public void setSlotDefId(Long id) {
-		this.setId(id);
-	}
-
-	// private boolean checkEmbeddedPropertyValues() {
-	// boolean passed = true;
-	// for (EmbeddedProperty embeddedProperty : this.getInstance()
-	// .getEmbeddedProperties()) {
-	// if (embeddedProperty.getValue() == null
-	// || embeddedProperty.getValue().equals("")
-	// || ((Set<String>) embeddedProperty.getValue()).isEmpty()) {
-	// FacesMessages.instance().add(
-	// Severity.ERROR,
-	// "L'informazione \"" + embeddedProperty.getLabel()
-	// + "\" non è stata valorizzata");
-	// passed = false;
-	// }
-	// }
-	// if (!passed) {
-	// FacesMessages
-	// .instance()
-	// .add(Severity.ERROR,
-	// "Non possono esserci informazioni sulla gara non valorizzate");
-	// }
-	// return passed;
-	// }
-
-	public void slotDefClone(SlotDef slotDef) {
-		this.model = slotDef;
-		SlotDef clonedSlotDef = null;
-		if (slotDef instanceof DependentSlotDef) {
-			clonedSlotDef = new DependentSlotDef();
-		} else {
-			clonedSlotDef = new SlotDef();
-		}
-		clonedSlotDef.setName("Copia di " + slotDef.getName());
-		clonedSlotDef.setType(slotDef.getType());
-
-		for (EmbeddedProperty embeddedProperty : slotDef
-				.getEmbeddedProperties()) {
-			if (embeddedProperty.isActive()) {
-				EmbeddedProperty clonedEmbeddedProperty = this
-						.cloneEmbeddedProperty(embeddedProperty);
-				clonedSlotDef.getEmbeddedProperties().add(
-						clonedEmbeddedProperty);
-			}
-		}
-
-		for (PropertyDef propertyDef : slotDef.getPropertyDefs()) {
-			if (propertyDef.isActive()) {
-				PropertyDef clonedPropertyDef = this
-						.clonePropertyDef(propertyDef);
-				clonedSlotDef.getPropertyDefs().add(clonedPropertyDef);
-			}
-		}
-
-		for (DocDefCollection collection : slotDef.getDocDefCollections()) {
-			if (collection.isActive()) {
-				DocDefCollection clonedDocDefCollection = this
-						.cloneDocDefCollection(collection, clonedSlotDef);
-				clonedDocDefCollection.setSlotDef(clonedSlotDef);
-				clonedSlotDef.getDocDefCollections()
-						.add(clonedDocDefCollection);
-			}
-		}
-		this.setInstance(clonedSlotDef);
-	}
-
-	public void wire() {
-		this.getInstance();
+	public void setModel(SlotDef model) {
+		this.model = model;
 	}
 
 }

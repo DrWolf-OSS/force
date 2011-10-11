@@ -189,6 +189,16 @@
             <f:param name="mode" value="GENERAL"/>
             </s:link>
         </rich:menuItem>
+        <rich:menuItem>
+            <s:link view="/admin/SlotDefTemplateList.xhtml"
+                value="Sottobuste Amministrative"
+                id="dependentTemplates"
+                includePageParams="false"
+                propagation="none">
+            <f:param name="model" value="#{true}"/>
+            <f:param name="mode" value="DEPENDENT"/>
+            </s:link>
+        </rich:menuItem>
     </rich:dropDownMenu>
     <!-- @newMenuItem@ -->
     <rich:toolBarGroup location="right" styleClass="linkMenuBar">

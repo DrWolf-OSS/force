@@ -27,16 +27,6 @@ public class SlotDefListManager {
 	@In(create = true)
 	private SlotDefParameters slotDefParameters;
 
-	@Factory("allPrimaryTemplates")
-	public List<SlotDef> retrieveAllPrimaryTemplates() {
-		return retrieve(true, SlotDefType.PRIMARY);
-	}
-
-	@Factory("allGeneralTemplates")
-	public List<SlotDef> retrieveAllGeneralTemplates() {
-		return retrieve(true, SlotDefType.GENERAL);
-	}
-
 	@SuppressWarnings("unchecked")
 	private List<SlotDef> retrieve(Boolean areTemplates, SlotDefType slotDefType) {
 		int count = 0;
@@ -67,31 +57,55 @@ public class SlotDefListManager {
 		List<SlotDef> resultList = null;
 
 		if (areTemplates != null && slotDefType != null) {
-			resultList = entityManager.createQuery(query)
+			resultList = this.entityManager.createQuery(query)
 					.setParameter("areTemplates", areTemplates)
 					.setParameter("slotDefType", slotDefType).getResultList();
 		} else if (areTemplates != null && slotDefType == null) {
-			resultList = entityManager.createQuery(query)
+			resultList = this.entityManager.createQuery(query)
 					.setParameter("areTemplates", areTemplates).getResultList();
 		} else if (areTemplates == null && slotDefType != null) {
-			resultList = entityManager.createQuery(query)
+			resultList = this.entityManager.createQuery(query)
 					.setParameter("slotDefType", slotDefType).getResultList();
 		} else if (areTemplates == null && slotDefType == null) {
-			resultList = entityManager.createQuery(query).getResultList();
+			resultList = this.entityManager.createQuery(query).getResultList();
 		}
 		return resultList;
 	}
 
+	@Factory("allGeneralTemplates")
+	public List<SlotDef> retrieveAllGeneralTemplates() {
+		return this.retrieve(true, SlotDefType.GENERAL);
+	}
+
+	@Factory("allPrimaryTemplates")
+	public List<SlotDef> retrieveAllPrimaryTemplates() {
+		return this.retrieve(true, SlotDefType.PRIMARY);
+	}
+
 	@Factory("slotDefsByParams")
 	public List<SlotDef> retrieveByParams() {
-		if (slotDefParameters.getMode() == null
-				|| slotDefParameters.getMode().equals(""))
-			return retrieve(slotDefParameters.isModel(), null);
-		else if (slotDefParameters.getMode().equals(SlotDefType.PRIMARY.name()))
-			return retrieve(slotDefParameters.isModel(), SlotDefType.PRIMARY);
-		else if (slotDefParameters.getMode().equals(SlotDefType.GENERAL.name()))
-			return retrieve(slotDefParameters.isModel(), SlotDefType.GENERAL);
+		if (this.slotDefParameters.getMode() == null
+				|| this.slotDefParameters.getMode().equals("")) {
+			return this.retrieve(this.slotDefParameters.isModel(), null);
+		} else if (this.slotDefParameters.getMode().equals(
+				SlotDefType.PRIMARY.name())) {
+			return this.retrieve(this.slotDefParameters.isModel(),
+					SlotDefType.PRIMARY);
+		} else if (this.slotDefParameters.getMode().equals(
+				SlotDefType.GENERAL.name())) {
+			return this.retrieve(this.slotDefParameters.isModel(),
+					SlotDefType.GENERAL);
+		} else if (this.slotDefParameters.getMode().equals(
+				SlotDefType.DEPENDENT.name())) {
+			return this.retrieve(this.slotDefParameters.isModel(),
+					SlotDefType.DEPENDENT);
+		}
 		return null;
+	}
+
+	public List<SlotDef> retrieveByType(Boolean areTemplates, String slotDefType) {
+		SlotDefType type = SlotDefType.valueOf(slotDefType);
+		return this.retrieve(areTemplates, type);
 	}
 
 	// public boolean isModel() {

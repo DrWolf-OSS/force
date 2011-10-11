@@ -14,6 +14,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
@@ -22,6 +24,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Cascade;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class SlotDef {
 
 	private Long id;
@@ -40,102 +43,34 @@ public class SlotDef {
 
 	private boolean template = Boolean.FALSE;
 
-	@Id
-	@GeneratedValue
-	public Long getId() {
-		return id;
+	// private PropertyDef conditionalPropertyDef;
+	//
+	// private PropertyInst conditionalPropertyInst;
+	//
+	// private boolean active = Boolean.TRUE;
+
+	private Set<DependentSlotDef> dependentSlotDefs = new HashSet<DependentSlotDef>();
+
+	@OneToMany(mappedBy = "parentSlotDef", cascade = CascadeType.ALL)
+	public Set<DependentSlotDef> getDependentSlotDefs() {
+		return this.dependentSlotDefs;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	@Transient
+	public List<DependentSlotDef> getDependentSlotDefsAsList() {
+		return new ArrayList<DependentSlotDef>(this.getDependentSlotDefs());
 	}
 
 	@OneToMany(mappedBy = "slotDef", cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@OrderBy("name")
 	public Set<DocDefCollection> getDocDefCollections() {
-		return docDefCollections;
-	}
-
-	public void setDocDefCollections(Set<DocDefCollection> docDefCollections) {
-		this.docDefCollections = docDefCollections;
-	}
-
-	@OneToMany(mappedBy = "slotDef", cascade = CascadeType.ALL)
-	public Set<Rule> getRules() {
-		return rules;
-	}
-
-	public void setRules(Set<Rule> rules) {
-		this.rules = rules;
-	}
-
-	@OrderBy("name")
-	@OneToMany(cascade = CascadeType.ALL)
-	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	@JoinColumn(name = "slotDef_id")
-	public Set<PropertyDef> getPropertyDefs() {
-		return propertyDefs;
-	}
-
-	public void setPropertyDefs(Set<PropertyDef> propertytDefs) {
-		this.propertyDefs = propertytDefs;
-	}
-
-	@Transient
-	public List<PropertyDef> getPropertyDefsAsList() {
-		return new ArrayList<PropertyDef>(propertyDefs);
-	}
-
-	@Transient
-	public void setPropertyDefsAsList(List<PropertyDef> propertyDefsAsList) {
-		this.propertyDefs = new HashSet<PropertyDef>(propertyDefsAsList);
+		return this.docDefCollections;
 	}
 
 	@Transient
 	public List<DocDefCollection> getDocDefCollectionsAsList() {
-		return new ArrayList<DocDefCollection>(docDefCollections);
-	}
-
-	@Transient
-	public void setDocDefCollectionsAsList(
-			List<DocDefCollection> docDefCollectionsAsList) {
-		this.docDefCollections = new HashSet<DocDefCollection>(
-				docDefCollectionsAsList);
-	}
-
-	@Transient
-	public List<EmbeddedProperty> getEmbeddedPropertiesAsList() {
-		return new ArrayList<EmbeddedProperty>(this.embeddedProperties);
-	}
-
-	@Transient
-	public void setEmbeddedPropertiesAsList(
-			List<EmbeddedProperty> embeddedPropertiesAsList) {
-		this.embeddedProperties = new HashSet<EmbeddedProperty>(
-				embeddedPropertiesAsList);
-	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
-
-	@Enumerated(EnumType.STRING)
-	public SlotDefType getType() {
-		return type;
-	}
-
-	public void setType(SlotDefType type) {
-		this.type = type;
+		return new ArrayList<DocDefCollection>(this.docDefCollections);
 	}
 
 	@OrderBy("name")
@@ -143,23 +78,54 @@ public class SlotDef {
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@JoinColumn(name = "slotDef_id")
 	public Set<EmbeddedProperty> getEmbeddedProperties() {
-		return embeddedProperties;
-	}
-
-	public void setEmbeddedProperties(Set<EmbeddedProperty> embeddedProperties) {
-		this.embeddedProperties = embeddedProperties;
+		return this.embeddedProperties;
 	}
 
 	@Transient
-	public PropertyDef retrievePropertyDefByName(String name) {
-		Iterator<PropertyDef> iterator = this.getPropertyDefs().iterator();
-		while (iterator.hasNext()) {
-			PropertyDef propertyDef = iterator.next();
-			if (propertyDef.getName().equals(name)) {
-				return propertyDef;
-			}
-		}
-		return null;
+	public List<EmbeddedProperty> getEmbeddedPropertiesAsList() {
+		return new ArrayList<EmbeddedProperty>(this.embeddedProperties);
+	}
+
+	@Id
+	@GeneratedValue
+	public Long getId() {
+		return this.id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	@OrderBy("name")
+	@OneToMany(cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+	@JoinColumn(name = "slotDef_id")
+	public Set<PropertyDef> getPropertyDefs() {
+		return this.propertyDefs;
+	}
+
+	@Transient
+	public List<PropertyDef> getPropertyDefsAsList() {
+		return new ArrayList<PropertyDef>(this.propertyDefs);
+	}
+
+	@OneToMany(mappedBy = "slotDef", cascade = CascadeType.ALL)
+	public Set<Rule> getRules() {
+		return this.rules;
+	}
+
+	@Transient
+	public List<Rule> getRulesAsList() {
+		return new ArrayList<Rule>(this.rules);
+	}
+
+	@Enumerated(EnumType.STRING)
+	public SlotDefType getType() {
+		return this.type;
+	}
+
+	public boolean isTemplate() {
+		return this.template;
 	}
 
 	@Transient
@@ -186,6 +152,29 @@ public class SlotDef {
 			}
 		}
 		return null;
+	}
+
+	@Transient
+	public PropertyDef retrievePropertyDefByName(String name) {
+		Iterator<PropertyDef> iterator = this.getPropertyDefs().iterator();
+		while (iterator.hasNext()) {
+			PropertyDef propertyDef = iterator.next();
+			if (propertyDef.getName().equals(name)) {
+				return propertyDef;
+			}
+		}
+		return null;
+	}
+
+	public void setDependentSlotDefs(Set<DependentSlotDef> dependentSlotDefs) {
+		this.dependentSlotDefs = dependentSlotDefs;
+	}
+
+	@Transient
+	public void setDependentSlotDefsAsList(
+			List<DependentSlotDef> dependentSlotDefsAsList) {
+		this.setDependentSlotDefs(new HashSet<DependentSlotDef>(
+				dependentSlotDefsAsList));
 	}
 
 	// @Override
@@ -235,22 +224,65 @@ public class SlotDef {
 	// return true;
 	// }
 
-	public boolean isTemplate() {
-		return template;
+	public void setDocDefCollections(Set<DocDefCollection> docDefCollections) {
+		this.docDefCollections = docDefCollections;
+	}
+
+	@Transient
+	public void setDocDefCollectionsAsList(
+			List<DocDefCollection> docDefCollectionsAsList) {
+		this.docDefCollections = new HashSet<DocDefCollection>(
+				docDefCollectionsAsList);
+	}
+
+	public void setEmbeddedProperties(Set<EmbeddedProperty> embeddedProperties) {
+		this.embeddedProperties = embeddedProperties;
+	}
+
+	@Transient
+	public void setEmbeddedPropertiesAsList(
+			List<EmbeddedProperty> embeddedPropertiesAsList) {
+		this.embeddedProperties = new HashSet<EmbeddedProperty>(
+				embeddedPropertiesAsList);
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setPropertyDefs(Set<PropertyDef> propertytDefs) {
+		this.propertyDefs = propertytDefs;
+	}
+
+	@Transient
+	public void setPropertyDefsAsList(List<PropertyDef> propertyDefsAsList) {
+		this.propertyDefs = new HashSet<PropertyDef>(propertyDefsAsList);
+	}
+
+	public void setRules(Set<Rule> rules) {
+		this.rules = rules;
+	}
+
+	@Transient
+	public void setRulesAsList(List<Rule> rules) {
+		this.setRules(new HashSet<Rule>(rules));
 	}
 
 	public void setTemplate(boolean template) {
 		this.template = template;
 	}
 
-	@Transient
-	public List<Rule> getRulesAsList() {
-		return new ArrayList<Rule>(this.rules);
+	public void setType(SlotDefType type) {
+		this.type = type;
 	}
 
-	@Transient
-	public void setRulesAsList(List<Rule> rules) {
-		this.setRules(new HashSet<Rule>(rules));
+	@Override
+	public String toString() {
+		return this.name;
 	}
 
 }
