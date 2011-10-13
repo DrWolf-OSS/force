@@ -319,13 +319,15 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 			SlotDefCloner slotDefCloner = this.slotDefCloner
 					.getDependentSlotDefCloners().get(key);
 			SlotDef cloned = slotDefCloner.getCloned();
+			cloned.setName(this.getInstance().getName() + " | "
+					+ cloned.getName());
 			entityManager.persist(cloned);
 			slotDefCloner.cloneRules();
 			entityManager.persist(cloned);
 		}
 		//
 
-		String result = super.persist();
+		super.persist();
 		// if (result.equals("persisted") && this.model != null) {
 		// for (Rule rule : this.model.getRules()) {
 		// //
@@ -342,9 +344,9 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		// }
 
 		this.slotDefCloner.cloneRules();
-		SlotDef cloned = this.slotDefCloner.getCloned();
-		entityManager.persist(cloned);
-		return result;
+		// SlotDef cloned = this.slotDefCloner.getCloned();
+		// entityManager.persist(cloned);
+		return super.persist();
 	}
 
 	// private boolean checkEmbeddedPropertyValues() {

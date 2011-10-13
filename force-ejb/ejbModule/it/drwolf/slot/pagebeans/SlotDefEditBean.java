@@ -139,9 +139,10 @@ public class SlotDefEditBean {
 		dependentCloned.setConditionalPropertyInst(this.dependentSlotDef
 				.getConditionalPropertyInst());
 
-		this.slotDefCloners.put(this.dependentSlotDef.getId(), slotDefCloner);
-		// this.slotDefHome.getSlotDefCloner().getDependentSlotDefCloners().put(this.dependentSlotDef.getId(),
+		// this.slotDefCloners.put(this.dependentSlotDef.getId(),
 		// slotDefCloner);
+		this.slotDefHome.getSlotDefCloner().getDependentSlotDefCloners()
+				.put(this.dependentSlotDef.getId(), slotDefCloner);
 		//
 
 		this.slotDefHome.getInstance().getDependentSlotDefs()
@@ -879,7 +880,7 @@ public class SlotDefEditBean {
 			embeddedValues = this.checkEmbeddedPropertyValues();
 		}
 		if (names && references && embeddedValues) {
-			this.persistDependentSlotDefs();
+			// this.persistDependentSlotDefs();
 
 			return this.slotDefHome.persist();
 		} else {
@@ -972,7 +973,7 @@ public class SlotDefEditBean {
 			}
 
 			//
-			this.persistDependentSlotDefs();
+			// this.persistDependentSlotDefs();
 			//
 			return updateResult;
 		} else {
