@@ -356,6 +356,12 @@ public class SlotDefEditBean {
 		this.edit = true;
 	}
 
+	// public void editDependentSlotDef(DependentSlotDef dependentSlotDef) {
+	// this.dependentSlotDef = dependentSlotDef;
+	// //
+	// this.edit = true;
+	// }
+
 	public void editEmbeddedProp(EmbeddedProperty embeddedProp) {
 		this.embeddedProperty = embeddedProp;
 	}
