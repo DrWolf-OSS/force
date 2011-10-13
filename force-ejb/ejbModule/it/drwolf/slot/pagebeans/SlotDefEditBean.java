@@ -87,8 +87,7 @@ public class SlotDefEditBean {
 	// @In(create = true)
 	// private DependentSlotDefHome dependentSlotDefHome;
 
-	@In(create = true)
-	private SlotDefCloner slotDefCloner;
+	// private SlotDefCloner slotDefCloner;
 
 	private Map<Long, SlotDefCloner> slotDefCloners = new HashMap<Long, SlotDefCloner>();
 
@@ -126,43 +125,30 @@ public class SlotDefEditBean {
 	}
 
 	public void addDependentSlotDef() {
-
-		this.slotDefCloner.clone(this.dependentSlotDef);
-		DependentSlotDef dependentCloned = (DependentSlotDef) this.slotDefCloner
+		//
+		// this.dependentSlotDef.setParentSlotDef(this.slotDefHome.getInstance());
+		//
+		SlotDefCloner slotDefCloner = new SlotDefCloner();
+		slotDefCloner.setModel(this.dependentSlotDef);
+		slotDefCloner.cloneModel();
+		DependentSlotDef dependentCloned = (DependentSlotDef) slotDefCloner
 				.getCloned();
-
-		// SlotDefHome dependentSlotDefHome = new SlotDefHome();
-		// dependentSlotDefHome.slotDefClone(this.dependentSlotDef);
-		// DependentSlotDef dependentCloned = (DependentSlotDef)
-		// dependentSlotDefHome
-		// .getInstance();
 
 		dependentCloned.setConditionalPropertyDef(this.dependentSlotDef
 				.getConditionalPropertyDef());
 		dependentCloned.setConditionalPropertyInst(this.dependentSlotDef
 				.getConditionalPropertyInst());
-		// this.dependentSlotDef.setConditionalPropertyDef(null);
-		// this.dependentSlotDef.setConditionalPropertyInst(null);
 
-		this.slotDefCloners.put(this.dependentSlotDef.getId(),
-				this.slotDefCloner);
+		this.slotDefCloners.put(this.dependentSlotDef.getId(), slotDefCloner);
+		// this.slotDefHome.getSlotDefCloner().getDependentSlotDefCloners().put(this.dependentSlotDef.getId(),
+		// slotDefCloner);
+		//
 
 		this.slotDefHome.getInstance().getDependentSlotDefs()
 				.add(dependentCloned);
 		dependentCloned.setParentSlotDef(this.slotDefHome.getInstance());
 
 		this.resetDependentSlotDefModel();
-
-		// this.dependentSlotDef = null;
-
-		// Dependet dependentSlotDefHome = new SlotDefHome();
-		// dependentSlotDefHome.slotDefClone(this.dependentSlotDef);
-		// SlotDef clonedDependentSlotDef = dependentSlotDefHome.getInstance();
-		// if (!this.slotDefHome.getInstance().getDependentSlotDefs()
-		// .contains(clonedDependentSlotDef)) {
-		// this.slotDefHome.getInstance().getDependentSlotDefs()
-		// .add(clonedDependentSlotDef);
-		// }
 	}
 
 	public void addEmbeddedProperty() {

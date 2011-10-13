@@ -296,6 +296,10 @@
 				<h:outputText value="Nessuna sottobusta definita" rendered="#{empty slotDefHome.instance.dependentSlotDefsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.dependentSlotDefsAsList}" var="slot" 
 						rendered="#{not empty slotDefHome.instance.dependentSlotDefsAsList}" style="width:1024px">
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Id</f:facet>
+						<h:outputText value="#{slot.id}" />
+					</rich:column>
 					<rich:column style="width:200px" styleClass="#{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{slot.name}" />

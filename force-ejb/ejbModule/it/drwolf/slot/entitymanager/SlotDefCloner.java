@@ -10,73 +10,106 @@ import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.ruleverifier.RuleParametersResolver;
-import it.drwolf.slot.session.RuleHome;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
-
-@Name("slotDefCloner")
-@Scope(ScopeType.EVENT)
 public class SlotDefCloner {
 
 	private SlotDef model;
 
 	private SlotDef cloned;
 
-	@In(create = true)
-	private RuleParametersResolver ruleParametersResolver;
+	// @In(create = true)
+	private RuleParametersResolver ruleParametersResolver = (RuleParametersResolver) org.jboss.seam.Component
+			.getInstance("ruleParametersResolver");
 
-	// = (RuleParametersResolver) org.jboss.seam.Component
-	// .getInstance("ruleParametersResolver");
+	private Map<Long, SlotDefCloner> dependentSlotDefCloners = new HashMap<Long, SlotDefCloner>();
 
-	@In(create = true)
-	private RuleHome ruleHome;
+	// @In(create = true)
+	// private RuleHome ruleHome;
 
-	public void clone(SlotDef slotDef) {
-		this.model = slotDef;
-		SlotDef clonedSlotDef = null;
-		if (slotDef instanceof DependentSlotDef) {
-			clonedSlotDef = new DependentSlotDef();
-		} else {
-			clonedSlotDef = new SlotDef();
+	// private void cloneConditionaProperties(DependentSlotDef dependentSlotDef,
+	// DependentSlotDef dependentCloned) {
+	// if (dependentSlotDef.getConditionalPropertyDef() != null) {
+	// PropertyDef clonedConditionalPropertyDef = dependentCloned
+	// .getParentSlotDef().retrievePropertyDefByName(
+	// dependentSlotDef.getConditionalPropertyDef()
+	// .getName());
+	// PropertyInst clonedConditionalPropertyInst = new PropertyInst(
+	// clonedConditionalPropertyDef);
+	// dependentCloned
+	// .setConditionalPropertyDef(clonedConditionalPropertyDef);
+	//
+	// PropertyInst conditionalPropertyInst = dependentSlotDef
+	// .getConditionalPropertyInst();
+	//
+	// //
+	// clonedConditionalPropertyInst
+	// .setStringValue(conditionalPropertyInst.getStringValue());
+	// clonedConditionalPropertyInst
+	// .setIntegerValue(conditionalPropertyInst.getIntegerValue());
+	// clonedConditionalPropertyInst
+	// .setBooleanValue(conditionalPropertyInst.getBooleanValue());
+	// clonedConditionalPropertyInst.setDateValue(conditionalPropertyInst
+	// .getDateValue());
+	// clonedConditionalPropertyInst
+	// .setMultiplicity(conditionalPropertyInst.getMultiplicity());
+	// clonedConditionalPropertyInst.setValues(new HashSet<String>(
+	// conditionalPropertyInst.getValues()));
+	// //
+	//
+	// dependentCloned
+	// .setConditionalPropertyInst(clonedConditionalPropertyInst);
+	// }
+	// }
+
+	private DependentSlotDef cloneDependentSlotDef(
+			DependentSlotDef dependentSlotDef, SlotDef clonedSlotDef) {
+		SlotDefCloner cloner = new SlotDefCloner();
+		cloner.setModel(dependentSlotDef);
+		cloner.cloneModel();
+		DependentSlotDef dependentCloned = (DependentSlotDef) cloner
+				.getCloned();
+		dependentCloned.setParentSlotDef(clonedSlotDef);
+
+		if (dependentSlotDef.getConditionalPropertyDef() != null) {
+			PropertyDef clonedConditionalPropertyDef = dependentCloned
+					.getParentSlotDef().retrievePropertyDefByName(
+							dependentSlotDef.getConditionalPropertyDef()
+									.getName());
+			PropertyInst clonedConditionalPropertyInst = new PropertyInst(
+					clonedConditionalPropertyDef);
+			dependentCloned
+					.setConditionalPropertyDef(clonedConditionalPropertyDef);
+
+			PropertyInst conditionalPropertyInst = dependentSlotDef
+					.getConditionalPropertyInst();
+
+			//
+			clonedConditionalPropertyInst
+					.setStringValue(conditionalPropertyInst.getStringValue());
+			clonedConditionalPropertyInst
+					.setIntegerValue(conditionalPropertyInst.getIntegerValue());
+			clonedConditionalPropertyInst
+					.setBooleanValue(conditionalPropertyInst.getBooleanValue());
+			clonedConditionalPropertyInst.setDateValue(conditionalPropertyInst
+					.getDateValue());
+			clonedConditionalPropertyInst
+					.setMultiplicity(conditionalPropertyInst.getMultiplicity());
+			clonedConditionalPropertyInst.setValues(new HashSet<String>(
+					conditionalPropertyInst.getValues()));
+			//
+
+			dependentCloned
+					.setConditionalPropertyInst(clonedConditionalPropertyInst);
+
+			this.dependentSlotDefCloners.put(dependentSlotDef.getId(), cloner);
 		}
-		clonedSlotDef.setName("Copia di " + slotDef.getName());
-		clonedSlotDef.setType(slotDef.getType());
 
-		for (EmbeddedProperty embeddedProperty : slotDef
-				.getEmbeddedProperties()) {
-			if (embeddedProperty.isActive()) {
-				EmbeddedProperty clonedEmbeddedProperty = this
-						.cloneEmbeddedProperty(embeddedProperty);
-				clonedSlotDef.getEmbeddedProperties().add(
-						clonedEmbeddedProperty);
-			}
-		}
-
-		for (PropertyDef propertyDef : slotDef.getPropertyDefs()) {
-			if (propertyDef.isActive()) {
-				PropertyDef clonedPropertyDef = this
-						.clonePropertyDef(propertyDef);
-				clonedSlotDef.getPropertyDefs().add(clonedPropertyDef);
-			}
-		}
-
-		for (DocDefCollection collection : slotDef.getDocDefCollections()) {
-			if (collection.isActive()) {
-				DocDefCollection clonedDocDefCollection = this
-						.cloneDocDefCollection(collection, clonedSlotDef);
-				clonedDocDefCollection.setSlotDef(clonedSlotDef);
-				clonedSlotDef.getDocDefCollections()
-						.add(clonedDocDefCollection);
-			}
-		}
-		this.cloned = clonedSlotDef;
+		return dependentCloned;
 	}
 
 	private DocDefCollection cloneDocDefCollection(DocDefCollection collection,
@@ -132,6 +165,66 @@ public class SlotDefCloner {
 		clonedEmbeddedProperty.setDictionary(embeddedProperty.getDictionary());
 		clonedEmbeddedProperty.setValues(new HashSet<String>());
 		return clonedEmbeddedProperty;
+	}
+
+	public void cloneModel() {
+		// this.model = slotDef;
+		SlotDef clonedSlotDef = null;
+		if (this.model instanceof DependentSlotDef) {
+			clonedSlotDef = new DependentSlotDef();
+		} else {
+			clonedSlotDef = new SlotDef();
+		}
+		clonedSlotDef.setName("Copia di " + this.model.getName());
+		clonedSlotDef.setType(this.model.getType());
+
+		for (EmbeddedProperty embeddedProperty : this.model
+				.getEmbeddedProperties()) {
+			if (embeddedProperty.isActive()) {
+				EmbeddedProperty clonedEmbeddedProperty = this
+						.cloneEmbeddedProperty(embeddedProperty);
+				clonedSlotDef.getEmbeddedProperties().add(
+						clonedEmbeddedProperty);
+			}
+		}
+
+		for (PropertyDef propertyDef : this.model.getPropertyDefs()) {
+			if (propertyDef.isActive()) {
+				PropertyDef clonedPropertyDef = this
+						.clonePropertyDef(propertyDef);
+				clonedSlotDef.getPropertyDefs().add(clonedPropertyDef);
+			}
+		}
+
+		for (DocDefCollection collection : this.model.getDocDefCollections()) {
+			if (collection.isActive()) {
+				DocDefCollection clonedDocDefCollection = this
+						.cloneDocDefCollection(collection, clonedSlotDef);
+				clonedDocDefCollection.setSlotDef(clonedSlotDef);
+				clonedSlotDef.getDocDefCollections()
+						.add(clonedDocDefCollection);
+			}
+		}
+
+		//
+		// if (clonedSlotDef instanceof DependentSlotDef) {
+		// this.cloneConditionaProperties((DependentSlotDef) this.model,
+		// (DependentSlotDef) clonedSlotDef);
+		// }
+		//
+
+		//
+		for (DependentSlotDef dependent : this.model.getDependentSlotDefs()) {
+			if (dependent.isActive()) {
+				DependentSlotDef clonedDependentSlotDef = this
+						.cloneDependentSlotDef(dependent, clonedSlotDef);
+				// clonedDependentSlotDef.setParentSlotDef(clonedSlotDef);
+				clonedSlotDef.getDependentSlotDefs()
+						.add(clonedDependentSlotDef);
+			}
+		}
+		//
+		this.cloned = clonedSlotDef;
 	}
 
 	private PropertyDef clonePropertyDef(PropertyDef propertyDef) {
@@ -287,6 +380,10 @@ public class SlotDefCloner {
 
 	public SlotDef getCloned() {
 		return this.cloned;
+	}
+
+	public Map<Long, SlotDefCloner> getDependentSlotDefCloners() {
+		return this.dependentSlotDefCloners;
 	}
 
 	public SlotDef getModel() {
