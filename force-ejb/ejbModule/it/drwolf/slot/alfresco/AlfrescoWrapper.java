@@ -68,14 +68,6 @@ public class AlfrescoWrapper {
 		return "";
 	}
 
-	public static ObjectId ref2id(String ref) {
-		if (("" + ref).length() < 10) {
-			System.out.println("null ref");
-		}
-		return ref.startsWith(AlfrescoWrapper.NODEREF_PREFIX) ? new ObjectIdImpl(
-				ref) : new ObjectIdImpl(AlfrescoWrapper.NODEREF_PREFIX + ref);
-	}
-
 	public static String normalizeFolderName(String oggetto, int lenghtLimit,
 			String spacer) {
 		String normalized = Normalizer.normalize(oggetto, Normalizer.Form.NFD);
@@ -89,6 +81,14 @@ public class AlfrescoWrapper {
 			normalized = normalized.substring(0, length - 1);
 		}
 		return normalized;
+	}
+
+	public static ObjectId ref2id(String ref) {
+		if (("" + ref).length() < 10) {
+			System.out.println("null ref");
+		}
+		return ref.startsWith(AlfrescoWrapper.NODEREF_PREFIX) ? new ObjectIdImpl(
+				ref) : new ObjectIdImpl(AlfrescoWrapper.NODEREF_PREFIX + ref);
 	}
 
 	@In
@@ -200,7 +200,6 @@ public class AlfrescoWrapper {
 		ArrayList<String> lists = new ArrayList<String>();
 		try {
 			Session session = this.alfrescoAdminIdentity.getSession();
-			OperationContext context = session.createOperationContext();
 			String query = "SELECT D.cmis:objectId FROM cmis:document AS D JOIN "
 					+ aspectId
 					+ " AS A ON D.cmis:objectId=A.cmis:objectId   WHERE IN_TREE(D, '"
