@@ -42,7 +42,11 @@
             
             <s:decorate id="parentSlot" template="/layout/display.xhtml">
                 <ui:define name="label">Busta Contenitrice</ui:define>
-                <h:outputText value="#{slotDefHome.instance.parentSlotDef.name}" />
+                <s:link view="/admin/SlotDefView.xhtml" value="#{slotDefHome.instance.parentSlotDef.name}" propagation="none">
+                	<f:param name="mode" value="#{slotDefHome.instance.parentSlotDef.type.name()}"/>
+					<f:param name="model" value="#{slotDefHome.instance.parentSlotDef.template}"/>
+					<f:param name="slotDefId" value="#{slotDefHome.instance.parentSlotDef.id}"/>
+                </s:link>
             </s:decorate>
             
             <s:div id="condPD" >
@@ -392,7 +396,18 @@
 					</rich:column>
 					<rich:column styleClass="action #{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Azioni</f:facet>
-
+						<a:commandLink value="Modifica1"
+									action="#{slotDefEditBean.editDependentSlotDef(slot)}"
+						 			oncomplete="#{rich:component('dependentSlotDefPanel')}.show()"
+						 			rendered="#{slot.id == null}"
+						 			reRender="dependentSlotDefPanel"/>
+						<s:link view="/admin/SlotDefWizardEdit.xhtml" value="Modifica2" 
+								rendered="#{slot.id != null}"
+								propagation="none">
+							<f:param name="mode" value="DEPENDENT"/>
+							<f:param name="model" value="true"/>
+							<f:param name="slotDefId" value="#{slot.id}"/>
+						</s:link>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -1011,6 +1026,7 @@
 			<a:form id="dsdf" onkeypress="dirty=true">
 				<ui:param name="customType" value="p" />
 				
+				<a:region>
 				<s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
 	                	<h:outputText value="Sottobusta" />
@@ -1018,12 +1034,14 @@
 					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef}">
      					<s:selectItems value="#{slotDefListManager.retrieveByType(true, 'DEPENDENT')}" label="#{slot.name}"
 									var="slot"  noSelectionLabel="-- select a value --"/>
-							<a:support event="onchange" reRender="condPD"/>		
+							<a:support event="onchange" reRender="condPD,condValue"/>		
 						<s:convertEntity/>
 					</h:selectOneMenu>
 	            </s:decorate>
+	            </a:region>
 				
 				<s:div id="condPD" >
+				<a:region>
 				<s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.dependentSlotDef != null}">
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
@@ -1037,9 +1055,11 @@
 						<a:support event="onchange" action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.dependentSlotDef)}" reRender="condValue"/>
 					</h:selectOneMenu>
 	            </s:decorate>
+	            </a:region>
 	            </s:div>
 	            
 	            <s:div id="condValue">
+	            <a:region>
 				<s:decorate  template="/layout/edit.xhtml" rendered="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}" >	            	
 	                <ui:define name="label">
 	                	<h:outputText value="Valore vincolante" />
@@ -1076,6 +1096,7 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
              			</h:selectOneMenu>
 	            </s:decorate>
+	            </a:region>
 	            </s:div>
 			<s:div>
 	        <div style="clear:both"/>
@@ -1085,7 +1106,16 @@
 	        			oncomplete="#{rich:component('dependentSlotDefPanel')}.hide();" 
 	        			reRender="dsdf,slotDefTable"/>
 	        <a:region>
-			<a:commandButton value="Annulla" action="#{slotDefEditBean.resetDependentSlotDefModel()}" oncomplete="#{rich:component('dependentSlotDefPanel')}.hide()" reRender="dsdf"/>
+			<a:region>
+			<a:commandButton value="Annulla1" action="#{slotDefEditBean.cancelDependentSlotDefEdit()}" 
+							oncomplete="#{rich:component('dependentSlotDefPanel')}.hide()" 
+							rendered="#{slotDefEditBean.edit == true}"
+							reRender="dsdf"/>
+			</a:region>
+			<a:commandButton value="Annulla2" action="#{slotDefEditBean.resetDependentSlotDefModel()}" 
+							oncomplete="#{rich:component('dependentSlotDefPanel')}.hide()" 
+							rendered="#{slotDefEditBean.edit == false}"
+							reRender="dsdf"/>
 			</a:region>
 			</a:form>
 		</rich:modalPanel>

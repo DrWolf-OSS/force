@@ -13,7 +13,7 @@
     <h:form id="slotDefSearch" styleClass="edit">
 
     <rich:panel>
-        <f:facet name="header">Elenco #{slotDefParameters.model ? 'modelli' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Buste di Riferimento' : 'Buste Amministrative'}</f:facet>
+        <f:facet name="header">Elenco #{slotDefParameters.model ? 'modelli' : ''} #{slotDefParameters.mode=='DEPENDENT' ? 'Sotto' :''} #{slotDefParameters.mode=='PRIMARY' ? 'Buste di Riferimento' : 'Buste Amministrative'}</f:facet>
     <div class="results" id="slotDefList">
 
     <h:outputText value="Non ci sono buste del tipo selezionato."

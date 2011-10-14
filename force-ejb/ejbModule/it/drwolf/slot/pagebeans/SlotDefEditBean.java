@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.faces.event.ActionEvent;
-import javax.persistence.EntityManager;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -45,6 +44,9 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage.Severity;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 @Name("slotDefEditBean")
 @Scope(ScopeType.CONVERSATION)
@@ -89,7 +91,16 @@ public class SlotDefEditBean {
 
 	// private SlotDefCloner slotDefCloner;
 
-	private Map<Long, SlotDefCloner> slotDefCloners = new HashMap<Long, SlotDefCloner>();
+	// private Map<Long, SlotDefCloner> slotDefCloners = new HashMap<Long,
+	// SlotDefCloner>();
+
+	// Cloned, Original
+	// private Map<DependentSlotDef, DependentSlotDef> clonedOriginalMap = new
+	// HashMap<DependentSlotDef, DependentSlotDef>();
+
+	// Cloned, Original
+	private BiMap<DependentSlotDef, DependentSlotDef> clonedOriginalBiMap = HashBiMap
+			.create();
 
 	public void addCollection() {
 		if (!this.slotDefHome.getInstance().getDocDefCollectionsAsList()
@@ -149,6 +160,9 @@ public class SlotDefEditBean {
 				.add(dependentCloned);
 		dependentCloned.setParentSlotDef(this.slotDefHome.getInstance());
 
+		// tengo l'originale per un eventuale successivo edit da interfaccia
+		this.clonedOriginalBiMap.put(dependentCloned, this.dependentSlotDef);
+
 		this.resetDependentSlotDefModel();
 	}
 
@@ -169,6 +183,20 @@ public class SlotDefEditBean {
 			this.converterPropertyMap.put(this.propertyDef.getUuid(),
 					this.propertyDef);
 		}
+		this.edit = false;
+	}
+
+	public void cancelDependentSlotDefEdit() {
+		DependentSlotDef cloned = this.clonedOriginalBiMap.inverse().get(
+				this.dependentSlotDef);
+
+		cloned.setConditionalPropertyDef(this.dependentSlotDef
+				.getConditionalPropertyDef());
+		cloned.setConditionalPropertyInst(this.dependentSlotDef
+				.getConditionalPropertyInst());
+		cloned.setParentSlotDef(this.slotDefHome.getInstance());
+
+		this.resetDependentSlotDefModel();
 		this.edit = false;
 	}
 
@@ -356,11 +384,21 @@ public class SlotDefEditBean {
 		this.edit = true;
 	}
 
-	// public void editDependentSlotDef(DependentSlotDef dependentSlotDef) {
-	// this.dependentSlotDef = dependentSlotDef;
-	// //
-	// this.edit = true;
-	// }
+	public void editDependentSlotDef(DependentSlotDef dependentSlotDef) {
+		// this.dependentSlotDef = dependentSlotDef;
+
+		this.slotDefHome.getInstance().getDependentSlotDefs()
+				.remove(dependentSlotDef);
+		dependentSlotDef.setParentSlotDef(null);
+
+		this.dependentSlotDef = this.clonedOriginalBiMap.get(dependentSlotDef);
+		this.dependentSlotDef.setConditionalPropertyDef(dependentSlotDef
+				.getConditionalPropertyDef());
+		this.dependentSlotDef.setConditionalPropertyInst(dependentSlotDef
+				.getConditionalPropertyInst());
+		//
+		this.edit = true;
+	}
 
 	public void editEmbeddedProp(EmbeddedProperty embeddedProp) {
 		this.embeddedProperty = embeddedProp;
@@ -617,17 +655,17 @@ public class SlotDefEditBean {
 		}
 	}
 
-	private void persistDependentSlotDefs() {
-		Set<Long> keySet = this.slotDefCloners.keySet();
-		EntityManager entityManager = this.slotDefHome.getEntityManager();
-		for (Long key : keySet) {
-			SlotDefCloner slotDefCloner = this.slotDefCloners.get(key);
-			SlotDef cloned = slotDefCloner.getCloned();
-			entityManager.persist(cloned);
-			slotDefCloner.cloneRules();
-			entityManager.persist(cloned);
-		}
-	}
+	// private void persistDependentSlotDefs() {
+	// Set<Long> keySet = this.slotDefCloners.keySet();
+	// EntityManager entityManager = this.slotDefHome.getEntityManager();
+	// for (Long key : keySet) {
+	// SlotDefCloner slotDefCloner = this.slotDefCloners.get(key);
+	// SlotDef cloned = slotDefCloner.getCloned();
+	// entityManager.persist(cloned);
+	// slotDefCloner.cloneRules();
+	// entityManager.persist(cloned);
+	// }
+	// }
 
 	// public List<DocDefCollection> getConditionedCollections(
 	// PropertyDef propertyDef) {
