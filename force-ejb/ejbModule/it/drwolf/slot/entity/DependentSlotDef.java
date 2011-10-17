@@ -3,15 +3,11 @@ package it.drwolf.slot.entity;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.interfaces.Conditionable;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.hibernate.annotations.Cascade;
 
 @Entity
@@ -25,31 +21,10 @@ public class DependentSlotDef extends SlotDef implements Conditionable {
 
 	private SlotDef parentSlotDef;
 
+	// private PropertyDef numberOfInstances;
+
 	public DependentSlotDef() {
 		this.setType(SlotDefType.DEPENDENT);
-	}
-
-	public DependentSlotDef(SlotDef slotDef) {
-		try {
-			this.setType(SlotDefType.DEPENDENT);
-			Map properties = BeanUtils.describe(slotDef);
-			// DependentSlotDef dependentSlotDef = new DependentSlotDef();
-			// dependentSlotDef.se
-			//
-			// BeanUtils.populate(dependentSlotDef, properties);
-
-			System.out.println("---> break");
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// FARE CLONATORE DA SLOT_DEF
 	}
 
 	@ManyToOne(cascade = CascadeType.PERSIST)
@@ -62,6 +37,11 @@ public class DependentSlotDef extends SlotDef implements Conditionable {
 	public PropertyInst getConditionalPropertyInst() {
 		return this.conditionalPropertyInst;
 	}
+
+	// @ManyToOne
+	// public PropertyDef getNumberOfInstances() {
+	// return this.numberOfInstances;
+	// }
 
 	@ManyToOne
 	public SlotDef getParentSlotDef() {
@@ -83,6 +63,10 @@ public class DependentSlotDef extends SlotDef implements Conditionable {
 	public void setConditionalPropertyInst(PropertyInst conditionalPropertyInst) {
 		this.conditionalPropertyInst = conditionalPropertyInst;
 	}
+
+	// public void setNumberOfInstances(PropertyDef numberOfInstances) {
+	// this.numberOfInstances = numberOfInstances;
+	// }
 
 	public void setParentSlotDef(SlotDef parentSlotDef) {
 		this.parentSlotDef = parentSlotDef;

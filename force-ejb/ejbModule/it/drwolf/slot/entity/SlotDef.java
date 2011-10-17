@@ -155,6 +155,18 @@ public class SlotDef {
 	}
 
 	@Transient
+	public PropertyDef retrievePropertyDefById(Long id) {
+		Iterator<PropertyDef> iterator = this.getPropertyDefs().iterator();
+		while (iterator.hasNext()) {
+			PropertyDef propertyDef = iterator.next();
+			if (propertyDef.getId() == id) {
+				return propertyDef;
+			}
+		}
+		return null;
+	}
+
+	@Transient
 	public PropertyDef retrievePropertyDefByName(String name) {
 		Iterator<PropertyDef> iterator = this.getPropertyDefs().iterator();
 		while (iterator.hasNext()) {
