@@ -66,6 +66,49 @@ public class SlotDefCloner {
 	// }
 	// }
 
+	// Va fatto separatamente perchè prima devono essere aggiunte TUTTE le
+	// PropertyDef
+	private void addConditionsToProperties(SlotDef clonedSlotDef) {
+		for (PropertyDef propertyDef : this.getModel().getPropertyDefs()) {
+			if (propertyDef.getConditionalPropertyDef() != null) {
+				// SlotDef slotDef = collection.getSlotDef();
+				PropertyDef clonedConditionalPropertyDef = clonedSlotDef
+						.retrievePropertyDefByName(propertyDef
+								.getConditionalPropertyDef().getName());
+				PropertyDef clonedPropertyDef = clonedSlotDef
+						.retrievePropertyDefByName(propertyDef.getName());
+
+				clonedPropertyDef
+						.setConditionalPropertyDef(clonedConditionalPropertyDef);
+				PropertyInst conditionalPropertyInst = propertyDef
+						.getConditionalPropertyInst();
+				PropertyInst clonedConditionalPropertyInst = new PropertyInst(
+						clonedConditionalPropertyDef);
+				clonedPropertyDef
+						.setConditionalPropertyInst(clonedConditionalPropertyInst);
+				//
+				clonedConditionalPropertyInst
+						.setStringValue(conditionalPropertyInst
+								.getStringValue());
+				clonedConditionalPropertyInst
+						.setIntegerValue(conditionalPropertyInst
+								.getIntegerValue());
+				clonedConditionalPropertyInst
+						.setBooleanValue(conditionalPropertyInst
+								.getBooleanValue());
+				clonedConditionalPropertyInst
+						.setDateValue(conditionalPropertyInst.getDateValue());
+				clonedConditionalPropertyInst
+						.setMultiplicity(conditionalPropertyInst
+								.getMultiplicity());
+				clonedConditionalPropertyInst.setValues(new HashSet<String>(
+						conditionalPropertyInst.getValues()));
+				//
+
+			}
+		}
+	}
+
 	private DependentSlotDef cloneDependentSlotDef(
 			DependentSlotDef dependentSlotDef, SlotDef clonedSlotDef) {
 		SlotDefCloner cloner = new SlotDefCloner();
@@ -190,8 +233,8 @@ public class SlotDefCloner {
 
 		for (PropertyDef propertyDef : this.model.getPropertyDefs()) {
 			if (propertyDef.isActive()) {
-				PropertyDef clonedPropertyDef = this
-						.clonePropertyDef(propertyDef);
+				PropertyDef clonedPropertyDef = this.clonePropertyDef(
+						propertyDef, clonedSlotDef);
 				clonedSlotDef.getPropertyDefs().add(clonedPropertyDef);
 			}
 		}
@@ -206,6 +249,7 @@ public class SlotDefCloner {
 			}
 		}
 
+		this.addConditionsToProperties(clonedSlotDef);
 		//
 		// if (clonedSlotDef instanceof DependentSlotDef) {
 		// this.cloneConditionaProperties((DependentSlotDef) this.model,
@@ -227,7 +271,8 @@ public class SlotDefCloner {
 		this.cloned = clonedSlotDef;
 	}
 
-	private PropertyDef clonePropertyDef(PropertyDef propertyDef) {
+	private PropertyDef clonePropertyDef(PropertyDef propertyDef,
+			SlotDef clonedSlotDef) {
 		PropertyDef clonedPropertyDef = new PropertyDef();
 		clonedPropertyDef.setName(propertyDef.getName());
 		clonedPropertyDef.setDataType(propertyDef.getDataType());
