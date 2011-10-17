@@ -20,8 +20,8 @@
 
     <rich:dataTable id="activeGareList"
                 var="_gara"
-              value="#{garaList.garaAttive}"
-           rendered="#{not empty garaList.garaAttive}">
+              value="#{garaList.getGaraAttive(0)}"
+           rendered="#{not empty garaList.getGaraAttive(0)}">
         <h:column>
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">

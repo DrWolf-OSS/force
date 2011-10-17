@@ -7,18 +7,48 @@
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:a="http://richfaces.org/a4j"
     xmlns:rich="http://richfaces.org/rich"
-    template="layout/template.xhtml">
-
+    template="layout/templateHome.xhtml">
+    <ui:define name="colonnaSx">
+    <rich:panel style="width : 300px;">
+     <f:facet name="header">Menu</f:facet>
+        <ul>
+            <li>Servizi Gratuiti</li>
+            <li>Servizo Base</li>
+            <li>Abbonamento FORCE</li>
+            <li>Attiva Call Center</li>
+            <li>Formazione</li>
+            <li>Richiedi Documentaizone Amministrativa</li>
+            <li>Servizi di Consulenza</li>
+        </ul>    
+    </rich:panel>
+    </ui:define>
     <ui:define name="body">
     <h:form>
 
-        <h1>Benvenuto nel Progetto FORCE (File yOuR raCE)!</h1>
+        
         <rich:panel>
             <h:panelGrid columns="2">
                 <h:graphicImage value="/img/seamlogo.png" alt="Seam logo"/>
+                <h1>Benvenuto nel Progetto FORCE (File yOuR raCE)!</h1>
             </h:panelGrid>
         </rich:panel>
         
 	</h:form>
+    </ui:define>
+    <ui:define name="colonnaDx">
+    <rich:panel  style="width : 300px;">
+     <f:facet name="header">Gare in primo piano</f:facet>
+     
+    <rich:dataList id="activeGareList"
+                var="_gara"
+              value="#{garaList.getGaraAttive(0)}"
+           rendered="#{not empty garaList.getGaraAttive(5)}">
+           <h:outputText value="#{_gara.oggetto} (Scad. #{_gara.dataScadenza})" />
+           <br />
+           <s:link view="/force/AddAzienda.xhtml">
+            <h:outputText value="Dettagli" /> 
+           </s:link>
+     </rich:dataList>
+    </rich:panel>
     </ui:define>
 </ui:composition>
