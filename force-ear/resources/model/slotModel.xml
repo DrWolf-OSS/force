@@ -18,6 +18,14 @@
 		<namespace uri="http://www.drwolf.it/alfresco/slot/model/1.0" prefix="slot" />
 	</namespaces>
     <constraints>
+        <constraint name="slot:MinMaxAnnoBilancio" type="MINMAX">
+            <parameter name="minValue"><value>2008</value></parameter>
+            <parameter name="maxValue"><value>2050</value></parameter>
+        </constraint>
+        <constraint name="slot:CodiceFiscaleCheck" type="REGEX">
+            <parameter name="expression"><value>^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$</value></parameter>
+            <parameter name="requiresMatch"><value>true</value></parameter>
+        </constraint>
         <constraint name="slot:CertificazioneList" type="LIST">
             <parameter name="allowedValues">
                 <list>
@@ -145,7 +153,10 @@
 				<property name="slot:personCodiceFiscale">
 					<title>Codice Fiscale</title>
 					<type>d:text</type>
-					<mandatory>true</mandatory>
+                    <mandatory>true</mandatory>
+                    <constraints>
+                       <constraint ref="slot:CodiceFiscaleCheck"></constraint>
+                    </constraints>
 				</property>
 			</properties>
 		</aspect>
@@ -169,7 +180,10 @@
                 </property>
                 <property name="slot:annoBilancio">
                     <title>Anno</title>
-                    <type>d:date</type>
+                    <type>d:integer</type>
+                    <constraints>
+                       <constraint ref="slot:CodiceFiscaleCheck"></constraint>
+                    </constraints>
                     <mandatory>true</mandatory>
                 </property>
             </properties>
@@ -182,9 +196,6 @@
                     <type>d:text</type>
                     <mandatory>true</mandatory>
                     <multiple>true</multiple>
-                    <constraints>
-                        <constraint ref="slot:SOACodeList" />
-                    </constraints>
                 </property>
             </properties>
         </aspect>
