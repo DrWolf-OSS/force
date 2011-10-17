@@ -83,21 +83,23 @@ public class Property implements DataDefinition, Comparable<Property>,
 	}
 
 	private Parameter getConstraintParameter(String name) {
-		Iterator<Constraint> iterator = this.constraints.iterator();
-		while (iterator.hasNext()) {
-			Constraint constraint = iterator.next();
-			if (constraint != null) {
-				List<Parameter> parameters = constraint.getParameters();
-				if (parameters != null) {
-					Iterator<Parameter> iterator2 = parameters.iterator();
-					while (iterator2.hasNext()) {
-						Parameter parameter = iterator2.next();
-						if (parameter.getName().equals(name)) {
-							return parameter;
+		if (this.constraints != null) {
+			Iterator<Constraint> iterator = this.constraints.iterator();
+			while (iterator.hasNext()) {
+				Constraint constraint = iterator.next();
+				if (constraint != null) {
+					List<Parameter> parameters = constraint.getParameters();
+					if (parameters != null) {
+						Iterator<Parameter> iterator2 = parameters.iterator();
+						while (iterator2.hasNext()) {
+							Parameter parameter = iterator2.next();
+							if (parameter.getName().equals(name)) {
+								return parameter;
+							}
 						}
 					}
-				}
 
+				}
 			}
 		}
 		return null;
