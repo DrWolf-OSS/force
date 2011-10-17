@@ -1,0 +1,64 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:a="http://richfaces.org/a4j"
+    template="/layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="cleaner" styleClass="edit">
+	    <rich:panel>
+	        <f:facet name="header">Elimina file per aspect</f:facet>
+                <s:decorate id="aspect" template="/layout/edit.xhtml">
+                <ui:define name="label">aspect</ui:define>
+                <h:inputText id="aspectId"
+                               cols="80"
+                              value="#{filesCleanerBean.aspectId}"/>
+            </s:decorate>
+            <a:commandButton id="elimina"
+                          value="Elimina"
+                          reRender="listOfFiles"
+                         action="#{filesCleanerBean.locateFilesByAspect()}"/>
+        </rich:panel>
+        <rich:panel>
+            <f:facet name="header">Elimina file per qualcos'altro</f:facet>
+                <s:decorate id="toBeDefined" template="/layout/edit.xhtml">
+                <ui:define name="label">tobed</ui:define>
+                <h:inputText id="aspectId"
+                               cols="80"/>
+            </s:decorate>
+            <h:commandButton id="tobedElimina"
+                          value="Elimina"/>
+        </rich:panel>
+        <rich:panel id="listOfFiles">
+            <f:facet name="header">Elenco dei file trovati da elimininare</f:facet>
+             <h:outputText value="Non sono stati trovati file da cancellare"
+               rendered="#{empty filesCleanerBean.filesToBeDeleted}"/>
+            <rich:dataTable id="lista" var="file" value="#{filesCleanerBean.filesToBeDeleted}" rendered="#{not empty filesCleanerBean.filesToBeDeleted}">
+            <h:column>
+            <f:facet name="header">Nome</f:facet>
+                <h:outputText value="#{file.name}"/>
+            </h:column>
+            <h:column>
+            <f:facet name="header">Id</f:facet>
+                <h:outputText value="#{file.objectId}"/>
+            </h:column>
+            <h:column>
+            <f:facet name="header">Proprietario</f:facet>
+                <h:outputText value="#{file.creator}"/>
+            </h:column>
+            </rich:dataTable>
+            <h:commandButton id="confermaElimina"
+                            rendered="#{not empty filesCleanerBean.filesToBeDeleted}"
+                            action="#{filesCleanerBean.deleteFiles()}"
+                          value="Elimina Tutti"/>
+            
+        </rich:panel>
+    </h:form>
+</ui:define>
+</ui:composition>

@@ -106,11 +106,9 @@ public class Heartbeat {
 							gara.setDataScadenza(dataFine);
 						}
 						if (startFeed.isAperta()) {
-							gara.setTipoProcedura(TipoProceduraGara.APERTA
-									.getNome());
-						} else if (startFeed.isNegoziata()) {
-							gara.setTipoProcedura(TipoProceduraGara.NEGOZIATA
-									.getNome());
+							gara.setTipoProcedura(TipoProceduraGara.APERTA.getNome());
+						}else if (startFeed.isNegoziata()) {
+							gara.setTipoProcedura(TipoProceduraGara.NEGOZIATA.getNome());
 						}
 
 						List<String> categorie = startFeed.getCategorie();
