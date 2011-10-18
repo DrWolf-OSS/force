@@ -65,6 +65,8 @@ public class Starter {
 
 		this.heartbeat.startFetcher(Calendar.getInstance().getTime(), new Long(
 				30 * 60 * 1000), endDate.getTime());
+		this.heartbeat.avcpFetcher(Calendar.getInstance().getTime(), new Long(
+				30 * 60 * 1000), endDate.getTime());
 
 	}
 }

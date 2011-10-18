@@ -1,9 +1,9 @@
 package it.drwolf.force.utils;
 
+import it.drwolf.force.interfaces.GaraFeedParserIF;
+
 import java.util.Date;
 import java.util.List;
-
-import it.drwolf.force.interfaces.GaraFeedParserIF;
 
 public class AvcpFeedParser implements GaraFeedParserIF {
 

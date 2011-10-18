@@ -8,7 +8,9 @@ import it.drwolf.force.enums.TipoGara;
 import it.drwolf.force.enums.TipoProceduraGara;
 import it.drwolf.force.utils.StartFeedParser;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -21,6 +23,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
+import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.jboss.seam.Component;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.Name;
@@ -40,6 +47,77 @@ import com.sun.syndication.io.XmlReader;
 @AutoCreate
 @Name("heartbeat")
 public class Heartbeat {
+
+	private static String[] CPVcodes = { "90900000-6" };
+
+	@Asynchronous
+	@Transactional
+	public QuartzTriggerHandle avcpFetcher(@Expiration Date date,
+			@IntervalDuration Long intervall, @FinalExpiration Date end) {
+		System.out
+				.println("################parte il fetcher feed avcp###############");
+		QuartzTriggerHandle handle = new QuartzTriggerHandle(
+				"Fetcher dei fedd del sistema AVCP");
+
+		EntityManager entityManager = null;
+
+		while (entityManager == null) {
+			try {
+				entityManager = (EntityManager) Component
+						.getInstance("entityManager");
+				System.out.println("---> Sleep!");
+				Thread.sleep(2000);
+			} catch (Exception e) {
+
+			}
+		}
+		String url = "http://bandigara.avcp.it/AVCP-ConsultazioneBandiGara/GoToAdvancedSearch.action";
+
+		String urlPost = "http://bandigara.avcp.it/AVCP-ConsultazioneBandiGara/AdvancedSearch.action";
+
+		HttpClient client = new HttpClient();
+		client.getParams()
+				.setParameter(
+						"http.useragent",
+						"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:7.0.1) Gecko/20100101 Firefox/7.0.1");
+		client.getState().setCredentials(AuthScope.ANY, new Credentials() {
+		});
+		BufferedReader br = null;
+
+		PostMethod method = new PostMethod(urlPost);
+		method.addParameter("CPV", Heartbeat.CPVcodes[0]);
+		try {
+			int returnCode = client.executeMethod(method);
+			if (returnCode == HttpStatus.SC_NOT_IMPLEMENTED) {
+				System.err
+						.println("The Post method is not implemented by this URI");
+				// still consume the response body
+				method.getResponseBodyAsString();
+			} else {
+				br = new BufferedReader(new InputStreamReader(
+						method.getResponseBodyAsStream()));
+				String readLine;
+				while (((readLine = br.readLine()) != null)) {
+					// System.err.println(readLine);
+				}
+			}
+		} catch (Exception e) {
+			System.err.println(e);
+		} finally {
+			method.releaseConnection();
+			if (br != null) {
+				try {
+					br.close();
+				} catch (Exception fe) {
+				}
+			}
+		}
+
+		for (String code : Heartbeat.CPVcodes) {
+			System.out.println(code);
+		}
+		return handle;
+	}
 
 	@Asynchronous
 	@Transactional
@@ -106,9 +184,11 @@ public class Heartbeat {
 							gara.setDataScadenza(dataFine);
 						}
 						if (startFeed.isAperta()) {
-							gara.setTipoProcedura(TipoProceduraGara.APERTA.getNome());
-						}else if (startFeed.isNegoziata()) {
-							gara.setTipoProcedura(TipoProceduraGara.NEGOZIATA.getNome());
+							gara.setTipoProcedura(TipoProceduraGara.APERTA
+									.getNome());
+						} else if (startFeed.isNegoziata()) {
+							gara.setTipoProcedura(TipoProceduraGara.NEGOZIATA
+									.getNome());
 						}
 
 						List<String> categorie = startFeed.getCategorie();
@@ -180,7 +260,6 @@ public class Heartbeat {
 			}
 
 		}
-
 		return handle;
 	}
 }
