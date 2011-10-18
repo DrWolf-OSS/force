@@ -312,19 +312,7 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 	@Override
 	public String persist() {
 		//
-		Set<Long> keySet = this.slotDefCloner.getDependentSlotDefCloners()
-				.keySet();
-		EntityManager entityManager = this.getEntityManager();
-		for (Long key : keySet) {
-			SlotDefCloner slotDefCloner = this.slotDefCloner
-					.getDependentSlotDefCloners().get(key);
-			SlotDef cloned = slotDefCloner.getCloned();
-			cloned.setName(this.getInstance().getName() + " | "
-					+ cloned.getName());
-			entityManager.persist(cloned);
-			slotDefCloner.cloneRules();
-			entityManager.persist(cloned);
-		}
+		this.persistAddedDependentSlotDefs();
 		//
 
 		super.persist();
@@ -349,6 +337,38 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		return super.persist();
 	}
 
+	private void persistAddedDependentSlotDefs() {
+		// Set<Long> keySet = this.slotDefCloner.getDependentSlotDefCloners()
+		// .keySet();
+		// EntityManager entityManager = this.getEntityManager();
+		// for (Long key : keySet) {
+		// SlotDefCloner slotDefCloner = this.slotDefCloner
+		// .getDependentSlotDefCloners().get(key);
+		// SlotDef cloned = slotDefCloner.getCloned();
+		// cloned.setName(this.getInstance().getName() + " | "
+		// + cloned.getName());
+		// entityManager.persist(cloned);
+		// slotDefCloner.cloneRules();
+		// entityManager.persist(cloned);
+		// }
+
+		Set<SlotDefCloner> dependentSlotDefCloners = this.slotDefCloner
+				.getDependentSlotDefCloners();
+		EntityManager entityManager = this.getEntityManager();
+		for (SlotDefCloner slotDefCloner : dependentSlotDefCloners) {
+			SlotDef cloned = slotDefCloner.getCloned();
+			cloned.setName(this.getInstance().getName() + " | "
+					+ cloned.getName());
+			entityManager.persist(cloned);
+			slotDefCloner.cloneRules();
+			entityManager.persist(cloned);
+		}
+	}
+
+	public void setSlotDefId(Long id) {
+		this.setId(id);
+	}
+
 	// private boolean checkEmbeddedPropertyValues() {
 	// boolean passed = true;
 	// for (EmbeddedProperty embeddedProperty : this.getInstance()
@@ -371,10 +391,6 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 	// }
 	// return passed;
 	// }
-
-	public void setSlotDefId(Long id) {
-		this.setId(id);
-	}
 
 	public void slotDefClone(SlotDef slotDef) {
 		// this.model = slotDef;
@@ -421,6 +437,12 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		this.slotDefCloner.cloneModel();
 
 		this.setInstance(this.slotDefCloner.getCloned());
+	}
+
+	@Override
+	public String update() {
+		this.persistAddedDependentSlotDefs();
+		return super.update();
 	}
 
 	public void wire() {

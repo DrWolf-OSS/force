@@ -11,7 +11,6 @@ import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.ruleverifier.RuleParametersResolver;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +25,10 @@ public class SlotDefCloner {
 	private RuleParametersResolver ruleParametersResolver = (RuleParametersResolver) org.jboss.seam.Component
 			.getInstance("ruleParametersResolver");
 
-	private Map<Long, SlotDefCloner> dependentSlotDefCloners = new HashMap<Long, SlotDefCloner>();
+	// private Map<Long, SlotDefCloner> dependentSlotDefCloners = new
+	// HashMap<Long, SlotDefCloner>();
+
+	private Set<SlotDefCloner> dependentSlotDefCloners = new HashSet<SlotDefCloner>();
 
 	// @In(create = true)
 	// private RuleHome ruleHome;
@@ -149,7 +151,9 @@ public class SlotDefCloner {
 			dependentCloned
 					.setConditionalPropertyInst(clonedConditionalPropertyInst);
 
-			this.dependentSlotDefCloners.put(dependentSlotDef.getId(), cloner);
+			// this.dependentSlotDefCloners.put(dependentSlotDef.getId(),
+			// cloner);
+			this.dependentSlotDefCloners.add(cloner);
 		}
 
 		return dependentCloned;
@@ -427,7 +431,11 @@ public class SlotDefCloner {
 		return this.cloned;
 	}
 
-	public Map<Long, SlotDefCloner> getDependentSlotDefCloners() {
+	// public Map<Long, SlotDefCloner> getDependentSlotDefCloners() {
+	// return this.dependentSlotDefCloners;
+	// }
+
+	public Set<SlotDefCloner> getDependentSlotDefCloners() {
 		return this.dependentSlotDefCloners;
 	}
 

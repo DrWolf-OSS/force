@@ -1026,8 +1026,15 @@
 			<a:form id="dsdf" onkeypress="dirty=true">
 				<ui:param name="customType" value="p" />
 				
+				<s:decorate template="/layout/display.xhtml" rendered="#{slotDefEditBean.edit}">
+	                <ui:define name="label">
+	                	<h:outputText value="Sottobusta" />
+					</ui:define>
+					<h:outputText value="#{slotDefEditBean.dependentSlotDef.name}" />
+	            </s:decorate>
+				
 				<a:region>
-				<s:decorate template="/layout/edit.xhtml">
+				<s:decorate template="/layout/edit.xhtml" rendered="#{not slotDefEditBean.edit}">
 	                <ui:define name="label">
 	                	<h:outputText value="Sottobusta" />
 					</ui:define>
@@ -1101,17 +1108,26 @@
 			<s:div>
 	        <div style="clear:both"/>
 	        </s:div>
+	        <a:jsFunction action="#{slotDefEditBean.clearEditing()}" name="clearEditing"/>
 	        <a:commandButton value="Ok"
 	        			action="#{slotDefEditBean.addDependentSlotDef()}" 
-	        			oncomplete="#{rich:component('dependentSlotDefPanel')}.hide();" 
+	        			oncomplete="#{rich:component('dependentSlotDefPanel')}.hide();"
+	        			rendered="#{not slotDefEditBean.edit}" 
 	        			reRender="dsdf,slotDefTable"/>
+	        			
+	        <a:commandButton value="Ok_edit" 
+	        			oncomplete="#{rich:component('dependentSlotDefPanel')}.hide(); clearEditing();"
+	        			rendered="#{slotDefEditBean.edit}"
+	        			
+	        			reRender="dsdf,slotDefTable"/>
+	        			
 	        <a:region>
-			<a:region>
-			<a:commandButton value="Annulla1" action="#{slotDefEditBean.cancelDependentSlotDefEdit()}" 
-							oncomplete="#{rich:component('dependentSlotDefPanel')}.hide()" 
+			<a:commandButton value="Annulla1"
+							oncomplete="#{rich:component('dependentSlotDefPanel')}.hide(); clearEditing();" 
 							rendered="#{slotDefEditBean.edit == true}"
 							reRender="dsdf"/>
 			</a:region>
+			<a:region>
 			<a:commandButton value="Annulla2" action="#{slotDefEditBean.resetDependentSlotDefModel()}" 
 							oncomplete="#{rich:component('dependentSlotDefPanel')}.hide()" 
 							rendered="#{slotDefEditBean.edit == false}"

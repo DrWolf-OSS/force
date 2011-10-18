@@ -45,9 +45,6 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage.Severity;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 @Name("slotDefEditBean")
 @Scope(ScopeType.CONVERSATION)
 public class SlotDefEditBean {
@@ -95,12 +92,14 @@ public class SlotDefEditBean {
 	// SlotDefCloner>();
 
 	// Cloned, Original
-	// private Map<DependentSlotDef, DependentSlotDef> clonedOriginalMap = new
-	// HashMap<DependentSlotDef, DependentSlotDef>();
+	private Map<DependentSlotDef, DependentSlotDef> clonedOriginalMap = new HashMap<DependentSlotDef, DependentSlotDef>();
+
+	private DependentSlotDef dependentTmp;
 
 	// Cloned, Original
-	private BiMap<DependentSlotDef, DependentSlotDef> clonedOriginalBiMap = HashBiMap
-			.create();
+	// private BiMap<DependentSlotDef, DependentSlotDef> clonedOriginalBiMap =
+	// HashBiMap
+	// .create();
 
 	public void addCollection() {
 		if (!this.slotDefHome.getInstance().getDocDefCollectionsAsList()
@@ -153,7 +152,7 @@ public class SlotDefEditBean {
 		// this.slotDefCloners.put(this.dependentSlotDef.getId(),
 		// slotDefCloner);
 		this.slotDefHome.getSlotDefCloner().getDependentSlotDefCloners()
-				.put(this.dependentSlotDef.getId(), slotDefCloner);
+				.add(slotDefCloner);
 		//
 
 		this.slotDefHome.getInstance().getDependentSlotDefs()
@@ -161,7 +160,9 @@ public class SlotDefEditBean {
 		dependentCloned.setParentSlotDef(this.slotDefHome.getInstance());
 
 		// tengo l'originale per un eventuale successivo edit da interfaccia
-		this.clonedOriginalBiMap.put(dependentCloned, this.dependentSlotDef);
+		// if (!this.clonedOriginalBiMap.containsValue(this.dependentSlotDef)) {
+		// this.clonedOriginalMap.put(dependentCloned, this.dependentSlotDef);
+		// }
 
 		this.resetDependentSlotDefModel();
 	}
@@ -187,8 +188,10 @@ public class SlotDefEditBean {
 	}
 
 	public void cancelDependentSlotDefEdit() {
-		DependentSlotDef cloned = this.clonedOriginalBiMap.inverse().get(
-				this.dependentSlotDef);
+		// DependentSlotDef cloned = this.clonedOriginalBiMap.inverse().get(
+		// this.dependentSlotDef);
+
+		DependentSlotDef cloned = this.dependentTmp;
 
 		cloned.setConditionalPropertyDef(this.dependentSlotDef
 				.getConditionalPropertyDef());
@@ -317,6 +320,7 @@ public class SlotDefEditBean {
 		this.conditional = false;
 		this.edit = false;
 		this.conditioned = SlotDefEditBean.CONDITIONED_NONE;
+		this.dependentSlotDef = null;
 	}
 
 	public void conditionalPropertyListener(ActionEvent event) {
@@ -385,18 +389,20 @@ public class SlotDefEditBean {
 	}
 
 	public void editDependentSlotDef(DependentSlotDef dependentSlotDef) {
-		// this.dependentSlotDef = dependentSlotDef;
-
-		this.slotDefHome.getInstance().getDependentSlotDefs()
-				.remove(dependentSlotDef);
-		dependentSlotDef.setParentSlotDef(null);
-
-		this.dependentSlotDef = this.clonedOriginalBiMap.get(dependentSlotDef);
-		this.dependentSlotDef.setConditionalPropertyDef(dependentSlotDef
-				.getConditionalPropertyDef());
-		this.dependentSlotDef.setConditionalPropertyInst(dependentSlotDef
-				.getConditionalPropertyInst());
+		// this.dependentTmp = dependentSlotDef;
 		//
+		// this.slotDefHome.getInstance().getDependentSlotDefs()
+		// .remove(dependentSlotDef);
+		// dependentSlotDef.setParentSlotDef(null);
+		//
+		// this.dependentSlotDef = this.clonedOriginalMap.get(dependentSlotDef);
+		// this.dependentSlotDef.setConditionalPropertyDef(dependentSlotDef
+		// .getConditionalPropertyDef());
+		// this.dependentSlotDef.setConditionalPropertyInst(dependentSlotDef
+		// .getConditionalPropertyInst());
+		//
+
+		this.dependentSlotDef = dependentSlotDef;
 		this.edit = true;
 	}
 
@@ -831,6 +837,9 @@ public class SlotDefEditBean {
 			this.dependentSlotDef.setParentSlotDef(null);
 
 			this.dependentSlotDef = null;
+			//
+			this.dependentTmp = null;
+			//
 		}
 
 		this.clearEditing();
