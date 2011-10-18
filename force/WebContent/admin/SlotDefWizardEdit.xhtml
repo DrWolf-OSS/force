@@ -396,18 +396,31 @@
 					</rich:column>
 					<rich:column styleClass="action #{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Azioni</f:facet>
-						<a:commandLink value="Modifica1"
+						<a:commandLink value="Modifica"
 									action="#{slotDefEditBean.editDependentSlotDef(slot)}"
 						 			oncomplete="#{rich:component('dependentSlotDefPanel')}.show()"
 						 			rendered="#{slot.id == null}"
 						 			reRender="dependentSlotDefPanel"/>
-						<s:link view="/admin/SlotDefWizardEdit.xhtml" value="Modifica2" 
+						 			
+						<s:link view="/admin/SlotDefWizardEdit.xhtml" value="Modifica" 
 								rendered="#{slot.id != null}"
 								propagation="none">
 							<f:param name="mode" value="DEPENDENT"/>
 							<f:param name="model" value="true"/>
 							<f:param name="slotDefId" value="#{slot.id}"/>
 						</s:link>
+						#{'  '}
+						<a:commandLink value="Elimina"
+									action="#{slotDefEditBean.removeNotPersistedDependentSlotDef(slot)}"
+						 			rendered="#{slot.id == null}"
+						 			reRender="slotDefTable"/>
+						 			
+						<a:commandLink value="Elimina"
+									action="#{slotDefEditBean.removePersistedDependentSlotDef(slot)}"
+									disabled="#{slot.referenced}"
+									styleClass="#{slot.referenced ? 'disabledLink' : ''}"
+						 			rendered="#{slot.id != null}"
+						 			reRender="slotDefTable"/>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -1115,20 +1128,20 @@
 	        			rendered="#{not slotDefEditBean.edit}" 
 	        			reRender="dsdf,slotDefTable"/>
 	        			
-	        <a:commandButton value="Ok_edit" 
+	        <a:commandButton value="Ok" 
 	        			oncomplete="#{rich:component('dependentSlotDefPanel')}.hide(); clearEditing();"
 	        			rendered="#{slotDefEditBean.edit}"
 	        			
 	        			reRender="dsdf,slotDefTable"/>
 	        			
 	        <a:region>
-			<a:commandButton value="Annulla1"
+			<a:commandButton value="Annulla"
 							oncomplete="#{rich:component('dependentSlotDefPanel')}.hide(); clearEditing();" 
 							rendered="#{slotDefEditBean.edit == true}"
 							reRender="dsdf"/>
 			</a:region>
 			<a:region>
-			<a:commandButton value="Annulla2" action="#{slotDefEditBean.resetDependentSlotDefModel()}" 
+			<a:commandButton value="Annulla" action="#{slotDefEditBean.resetDependentSlotDefModel()}" 
 							oncomplete="#{rich:component('dependentSlotDefPanel')}.hide()" 
 							rendered="#{slotDefEditBean.edit == false}"
 							reRender="dsdf"/>

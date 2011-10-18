@@ -283,18 +283,21 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		return new ArrayList<SlotInst>();
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean isReferenced() {
-		if (this.getInstance().getId() != null) {
-			List<SlotInst> resultList = this
-					.getEntityManager()
-					.createQuery(
-							"select id from SlotInst s where s.slotDef=:slotDef")
-					.setParameter("slotDef", this.getInstance())
-					.setMaxResults(1).getResultList();
-			if (resultList != null && !resultList.isEmpty()) {
-				return true;
-			}
+		// if (this.getInstance().getId() != null) {
+		// List<SlotInst> resultList = this
+		// .getEntityManager()
+		// .createQuery(
+		// "select id from SlotInst s where s.slotDef=:slotDef")
+		// .setParameter("slotDef", this.getInstance())
+		// .setMaxResults(1).getResultList();
+		// if (resultList != null && !resultList.isEmpty()) {
+		// return true;
+		// }
+		// }
+		// return false;
+		if (this.getInstance() != null) {
+			return this.getInstance().isReferenced();
 		}
 		return false;
 	}

@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -122,6 +123,24 @@ public class SlotDef {
 	@Enumerated(EnumType.STRING)
 	public SlotDefType getType() {
 		return this.type;
+	}
+
+	@Transient
+	@SuppressWarnings("unchecked")
+	public boolean isReferenced() {
+		EntityManager entityManager = (EntityManager) org.jboss.seam.Component
+				.getInstance("entityManager");
+		if (this.getId() != null) {
+			List<SlotInst> resultList = entityManager
+					.createQuery(
+							"select id from SlotInst s where s.slotDef=:slotDef")
+					.setParameter("slotDef", this).setMaxResults(1)
+					.getResultList();
+			if (resultList != null && !resultList.isEmpty()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public boolean isTemplate() {

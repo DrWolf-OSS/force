@@ -776,6 +776,29 @@ public class SlotDefEditBean {
 		}
 	}
 
+	public void removeNotPersistedDependentSlotDef(
+			DependentSlotDef dependentSlotDef) {
+		this.slotDefHome.getInstance().getDependentSlotDefs()
+				.remove(dependentSlotDef);
+		dependentSlotDef.setParentSlotDef(null);
+		Iterator<SlotDefCloner> iterator = this.slotDefHome.getSlotDefCloner()
+				.getDependentSlotDefCloners().iterator();
+		while (iterator.hasNext()) {
+			SlotDefCloner cloner = iterator.next();
+			if (cloner.getCloned().equals(dependentSlotDef)) {
+				iterator.remove();
+			}
+		}
+	}
+
+	public void removePersistedDependentSlotDef(
+			DependentSlotDef dependentSlotDef) {
+		this.slotDefHome.getInstance().getDependentSlotDefs()
+				.remove(dependentSlotDef);
+		dependentSlotDef.setParentSlotDef(null);
+		this.slotDefHome.getEntityManager().remove(dependentSlotDef);
+	}
+
 	public void removeProp(PropertyDef prop) {
 		this.removeReferencesFromCollections(prop, false);
 		this.removeReferencesFromProperties(prop, false);
