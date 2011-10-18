@@ -13,10 +13,10 @@
     <h:form id="slotDefSearch" styleClass="edit">
 
     <rich:panel>
-        <f:facet name="header">Elenco #{slotDefParameters.model ? 'modelli' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Buste di Riferimento' : 'Buste Amministrative'}</f:facet>
+        <f:facet name="header">Elenco #{slotDefParameters.model ? 'modelli' : ''} #{slotDefParameters.mode=='DEPENDENT' ? 'Sotto' :''} #{slotDefParameters.mode=='PRIMARY' ? 'Buste di Riferimento' : 'Buste Amministrative'}</f:facet>
     <div class="results" id="slotDefList">
 
-    <h:outputText value="The slotDef search returned no results."
+    <h:outputText value="Non ci sono buste del tipo selezionato."
                rendered="#{empty slotDefsByParams}"/>
 
     <rich:dataTable id="slotDefList"
@@ -63,7 +63,8 @@
                     id="create"
            propagation="none"
                  value="#{slotDefParameters.from.equals('/admin/GaraEdit.xhtml') ? 'Crea una nuova Busta Amministrativa' : 'Crea un nuovo Modello'}"
-              	 rendered="#{not slotDefParameters.from.equals('/admin/GaraEdit.xhtml')}">
+              	 rendered="#{not slotDefParameters.from.equals('/admin/GaraEdit.xhtml')}"
+              	 action="#{slotDefEditBean.checkIfDependentSlotDef()}">
             <f:param name="slotDefId"/>
             <f:param name="model" value="#{true}"/>
             <f:param name="wizard" value="#{true}"/>

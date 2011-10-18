@@ -29,7 +29,7 @@
 		<a:form id="slotInst" styleClass="edit" onkeypress="dirty=true">
 		<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
 		
-			<rich:simpleTogglePanel id="summaryPanel" switchType="client" opened="true">
+			<rich:simpleTogglePanel id="summaryPanel" switchType="client" opened="#{not empty slotDefHome.instance.docDefCollectionsAsList ? 'true' : 'false'}">
 				<f:facet name="header">Pannello riassuntivo Richieste</f:facet>			
 				<h:panelGrid styleClass="summaryGrid" columns="4">
 					<a:repeat value="#{slotInstEditBean.docInstCollections}" var="coll">
@@ -180,6 +180,7 @@
 					</s:div>
 					</c:forEach>
 				</s:div>
+
 				
 				<div style="clear: both"><span class="required">*</span>
 				campi obbligatori</div>
@@ -411,6 +412,15 @@
 
 				<div style="clear: both"><span class="required">*</span>
 				campi obbligatori</div>
+				
+				<s:div id="dependentSlots">
+					<c:forEach var="slot"  items="#{slotInstHome.instance.dependentSlotInsts}">
+						<s:link value="Sotto Busta: #{slot.slotDef.name} : #{slot.id}" view="/user/SlotInstEdit.xhtml" propagation="none">
+							<f:param name="slotDefId" value="#{slot.slotDef.id}"/>
+							<f:param name="slotInstId" value="#{slot.id}"/>
+						</s:link>
+					</c:forEach>
+				</s:div>
 
 			</rich:panel>
 

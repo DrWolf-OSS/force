@@ -8,6 +8,7 @@ import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.digsig.CertsController;
 import it.drwolf.slot.digsig.Signature;
 import it.drwolf.slot.digsig.Utils;
+import it.drwolf.slot.entity.DependentSlotDef;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
@@ -481,6 +482,50 @@ public class SlotInstEditBean {
 		nodeRef = objectId.getId();
 
 		return nodeRef;
+	}
+
+	private void createEmptyDependetSlotInsts() {
+		// SlotDef parent = slotDefHome.getInstance();
+		Set<DependentSlotDef> dependentSlotDefs = this.slotDefHome
+				.getInstance().getDependentSlotDefs();
+		for (DependentSlotDef dependentSlotDef : dependentSlotDefs) {
+			if (dependentSlotDef.getConditionalPropertyDef() != null
+					&& dependentSlotDef
+							.getConditionalPropertyInst()
+							.getValue()
+							.equals(this.slotInstHome
+									.getInstance()
+									.retrievePropertyInstByDef(
+											dependentSlotDef
+													.getConditionalPropertyDef())
+									.getValue())) {
+
+				SlotInst dependentSlotInst = new SlotInst();
+				dependentSlotInst.setSlotDef(dependentSlotDef);
+				for (PropertyDef depPropertyDef : dependentSlotDef
+						.getPropertyDefs()) {
+					PropertyInst depPropertyInst = new PropertyInst(
+							depPropertyDef, dependentSlotInst);
+					dependentSlotInst.getPropertyInsts().add(depPropertyInst);
+				}
+
+				for (DocDefCollection depDocDefCollection : dependentSlotDef
+						.getDocDefCollections()) {
+					DocInstCollection depDocInstCollection = new DocInstCollection(
+							dependentSlotInst, depDocDefCollection);
+					dependentSlotInst.getDocInstCollections().add(
+							depDocInstCollection);
+				}
+
+				dependentSlotInst.setOwnerId(this.slotInstHome.getInstance()
+						.getOwnerId());
+
+				this.slotInstHome.getInstance().getDependentSlotInsts()
+						.add(dependentSlotInst);
+			}
+		}
+
+		// this.slotInstHome.update();
 	}
 
 	public void editItem(Long docDefCollectionId, FileContainer container) {
@@ -1023,6 +1068,9 @@ public class SlotInstEditBean {
 				new HashSet<DocInstCollection>(this.docInstCollections));
 		this.slotInstHome.getInstance().setOwnerId(
 				this.alfrescoUserIdentity.getActiveGroup().getShortName());
+		//
+		this.createEmptyDependetSlotInsts();
+		//
 		this.slotInstHome.persist();
 		FacesMessages.instance().add(
 				"Slot " + this.slotDefHome.getInstance().getName()

@@ -246,6 +246,41 @@
 			<div style="clear:both"/>
 			<rich:separator height="15px" lineType="none" />
 			
+			<s:decorate template="/layout/display.xhtml" id="slotDefTable">
+				<ui:define name="label">
+	                <h:outputText value="Sottobuste" />
+				</ui:define>
+				<h:outputText value="Nessuna sottobusta definita" rendered="#{empty slotDefHome.instance.dependentSlotDefsAsList}"/>
+				<rich:dataTable value="#{slotDefHome.instance.dependentSlotDefsAsList}" var="slot" 
+						rendered="#{not empty slotDefHome.instance.dependentSlotDefsAsList}" style="width:1024px">
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Id</f:facet>
+						<h:outputText value="#{slot.id}" />
+					</rich:column>
+					<rich:column style="width:200px" styleClass="#{!slot.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Nome</f:facet>
+						<h:outputText value="#{slot.name}" />
+					</rich:column>
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Informazione vincolante</f:facet>
+						<h:outputText value="#{slot.conditionalPropertyDef!=null ? slot.conditionalPropertyDef.name : ''}" />
+					</rich:column>
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Valore informazione vincolante</f:facet>
+						<h:outputText value="#{slot.conditionalPropertyInst.stringValue}"
+								rendered="#{slot.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
+						<h:outputText value="#{slot.conditionalPropertyInst.integerValue}"
+								rendered="#{slot.conditionalPropertyInst.dataDefinition.dataType == 'INTEGER'}" />
+						<h:outputText value="#{slot.conditionalPropertyInst.booleanValue ? 'true' : 'false'}"
+								rendered="#{slot.conditionalPropertyInst.dataDefinition.dataType == 'BOOLEAN'}" />
+						<h:outputText value="#{slot.conditionalPropertyInst.dateValue}"
+								rendered="#{slot.conditionalPropertyInst.dataDefinition.dataType == 'DATE'}">
+							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</rich:column>
+				</rich:dataTable>
+			</s:decorate>
+			
 			
 			<s:decorate template="/layout/display.xhtml">
 				<ui:define name="label">
