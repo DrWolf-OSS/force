@@ -37,12 +37,12 @@ public class GaraList extends EntityQuery<Gara> {
 
 	public List<Gara> getGaraAttive(Integer maxRes) {
 		ArrayList<Gara> ritorno = new ArrayList<Gara>();
-		if (maxRes != null && maxRes > 0) {
-			this.setMaxResults(maxRes);
-		}
 		for (Gara gara : this.getResultList()) {
 			if (gara.getType().equals(TipoGara.GESTITA.getNome())) {
 				ritorno.add(gara);
+			}
+			if (ritorno.size() == maxRes) {
+				break;
 			}
 		}
 		return ritorno;

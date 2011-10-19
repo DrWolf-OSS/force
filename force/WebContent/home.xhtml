@@ -41,11 +41,11 @@
      
     <rich:dataList id="activeGareList"
                 var="_gara"
-              value="#{garaList.getGaraAttive(0)}"
+              value="#{garaList.getGaraAttive(5)}"
            rendered="#{not empty garaList.getGaraAttive(5)}">
            <h:outputText value="#{_gara.oggetto} (Scad. #{_gara.dataScadenza})" />
            <br />
-           <s:link view="/force/AddAzienda.xhtml">
+           <s:link view="/AddAzienda.xhtml">
             <h:outputText value="Dettagli" /> 
            </s:link>
      </rich:dataList>
