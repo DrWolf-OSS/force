@@ -1,11 +1,15 @@
 package it.drwolf.slot.entity;
 
+import it.drwolf.slot.enums.SlotInstStatus;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -33,6 +37,28 @@ public class SlotInst {
 	// HashSet<MultiplePropertyInst>();
 
 	private String ownerId;
+
+	private SlotInstStatus status = SlotInstStatus.EMPTY;
+
+	public SlotInst() {
+	}
+
+	public SlotInst(SlotDef slotDef) {
+		super();
+		this.setSlotDef(slotDef);
+		for (PropertyDef depPropertyDef : this.getSlotDef().getPropertyDefs()) {
+			PropertyInst depPropertyInst = new PropertyInst(depPropertyDef,
+					this);
+			this.getPropertyInsts().add(depPropertyInst);
+		}
+
+		for (DocDefCollection depDocDefCollection : this.getSlotDef()
+				.getDocDefCollections()) {
+			DocInstCollection depDocInstCollection = new DocInstCollection(
+					this, depDocDefCollection);
+			this.getDocInstCollections().add(depDocInstCollection);
+		}
+	}
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "parentSlotInst_id")
@@ -69,6 +95,11 @@ public class SlotInst {
 	@ManyToOne
 	public SlotDef getSlotDef() {
 		return this.slotDef;
+	}
+
+	@Enumerated(EnumType.STRING)
+	public SlotInstStatus getStatus() {
+		return this.status;
 	}
 
 	@Transient
@@ -109,6 +140,10 @@ public class SlotInst {
 
 	public void setSlotDef(SlotDef slotDef) {
 		this.slotDef = slotDef;
+	}
+
+	public void setStatus(SlotInstStatus status) {
+		this.status = status;
 	}
 
 	// @OrderBy("propertyDef")

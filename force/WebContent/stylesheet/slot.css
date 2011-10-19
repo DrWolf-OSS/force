@@ -147,6 +147,16 @@ a:HOVER {
 	text-decoration: underline;
 }
 
+.messageBox{
+	/*background-color: #FFFFFF;*/
+	padding: 10px;
+	/* margin: 2px; */
+	margin-bottom: 10px;
+	border-color: graytext;
+	border-width: thin;
+	border-style: solid;
+}
+
 
 /*
 .invalidRow.action.disabledLink a:LINK {
