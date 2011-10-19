@@ -3,20 +3,20 @@
 
 <model name="slot:model" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
-	<description>SLOT Custom model</description>
-	<author>Dr Wolf srl</author>
-	<version>1.0</version>
+    <description>SLOT Custom model</description>
+    <author>Dr Wolf srl</author>
+    <version>1.0</version>
 
 
-	<imports>
+    <imports>
 
-		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
-		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
-	</imports>
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+    </imports>
 
-	<namespaces>
-		<namespace uri="http://www.drwolf.it/alfresco/slot/model/1.0" prefix="slot" />
-	</namespaces>
+    <namespaces>
+        <namespace uri="http://www.drwolf.it/alfresco/slot/model/1.0" prefix="slot" />
+    </namespaces>
     <constraints>
         <constraint name="slot:MinMaxAnnoBilancio" type="MINMAX">
             <parameter name="minValue"><value>2008</value></parameter>
@@ -115,63 +115,99 @@
             </parameter>
         </constraint>
     </constraints>
-	<aspects>
-		
-		<aspect name="slot:expirable">
-			<title>Scadibile</title>
-			<properties>
-				<property name="slot:expirationDate">
-					<title>Data di Scadenza</title>
-					<type>d:date</type>
-					<mandatory>true</mandatory>
-				</property>
-			</properties>
-		</aspect>
-		<aspect name="slot:person">
-			<title>Persona</title>
-			<properties>
-				<property name="slot:personName">
-					<title>Nome</title>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-				</property>
-				<property name="slot:personSurname">
-					<title>Cognome</title>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-				</property>
-				<property name="slot:personBirthDate">
-					<title>Data di Nascita</title>
-					<type>d:date</type>
-					<mandatory>true</mandatory>
-				</property>
-				<property name="slot:personBirthPlace">
-					<title>Luogo di Nascita</title>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-				</property>
-				<property name="slot:personCodiceFiscale">
-					<title>Codice Fiscale</title>
-					<type>d:text</type>
+    <aspects>
+        
+        <aspect name="slot:expirable">
+            <title>Scadibile</title>
+            <properties>
+                <property name="slot:expirationDate">
+                    <title>Data di Scadenza</title>
+                    <type>d:date</type>
+                    <mandatory>true</mandatory>
+                </property>
+            </properties>
+        </aspect>
+        <aspect name="slot:person">
+            <title>Persona</title>
+            <properties>
+                <property name="slot:personName">
+                    <title>Nome</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="slot:personSurname">
+                    <title>Cognome</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="slot:personBirthDate">
+                    <title>Data di Nascita</title>
+                    <type>d:date</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="slot:personBirthPlace">
+                    <title>Luogo di Nascita</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="slot:personCodiceFiscale">
+                    <title>Codice Fiscale</title>
+                    <type>d:text</type>
                     <mandatory>true</mandatory>
                     <constraints>
                        <constraint ref="slot:CodiceFiscaleCheck"></constraint>
                     </constraints>
-				</property>
-			</properties>
-		</aspect>
-		<aspect name="slot:procura">
-		  <title>Procura</title>
-		  <properties>
-		      <property name="slot:procuraCode">
-		          <title>Numero Procura</title>
-		          <type>d:text</type>
-		          <mandatory>true</mandatory>
-		      </property>
-		  </properties>
-		</aspect>
-        <aspect name="slot:bilancio">
+                </property>
+            </properties>
+        </aspect>
+        <aspect name="slot:procura">
+          <title>Procura</title>
+          <properties>
+              <property name="slot:procuraCode">
+                  <title>Numero Procura</title>
+                  <type>d:text</type>
+                  <mandatory>true</mandatory>
+              </property>
+          </properties>
+        </aspect>
+           <aspect name="slot:bilancio_1_1">
             <title>Bilancio</title>
+            <properties>
+                <property name="slot:fatturatoBilancio_1_1">
+                    <title>Fatturato</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="slot:annoBilancio_1_1">
+                    <title>Anno</title>
+                    <type>d:int</type>
+                    <mandatory>true</mandatory>
+                    <constraints>
+                       <constraint ref="slot:MinMaxAnnoBilancio"></constraint>
+                    </constraints>
+                </property>
+            </properties>
+        </aspect>
+           <aspect name="slot:bilancio_1.1">
+            <title>Bilancio (Obsoleto 1.1)</title>
+            <properties>
+                <property name="slot:fatturatoBilancio_1.1">
+                    <title>Fatturato</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="slot:annoBilancio_1.1">
+                    <title>Anno</title>
+                    <type>d:int</type>
+                    <mandatory>true</mandatory>
+                    <constraints>
+                       <constraint ref="slot:MinMaxAnnoBilancio"></constraint>
+                    </constraints>
+                </property>
+            </properties>
+        </aspect>
+        <aspect name="slot:bilancio">
+            <title>Bilancio (Obsoleto)</title>
             <properties>
                 <property name="slot:fatturatoBilancio">
                     <title>Fatturato</title>
@@ -180,10 +216,7 @@
                 </property>
                 <property name="slot:annoBilancio">
                     <title>Anno</title>
-                    <type>d:integer</type>
-                    <constraints>
-                       <constraint ref="slot:CodiceFiscaleCheck"></constraint>
-                    </constraints>
+                    <type>d:date</type>
                     <mandatory>true</mandatory>
                 </property>
             </properties>
@@ -217,5 +250,5 @@
                 </property>
             </properties>
         </aspect>
-	</aspects>
+    </aspects>
 </model>
