@@ -490,11 +490,13 @@
 				onclick="return confirm('Sicuro di voler eliminare la busta?'); dirty = false;"
 				rendered="#{slotInstHome.instance.id != null}"
 				styleClass="modal"/>
+			<a:jsFunction name="setDirty" >
+				<a:actionparam name="dirty" assignTo="#{slotInstEditBean.dirty}"/>
+			</a:jsFunction>
 			<h:commandButton id="validate"
 				value="Valida" 
-				onclick="dirty = false;"
+				onclick="setDirty(dirty); dirty = false;"
 				action="#{slotInstEditBean.validate()}"
-				
 				styleClass="modal"/>
 			</div>
 		</a:form>

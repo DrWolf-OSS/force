@@ -145,6 +145,9 @@ public class SlotInstEditBean {
 
 	boolean warning = false;
 
+	// private String validationResult;
+	private String dirty;
+
 	@In(create = true)
 	private ValueChangeListener valueChangeListener;
 
@@ -667,6 +670,10 @@ public class SlotInstEditBean {
 		return this.datas;
 	}
 
+	public String getDirty() {
+		return this.dirty;
+	}
+
 	public List<DocInstCollection> getDocInstCollections() {
 		return this.docInstCollections;
 	}
@@ -705,6 +712,10 @@ public class SlotInstEditBean {
 	public List<PropertyInst> getPropertyInsts() {
 		return this.propertyInsts;
 	}
+
+	// public String getValidationResult() {
+	// return this.validationResult;
+	// }
 
 	public ArrayList<VerifierMessage> getSlotMessages() {
 		return this.slotMessages;
@@ -1061,6 +1072,11 @@ public class SlotInstEditBean {
 		// return "failed";
 		// }
 
+		// c'è bisogno di settare dirty a flase per far settare lo status
+		// risultante dalla validazione
+		this.dirty = "false";
+		this.validate();
+
 		this.slotInstHome.getInstance().setPropertyInsts(
 				new HashSet<PropertyInst>(this.propertyInsts));
 
@@ -1126,6 +1142,10 @@ public class SlotInstEditBean {
 
 	public void setDatas(HashMap<Long, List<FileContainer>> datas) {
 		this.datas = datas;
+	}
+
+	public void setDirty(String dirty) {
+		this.dirty = dirty;
 	}
 
 	public void setDocInstCollections(List<DocInstCollection> docInstCollections) {
@@ -1218,6 +1238,11 @@ public class SlotInstEditBean {
 		// return "failed";
 		// }
 
+		// c'è bisogno di settare dirty a flase per far settare lo status
+		// risultante dalla validazione
+		this.dirty = "false";
+		this.validate();
+
 		this.entityManager.merge(instance);
 
 		//
@@ -1305,6 +1330,26 @@ public class SlotInstEditBean {
 	}
 
 	public String validate() {
+		// Map<String, String> requestParameterMap = FacesContext
+		// .getCurrentInstance().getExternalContext()
+		// .getRequestParameterMap();
+		// Boolean dirty = null;
+		// if (requestParameterMap != null) {
+		// String _dirty = requestParameterMap.get("dirty");
+		// dirty = new Boolean(_dirty);
+		// }
+
+		Boolean dirty = null;
+		if (this.dirty != null && !this.dirty.equals("")) {
+			try {
+				dirty = new Boolean(this.dirty);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				dirty = Boolean.TRUE;
+				e.printStackTrace();
+			}
+		}
+
 		this.cleanMessages();
 		boolean sizeCollectionPassed = this.checkCollectionsSize();
 		if (!sizeCollectionPassed) {
@@ -1312,6 +1357,10 @@ public class SlotInstEditBean {
 					.instance()
 					.add(Severity.ERROR,
 							"Validazione fallita! Le dimensioni di alcune buste non rispettano le specifiche");
+			if (dirty != null && dirty == false) {
+				this.slotInstHome.getInstance().setStatus(
+						SlotInstStatus.INVALID);
+			}
 			return "failed";
 		}
 
@@ -1320,12 +1369,20 @@ public class SlotInstEditBean {
 			FacesMessages.instance().add(Severity.ERROR,
 					"Validazione fallita! Alcune regole non sono verificate");
 			// this.entityManager.clear();
+			if (dirty != null && dirty == false) {
+				this.slotInstHome.getInstance().setStatus(
+						SlotInstStatus.INVALID);
+			}
 			return "failed";
+
 		}
 
 		if (sizeCollectionPassed && rulesPassed) {
 			FacesMessages.instance().add(Severity.INFO,
 					"La busta ha passato la validazione");
+			if (dirty != null && dirty == false) {
+				this.slotInstHome.getInstance().setStatus(SlotInstStatus.VALID);
+			}
 			return "validated";
 		}
 
@@ -1341,7 +1398,7 @@ public class SlotInstEditBean {
 		// } else {
 		// this.slotInstHome.getInstance().setStatus(SlotInstStatus.INVALID);
 		// }
-		return null;
+		return "failed";
 	}
 
 	private boolean verify() {
