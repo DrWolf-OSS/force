@@ -12,7 +12,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
@@ -32,6 +31,8 @@ public class SlotInst {
 	private String nodeRef;
 
 	private Set<SlotInst> dependentSlotInsts = new HashSet<SlotInst>();
+
+	private SlotInst parentSlotInst;
 
 	// private Set<MultiplePropertyInst> multiPropertyInsts = new
 	// HashSet<MultiplePropertyInst>();
@@ -60,8 +61,8 @@ public class SlotInst {
 		}
 	}
 
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "parentSlotInst_id")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "parentSlotInst")
+	// @JoinColumn(name = "parentSlotInst_id")
 	public Set<SlotInst> getDependentSlotInsts() {
 		return this.dependentSlotInsts;
 	}
@@ -84,6 +85,11 @@ public class SlotInst {
 
 	public String getOwnerId() {
 		return this.ownerId;
+	}
+
+	@ManyToOne
+	public SlotInst getParentSlotInst() {
+		return this.parentSlotInst;
 	}
 
 	@OrderBy("propertyDef")
@@ -132,6 +138,10 @@ public class SlotInst {
 
 	public void setOwnerId(String owner) {
 		this.ownerId = owner;
+	}
+
+	public void setParentSlotInst(SlotInst parentSlotInst) {
+		this.parentSlotInst = parentSlotInst;
 	}
 
 	public void setPropertyInsts(Set<PropertyInst> propertyInsts) {

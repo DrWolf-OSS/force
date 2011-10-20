@@ -68,8 +68,25 @@
 			
 				
 			<rich:panel>
-				<f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Modifica' : 'Crea'} Busta #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
+				<f:facet name="header">
+				#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Modifica' : 'Crea'} Busta #{slotInstHome.managed ? slotInstHome.id : ''}
+				</f:facet>
 				
+				<s:decorate template="/layout/display.xhtml" rendered="#{slotDefHome.instance.type == 'DEPENDENT'}">
+					<ui:define name="label">
+						<h:outputText value="Busta Principale" />
+					</ui:define>
+					<h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
+							rendered="#{slotInstHome.instance.parentSlotInst.status == 'EMPTY'}" />
+					<h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
+							rendered="#{slotInstHome.instance.parentSlotInst.status == 'VALID'}" />
+					<h:graphicImage value="/img/envelope-red-exclamation.png"  styleClass="fileIcon"
+							rendered="#{slotInstHome.instance.parentSlotInst.status == 'INVALID'}" />
+					<s:link value="#{slotDefHome.instance.parentSlotDef.name}" view="/user/SlotInstEdit.xhtml" propagation="none">
+						<f:param name="slotDefId" value="#{slotDefHome.instance.parentSlotDef.id}"/>
+						<f:param name="slotInstId" value="#{slotInstHome.instance.parentSlotInst.id}"/>
+					</s:link>
+				</s:decorate>
 				
 				<s:decorate template="/layout/display.xhtml">
 					<ui:define name="label">
@@ -77,6 +94,7 @@
 					</ui:define>
 					<h:outputText value="#{slotInstHome.instance.status.value()}" />
 				</s:decorate>
+				
 
 				<s:div id="embeddedProperties">
 					<c:forEach var="dataInstance" items="#{slotInstEditBean.embeddedProperties}">
@@ -434,12 +452,25 @@
 				
 				<s:div id="dependentSlots">
 					<c:forEach var="slot"  items="#{slotInstHome.instance.dependentSlotInsts}">
-						<s:link value="Sotto Busta: #{slot.slotDef.name} : #{slot.id}" view="/user/SlotInstEdit.xhtml" propagation="none">
-							<f:param name="slotDefId" value="#{slot.slotDef.id}"/>
-							<f:param name="slotInstId" value="#{slot.id}"/>
-						</s:link>
+						<s:decorate template="/layout/display.xhtml">
+							<ui:define name="label">
+								<h:outputText value="Sottobuste" />
+							</ui:define>
+							<h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
+								rendered="#{slot.status == 'EMPTY'}" />
+							<h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
+								rendered="#{slot.status == 'VALID'}" />
+							<h:graphicImage value="/img/envelope-red-exclamation.png"  styleClass="fileIcon"
+								rendered="#{slot.status == 'INVALID'}" />
+							<s:link value="#{slot.slotDef.name} : #{slot.id}" view="/user/SlotInstEdit.xhtml" propagation="none">
+								<f:param name="slotDefId" value="#{slot.slotDef.id}"/>
+								<f:param name="slotInstId" value="#{slot.id}"/>
+							</s:link>
+						</s:decorate>
 					</c:forEach>
 				</s:div>
+				
+				<div style="clear: both"/>
 
 			</rich:panel>
 
@@ -457,13 +488,13 @@
 			<h:commandButton id="delete"
 				value="Elimina" action="#{slotInstEditBean.removeSlot()}" immediate="true"
 				onclick="return confirm('Sicuro di voler eliminare la busta?'); dirty = false;"
-				
+				rendered="#{slotInstHome.instance.id != null}"
 				styleClass="modal"/>
 			<h:commandButton id="validate"
 				value="Valida" 
 				onclick="dirty = false;"
 				action="#{slotInstEditBean.validate()}"
-				disabled="#{slotInstHome.instance.id == null}"
+				
 				styleClass="modal"/>
 			</div>
 		</a:form>

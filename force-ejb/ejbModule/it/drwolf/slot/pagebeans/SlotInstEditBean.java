@@ -522,10 +522,11 @@ public class SlotInstEditBean {
 				//
 				SlotInst dependentSlotInst = new SlotInst(dependentSlotDef);
 				//
-
 				dependentSlotInst.setOwnerId(this.slotInstHome.getInstance()
 						.getOwnerId());
 
+				dependentSlotInst.setParentSlotInst(this.slotInstHome
+						.getInstance());
 				this.slotInstHome.getInstance().getDependentSlotInsts()
 						.add(dependentSlotInst);
 			}
@@ -1318,7 +1319,7 @@ public class SlotInstEditBean {
 		if (!rulesPassed) {
 			FacesMessages.instance().add(Severity.ERROR,
 					"Validazione fallita! Alcune regole non sono verificate");
-			this.entityManager.clear();
+			// this.entityManager.clear();
 			return "failed";
 		}
 
@@ -1327,6 +1328,19 @@ public class SlotInstEditBean {
 					"La busta ha passato la validazione");
 			return "validated";
 		}
+
+		// Con le entity non detached (senza entityManager.clear())
+		// il valore calcolato dello status viene
+		// PERSISTITO anche se non viene invocato direttamente il metodo
+		// update()
+		// if (rulesPassed && sizeCollectionPassed) {
+		// this.slotInstHome.getInstance().setStatus(SlotInstStatus.VALID);
+		// FacesMessages.instance().add(Severity.INFO,
+		// "La busta ha passato la validazione");
+		// return "validated";
+		// } else {
+		// this.slotInstHome.getInstance().setStatus(SlotInstStatus.INVALID);
+		// }
 		return null;
 	}
 
