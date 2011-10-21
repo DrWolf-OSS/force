@@ -149,6 +149,11 @@ public class SlotDefEditBean {
 		dependentCloned.setConditionalPropertyInst(this.dependentSlotDef
 				.getConditionalPropertyInst());
 
+		//
+		dependentCloned.setNumberOfInstances(this.dependentSlotDef
+				.getNumberOfInstances());
+		//
+
 		// this.slotDefCloners.put(this.dependentSlotDef.getId(),
 		// slotDefCloner);
 		this.slotDefHome.getSlotDefCloner().getDependentSlotDefCloners()
@@ -858,6 +863,7 @@ public class SlotDefEditBean {
 			this.dependentSlotDef.setConditionalPropertyDef(null);
 			this.dependentSlotDef.setConditionalPropertyInst(null);
 			this.dependentSlotDef.setParentSlotDef(null);
+			this.dependentSlotDef.setNumberOfInstances(null);
 
 			this.dependentSlotDef = null;
 			//

@@ -521,17 +521,30 @@ public class SlotInstEditBean {
 				// dependentSlotInst.getDocInstCollections().add(
 				// depDocInstCollection);
 				// }
+				PropertyInst numberOfInstancesPropertyInst = this.slotInstHome
+						.getInstance().retrievePropertyInstByDef(
+								dependentSlotDef.getNumberOfInstances());
+				if (numberOfInstancesPropertyInst != null
+						&& numberOfInstancesPropertyInst.getPropertyDef()
+								.getDataType().equals(DataType.INTEGER)) {
+					Integer numberOfInstances = numberOfInstancesPropertyInst
+							.getIntegerValue();
+					for (int i = 0; i < numberOfInstances; i++) {
+						//
+						SlotInst dependentSlotInst = new SlotInst(
+								dependentSlotDef);
+						//
+						dependentSlotInst.setOwnerId(this.slotInstHome
+								.getInstance().getOwnerId());
 
-				//
-				SlotInst dependentSlotInst = new SlotInst(dependentSlotDef);
-				//
-				dependentSlotInst.setOwnerId(this.slotInstHome.getInstance()
-						.getOwnerId());
+						dependentSlotInst.setParentSlotInst(this.slotInstHome
+								.getInstance());
+						this.slotInstHome.getInstance().getDependentSlotInsts()
+								.add(dependentSlotInst);
+					}
 
-				dependentSlotInst.setParentSlotInst(this.slotInstHome
-						.getInstance());
-				this.slotInstHome.getInstance().getDependentSlotInsts()
-						.add(dependentSlotInst);
+				}
+
 			}
 		}
 

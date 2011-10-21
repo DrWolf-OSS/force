@@ -451,11 +451,40 @@
 				campi obbligatori</div>
 				
 				<s:div id="dependentSlots">
-					<c:forEach var="slot"  items="#{slotInstHome.instance.dependentSlotInsts}">
-						<s:decorate template="/layout/display.xhtml">
-							<ui:define name="label">
-								<h:outputText value="Sottobuste" />
-							</ui:define>
+				<s:decorate template="/layout/display.xhtml">
+					<ui:define name="label">
+						<h:outputText value="Sottobuste" />
+					</ui:define>
+					<ui:repeat var="slot" value="#{slotInstHome.instance.dependentSlotInstsAsList}">
+						<s:div>
+							<rich:toolTip>
+							<span>
+							<ui:repeat var="dataInstance" value="#{slot.propertyInstsAsList}">
+								<s:decorate template="/layout/display.xhtml">
+									<ui:define name="label">
+										<h:outputText value="#{dataInstance.dataDefinition.label}" />
+									</ui:define>
+									<s:fragment rendered="#{not dataInstance.dataDefinition.multiple}">
+									<h:outputText value="#{dataInstance.stringValue}"
+										rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"/>
+									<h:outputText value="#{dataInstance.integerValue}"
+										rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER'}" />
+									<h:outputText value="#{dataInstance.booleanValue ? 'Sì' : 'No'}"
+										rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}" />
+									<h:outputText value="#{dataInstance.dateValue}"
+										rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}">
+										<s:convertDateTime type="date" dateStyle="short"
+											pattern="dd/MM/yyyy" />
+									</h:outputText>
+									</s:fragment>
+									<s:fragment rendered="#{dataInstance.dataDefinition.multiple}">
+									<h:outputText value="#{dataInstance.values.toString()}"/>
+									</s:fragment>
+								</s:decorate>
+							</ui:repeat>
+							</span>
+							</rich:toolTip>
+							
 							<h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
 								rendered="#{slot.status == 'EMPTY'}" />
 							<h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
@@ -466,8 +495,9 @@
 								<f:param name="slotDefId" value="#{slot.slotDef.id}"/>
 								<f:param name="slotInstId" value="#{slot.id}"/>
 							</s:link>
-						</s:decorate>
-					</c:forEach>
+						</s:div>
+					</ui:repeat>
+				</s:decorate>
 				</s:div>
 				
 				<div style="clear: both"/>

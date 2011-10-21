@@ -2,8 +2,10 @@ package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.SlotInstStatus;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -67,6 +69,11 @@ public class SlotInst {
 		return this.dependentSlotInsts;
 	}
 
+	@Transient
+	public List<SlotInst> getDependentSlotInstsAsList() {
+		return new ArrayList<SlotInst>(this.getDependentSlotInsts());
+	}
+
 	@OrderBy("docDefCollection")
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "slotInst")
 	public Set<DocInstCollection> getDocInstCollections() {
@@ -96,6 +103,11 @@ public class SlotInst {
 	@OneToMany(mappedBy = "slotInst", cascade = CascadeType.ALL)
 	public Set<PropertyInst> getPropertyInsts() {
 		return this.propertyInsts;
+	}
+
+	@Transient
+	public List<PropertyInst> getPropertyInstsAsList() {
+		return new ArrayList<PropertyInst>(this.getPropertyInsts());
 	}
 
 	@ManyToOne

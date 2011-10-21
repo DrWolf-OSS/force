@@ -106,8 +106,8 @@ public class SlotDefCloner {
 				clonedConditionalPropertyInst.setValues(new HashSet<String>(
 						conditionalPropertyInst.getValues()));
 				//
-
 			}
+
 		}
 	}
 
@@ -153,8 +153,16 @@ public class SlotDefCloner {
 
 			// this.dependentSlotDefCloners.put(dependentSlotDef.getId(),
 			// cloner);
-			this.dependentSlotDefCloners.add(cloner);
 		}
+
+		if (dependentSlotDef.getNumberOfInstances() != null) {
+			PropertyDef clonedNumberOfInstances = dependentCloned
+					.getParentSlotDef().retrievePropertyDefByName(
+							dependentSlotDef.getNumberOfInstances().getName());
+			dependentCloned.setNumberOfInstances(clonedNumberOfInstances);
+		}
+
+		this.dependentSlotDefCloners.add(cloner);
 
 		return dependentCloned;
 	}

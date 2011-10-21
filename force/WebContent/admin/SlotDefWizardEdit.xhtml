@@ -108,6 +108,23 @@
 	            </s:decorate>
 	            </a:region>
 	            </s:div>
+	            
+	            <s:div id="instances" >
+				<a:region>
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Numero di copie" />
+					</ui:define>
+					<h:selectOneMenu  value="#{slotDefHome.instance.numberOfInstances}" required="true"
+								converter="propertyDefConverter">
+     					<s:selectItems value="#{slotDefHome.instance.parentSlotDef.propertyDefsAsList}" label="#{propertyDef.name}"
+									var="propertyDef"  noSelectionLabel="-- select a value --" 
+									itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
+									disabled="#{propertyDef.dataType != 'INTEGER' or not propertyDef.required}"/>
+					</h:selectOneMenu>
+	            </s:decorate>
+	            </a:region>
+	            </s:div>
             
             </s:div>
 			
@@ -393,6 +410,10 @@
 								rendered="#{slot.conditionalPropertyInst.dataDefinition.dataType == 'DATE'}">
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 						</h:outputText>
+					</rich:column>
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Numero di copie</f:facet>
+						<h:outputText value="#{slot.numberOfInstances!=null ? slot.numberOfInstances.name : ''}" />
 					</rich:column>
 					<rich:column styleClass="action #{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Azioni</f:facet>
@@ -1038,6 +1059,10 @@
 			</f:facet>
 			<a:form id="dsdf" onkeypress="dirty=true">
 				<ui:param name="customType" value="p" />
+				<script type="text/javascript">
+					var dsdinvalid = false;
+				</script>
+				<ui:param name="prefix" value="dsd" />
 				
 				<s:decorate template="/layout/display.xhtml" rendered="#{slotDefEditBean.edit}">
 	                <ui:define name="label">
@@ -1054,7 +1079,7 @@
 					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef}">
      					<s:selectItems value="#{slotDefListManager.retrieveByType(true, 'DEPENDENT')}" label="#{slot.name}"
 									var="slot"  noSelectionLabel="-- select a value --"/>
-							<a:support event="onchange" reRender="condPD,condValue"/>		
+							<a:support event="onchange" reRender="condPD,condValue,numberOfIstances"/>		
 						<s:convertEntity/>
 					</h:selectOneMenu>
 	            </s:decorate>
@@ -1118,18 +1143,36 @@
 	            </s:decorate>
 	            </a:region>
 	            </s:div>
+	            
+	            <s:div id="numberOfIstances" >
+				<a:region>
+				<s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.dependentSlotDef != null}">
+	                <ui:define name="label">
+	                	<h:outputText value="Numero di copie" />
+					</ui:define>
+					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef.numberOfInstances}" required="true"
+								converter="propertyDefConverter">
+     					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
+									var="propertyDef"  noSelectionLabel="-- select a value --" 
+									itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
+									disabled="#{propertyDef.dataType != 'INTEGER' or not propertyDef.required}"/>
+					</h:selectOneMenu>
+	            </s:decorate>
+	            </a:region>
+	            </s:div>
+	            
 			<s:div>
 	        <div style="clear:both"/>
 	        </s:div>
 	        <a:jsFunction action="#{slotDefEditBean.clearEditing()}" name="clearEditing"/>
 	        <a:commandButton value="Ok"
 	        			action="#{slotDefEditBean.addDependentSlotDef()}" 
-	        			oncomplete="#{rich:component('dependentSlotDefPanel')}.hide();"
+	        			oncomplete="if(!dsdinvalid){#{rich:component('dependentSlotDefPanel')}.hide();}"
 	        			rendered="#{not slotDefEditBean.edit}" 
 	        			reRender="dsdf,slotDefTable"/>
 	        			
 	        <a:commandButton value="Ok" 
-	        			oncomplete="#{rich:component('dependentSlotDefPanel')}.hide(); clearEditing();"
+	        			oncomplete="if(!dsdinvalid){#{rich:component('dependentSlotDefPanel')}.hide(); clearEditing();}"
 	        			rendered="#{slotDefEditBean.edit}"
 	        			
 	        			reRender="dsdf,slotDefTable"/>
