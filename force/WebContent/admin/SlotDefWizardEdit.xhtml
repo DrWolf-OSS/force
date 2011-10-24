@@ -585,7 +585,7 @@
 									var="propertyDef"  noSelectionLabel="-- select a value --" 
 									itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
-						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="scp"/>
+						<a:support event="onchange" action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.collection)}" reRender="scp"/>
 					</h:selectOneMenu>
 					
 					<h:selectOneMenu  value="#{slotDefEditBean.propertyDef.conditionalPropertyDef}" 
@@ -595,7 +595,7 @@
 									var="propertyDef"  noSelectionLabel="-- select a value --" 
 									itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
-						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="scp"/>
+						<a:support event="onchange" action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.propertyDef)}" reRender="scp"/>
 					</h:selectOneMenu>
 	            </s:decorate>
 			<s:div>
@@ -701,7 +701,7 @@
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN') or propertyDef.uuid==slotDefEditBean.propertyDef.uuid}"/>
-						<a:support event="onchange" actionListener="#{slotDefEditBean.propertyDefConditionalPropertyListener}" reRender="condValue"/>
+						<a:support event="onchange" action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.propertyDef)}" reRender="condValue"/>
 					</h:selectOneMenu>
 	            </s:decorate>
 				</a:region>	
@@ -990,7 +990,7 @@
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
-						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="condPD, condPI"/>
+						<a:support event="onchange" action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.collection)}" reRender="condPD, condPI"/>
 					</h:selectOneMenu>
 	            </s:decorate>
 	            </a:region>

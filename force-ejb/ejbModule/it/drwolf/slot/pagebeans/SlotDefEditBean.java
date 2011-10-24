@@ -34,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.faces.event.ActionEvent;
-
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Factory;
@@ -114,8 +112,8 @@ public class SlotDefEditBean {
 		this.newCollection();
 		this.addProperty();
 		this.collection.setConditionalPropertyDef(this.propertyDef);
-		this.conditionalPropertyListener(null);
-		// this.conditionalPropertyListenerForConditionable(this.collection);
+		// this.conditionalPropertyListener(null);
+		this.conditionalPropertyListenerForConditionable(this.collection);
 
 		//
 		this.conditional = false;
@@ -126,8 +124,8 @@ public class SlotDefEditBean {
 		PropertyDef conditionalPropertyDef = this.propertyDef;
 		this.propertyDef = new PropertyDef();
 		this.propertyDef.setConditionalPropertyDef(conditionalPropertyDef);
-		this.conditionalPropertyListener(null);
-		// this.conditionalPropertyListenerForConditionable(this.propertyDef);
+		// this.conditionalPropertyListener(null);
+		this.conditionalPropertyListenerForConditionable(this.propertyDef);
 
 		//
 		this.conditional = false;
@@ -332,39 +330,49 @@ public class SlotDefEditBean {
 		this.dependentSlotDef = null;
 	}
 
-	public void conditionalPropertyListener(ActionEvent event) {
-		if (this.conditioned.equals(SlotDefEditBean.CONDITIONED_COLLECTION)) {
-			if (this.collection.getConditionalPropertyDef() != null) {
-				this.collection.setConditionalPropertyInst(new PropertyInst(
-						this.collection.getConditionalPropertyDef()));
-			} else {
-				this.collection.setConditionalPropertyInst(null);
-			}
-		} else if (this.conditioned
-				.equals(SlotDefEditBean.CONDITIONED_PROPERTY)) {
-			if (this.propertyDef.getConditionalPropertyDef() != null) {
-				this.propertyDef.setConditionalPropertyInst(new PropertyInst(
-						this.propertyDef.getConditionalPropertyDef()));
-			} else {
-				this.propertyDef.setConditionalPropertyInst(null);
-			}
-		} else if (this.conditioned.equals(SlotDefEditBean.CONDITIONED_SLOTDEF)) {
-			// if (this.dependentSlotDef.getConditionalPropertyDef() != null) {
-			// this.dependentSlotDef
-			// .setConditionalPropertyInst(new PropertyInst(
-			// this.dependentSlotDef
-			// .getConditionalPropertyDef()));
-			// } else {
-			// this.dependentSlotDef.setConditionalPropertyInst(null);
-			// }
-		}
-	}
+	// public void conditionalPropertyListener(ActionEvent event) {
+	// if (this.conditioned.equals(SlotDefEditBean.CONDITIONED_COLLECTION)) {
+	// if (this.collection.getConditionalPropertyDef() != null) {
+	// this.collection.setConditionalPropertyInst(new PropertyInst(
+	// this.collection.getConditionalPropertyDef()));
+	// } else {
+	// this.collection.setConditionalPropertyInst(null);
+	// }
+	// } else if (this.conditioned
+	// .equals(SlotDefEditBean.CONDITIONED_PROPERTY)) {
+	// if (this.propertyDef.getConditionalPropertyDef() != null) {
+	// this.propertyDef.setConditionalPropertyInst(new PropertyInst(
+	// this.propertyDef.getConditionalPropertyDef()));
+	// } else {
+	// this.propertyDef.setConditionalPropertyInst(null);
+	// }
+	// } else if (this.conditioned.equals(SlotDefEditBean.CONDITIONED_SLOTDEF))
+	// {
+	// // if (this.dependentSlotDef.getConditionalPropertyDef() != null) {
+	// // this.dependentSlotDef
+	// // .setConditionalPropertyInst(new PropertyInst(
+	// // this.dependentSlotDef
+	// // .getConditionalPropertyDef()));
+	// // } else {
+	// // this.dependentSlotDef.setConditionalPropertyInst(null);
+	// // }
+	// }
+	// }
 
 	public void conditionalPropertyListenerForConditionable(
 			Conditionable conditionable) {
 		if (conditionable.getConditionalPropertyDef() != null) {
 			conditionable.setConditionalPropertyInst(new PropertyInst(
 					conditionable.getConditionalPropertyDef()));
+			if (conditionable instanceof PropertyDef) {
+				conditionable.getConditionalPropertyDef()
+						.getConditionedPropertyDefs()
+						.add((PropertyDef) conditionable);
+			} else if (conditionable instanceof DocDefCollection) {
+				conditionable.getConditionalPropertyDef()
+						.getConditionedDocDefCollections()
+						.add((DocDefCollection) conditionable);
+			}
 		} else {
 			conditionable.setConditionalPropertyInst(null);
 		}
@@ -719,14 +727,14 @@ public class SlotDefEditBean {
 	// return referencedPropertyDef;
 	// }
 
-	public void propertyDefConditionalPropertyListener(ActionEvent event) {
-		if (this.propertyDef.getConditionalPropertyDef() != null) {
-			this.propertyDef.setConditionalPropertyInst(new PropertyInst(
-					this.propertyDef.getConditionalPropertyDef()));
-		} else {
-			this.propertyDef.setConditionalPropertyInst(null);
-		}
-	}
+	// public void propertyDefConditionalPropertyListener(ActionEvent event) {
+	// if (this.propertyDef.getConditionalPropertyDef() != null) {
+	// this.propertyDef.setConditionalPropertyInst(new PropertyInst(
+	// this.propertyDef.getConditionalPropertyDef()));
+	// } else {
+	// this.propertyDef.setConditionalPropertyInst(null);
+	// }
+	// }
 
 	public void removeColl(DocDefCollection coll) {
 		this.slotDefHome.getInstance().getDocDefCollections().remove(coll);
