@@ -60,6 +60,8 @@ public class Gara implements Serializable {
 	// Con questo si mappa la tipologia della gara (Aperta, Negoziata, etc)
 	private String tipoProcedura;
 
+	private String tipoSvolgimento;
+
 	private Fonte fonte;
 
 	private SlotDef slotDef;
@@ -174,13 +176,18 @@ public class Gara implements Serializable {
 		return this.tipoProcedura;
 	}
 
-	// deve essere inserito anche un riferimento al settore?
+	@Column
+	public String getTipoSvolgimento() {
+		return this.tipoSvolgimento;
+	}
 
 	@Column(nullable = false)
 	@NotNull
 	public String getType() {
 		return this.type;
 	}
+
+	// deve essere inserito anche un riferimento al settore?
 
 	@Transient
 	public boolean isActive() {
@@ -268,6 +275,10 @@ public class Gara implements Serializable {
 
 	public void setTipoProcedura(String tipologia) {
 		this.tipoProcedura = tipologia;
+	}
+
+	public void setTipoSvolgimento(String tipoSvolgimento) {
+		this.tipoSvolgimento = tipoSvolgimento;
 	}
 
 	public void setType(String type) {

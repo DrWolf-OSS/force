@@ -133,6 +133,26 @@ public class StartFeedParser implements GaraFeedParserIF {
 		return false;
 	}
 
+	public boolean isOffLine() {
+		if (this.feedElements.containsKey("Svolgimento della gara:")) {
+			if (this.feedElements.get("Svolgimento della gara:").equals(
+					"Tradizionale (off line)")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isOnLine() {
+		if (this.feedElements.containsKey("Svolgimento della gara:")) {
+			if (this.feedElements.get("Svolgimento della gara:").equals(
+					"Telematica (on line)")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public boolean isValid() {
 		if (this.feedElements.isEmpty()) {
 			return false;

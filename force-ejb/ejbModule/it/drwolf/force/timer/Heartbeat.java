@@ -6,6 +6,7 @@ import it.drwolf.force.entity.Gara;
 import it.drwolf.force.entity.SOA;
 import it.drwolf.force.enums.TipoGara;
 import it.drwolf.force.enums.TipoProceduraGara;
+import it.drwolf.force.enums.TipoSvolgimento;
 import it.drwolf.force.utils.StartFeedParser;
 
 import java.io.BufferedReader;
@@ -192,7 +193,13 @@ public class Heartbeat {
 								gara.setTipoProcedura(TipoProceduraGara.NEGOZIATA
 										.getNome());
 							}
-							List<String> categorie = startFeed.getCategorie();
+							if (startFeed.isOffLine()) {
+								gara.setTipoSvolgimento(TipoSvolgimento.OFFLINE
+										.getNome());
+							} else if (startFeed.isOnLine()) {
+								gara.setTipoSvolgimento(TipoSvolgimento.ONLINE
+										.getNome());
+							}
 							if (startFeed.haveCm()) {
 								System.out.println("trovate le categorie : "
 										+ startFeed.getCM());
