@@ -56,6 +56,10 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	private Set<DocDefCollection> conditionedDocDefCollections = new HashSet<DocDefCollection>();
 
+	private Set<DependentSlotDef> conditionedSlotDefs = new HashSet<DependentSlotDef>();
+
+	private Set<DependentSlotDef> slotDefsIsNumberOfInstancesOf = new HashSet<DependentSlotDef>();
+
 	private Constraint constraint;
 
 	private Validator validator = new Validator();
@@ -133,6 +137,11 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 		return new ArrayList<PropertyDef>(this.conditionedPropertyDefs);
 	}
 
+	@OneToMany(mappedBy = "conditionalPropertyDef")
+	public Set<DependentSlotDef> getConditionedSlotDefs() {
+		return this.conditionedSlotDefs;
+	}
+
 	@ManyToOne
 	public Constraint getConstraint() {
 		return this.constraint;
@@ -171,6 +180,11 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	public String getName() {
 		return this.name;
+	}
+
+	@OneToMany(mappedBy = "numberOfInstances")
+	public Set<DependentSlotDef> getSlotDefsIsNumberOfInstancesOf() {
+		return this.slotDefsIsNumberOfInstancesOf;
 	}
 
 	@Transient
@@ -232,6 +246,10 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 		this.conditionedPropertyDefs = conditionedPropertyDefs;
 	}
 
+	public void setConditionedSlotDefs(Set<DependentSlotDef> conditionedSlotDefs) {
+		this.conditionedSlotDefs = conditionedSlotDefs;
+	}
+
 	public void setConstraint(Constraint constraint) {
 		this.constraint = constraint;
 	}
@@ -258,6 +276,11 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	public void setRequired(boolean required) {
 		this.required = required;
+	}
+
+	public void setSlotDefsIsNumberOfInstancesOf(
+			Set<DependentSlotDef> slotDefsIsNumberOfInstancesOf) {
+		this.slotDefsIsNumberOfInstancesOf = slotDefsIsNumberOfInstancesOf;
 	}
 
 	@Override

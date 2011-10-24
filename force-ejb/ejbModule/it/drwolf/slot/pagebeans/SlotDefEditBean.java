@@ -115,6 +115,7 @@ public class SlotDefEditBean {
 		this.addProperty();
 		this.collection.setConditionalPropertyDef(this.propertyDef);
 		this.conditionalPropertyListener(null);
+		// this.conditionalPropertyListenerForConditionable(this.collection);
 
 		//
 		this.conditional = false;
@@ -126,6 +127,9 @@ public class SlotDefEditBean {
 		this.propertyDef = new PropertyDef();
 		this.propertyDef.setConditionalPropertyDef(conditionalPropertyDef);
 		this.conditionalPropertyListener(null);
+		// this.conditionalPropertyListenerForConditionable(this.propertyDef);
+
+		//
 		this.conditional = false;
 	}
 
@@ -208,6 +212,16 @@ public class SlotDefEditBean {
 		this.edit = false;
 	}
 
+	public void checkAndInstanceDependentSlotDef() {
+		if (this.slotDefParameters.getMode().equals(
+				SlotDefType.DEPENDENT.name())
+				&& this.slotDefHome.getId() == null) {
+			DependentSlotDef dependentSlotDef = new DependentSlotDef();
+			dependentSlotDef.setTemplate(this.slotDefParameters.isModel());
+			this.slotDefHome.setInstance(dependentSlotDef);
+		}
+	}
+
 	private boolean checkCollectionReferences() {
 		boolean result = true;
 
@@ -260,16 +274,6 @@ public class SlotDefEditBean {
 							"Non possono esserci informazioni sulla gara non valorizzate!");
 		}
 		return passed;
-	}
-
-	public void checkIfDependentSlotDef() {
-		if (this.slotDefParameters.getMode().equals(
-				SlotDefType.DEPENDENT.name())
-				&& this.slotDefHome.getId() == null) {
-			DependentSlotDef dependentSlotDef = new DependentSlotDef();
-			dependentSlotDef.setTemplate(this.slotDefParameters.isModel());
-			this.slotDefHome.setInstance(dependentSlotDef);
-		}
 	}
 
 	private boolean checkNames() {

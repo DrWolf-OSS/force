@@ -149,7 +149,8 @@
 							<h:inputText value="#{dataInstance.integerValue}"
 								rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
-								disabled="#{not dataInstance.dataDefinition.editable}"
+								disabled="#{not dataInstance.dataDefinition.editable or 
+											(slotInstHome.instance.id != null and not empty dataInstance.propertyDef.slotDefsIsNumberOfInstancesOf)}"
 								validator="#{dataInstance.dataDefinition.validate}" />
 							<a:region>
 							<h:selectBooleanCheckbox value="#{dataInstance.booleanValue}"
