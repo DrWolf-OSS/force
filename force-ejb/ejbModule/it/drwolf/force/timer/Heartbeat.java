@@ -169,83 +169,85 @@ public class Heartbeat {
 						System.out.println("Nuova Gara : " + post.getTitle());
 						// nuova Gara. La inserisco
 						System.out.println(post.getLink());
-						Gara gara = new Gara(post.getTitle(), post.getLink(),
-								TipoGara.NUOVA.getNome(), fonte);
 						// devo prenderemi dal link i valori della gara che sono
 						// nella pagina del dettaglio
 						StartFeedParser startFeed = new StartFeedParser();
 						startFeed.parse(post.getLink());
-						Date dataInizio = startFeed.getDataInizio();
-						if (dataInizio != null) {
-							gara.setDataPubblicazione(dataInizio);
-						}
-						Date dataFine = startFeed.getDataFine();
-						if (dataInizio != null) {
-							gara.setDataScadenza(dataFine);
-						}
-						if (startFeed.isAperta()) {
-							gara.setTipoProcedura(TipoProceduraGara.APERTA
-									.getNome());
-						} else if (startFeed.isNegoziata()) {
-							gara.setTipoProcedura(TipoProceduraGara.NEGOZIATA
-									.getNome());
-						}
-
-						List<String> categorie = startFeed.getCategorie();
-						if (startFeed.haveCm()) {
-							System.out.println("trovate le categorie : "
-									+ startFeed.getCM());
-							HashSet<CategoriaMerceologica> listaCategorie = new HashSet<CategoriaMerceologica>();
-							for (String element : startFeed.getCM()) {
-								try {
-									String cat = element.toLowerCase()
-											.replaceAll("\\W", "_");
-									// .replaceAll("\u2012", "-")
-									// .replaceAll("\u2013", "-")
-									// .replaceAll("\u2014", "-")
-									// .replaceAll("\u2015", "-")
-									// .replaceAll("\u2053", "-");
-									CategoriaMerceologica cm = (CategoriaMerceologica) entityManager
-											.createQuery(
-													"from CategoriaMerceologica where lower(categoria) like (:categoria)")
-											.setParameter("categoria",
-													cat.trim())
-											.getSingleResult();
-									listaCategorie.add(cm);
-								} catch (NoResultException e) {
-									System.out.println("Categoria non trovata"
-											+ element);
-									e.printStackTrace();
-								} catch (NonUniqueResultException e) {
-									e.printStackTrace();
-								}
+						if (startFeed.isValid()) {
+							Gara gara = new Gara(post.getTitle(),
+									post.getLink(), TipoGara.NUOVA.getNome(),
+									fonte);
+							Date dataInizio = startFeed.getDataInizio();
+							if (dataInizio != null) {
+								gara.setDataPubblicazione(dataInizio);
 							}
-							gara.setCategorieMerceologiche(listaCategorie);
-							gara.setType(TipoGara.GESTITA.getNome());
-						}
-						if (startFeed.haveSoa()) {
-							System.out.println("trovate le soa : "
-									+ startFeed.getSOA());
-							HashSet<SOA> listaSOA = new HashSet<SOA>();
-							for (String element : startFeed.getSOA()) {
-								try {
-									SOA soa = (SOA) entityManager
-											.createQuery(
-													"from SOA where codice = :codice")
-											.setParameter("codice", element)
-											.getSingleResult();
-									listaSOA.add(soa);
-								} catch (NoResultException e) {
-									e.printStackTrace();
-								} catch (NonUniqueResultException e) {
-									e.printStackTrace();
-								}
+							Date dataFine = startFeed.getDataFine();
+							if (dataInizio != null) {
+								gara.setDataScadenza(dataFine);
 							}
-							gara.setSOA(listaSOA);
-							gara.setType(TipoGara.GESTITA.getNome());
+							if (startFeed.isAperta()) {
+								gara.setTipoProcedura(TipoProceduraGara.APERTA
+										.getNome());
+							} else if (startFeed.isNegoziata()) {
+								gara.setTipoProcedura(TipoProceduraGara.NEGOZIATA
+										.getNome());
+							}
+							List<String> categorie = startFeed.getCategorie();
+							if (startFeed.haveCm()) {
+								System.out.println("trovate le categorie : "
+										+ startFeed.getCM());
+								HashSet<CategoriaMerceologica> listaCategorie = new HashSet<CategoriaMerceologica>();
+								for (String element : startFeed.getCM()) {
+									try {
+										String cat = element.toLowerCase()
+												.replaceAll("\\W", "_");
+										// .replaceAll("\u2012", "-")
+										// .replaceAll("\u2013", "-")
+										// .replaceAll("\u2014", "-")
+										// .replaceAll("\u2015", "-")
+										// .replaceAll("\u2053", "-");
+										CategoriaMerceologica cm = (CategoriaMerceologica) entityManager
+												.createQuery(
+														"from CategoriaMerceologica where lower(categoria) like (:categoria)")
+												.setParameter("categoria",
+														cat.trim())
+												.getSingleResult();
+										listaCategorie.add(cm);
+									} catch (NoResultException e) {
+										System.out
+												.println("Categoria non trovata"
+														+ element);
+										e.printStackTrace();
+									} catch (NonUniqueResultException e) {
+										e.printStackTrace();
+									}
+								}
+								gara.setCategorieMerceologiche(listaCategorie);
+								gara.setType(TipoGara.GESTITA.getNome());
+							}
+							if (startFeed.haveSoa()) {
+								System.out.println("trovate le soa : "
+										+ startFeed.getSOA());
+								HashSet<SOA> listaSOA = new HashSet<SOA>();
+								for (String element : startFeed.getSOA()) {
+									try {
+										SOA soa = (SOA) entityManager
+												.createQuery(
+														"from SOA where codice = :codice")
+												.setParameter("codice", element)
+												.getSingleResult();
+										listaSOA.add(soa);
+									} catch (NoResultException e) {
+										e.printStackTrace();
+									} catch (NonUniqueResultException e) {
+										e.printStackTrace();
+									}
+								}
+								gara.setSOA(listaSOA);
+								gara.setType(TipoGara.GESTITA.getNome());
+							}
+							entityManager.persist(gara);
 						}
-
-						entityManager.persist(gara);
 					}
 				}
 			} catch (IllegalArgumentException e) {

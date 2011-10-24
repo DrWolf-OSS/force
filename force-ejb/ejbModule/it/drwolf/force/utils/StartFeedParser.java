@@ -133,6 +133,13 @@ public class StartFeedParser implements GaraFeedParserIF {
 		return false;
 	}
 
+	public boolean isValid() {
+		if (this.feedElements.isEmpty()) {
+			return false;
+		}
+		return true;
+	}
+
 	public void parse(String url) {
 		WebClient wc = new WebClient();
 		// Pattern pCM = Pattern.compile("^[A-Z0-9\\-\\.]+$");
