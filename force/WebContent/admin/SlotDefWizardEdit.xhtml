@@ -29,6 +29,11 @@
                 <h:inputTextarea id="name" value="#{slotDefHome.instance.name}" required="true" style="width:525px" />
             </s:decorate>
             
+            <s:decorate id="statusField" template="/layout/display.xhtml">
+                <ui:define name="label">Stato</ui:define>
+                <h:outputText id="status" value="#{slotDefHome.instance.status.value()}" />
+            </s:decorate>
+            
             <s:decorate id="typeField" template="/layout/edit.xhtml" rendered="#{slotDefParameters.mode == 'Normal'}">
                 <ui:define name="label">Tipo</ui:define>
                 <h:selectOneMenu id="slotDefType" value="#{slotDefHome.instance.type}" >
@@ -38,7 +43,7 @@
              	</h:selectOneMenu>
             </s:decorate>
             
-            <s:div rendered="#{slotDefHome.instance.type == 'DEPENDENT' and not slotDefHome.instance.template}">
+            <s:div rendered="#{slotDefHome.instance.id != null and slotDefHome.instance.type == 'DEPENDENT' and not slotDefHome.instance.template}">
             
 	            <s:decorate id="parentSlot" template="/layout/display.xhtml">
 	                <ui:define name="label">Busta Contenitrice</ui:define>
@@ -143,7 +148,7 @@
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.embeddedPropertiesAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.embeddedPropertiesAsList}" var="eprop" 
 						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" style="width:1024px" >
-					<rich:column style="width:200px" styleClass="#{!eprop.active ? 'invalidRow' : ''}">
+					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{eprop.name}" />
 					</rich:column>
@@ -219,7 +224,7 @@
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.propertyDefsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
 						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" >
-					<rich:column style="width:200px" styleClass="#{!prop.active ? 'invalidRow' : ''}">
+					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{prop.name}" />
 					</rich:column>
@@ -319,7 +324,7 @@
 				<h:outputText value="Nessuna richiesta definita" rendered="#{empty slotDefHome.instance.docDefCollectionsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.docDefCollectionsAsList}" var="coll" 
 						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" style="width:1024px">
-					<rich:column style="width:200px" styleClass="#{!coll.active ? 'invalidRow' : ''}">
+					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{coll.name}" />
 					</rich:column>
@@ -395,9 +400,13 @@
 						<f:facet name="header">Id</f:facet>
 						<h:outputText value="#{slot.id}" />
 					</rich:column>
-					<rich:column style="width:200px" styleClass="#{!slot.active ? 'invalidRow' : ''}">
+					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{slot.name}" />
+					</rich:column>
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Stato</f:facet>
+						<h:outputText value="#{slot.status.value()}" />
 					</rich:column>
 					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Informazione vincolante</f:facet>
@@ -512,6 +521,12 @@
                       immediate="true"
                        rendered="#{slotDefHome.managed}"
                        disabled="#{slotDefHome.referenced}"/>
+                       
+            <s:button view="/admin/SlotDefView.xhtml" value="indietro" propagation="none">
+               	<f:param name="mode" value="#{slotDefHome.instance.type.name()}"/>
+				<f:param name="model" value="#{slotDefHome.instance.template}"/>
+				<f:param name="slotDefId" value="#{slotDefHome.instance.id}"/>
+	        </s:button>
 
         </div>
 
@@ -585,7 +600,7 @@
 									var="propertyDef"  noSelectionLabel="-- select a value --" 
 									itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
-						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="scp"/>
+						<a:support event="onchange" action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.collection)}" reRender="scp"/>
 					</h:selectOneMenu>
 					
 					<h:selectOneMenu  value="#{slotDefEditBean.propertyDef.conditionalPropertyDef}" 
@@ -595,7 +610,7 @@
 									var="propertyDef"  noSelectionLabel="-- select a value --" 
 									itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
-						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="scp"/>
+						<a:support event="onchange" action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.propertyDef)}" reRender="scp"/>
 					</h:selectOneMenu>
 	            </s:decorate>
 			<s:div>
@@ -701,7 +716,7 @@
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN') or propertyDef.uuid==slotDefEditBean.propertyDef.uuid}"/>
-						<a:support event="onchange" actionListener="#{slotDefEditBean.propertyDefConditionalPropertyListener}" reRender="condValue"/>
+						<a:support event="onchange" action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.propertyDef)}" reRender="condValue"/>
 					</h:selectOneMenu>
 	            </s:decorate>
 				</a:region>	
@@ -990,7 +1005,7 @@
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
-						<a:support event="onchange" actionListener="#{slotDefEditBean.conditionalPropertyListener}" reRender="condPD, condPI"/>
+						<a:support event="onchange" action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.collection)}" reRender="condPD, condPI"/>
 					</h:selectOneMenu>
 	            </s:decorate>
 	            </a:region>
@@ -1102,7 +1117,10 @@
 									var="propertyDef"  noSelectionLabel="-- select a value --" 
 									itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
-						<a:support event="onchange" action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.dependentSlotDef)}" reRender="condValue"/>
+						<a:support event="onchange" 
+								action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.dependentSlotDef)}" 
+								oncomplete="dirty = true"
+								reRender="condValue"/>
 					</h:selectOneMenu>
 	            </s:decorate>
 	            </a:region>
@@ -1129,17 +1147,23 @@
 							required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"/>
 							
 						
-						<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.stringValue}" required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
+						<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.stringValue}" 
+									onchange="dirty = true"
+									required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
 									rendered="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dataType == 'STRING' and slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues != null}">
                     		<s:selectItems value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues}" 
 											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
              			</h:selectOneMenu>
-             			<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.integerValue}" required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
+             			<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.integerValue}" 
+             						required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
+             						onchange="dirty = true"
 									rendered="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dataType == 'INTEGER' and slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues != null}">
                     		<s:selectItems value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues}" 
 											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
              			</h:selectOneMenu>
-             			<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.dateValue}"  required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
+             			<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.dateValue}"  
+             						onchange="dirty = true"
+             						required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
              						rendered="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dataType == 'DATE' and slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues != null}">
                     		<s:selectItems value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues}" 
 											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
@@ -1155,7 +1179,9 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Numero di copie" />
 					</ui:define>
-					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef.numberOfInstances}" required="true"
+					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef.numberOfInstances}" 
+								onchange="dirty = true"
+								required="true"
 								converter="propertyDefConverter">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" 
@@ -1172,14 +1198,13 @@
 	        <a:jsFunction action="#{slotDefEditBean.clearEditing()}" name="clearEditing"/>
 	        <a:commandButton value="Ok"
 	        			action="#{slotDefEditBean.addDependentSlotDef()}" 
-	        			oncomplete="if(!dsdinvalid){#{rich:component('dependentSlotDefPanel')}.hide();}"
+	        			oncomplete="if(!dsdinvalid){#{rich:component('dependentSlotDefPanel')}.hide(); dirty=true;}"
 	        			rendered="#{not slotDefEditBean.edit}" 
 	        			reRender="dsdf,slotDefTable"/>
 	        			
 	        <a:commandButton value="Ok" 
 	        			oncomplete="if(!dsdinvalid){#{rich:component('dependentSlotDefPanel')}.hide(); clearEditing();}"
 	        			rendered="#{slotDefEditBean.edit}"
-	        			
 	        			reRender="dsdf,slotDefTable"/>
 	        			
 	        <a:region>

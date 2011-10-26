@@ -159,6 +159,11 @@ a:HOVER {
 	*/
 }
 
+.columnName{
+	width:200px;
+	font-weight:bold";
+}
+
 
 /*
 .invalidRow.action.disabledLink a:LINK {
