@@ -1,5 +1,6 @@
 package it.drwolf.slot.entity;
 
+import it.drwolf.slot.enums.SlotDefSatus;
 import it.drwolf.slot.enums.SlotDefType;
 
 import java.util.ArrayList;
@@ -51,6 +52,8 @@ public class SlotDef {
 	// private boolean active = Boolean.TRUE;
 
 	private Set<DependentSlotDef> dependentSlotDefs = new HashSet<DependentSlotDef>();
+
+	private SlotDefSatus status = SlotDefSatus.INVALID;
 
 	@OneToMany(mappedBy = "parentSlotDef", cascade = CascadeType.ALL)
 	public Set<DependentSlotDef> getDependentSlotDefs() {
@@ -118,6 +121,11 @@ public class SlotDef {
 	@Transient
 	public List<Rule> getRulesAsList() {
 		return new ArrayList<Rule>(this.rules);
+	}
+
+	@Enumerated(EnumType.STRING)
+	public SlotDefSatus getStatus() {
+		return this.status;
 	}
 
 	@Enumerated(EnumType.STRING)
@@ -201,13 +209,6 @@ public class SlotDef {
 		this.dependentSlotDefs = dependentSlotDefs;
 	}
 
-	@Transient
-	public void setDependentSlotDefsAsList(
-			List<DependentSlotDef> dependentSlotDefsAsList) {
-		this.setDependentSlotDefs(new HashSet<DependentSlotDef>(
-				dependentSlotDefsAsList));
-	}
-
 	// @Override
 	// public int hashCode() {
 	// final int prime = 31;
@@ -255,6 +256,13 @@ public class SlotDef {
 	// return true;
 	// }
 
+	@Transient
+	public void setDependentSlotDefsAsList(
+			List<DependentSlotDef> dependentSlotDefsAsList) {
+		this.setDependentSlotDefs(new HashSet<DependentSlotDef>(
+				dependentSlotDefsAsList));
+	}
+
 	public void setDocDefCollections(Set<DocDefCollection> docDefCollections) {
 		this.docDefCollections = docDefCollections;
 	}
@@ -301,6 +309,10 @@ public class SlotDef {
 	@Transient
 	public void setRulesAsList(List<Rule> rules) {
 		this.setRules(new HashSet<Rule>(rules));
+	}
+
+	public void setStatus(SlotDefSatus status) {
+		this.status = status;
 	}
 
 	public void setTemplate(boolean template) {

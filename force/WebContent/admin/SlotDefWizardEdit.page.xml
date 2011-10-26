@@ -33,7 +33,7 @@
    
    <navigation from-action="#{slotDefEditBean.save()}">
       <rule if-outcome="persisted">
-         <end-conversation before-redirect="true"/>
+         <end-conversation />
          <redirect view-id="/admin/SlotDefView.xhtml">
          	<param name="model" value="#{slotDefParameters.model}"/>
     		<param name="mode" value="#{slotDefParameters.mode}"/>
@@ -53,7 +53,7 @@
    
    <navigation from-action="#{slotDefEditBean.update()}">
       <rule if-outcome="updated">
-         <end-conversation before-redirect="true"/>
+         <end-conversation />
          <redirect view-id="/admin/SlotDefView.xhtml">
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
     		<param name="model" value="#{slotDefParameters.model}"/>

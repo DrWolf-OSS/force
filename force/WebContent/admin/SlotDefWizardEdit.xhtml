@@ -38,7 +38,7 @@
              	</h:selectOneMenu>
             </s:decorate>
             
-            <s:div rendered="#{slotDefHome.instance.type == 'DEPENDENT' and not slotDefHome.instance.template}">
+            <s:div rendered="#{slotDefHome.instance.id != null and slotDefHome.instance.type == 'DEPENDENT' and not slotDefHome.instance.template}">
             
 	            <s:decorate id="parentSlot" template="/layout/display.xhtml">
 	                <ui:define name="label">Busta Contenitrice</ui:define>
@@ -1102,7 +1102,10 @@
 									var="propertyDef"  noSelectionLabel="-- select a value --" 
 									itemLabel="#{propertyDef.id}" itemValue="#{propertyDef.id}:#{propertyDef.uuid}" 
 									disabled="#{(not propertyDef.multiple) and (propertyDef.dictionary == null) and (propertyDef.dataType != 'BOOLEAN')}"/>
-						<a:support event="onchange" action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.dependentSlotDef)}" reRender="condValue"/>
+						<a:support event="onchange" 
+								action="#{slotDefEditBean.conditionalPropertyListenerForConditionable(slotDefEditBean.dependentSlotDef)}" 
+								oncomplete="dirty = true"
+								reRender="condValue"/>
 					</h:selectOneMenu>
 	            </s:decorate>
 	            </a:region>
@@ -1129,17 +1132,23 @@
 							required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"/>
 							
 						
-						<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.stringValue}" required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
+						<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.stringValue}" 
+									onchange="dirty = true"
+									required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
 									rendered="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dataType == 'STRING' and slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues != null}">
                     		<s:selectItems value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues}" 
 											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
              			</h:selectOneMenu>
-             			<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.integerValue}" required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
+             			<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.integerValue}" 
+             						required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
+             						onchange="dirty = true"
 									rendered="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dataType == 'INTEGER' and slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues != null}">
                     		<s:selectItems value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues}" 
 											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
              			</h:selectOneMenu>
-             			<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.dateValue}"  required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
+             			<h:selectOneMenu value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyInst.dateValue}"  
+             						onchange="dirty = true"
+             						required="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef != null}"
              						rendered="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dataType == 'DATE' and slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues != null}">
                     		<s:selectItems value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef.dictionaryValues}" 
 											var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
@@ -1155,7 +1164,9 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Numero di copie" />
 					</ui:define>
-					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef.numberOfInstances}" required="true"
+					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef.numberOfInstances}" 
+								onchange="dirty = true"
+								required="true"
 								converter="propertyDefConverter">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" 
@@ -1172,14 +1183,13 @@
 	        <a:jsFunction action="#{slotDefEditBean.clearEditing()}" name="clearEditing"/>
 	        <a:commandButton value="Ok"
 	        			action="#{slotDefEditBean.addDependentSlotDef()}" 
-	        			oncomplete="if(!dsdinvalid){#{rich:component('dependentSlotDefPanel')}.hide();}"
+	        			oncomplete="if(!dsdinvalid){#{rich:component('dependentSlotDefPanel')}.hide(); dirty=true;}"
 	        			rendered="#{not slotDefEditBean.edit}" 
 	        			reRender="dsdf,slotDefTable"/>
 	        			
 	        <a:commandButton value="Ok" 
 	        			oncomplete="if(!dsdinvalid){#{rich:component('dependentSlotDefPanel')}.hide(); clearEditing();}"
 	        			rendered="#{slotDefEditBean.edit}"
-	        			
 	        			reRender="dsdf,slotDefTable"/>
 	        			
 	        <a:region>
