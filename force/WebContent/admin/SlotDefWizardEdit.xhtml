@@ -29,6 +29,11 @@
                 <h:inputTextarea id="name" value="#{slotDefHome.instance.name}" required="true" style="width:525px" />
             </s:decorate>
             
+            <s:decorate id="statusField" template="/layout/display.xhtml">
+                <ui:define name="label">Stato</ui:define>
+                <h:outputText id="status" value="#{slotDefHome.instance.status.value()}" />
+            </s:decorate>
+            
             <s:decorate id="typeField" template="/layout/edit.xhtml" rendered="#{slotDefParameters.mode == 'Normal'}">
                 <ui:define name="label">Tipo</ui:define>
                 <h:selectOneMenu id="slotDefType" value="#{slotDefHome.instance.type}" >
@@ -143,7 +148,7 @@
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.embeddedPropertiesAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.embeddedPropertiesAsList}" var="eprop" 
 						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" style="width:1024px" >
-					<rich:column style="width:200px" styleClass="#{!eprop.active ? 'invalidRow' : ''}">
+					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{eprop.name}" />
 					</rich:column>
@@ -219,7 +224,7 @@
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.propertyDefsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
 						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" >
-					<rich:column style="width:200px" styleClass="#{!prop.active ? 'invalidRow' : ''}">
+					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{prop.name}" />
 					</rich:column>
@@ -319,7 +324,7 @@
 				<h:outputText value="Nessuna richiesta definita" rendered="#{empty slotDefHome.instance.docDefCollectionsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.docDefCollectionsAsList}" var="coll" 
 						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" style="width:1024px">
-					<rich:column style="width:200px" styleClass="#{!coll.active ? 'invalidRow' : ''}">
+					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{coll.name}" />
 					</rich:column>
@@ -395,9 +400,13 @@
 						<f:facet name="header">Id</f:facet>
 						<h:outputText value="#{slot.id}" />
 					</rich:column>
-					<rich:column style="width:200px" styleClass="#{!slot.active ? 'invalidRow' : ''}">
+					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{slot.name}" />
+					</rich:column>
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Stato</f:facet>
+						<h:outputText value="#{slot.status.value()}" />
 					</rich:column>
 					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Informazione vincolante</f:facet>
@@ -512,6 +521,12 @@
                       immediate="true"
                        rendered="#{slotDefHome.managed}"
                        disabled="#{slotDefHome.referenced}"/>
+                       
+            <s:button view="/admin/SlotDefView.xhtml" value="indietro" propagation="none">
+               	<f:param name="mode" value="#{slotDefHome.instance.type.name()}"/>
+				<f:param name="model" value="#{slotDefHome.instance.template}"/>
+				<f:param name="slotDefId" value="#{slotDefHome.instance.id}"/>
+	        </s:button>
 
         </div>
 

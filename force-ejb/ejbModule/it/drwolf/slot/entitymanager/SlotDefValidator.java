@@ -28,8 +28,7 @@ public class SlotDefValidator {
 		this.slotDef = slotDef;
 	}
 
-	private boolean checkCollectionReferences(boolean displayMessages,
-			SlotDef slotDef) {
+	private boolean checkCollectionReferences(SlotDef slotDef) {
 		boolean result = true;
 
 		for (DocDefCollection collection : slotDef.getDocDefCollections()) {
@@ -38,7 +37,7 @@ public class SlotDefValidator {
 			if (conditionalPropertyDef != null
 					&& collection.getConditionalPropertyInst().getValue() == null) {
 				result = false;
-				if (displayMessages) {
+				if (this.slotDef.equals(slotDef)) {
 					FacesMessages
 							.instance()
 							.add(Severity.ERROR,
@@ -50,7 +49,7 @@ public class SlotDefValidator {
 				}
 			}
 		}
-		if (!result && displayMessages) {
+		if (!result && this.slotDef.equals(slotDef)) {
 			FacesMessages
 					.instance()
 					.add(Severity.ERROR,
@@ -61,8 +60,7 @@ public class SlotDefValidator {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private boolean checkEmbeddedPropertyValues(boolean displayMessages,
-			SlotDef slotDef) {
+	private boolean checkEmbeddedPropertyValues(SlotDef slotDef) {
 		boolean passed = true;
 		for (EmbeddedProperty embeddedProperty : slotDef
 				.getEmbeddedProperties()) {
@@ -70,7 +68,7 @@ public class SlotDefValidator {
 					.getValue().equals("")))
 					|| (embeddedProperty.isMultiple() && ((Set) embeddedProperty
 							.getValue()).isEmpty())) {
-				if (displayMessages) {
+				if (this.slotDef.equals(slotDef)) {
 					FacesMessages.instance().add(
 							Severity.ERROR,
 							"L'informazione \"" + embeddedProperty.getLabel()
@@ -80,7 +78,7 @@ public class SlotDefValidator {
 			}
 		}
 		if (!passed) {
-			if (displayMessages) {
+			if (this.slotDef.equals(slotDef)) {
 				FacesMessages
 						.instance()
 						.add(Severity.ERROR,
@@ -90,7 +88,7 @@ public class SlotDefValidator {
 		return passed;
 	}
 
-	private boolean checkNames(boolean displayMessages, SlotDef slotDef) {
+	private boolean checkNames(SlotDef slotDef) {
 		Set<String> differentNames = new HashSet<String>();
 		boolean result = true;
 
@@ -103,7 +101,7 @@ public class SlotDefValidator {
 		}
 		if (differentNames.size() < allProperties.size()) {
 			result = false;
-			if (displayMessages) {
+			if (this.slotDef.equals(slotDef)) {
 				FacesMessages.instance().add(Severity.ERROR,
 						"Non possono esserci property con lo stesso nome");
 			}
@@ -115,7 +113,7 @@ public class SlotDefValidator {
 		}
 		if (differentNames.size() < slotDef.getDocDefCollectionsAsList().size()) {
 			result = false;
-			if (displayMessages) {
+			if (this.slotDef.equals(slotDef)) {
 				FacesMessages.instance().add(Severity.ERROR,
 						"Non possono esserci collections con lo stesso nome");
 			}
@@ -128,8 +126,7 @@ public class SlotDefValidator {
 		return this.slotDef;
 	}
 
-	private boolean ricorsiveValidateSingleSlot(boolean displayMessages,
-			SlotDef slotDef) {
+	private boolean ricorsiveValidateSingleSlot(SlotDef slotDef) {
 
 		// if (slotDef instanceof DependentSlotDef) {
 		// this.ricorsiveValidateSingleSlot(false,
@@ -141,24 +138,26 @@ public class SlotDefValidator {
 		if (slotDef.getDependentSlotDefs() != null
 				&& !slotDef.getDependentSlotDefs().isEmpty()) {
 			for (SlotDef dependentSlotDef : slotDef.getDependentSlotDefs()) {
-				boolean dependentResult = this.ricorsiveValidateSingleSlot(
-						false, dependentSlotDef);
+				boolean dependentResult = this
+						.ricorsiveValidateSingleSlot(dependentSlotDef);
 				if (!dependentResult) {
 					result = false;
-					FacesMessages.instance().add(
-							Severity.ERROR,
-							"La sottobusta " + dependentSlotDef.getName()
-									+ " non è valida. Editarla singolarmente");
+					if (!this.slotDef.equals(dependentSlotDef)) {
+						FacesMessages
+								.instance()
+								.add(Severity.ERROR,
+										"La sottobusta \""
+												+ dependentSlotDef.getName()
+												+ "\" non è valida. Editarla singolarmente");
+					}
 				}
 			}
 		}
-		boolean names = this.checkNames(displayMessages, slotDef);
-		boolean references = this.checkCollectionReferences(displayMessages,
-				slotDef);
+		boolean names = this.checkNames(slotDef);
+		boolean references = this.checkCollectionReferences(slotDef);
 		boolean embeddedValues = true;
 		if (!slotDef.isTemplate()) {
-			embeddedValues = this.checkEmbeddedPropertyValues(displayMessages,
-					slotDef);
+			embeddedValues = this.checkEmbeddedPropertyValues(slotDef);
 		}
 
 		//
@@ -188,10 +187,21 @@ public class SlotDefValidator {
 
 	public boolean validate() {
 		if (this.slotDef instanceof DependentSlotDef) {
-			return this.ricorsiveValidateSingleSlot(true,
-					((DependentSlotDef) this.slotDef).getParentSlotDef());
+			boolean valid = this
+					.ricorsiveValidateSingleSlot(((DependentSlotDef) this.slotDef)
+							.getParentSlotDef());
+			if (!valid && this.slotDef.getStatus().equals(SlotDefSatus.VALID)) {
+				FacesMessages
+						.instance()
+						.add(Severity.ERROR,
+								"La busta contenitrice \""
+										+ ((DependentSlotDef) this.slotDef)
+												.getParentSlotDef().getName()
+										+ "\" non è valida. Controllare la busta principale o altre sue sottobuste");
+			}
+			return valid;
 		}
-		return this.ricorsiveValidateSingleSlot(true, this.slotDef);
+		return this.ricorsiveValidateSingleSlot(this.slotDef);
 	}
 
 	// /**
