@@ -41,8 +41,11 @@ public class GaraList extends EntityQuery<Gara> {
 			if (gara.getType().equals(TipoGara.GESTITA.getNome())) {
 				ritorno.add(gara);
 			}
-			if (ritorno.size() == maxRes) {
-				break;
+			// se maxRes è 0 vuol dire che le voglio tutte
+			if (maxRes > 0) {
+				if (ritorno.size() == maxRes) {
+					break;
+				}
 			}
 		}
 		return ritorno;
