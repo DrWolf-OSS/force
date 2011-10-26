@@ -32,6 +32,8 @@ public class SOA implements Serializable {
 
 	private Boolean qualifica;
 
+	private String classifica;
+
 	private Set<Azienda> aziende;
 
 	private Set<Gara> gare;
@@ -61,6 +63,11 @@ public class SOA implements Serializable {
 	@ManyToMany(mappedBy = "SOA")
 	public Set<Azienda> getAziende() {
 		return this.aziende;
+	}
+
+	@Column
+	public String getClassifica() {
+		return this.classifica;
 	}
 
 	@Column
@@ -108,6 +115,10 @@ public class SOA implements Serializable {
 
 	public void setAziende(Set<Azienda> aziende) {
 		this.aziende = aziende;
+	}
+
+	public void setClassifica(String classifica) {
+		this.classifica = classifica;
 	}
 
 	public void setCodice(String og) {
