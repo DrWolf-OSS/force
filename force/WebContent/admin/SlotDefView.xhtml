@@ -278,6 +278,10 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 						</h:outputText>
 					</rich:column>
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Info contenente numero di copie</f:facet>
+						<h:outputText value="#{slot.numberOfInstances!=null ? slot.numberOfInstances.name : ''}" />
+					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
 			

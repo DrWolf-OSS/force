@@ -25,6 +25,19 @@
 	          <rich:componentControl for="panel" attachTo="chiudiPanel" operation="hide" event="onclick"/>
 	    </rich:modalPanel>
 	    
+	    <s:div styleClass="messageBox" rendered="#{not empty slotInstEditBean.slotMessages}">
+				<ui:repeat var="message" value="#{slotInstEditBean.slotMessages}">
+					<h:graphicImage value="/img/msgerror.png"  styleClass="fileIcon"
+						rendered="#{message.type == 'ERROR'}" />
+					<h:graphicImage value="/img/msgwarn.png"  styleClass="fileIcon"
+						rendered="#{message.type == 'WARNING'}" />
+					<h:graphicImage value="/img/tick.png"  styleClass="fileIcon"
+						rendered="#{message.type == 'VALID'}" />
+					<h:outputText value="#{message.text}" />
+					<br />
+				</ui:repeat>
+				</s:div>
+				<div style="clear: both"/>
 	    
 		<a:form id="slotInst" styleClass="edit" onkeypress="dirty=true">
 		<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
@@ -49,19 +62,39 @@
 				</h:panelGrid>
 			</rich:simpleTogglePanel>
 			
+						
 			<rich:spacer height="10"></rich:spacer>
+			<div style="clear: both"/>
 			
-			<rich:panel>
-				<f:facet name="header">#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Modifica' : 'Crea'} Busta #{slotInstHome.managed ? slotInstHome.id : ''}</f:facet>
 				
-				<ui:repeat var="message" value="#{slotInstEditBean.slotMessages}">
-					<h:graphicImage value="/img/msgerror.png"
-						rendered="#{message.type == 'ERROR'}" />
-					<h:graphicImage value="/img/msgwarn.png"
-						rendered="#{message.type == 'WARNING'}" />
-					<h:outputText value="#{message.text}" />
-					<br />
-				</ui:repeat>
+			<rich:panel>
+				<f:facet name="header">
+				#{slotDefHome.instance.name} : #{slotInstHome.managed ? 'Modifica' : 'Crea'} Busta #{slotInstHome.managed ? slotInstHome.id : ''}
+				</f:facet>
+				
+				<s:decorate template="/layout/display.xhtml" rendered="#{slotDefHome.instance.type == 'DEPENDENT'}">
+					<ui:define name="label">
+						<h:outputText value="Busta Principale" />
+					</ui:define>
+					<h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
+							rendered="#{slotInstHome.instance.parentSlotInst.status == 'EMPTY'}" />
+					<h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
+							rendered="#{slotInstHome.instance.parentSlotInst.status == 'VALID'}" />
+					<h:graphicImage value="/img/envelope-red-exclamation.png"  styleClass="fileIcon"
+							rendered="#{slotInstHome.instance.parentSlotInst.status == 'INVALID'}" />
+					<s:link value="#{slotDefHome.instance.parentSlotDef.name}" view="/user/SlotInstEdit.xhtml" propagation="none">
+						<f:param name="slotDefId" value="#{slotDefHome.instance.parentSlotDef.id}"/>
+						<f:param name="slotInstId" value="#{slotInstHome.instance.parentSlotInst.id}"/>
+					</s:link>
+				</s:decorate>
+				
+				<s:decorate template="/layout/display.xhtml">
+					<ui:define name="label">
+						<h:outputText value="Stato" />
+					</ui:define>
+					<h:outputText value="#{slotInstHome.instance.status.value()}" />
+				</s:decorate>
+				
 
 				<s:div id="embeddedProperties">
 					<c:forEach var="dataInstance" items="#{slotInstEditBean.embeddedProperties}">
@@ -116,7 +149,8 @@
 							<h:inputText value="#{dataInstance.integerValue}"
 								rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
-								disabled="#{not dataInstance.dataDefinition.editable}"
+								disabled="#{not dataInstance.dataDefinition.editable or 
+											(slotInstHome.instance.id != null and not empty dataInstance.propertyDef.slotDefsIsNumberOfInstancesOf)}"
 								validator="#{dataInstance.dataDefinition.validate}" />
 							<a:region>
 							<h:selectBooleanCheckbox value="#{dataInstance.booleanValue}"
@@ -255,15 +289,17 @@
 						<s:div id="infoPanel_#{coll.docDefCollection.id}"
 							rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
 										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
-							<ui:repeat var="message"
-								value="#{slotInstEditBean.collectionsMessages[coll.docDefCollection.id]}">
-								<h:graphicImage value="/img/msgerror.png"
-									rendered="#{message.type == 'ERROR'}" />
-								<h:graphicImage value="/img/msgwarn.png"
-									rendered="#{message.type == 'WARNING'}" />
-								<h:outputText value="#{message.text}" />
-								<br />
-							</ui:repeat>
+							<s:div styleClass="messageBox" rendered="#{not empty slotInstEditBean.collectionsMessages[coll.docDefCollection.id]}">
+								<ui:repeat var="message"
+									value="#{slotInstEditBean.collectionsMessages[coll.docDefCollection.id]}">
+									<h:graphicImage value="/img/msgerror.png"
+										rendered="#{message.type == 'ERROR'}" styleClass="fileIcon"/>
+									<h:graphicImage value="/img/msgwarn.png"
+										rendered="#{message.type == 'WARNING'}" styleClass="fileIcon"/>
+									<h:outputText value="#{message.text}" />
+									<br />
+								</ui:repeat>
+							</s:div>
 							<rich:panel styleClass="infoPanel">
 								<f:facet name="header">
 									<h:outputText value="Informazioni sui documenti caricati" />
@@ -277,15 +313,17 @@
 									
 									<s:div styleClass="fileItem">
 			
-									<ui:repeat var="message"
-										value="#{slotInstEditBean.filesMessages[item.id]}">
-										<h:graphicImage value="/img/msgerror.png"
-											rendered="#{message.type == 'ERROR'}" />
-										<h:graphicImage value="/img/msgwarn.png"
-											rendered="#{message.type == 'WARNING'}" />
-										<h:outputText value="#{message.text}" />
-										<br />
-									</ui:repeat>
+									<s:div styleClass="messageBox" rendered="#{not empty slotInstEditBean.filesMessages[item.id]}">
+										<ui:repeat var="message"
+											value="#{slotInstEditBean.filesMessages[item.id]}">
+											<h:graphicImage value="/img/msgerror.png" styleClass="fileIcon"
+												rendered="#{message.type == 'ERROR'}" />
+											<h:graphicImage value="/img/msgwarn.png" styleClass="fileIcon"
+												rendered="#{message.type == 'WARNING'}" />
+											<h:outputText value="#{message.text}" />
+											<br />
+										</ui:repeat>
+									</s:div>
 
 									<s:decorate template="/layout/display.xhtml">
 										<rich:toolTip direction="top-left">
@@ -414,13 +452,56 @@
 				campi obbligatori</div>
 				
 				<s:div id="dependentSlots">
-					<c:forEach var="slot"  items="#{slotInstHome.instance.dependentSlotInsts}">
-						<s:link value="Sotto Busta: #{slot.slotDef.name} : #{slot.id}" view="/user/SlotInstEdit.xhtml" propagation="none">
-							<f:param name="slotDefId" value="#{slot.slotDef.id}"/>
-							<f:param name="slotInstId" value="#{slot.id}"/>
-						</s:link>
-					</c:forEach>
+				<s:decorate template="/layout/display.xhtml">
+					<ui:define name="label">
+						<h:outputText value="Sottobuste" />
+					</ui:define>
+					<ui:repeat var="slot" value="#{slotInstHome.instance.dependentSlotInstsAsList}">
+						<s:div>
+							<rich:toolTip>
+							<span>
+							<ui:repeat var="dataInstance" value="#{slot.propertyInstsAsList}">
+								<s:decorate template="/layout/display.xhtml">
+									<ui:define name="label">
+										<h:outputText value="#{dataInstance.dataDefinition.label}" />
+									</ui:define>
+									<s:fragment rendered="#{not dataInstance.dataDefinition.multiple}">
+									<h:outputText value="#{dataInstance.stringValue}"
+										rendered="#{dataInstance.dataDefinition.dataType == 'STRING'}"/>
+									<h:outputText value="#{dataInstance.integerValue}"
+										rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER'}" />
+									<h:outputText value="#{dataInstance.booleanValue ? 'Sì' : 'No'}"
+										rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}" />
+									<h:outputText value="#{dataInstance.dateValue}"
+										rendered="#{dataInstance.dataDefinition.dataType == 'DATE'}">
+										<s:convertDateTime type="date" dateStyle="short"
+											pattern="dd/MM/yyyy" />
+									</h:outputText>
+									</s:fragment>
+									<s:fragment rendered="#{dataInstance.dataDefinition.multiple}">
+									<h:outputText value="#{dataInstance.values.toString()}"/>
+									</s:fragment>
+								</s:decorate>
+							</ui:repeat>
+							</span>
+							</rich:toolTip>
+							
+							<h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
+								rendered="#{slot.status == 'EMPTY'}" />
+							<h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
+								rendered="#{slot.status == 'VALID'}" />
+							<h:graphicImage value="/img/envelope-red-exclamation.png"  styleClass="fileIcon"
+								rendered="#{slot.status == 'INVALID'}" />
+							<s:link value="#{slot.slotDef.name} : #{slot.id}" view="/user/SlotInstEdit.xhtml" propagation="none">
+								<f:param name="slotDefId" value="#{slot.slotDef.id}"/>
+								<f:param name="slotInstId" value="#{slot.id}"/>
+							</s:link>
+						</s:div>
+					</ui:repeat>
+				</s:decorate>
 				</s:div>
+				
+				<div style="clear: both"/>
 
 			</rich:panel>
 
@@ -436,9 +517,17 @@
 				rendered="#{slotInstHome.id != null}" 
 				styleClass="modal"/>
 			<h:commandButton id="delete"
-				value="Elimina" action="#{slotInstHome.remove}" immediate="true"
+				value="Elimina" action="#{slotInstEditBean.removeSlot()}" immediate="true"
 				onclick="return confirm('Sicuro di voler eliminare la busta?'); dirty = false;"
-				rendered="#{slotInstHome.managed}" 
+				rendered="#{slotInstHome.instance.id != null}"
+				styleClass="modal"/>
+			<a:jsFunction name="setDirty" >
+				<a:actionparam name="dirty" assignTo="#{slotInstEditBean.dirty}"/>
+			</a:jsFunction>
+			<h:commandButton id="validate"
+				value="Valida" 
+				onclick="setDirty(dirty); dirty = false;"
+				action="#{slotInstEditBean.validate()}"
 				styleClass="modal"/>
 			</div>
 		</a:form>

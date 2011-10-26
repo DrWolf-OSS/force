@@ -21,7 +21,7 @@ public class DependentSlotDef extends SlotDef implements Conditionable {
 
 	private SlotDef parentSlotDef;
 
-	// private PropertyDef numberOfInstances;
+	private PropertyDef numberOfInstances;
 
 	public DependentSlotDef() {
 		this.setType(SlotDefType.DEPENDENT);
@@ -38,10 +38,10 @@ public class DependentSlotDef extends SlotDef implements Conditionable {
 		return this.conditionalPropertyInst;
 	}
 
-	// @ManyToOne
-	// public PropertyDef getNumberOfInstances() {
-	// return this.numberOfInstances;
-	// }
+	@ManyToOne
+	public PropertyDef getNumberOfInstances() {
+		return this.numberOfInstances;
+	}
 
 	@ManyToOne
 	public SlotDef getParentSlotDef() {
@@ -64,9 +64,9 @@ public class DependentSlotDef extends SlotDef implements Conditionable {
 		this.conditionalPropertyInst = conditionalPropertyInst;
 	}
 
-	// public void setNumberOfInstances(PropertyDef numberOfInstances) {
-	// this.numberOfInstances = numberOfInstances;
-	// }
+	public void setNumberOfInstances(PropertyDef numberOfInstances) {
+		this.numberOfInstances = numberOfInstances;
+	}
 
 	public void setParentSlotDef(SlotDef parentSlotDef) {
 		this.parentSlotDef = parentSlotDef;

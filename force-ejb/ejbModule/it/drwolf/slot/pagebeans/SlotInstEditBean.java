@@ -20,6 +20,7 @@ import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.enums.SlotInstStatus;
 import it.drwolf.slot.exceptions.WrongDataTypeException;
 import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.DataDefinition;
@@ -143,6 +144,9 @@ public class SlotInstEditBean {
 	boolean failAllowed = false;
 
 	boolean warning = false;
+
+	// private String validationResult;
+	private String dirty;
 
 	@In(create = true)
 	private ValueChangeListener valueChangeListener;
@@ -500,28 +504,47 @@ public class SlotInstEditBean {
 													.getConditionalPropertyDef())
 									.getValue())) {
 
-				SlotInst dependentSlotInst = new SlotInst();
-				dependentSlotInst.setSlotDef(dependentSlotDef);
-				for (PropertyDef depPropertyDef : dependentSlotDef
-						.getPropertyDefs()) {
-					PropertyInst depPropertyInst = new PropertyInst(
-							depPropertyDef, dependentSlotInst);
-					dependentSlotInst.getPropertyInsts().add(depPropertyInst);
+				// SlotInst dependentSlotInst = new SlotInst();
+				// dependentSlotInst.setSlotDef(dependentSlotDef);
+				// for (PropertyDef depPropertyDef : dependentSlotDef
+				// .getPropertyDefs()) {
+				// PropertyInst depPropertyInst = new PropertyInst(
+				// depPropertyDef, dependentSlotInst);
+				// dependentSlotInst.getPropertyInsts().add(depPropertyInst);
+				// }
+				//
+				// for (DocDefCollection depDocDefCollection : dependentSlotDef
+				// .getDocDefCollections()) {
+				// DocInstCollection depDocInstCollection = new
+				// DocInstCollection(
+				// dependentSlotInst, depDocDefCollection);
+				// dependentSlotInst.getDocInstCollections().add(
+				// depDocInstCollection);
+				// }
+				PropertyInst numberOfInstancesPropertyInst = this.slotInstHome
+						.getInstance().retrievePropertyInstByDef(
+								dependentSlotDef.getNumberOfInstances());
+				if (numberOfInstancesPropertyInst != null
+						&& numberOfInstancesPropertyInst.getPropertyDef()
+								.getDataType().equals(DataType.INTEGER)) {
+					Integer numberOfInstances = numberOfInstancesPropertyInst
+							.getIntegerValue();
+					for (int i = 0; i < numberOfInstances; i++) {
+						//
+						SlotInst dependentSlotInst = new SlotInst(
+								dependentSlotDef);
+						//
+						dependentSlotInst.setOwnerId(this.slotInstHome
+								.getInstance().getOwnerId());
+
+						dependentSlotInst.setParentSlotInst(this.slotInstHome
+								.getInstance());
+						this.slotInstHome.getInstance().getDependentSlotInsts()
+								.add(dependentSlotInst);
+					}
+
 				}
 
-				for (DocDefCollection depDocDefCollection : dependentSlotDef
-						.getDocDefCollections()) {
-					DocInstCollection depDocInstCollection = new DocInstCollection(
-							dependentSlotInst, depDocDefCollection);
-					dependentSlotInst.getDocInstCollections().add(
-							depDocInstCollection);
-				}
-
-				dependentSlotInst.setOwnerId(this.slotInstHome.getInstance()
-						.getOwnerId());
-
-				this.slotInstHome.getInstance().getDependentSlotInsts()
-						.add(dependentSlotInst);
 			}
 		}
 
@@ -660,6 +683,10 @@ public class SlotInstEditBean {
 		return this.datas;
 	}
 
+	public String getDirty() {
+		return this.dirty;
+	}
+
 	public List<DocInstCollection> getDocInstCollections() {
 		return this.docInstCollections;
 	}
@@ -698,6 +725,10 @@ public class SlotInstEditBean {
 	public List<PropertyInst> getPropertyInsts() {
 		return this.propertyInsts;
 	}
+
+	// public String getValidationResult() {
+	// return this.validationResult;
+	// }
 
 	public ArrayList<VerifierMessage> getSlotMessages() {
 		return this.slotMessages;
@@ -806,7 +837,18 @@ public class SlotInstEditBean {
 				this.primaryDocs.put(defCollection.getId(), fileContainers);
 			}
 
-			this.verify();
+			boolean verifyPassed = this.verify();
+			boolean checkCollectionsSizePassed = this.checkCollectionsSize();
+			if (verifyPassed && checkCollectionsSizePassed) {
+				this.slotInstHome.getInstance().setStatus(SlotInstStatus.VALID);
+				this.slotMessages.add(new VerifierMessage("La busta è valida",
+						VerifierMessageType.VALID));
+			} else {
+				this.slotInstHome.getInstance().setStatus(
+						SlotInstStatus.INVALID);
+				this.slotMessages.add(new VerifierMessage(
+						"La busta non è valida", VerifierMessageType.ERROR));
+			}
 		}
 
 	}
@@ -842,6 +884,13 @@ public class SlotInstEditBean {
 		if (messages != null) {
 			messages.clear();
 		}
+	}
+
+	public String removeSlot() {
+		SlotInst instance = this.slotInstHome.getInstance();
+		SlotInst merged = this.entityManager.merge(instance);
+		this.slotInstHome.setInstance(merged);
+		return this.slotInstHome.remove();
 	}
 
 	private void resetFlags() {
@@ -1019,22 +1068,27 @@ public class SlotInstEditBean {
 	}
 
 	public String save() {
-		this.cleanMessages();
-		boolean sizeCollectionPassed = this.checkCollectionsSize();
-		if (!sizeCollectionPassed) {
-			FacesMessages
-					.instance()
-					.add(Severity.ERROR,
-							"Le dimensioni di alcune collection non rispettano le specifiche");
-			return "failed";
-		}
+		// this.cleanMessages();
+		// boolean sizeCollectionPassed = this.checkCollectionsSize();
+		// if (!sizeCollectionPassed) {
+		// FacesMessages
+		// .instance()
+		// .add(Severity.ERROR,
+		// "Le dimensioni di alcune collection non rispettano le specifiche");
+		// return "failed";
+		// }
+		//
+		// boolean rulesPassed = this.verify();
+		// if (!rulesPassed) {
+		// FacesMessages.instance().add(Severity.ERROR,
+		// "Alcune regole non sono verificate!");
+		// return "failed";
+		// }
 
-		boolean rulesPassed = this.verify();
-		if (!rulesPassed) {
-			FacesMessages.instance().add(Severity.ERROR,
-					"Alcune regole non sono verificate!");
-			return "failed";
-		}
+		// c'è bisogno di settare dirty a flase per far settare lo status
+		// risultante dalla validazione
+		this.dirty = "false";
+		this.validate();
 
 		this.slotInstHome.getInstance().setPropertyInsts(
 				new HashSet<PropertyInst>(this.propertyInsts));
@@ -1056,6 +1110,8 @@ public class SlotInstEditBean {
 				} catch (Exception e) {
 					FacesMessages.instance().add(Severity.ERROR,
 							"Errors in Alfresco storage process");
+					System.out
+							.println("----------------> Errors in Alfresco storage process!!!!!!!");
 					// TODO: se il documento è stato creato farsi dare l'id e
 					// toglierlo per avere una garanzia "transazionale"
 					e.printStackTrace();
@@ -1099,6 +1155,10 @@ public class SlotInstEditBean {
 
 	public void setDatas(HashMap<Long, List<FileContainer>> datas) {
 		this.datas = datas;
+	}
+
+	public void setDirty(String dirty) {
+		this.dirty = dirty;
 	}
 
 	public void setDocInstCollections(List<DocInstCollection> docInstCollections) {
@@ -1171,25 +1231,30 @@ public class SlotInstEditBean {
 	}
 
 	public String update() {
-		this.cleanMessages();
+		// this.cleanMessages();
 		SlotInst instance = this.slotInstHome.getInstance();
 
-		boolean sizeCollectionPassed = this.checkCollectionsSize();
-		if (!sizeCollectionPassed) {
-			FacesMessages
-					.instance()
-					.add(Severity.ERROR,
-							"Le dimensioni di alcune collection non rispettano le specifiche");
-			return "failed";
-		}
+		// boolean sizeCollectionPassed = this.checkCollectionsSize();
+		// if (!sizeCollectionPassed) {
+		// FacesMessages
+		// .instance()
+		// .add(Severity.ERROR,
+		// "Le dimensioni di alcune collection non rispettano le specifiche");
+		// return "failed";
+		// }
+		//
+		// boolean rulesPassed = this.verify();
+		// if (!rulesPassed) {
+		// FacesMessages.instance().add(Severity.ERROR,
+		// "Alcune regole non sono verificate!");
+		// this.entityManager.clear();
+		// return "failed";
+		// }
 
-		boolean rulesPassed = this.verify();
-		if (!rulesPassed) {
-			FacesMessages.instance().add(Severity.ERROR,
-					"Alcune regole non sono verificate!");
-			this.entityManager.clear();
-			return "failed";
-		}
+		// c'è bisogno di settare dirty a flase per far settare lo status
+		// risultante dalla validazione
+		this.dirty = "false";
+		this.validate();
 
 		this.entityManager.merge(instance);
 
@@ -1275,6 +1340,78 @@ public class SlotInstEditBean {
 			}
 		}
 		document.updateProperties(aspectsProperties);
+	}
+
+	public String validate() {
+		// Map<String, String> requestParameterMap = FacesContext
+		// .getCurrentInstance().getExternalContext()
+		// .getRequestParameterMap();
+		// Boolean dirty = null;
+		// if (requestParameterMap != null) {
+		// String _dirty = requestParameterMap.get("dirty");
+		// dirty = new Boolean(_dirty);
+		// }
+
+		Boolean dirty = null;
+		if (this.dirty != null && !this.dirty.equals("")) {
+			try {
+				dirty = new Boolean(this.dirty);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				dirty = Boolean.TRUE;
+				e.printStackTrace();
+			}
+		}
+
+		this.cleanMessages();
+		boolean sizeCollectionPassed = this.checkCollectionsSize();
+		if (!sizeCollectionPassed) {
+			FacesMessages
+					.instance()
+					.add(Severity.ERROR,
+							"Validazione fallita! Le dimensioni di alcune buste non rispettano le specifiche");
+			if (dirty != null && dirty == false) {
+				this.slotInstHome.getInstance().setStatus(
+						SlotInstStatus.INVALID);
+			}
+			return "failed";
+		}
+
+		boolean rulesPassed = this.verify();
+		if (!rulesPassed) {
+			FacesMessages.instance().add(Severity.ERROR,
+					"Validazione fallita! Alcune regole non sono verificate");
+			// this.entityManager.clear();
+			if (dirty != null && dirty == false) {
+				this.slotInstHome.getInstance().setStatus(
+						SlotInstStatus.INVALID);
+			}
+			return "failed";
+
+		}
+
+		if (sizeCollectionPassed && rulesPassed) {
+			FacesMessages.instance().add(Severity.INFO,
+					"La busta ha passato la validazione");
+			if (dirty != null && dirty == false) {
+				this.slotInstHome.getInstance().setStatus(SlotInstStatus.VALID);
+			}
+			return "validated";
+		}
+
+		// Con le entity non detached (senza entityManager.clear())
+		// il valore calcolato dello status viene
+		// PERSISTITO anche se non viene invocato direttamente il metodo
+		// update()
+		// if (rulesPassed && sizeCollectionPassed) {
+		// this.slotInstHome.getInstance().setStatus(SlotInstStatus.VALID);
+		// FacesMessages.instance().add(Severity.INFO,
+		// "La busta ha passato la validazione");
+		// return "validated";
+		// } else {
+		// this.slotInstHome.getInstance().setStatus(SlotInstStatus.INVALID);
+		// }
+		return "failed";
 	}
 
 	private boolean verify() {

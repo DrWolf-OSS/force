@@ -18,7 +18,7 @@
 	
 	<navigation from-action="#{slotInstEditBean.save()}">
 	  <rule if-outcome="saved">
-         <end-conversation/>
+         <end-conversation before-redirect="true"/>
          <redirect>
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
@@ -59,6 +59,35 @@
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
+      </rule>
+   </navigation>
+   
+   	<navigation from-action="#{slotInstEditBean.validate()}">
+	  <rule if-outcome="validated">
+         <redirect>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         </redirect>
+      </rule>
+      <rule if-outcome="failed">
+         <redirect>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         </redirect>
+      </rule>
+      <rule if-outcome="warning">
+     	 <end-conversation before-redirect="true"/>
+         <redirect>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         </redirect>
+      </rule>
+   </navigation>
+   
+   <navigation from-action="#{slotInstEditBean.removeSlot()}">
+      <rule if-outcome="removed">
+         <end-conversation/>
+         <redirect view-id="/home.xhtml"/>
       </rule>
    </navigation>
 

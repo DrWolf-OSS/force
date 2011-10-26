@@ -62,6 +62,16 @@
             </f:facet>
             <h:outputText value="#{_slotInst.slotDef.id}"/>
         </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{slotInstList}"/>
+                    <ui:param name="propertyLabel" value="Slot def name"/>
+                    <ui:param name="propertyPath" value="slotInst.slotDef.name"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_slotInst.slotDef.name}"/>
+        </h:column>
          <h:column>
             <f:facet name="header">
                 <h:outputText value="Owner" />

@@ -1,14 +1,19 @@
 package it.drwolf.slot.entity;
 
+import it.drwolf.slot.enums.SlotInstStatus;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
@@ -29,15 +34,44 @@ public class SlotInst {
 
 	private Set<SlotInst> dependentSlotInsts = new HashSet<SlotInst>();
 
+	private SlotInst parentSlotInst;
+
 	// private Set<MultiplePropertyInst> multiPropertyInsts = new
 	// HashSet<MultiplePropertyInst>();
 
 	private String ownerId;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "parentSlotInst_id")
+	private SlotInstStatus status = SlotInstStatus.EMPTY;
+
+	public SlotInst() {
+	}
+
+	public SlotInst(SlotDef slotDef) {
+		super();
+		this.setSlotDef(slotDef);
+		for (PropertyDef depPropertyDef : this.getSlotDef().getPropertyDefs()) {
+			PropertyInst depPropertyInst = new PropertyInst(depPropertyDef,
+					this);
+			this.getPropertyInsts().add(depPropertyInst);
+		}
+
+		for (DocDefCollection depDocDefCollection : this.getSlotDef()
+				.getDocDefCollections()) {
+			DocInstCollection depDocInstCollection = new DocInstCollection(
+					this, depDocDefCollection);
+			this.getDocInstCollections().add(depDocInstCollection);
+		}
+	}
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "parentSlotInst")
+	// @JoinColumn(name = "parentSlotInst_id")
 	public Set<SlotInst> getDependentSlotInsts() {
 		return this.dependentSlotInsts;
+	}
+
+	@Transient
+	public List<SlotInst> getDependentSlotInstsAsList() {
+		return new ArrayList<SlotInst>(this.getDependentSlotInsts());
 	}
 
 	@OrderBy("docDefCollection")
@@ -60,15 +94,30 @@ public class SlotInst {
 		return this.ownerId;
 	}
 
+	@ManyToOne
+	public SlotInst getParentSlotInst() {
+		return this.parentSlotInst;
+	}
+
 	@OrderBy("propertyDef")
 	@OneToMany(mappedBy = "slotInst", cascade = CascadeType.ALL)
 	public Set<PropertyInst> getPropertyInsts() {
 		return this.propertyInsts;
 	}
 
+	@Transient
+	public List<PropertyInst> getPropertyInstsAsList() {
+		return new ArrayList<PropertyInst>(this.getPropertyInsts());
+	}
+
 	@ManyToOne
 	public SlotDef getSlotDef() {
 		return this.slotDef;
+	}
+
+	@Enumerated(EnumType.STRING)
+	public SlotInstStatus getStatus() {
+		return this.status;
 	}
 
 	@Transient
@@ -103,12 +152,20 @@ public class SlotInst {
 		this.ownerId = owner;
 	}
 
+	public void setParentSlotInst(SlotInst parentSlotInst) {
+		this.parentSlotInst = parentSlotInst;
+	}
+
 	public void setPropertyInsts(Set<PropertyInst> propertyInsts) {
 		this.propertyInsts = propertyInsts;
 	}
 
 	public void setSlotDef(SlotDef slotDef) {
 		this.slotDef = slotDef;
+	}
+
+	public void setStatus(SlotInstStatus status) {
+		this.status = status;
 	}
 
 	// @OrderBy("propertyDef")

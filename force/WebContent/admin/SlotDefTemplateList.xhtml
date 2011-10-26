@@ -64,7 +64,7 @@
            propagation="none"
                  value="#{slotDefParameters.from.equals('/admin/GaraEdit.xhtml') ? 'Crea una nuova Busta Amministrativa' : 'Crea un nuovo Modello'}"
               	 rendered="#{not slotDefParameters.from.equals('/admin/GaraEdit.xhtml')}"
-              	 action="#{slotDefEditBean.checkIfDependentSlotDef()}">
+              	 action="#{slotDefEditBean.checkAndInstanceDependentSlotDef()}">
             <f:param name="slotDefId"/>
             <f:param name="model" value="#{true}"/>
             <f:param name="wizard" value="#{true}"/>
