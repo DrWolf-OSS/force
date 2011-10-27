@@ -115,7 +115,7 @@ public class SlotDefValidator {
 			result = false;
 			if (this.slotDef.equals(slotDef)) {
 				FacesMessages.instance().add(Severity.ERROR,
-						"Non possono esserci collections con lo stesso nome");
+						"Non possono esserci richieste con lo stesso nome");
 			}
 		}
 
@@ -126,20 +126,14 @@ public class SlotDefValidator {
 		return this.slotDef;
 	}
 
-	private boolean ricorsiveValidateSingleSlot(SlotDef slotDef) {
-
-		// if (slotDef instanceof DependentSlotDef) {
-		// this.ricorsiveValidateSingleSlot(false,
-		// ((DependentSlotDef) slotDef).getParentSlotDef());
-		// }
+	private boolean ricorsiveValidation(SlotDef slotDef) {
 
 		boolean result = true;
-		// boolean singleSlotResult = true;
 		if (slotDef.getDependentSlotDefs() != null
 				&& !slotDef.getDependentSlotDefs().isEmpty()) {
 			for (SlotDef dependentSlotDef : slotDef.getDependentSlotDefs()) {
 				boolean dependentResult = this
-						.ricorsiveValidateSingleSlot(dependentSlotDef);
+						.ricorsiveValidation(dependentSlotDef);
 				if (!dependentResult) {
 					result = false;
 					if (!this.slotDef.equals(dependentSlotDef)) {
@@ -160,14 +154,6 @@ public class SlotDefValidator {
 			embeddedValues = this.checkEmbeddedPropertyValues(slotDef);
 		}
 
-		//
-		// if (names && references && embeddedValues) {
-		// singleSlotResult = true;
-		// } else {
-		// singleSlotResult = false;
-		// }
-		//
-
 		if (names && references && embeddedValues && result) {
 			// VALIDO
 			slotDef.setStatus(SlotDefSatus.VALID);
@@ -177,8 +163,6 @@ public class SlotDefValidator {
 			slotDef.setStatus(SlotDefSatus.INVALID);
 			return false;
 		}
-
-		// return singleSlotResult;
 	}
 
 	public void setSlotDef(SlotDef slotDef) {
@@ -188,7 +172,7 @@ public class SlotDefValidator {
 	public boolean validate() {
 		if (this.slotDef instanceof DependentSlotDef) {
 			boolean valid = this
-					.ricorsiveValidateSingleSlot(((DependentSlotDef) this.slotDef)
+					.ricorsiveValidation(((DependentSlotDef) this.slotDef)
 							.getParentSlotDef());
 			if (!valid && this.slotDef.getStatus().equals(SlotDefSatus.VALID)) {
 				FacesMessages
@@ -201,59 +185,7 @@ public class SlotDefValidator {
 			}
 			return valid;
 		}
-		return this.ricorsiveValidateSingleSlot(this.slotDef);
+		return this.ricorsiveValidation(this.slotDef);
 	}
-
-	// /**
-	// *
-	// * @param displayMessages
-	// * @return
-	// */
-	// public boolean validateAll(boolean displayMessages) {
-	// boolean names = this.checkNames(displayMessages);
-	// boolean references = this.checkCollectionReferences(displayMessages);
-	// boolean embeddedValues = true;
-	// if (!this.slotDef.isTemplate()) {
-	// embeddedValues = this.checkEmbeddedPropertyValues(displayMessages);
-	// }
-	// if (names && references && embeddedValues) {
-	// // VALIDO
-	// boolean validated = true;
-	// for (SlotDef dependent : this.slotDef.getDependentSlotDefs()) {
-	// SlotDefValidator dependentValidator = new SlotDefValidator(
-	// dependent);
-	// if (!dependentValidator.validate(false)) {
-	// validated = false;
-	// FacesMessages.instance().add(
-	// Severity.ERROR,
-	// "La sottobusta " + dependent.getName()
-	// + " non è valida. Editarla singolarmente");
-	// }
-	// }
-	// return validated;
-	// } else {
-	// // NON VALIDO
-	// return false;
-	// }
-	// }
-
-	// private boolean validateSingleSlot(boolean displayMessages, SlotDef
-	// slotDef) {
-	// boolean names = this.checkNames(displayMessages);
-	// boolean references = this.checkCollectionReferences(displayMessages);
-	// boolean embeddedValues = true;
-	// if (!slotDef.isTemplate()) {
-	// embeddedValues = this.checkEmbeddedPropertyValues(displayMessages);
-	// }
-	// if (names && references && embeddedValues) {
-	// // VALIDO
-	// slotDef.setStatus(SlotDefSatus.VALID);
-	// return true;
-	// } else {
-	// // NON VALIDO
-	// slotDef.setStatus(SlotDefSatus.INVALID);
-	// return false;
-	// }
-	// }
 
 }

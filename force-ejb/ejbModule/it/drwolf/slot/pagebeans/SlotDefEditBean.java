@@ -16,7 +16,6 @@ import it.drwolf.slot.enums.CollectionQuantifier;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.interfaces.Conditionable;
-import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.Deactivable;
 import it.drwolf.slot.interfaces.Definition;
 import it.drwolf.slot.pagebeans.support.PropertiesSourceContainer;
@@ -82,24 +81,7 @@ public class SlotDefEditBean {
 	@In(create = true)
 	private SlotDefParameters slotDefParameters;
 
-	// @In(create = true)
-	// private DependentSlotDefHome dependentSlotDefHome;
-
-	// private SlotDefCloner slotDefCloner;
-
-	// private Map<Long, SlotDefCloner> slotDefCloners = new HashMap<Long,
-	// SlotDefCloner>();
-
-	// Cloned, Original
-	// private Map<DependentSlotDef, DependentSlotDef> clonedOriginalMap = new
-	// HashMap<DependentSlotDef, DependentSlotDef>();
-
 	private DependentSlotDef dependentTmp;
-
-	// Cloned, Original
-	// private BiMap<DependentSlotDef, DependentSlotDef> clonedOriginalBiMap =
-	// HashBiMap
-	// .create();
 
 	public void addCollection() {
 		if (!this.slotDefHome.getInstance().getDocDefCollectionsAsList()
@@ -222,94 +204,6 @@ public class SlotDefEditBean {
 		}
 	}
 
-	private boolean checkCollectionReferences() {
-		boolean result = true;
-
-		for (DocDefCollection collection : this.slotDefHome.getInstance()
-				.getDocDefCollections()) {
-			PropertyDef conditionalPropertyDef = collection
-					.getConditionalPropertyDef();
-			if (conditionalPropertyDef != null
-					&& collection.getConditionalPropertyInst().getValue() == null) {
-				result = false;
-				FacesMessages
-						.instance()
-						.add(Severity.ERROR,
-								"La richiesta \""
-										+ collection.getName()
-										+ "\" vincolata dall'informazione \""
-										+ conditionalPropertyDef.getLabel()
-										+ "\" non ha il valore del vincolo valorizzato");
-			}
-		}
-		if (!result) {
-			FacesMessages
-					.instance()
-					.add(Severity.ERROR,
-							"Non possono esserci richieste vincolate con il loro vincolo non valorizzato!");
-		}
-
-		return result;
-	}
-
-	private boolean checkEmbeddedPropertyValues() {
-		boolean passed = true;
-		for (EmbeddedProperty embeddedProperty : this.slotDefHome.getInstance()
-				.getEmbeddedProperties()) {
-			if ((!embeddedProperty.isMultiple() && (embeddedProperty.getValue() == null || embeddedProperty
-					.getValue().equals("")))
-					|| (embeddedProperty.isMultiple() && ((Set) embeddedProperty
-							.getValue()).isEmpty())) {
-				FacesMessages.instance().add(
-						Severity.ERROR,
-						"L'informazione \"" + embeddedProperty.getLabel()
-								+ "\" non è stata valorizzata");
-				passed = false;
-			}
-		}
-		if (!passed) {
-			FacesMessages
-					.instance()
-					.add(Severity.ERROR,
-							"Non possono esserci informazioni sulla gara non valorizzate!");
-		}
-		return passed;
-	}
-
-	private boolean checkNames() {
-		Set<String> differentNames = new HashSet<String>();
-		boolean result = true;
-
-		List<DataDefinition> allProperties = new ArrayList<DataDefinition>();
-		allProperties.addAll(this.slotDefHome.getInstance()
-				.getPropertyDefsAsList());
-		allProperties.addAll(this.slotDefHome.getInstance()
-				.getEmbeddedPropertiesAsList());
-
-		for (DataDefinition p : allProperties) {
-			differentNames.add(p.getLabel());
-		}
-		if (differentNames.size() < allProperties.size()) {
-			result = false;
-			FacesMessages.instance().add(Severity.ERROR,
-					"Non possono esserci property con lo stesso nome");
-		}
-
-		differentNames.clear();
-		for (DocDefCollection d : this.slotDefHome.getInstance()
-				.getDocDefCollectionsAsList()) {
-			differentNames.add(d.getName());
-		}
-		if (differentNames.size() < this.slotDefHome.getInstance()
-				.getDocDefCollectionsAsList().size()) {
-			result = false;
-			FacesMessages.instance().add(Severity.ERROR,
-					"Non possono esserci collections con lo stesso nome");
-		}
-
-		return result;
-	}
-
 	public void checkReference() {
 		if (this.slotDefHome.isReferenced()) {
 			FacesMessages
@@ -322,35 +216,6 @@ public class SlotDefEditBean {
 									+ "è referenziata da una o più istanze già compilate!");
 		}
 	}
-
-	// public void conditionalPropertyListener(ActionEvent event) {
-	// if (this.conditioned.equals(SlotDefEditBean.CONDITIONED_COLLECTION)) {
-	// if (this.collection.getConditionalPropertyDef() != null) {
-	// this.collection.setConditionalPropertyInst(new PropertyInst(
-	// this.collection.getConditionalPropertyDef()));
-	// } else {
-	// this.collection.setConditionalPropertyInst(null);
-	// }
-	// } else if (this.conditioned
-	// .equals(SlotDefEditBean.CONDITIONED_PROPERTY)) {
-	// if (this.propertyDef.getConditionalPropertyDef() != null) {
-	// this.propertyDef.setConditionalPropertyInst(new PropertyInst(
-	// this.propertyDef.getConditionalPropertyDef()));
-	// } else {
-	// this.propertyDef.setConditionalPropertyInst(null);
-	// }
-	// } else if (this.conditioned.equals(SlotDefEditBean.CONDITIONED_SLOTDEF))
-	// {
-	// // if (this.dependentSlotDef.getConditionalPropertyDef() != null) {
-	// // this.dependentSlotDef
-	// // .setConditionalPropertyInst(new PropertyInst(
-	// // this.dependentSlotDef
-	// // .getConditionalPropertyDef()));
-	// // } else {
-	// // this.dependentSlotDef.setConditionalPropertyInst(null);
-	// // }
-	// }
-	// }
 
 	public void clearEditing() {
 		this.collection = new DocDefCollection();
@@ -408,19 +273,6 @@ public class SlotDefEditBean {
 	}
 
 	public void editDependentSlotDef(DependentSlotDef dependentSlotDef) {
-		// this.dependentTmp = dependentSlotDef;
-		//
-		// this.slotDefHome.getInstance().getDependentSlotDefs()
-		// .remove(dependentSlotDef);
-		// dependentSlotDef.setParentSlotDef(null);
-		//
-		// this.dependentSlotDef = this.clonedOriginalMap.get(dependentSlotDef);
-		// this.dependentSlotDef.setConditionalPropertyDef(dependentSlotDef
-		// .getConditionalPropertyDef());
-		// this.dependentSlotDef.setConditionalPropertyInst(dependentSlotDef
-		// .getConditionalPropertyInst());
-		//
-
 		this.dependentSlotDef = dependentSlotDef;
 		this.edit = true;
 	}
@@ -503,27 +355,6 @@ public class SlotDefEditBean {
 		return this.enqueueNames(new HashSet<Definition>(propertyDef
 				.getConditionedDocDefCollections()));
 	}
-
-	// private void removeReferencesFromCollections(PropertyDef prop,
-	// boolean invalidateCollections) {
-	// List<DocDefCollection> referencedCollections = this
-	// .getConditionedCollections(prop);
-	// for (DocDefCollection collection : referencedCollections) {
-	// collection.getConditionalPropertyInst().setPropertyDef(null);
-	// collection.setConditionalPropertyInst(null);
-	// collection.setConditionalPropertyDef(null);
-	// if (invalidateCollections) {
-	// if (collection.getId() != null && slotDefHome.isReferenced()) {
-	// collection.setActive(false);
-	// } else {
-	// // se lo SlotDef non è referenziato o la collection è stata
-	// // appena creata (e quindi sicuramente non referenziata
-	// // anche se lo SlotDef lo fosse) posso eliminarla del tutto
-	// this.removeColl(collection);
-	// }
-	// }
-	// }
-	// }
 
 	public String getReferencedPropertyNames(PropertyDef propertyDef) {
 		return this.enqueueNames(new HashSet<Definition>(propertyDef
@@ -643,11 +474,6 @@ public class SlotDefEditBean {
 		this.conditioned = SlotDefEditBean.CONDITIONED_PROPERTY;
 	}
 
-	// public void newDependentSlotDef() {
-	// this.dependentSlotDef = new SlotDef();
-	// this.conditioned = SlotDefEditBean.CONDITIONED_SLOTDEF;
-	// }
-
 	private void newConditionaProperty() {
 		this.newProperty();
 		this.conditional = true;
@@ -672,64 +498,6 @@ public class SlotDefEditBean {
 		this.conditional = false;
 		this.conditioned = SlotDefEditBean.CONDITIONED_NONE;
 	}
-
-	// private void persistDependentSlotDefs() {
-	// Set<Long> keySet = this.slotDefCloners.keySet();
-	// EntityManager entityManager = this.slotDefHome.getEntityManager();
-	// for (Long key : keySet) {
-	// SlotDefCloner slotDefCloner = this.slotDefCloners.get(key);
-	// SlotDef cloned = slotDefCloner.getCloned();
-	// entityManager.persist(cloned);
-	// slotDefCloner.cloneRules();
-	// entityManager.persist(cloned);
-	// }
-	// }
-
-	// public List<DocDefCollection> getConditionedCollections(
-	// PropertyDef propertyDef) {
-	// List<DocDefCollection> referencedDocDefCollections = new
-	// ArrayList<DocDefCollection>();
-	// Set<DocDefCollection> docDefCollections = slotDefHome.getInstance()
-	// .getDocDefCollections();
-	// Iterator<DocDefCollection> iterator = docDefCollections.iterator();
-	// while (iterator.hasNext()) {
-	// DocDefCollection docDefCollection = iterator.next();
-	// PropertyDef conditionalPropertyDef = docDefCollection
-	// .getConditionalPropertyDef();
-	// if (conditionalPropertyDef != null
-	// && conditionalPropertyDef.equals(propertyDef)) {
-	// referencedDocDefCollections.add(docDefCollection);
-	// }
-	// }
-	// return referencedDocDefCollections;
-	// }
-
-	// public List<PropertyDef> getConditionedPropertyDefs(PropertyDef
-	// propertyDef) {
-	// List<PropertyDef> referencedPropertyDef = new ArrayList<PropertyDef>();
-	// Set<PropertyDef> propertyDefs = slotDefHome.getInstance()
-	// .getPropertyDefs();
-	// Iterator<PropertyDef> iterator = propertyDefs.iterator();
-	// while (iterator.hasNext()) {
-	// PropertyDef pDef = iterator.next();
-	// PropertyDef conditionalPropertyDef = pDef
-	// .getConditionalPropertyDef();
-	// if (conditionalPropertyDef != null
-	// && conditionalPropertyDef.equals(propertyDef)) {
-	// referencedPropertyDef.add(pDef);
-	// }
-	// }
-	// return referencedPropertyDef;
-	// }
-
-	// public void propertyDefConditionalPropertyListener(ActionEvent event) {
-	// if (this.propertyDef.getConditionalPropertyDef() != null) {
-	// this.propertyDef.setConditionalPropertyInst(new PropertyInst(
-	// this.propertyDef.getConditionalPropertyDef()));
-	// } else {
-	// this.propertyDef.setConditionalPropertyInst(null);
-	// }
-	// }
 
 	public void onChangeEmbeddedPropertyDictionary() {
 		if (this.embeddedProperty != null) {
@@ -855,23 +623,6 @@ public class SlotDefEditBean {
 
 	private void removeReferencesFromCollections(PropertyDef prop,
 			boolean invalidateCollections) {
-		// List<DocDefCollection> referencedCollections = this
-		// .getConditionedCollections(prop);
-		// for (DocDefCollection collection : referencedCollections) {
-		// collection.getConditionalPropertyInst().setPropertyDef(null);
-		// collection.setConditionalPropertyInst(null);
-		// collection.setConditionalPropertyDef(null);
-		// if (invalidateCollections) {
-		// if (collection.getId() != null && slotDefHome.isReferenced()) {
-		// collection.setActive(false);
-		// } else {
-		// // se lo SlotDef non è referenziato o la collection è stata
-		// // appena creata (e quindi sicuramente non referenziata
-		// // anche se lo SlotDef lo fosse) posso eliminarla del tutto
-		// this.removeColl(collection);
-		// }
-		// }
-		// }
 		this.removeConditionalReferences(
 				new ArrayList<Conditionable>(prop
 						.getConditionedDocDefCollections()),
@@ -880,8 +631,6 @@ public class SlotDefEditBean {
 
 	private void removeReferencesFromProperties(PropertyDef prop,
 			boolean invalidateProperties) {
-		// List<PropertyDef> conditionedPropertyDefs = this
-		// .getConditionedPropertyDefs(prop);
 		this.removeConditionalReferences(
 				new ArrayList<Conditionable>(prop.getConditionedPropertyDefs()),
 				invalidateProperties);
@@ -1001,9 +750,9 @@ public class SlotDefEditBean {
 				this.slotDefHome.getInstance());
 		String result = null;
 		if (slotDefValidator.validate()) {
-			result = "persisted";
+			result = "valid";
 		} else {
-			result = "failed";
+			result = "invalid";
 		}
 		this.slotDefHome.persist();
 		return result;
@@ -1077,9 +826,9 @@ public class SlotDefEditBean {
 		SlotDefValidator slotDefValidator = new SlotDefValidator(
 				this.slotDefHome.getInstance());
 		if (slotDefValidator.validate()) {
-			result = "updated";
+			result = "valid";
 		} else {
-			result = "failed";
+			result = "invalid";
 		}
 
 		Set<PropertyDef> newPropertyDefs = new HashSet<PropertyDef>();
@@ -1097,7 +846,7 @@ public class SlotDefEditBean {
 				newDocDefCollections.add(collection);
 			}
 		}
-		String updateResult = this.slotDefHome.update();
+		this.slotDefHome.update();
 		if ((!newDocDefCollections.isEmpty() || !newPropertyDefs.isEmpty())
 				&& this.slotDefHome.isReferenced()) {
 			this.modifyReferencedSlotInsts(newPropertyDefs,
