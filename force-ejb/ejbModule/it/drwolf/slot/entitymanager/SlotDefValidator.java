@@ -169,7 +169,7 @@ public class SlotDefValidator {
 		this.slotDef = slotDef;
 	}
 
-	public boolean validate() {
+	public void validate() {
 		if (this.slotDef instanceof DependentSlotDef) {
 			boolean valid = this
 					.ricorsiveValidation(((DependentSlotDef) this.slotDef)
@@ -183,9 +183,11 @@ public class SlotDefValidator {
 												.getParentSlotDef().getName()
 										+ "\" non è valida. Controllare la busta principale o altre sue sottobuste");
 			}
-			return valid;
+			// return valid;
+		} else {
+			// return
+			this.ricorsiveValidation(this.slotDef);
 		}
-		return this.ricorsiveValidation(this.slotDef);
 	}
 
 }

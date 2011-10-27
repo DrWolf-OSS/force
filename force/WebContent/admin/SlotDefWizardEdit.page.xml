@@ -9,7 +9,7 @@
 
    <action execute="#{slotDefHome.wire}"/>
    
-   
+   <action execute="#{slotDefEditBean.validate}"/>
 
    <param name="slotDefFrom"/>
    <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>

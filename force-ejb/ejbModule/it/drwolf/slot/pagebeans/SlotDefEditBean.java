@@ -14,6 +14,7 @@ import it.drwolf.slot.entitymanager.SlotDefCloner;
 import it.drwolf.slot.entitymanager.SlotDefValidator;
 import it.drwolf.slot.enums.CollectionQuantifier;
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.enums.SlotDefSatus;
 import it.drwolf.slot.enums.SlotDefType;
 import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.Deactivable;
@@ -369,7 +370,16 @@ public class SlotDefEditBean {
 	@Create
 	public void init() {
 		this.setKnownParameters();
+		// SlotDefValidator slotDefValidator = new SlotDefValidator(
+		// this.slotDefHome.getInstance());
+		// slotDefValidator.validate();
 	}
+
+	// public void initialValidation() {
+	// SlotDefValidator slotDefValidator = new SlotDefValidator(
+	// this.slotDefHome.getInstance());
+	// slotDefValidator.validate();
+	// }
 
 	public void invalidate(Object obj) {
 		Deactivable def = (Deactivable) obj;
@@ -746,16 +756,19 @@ public class SlotDefEditBean {
 		// } else {
 		// return "failed";
 		// }
-		SlotDefValidator slotDefValidator = new SlotDefValidator(
-				this.slotDefHome.getInstance());
-		String result = null;
-		if (slotDefValidator.validate()) {
-			result = "valid";
-		} else {
-			result = "invalid";
-		}
+		// SlotDefValidator slotDefValidator = new SlotDefValidator(
+		// this.slotDefHome.getInstance());
+		// String result = null;
+		// slotDefValidator.validate();
+		// if (this.slotDefHome.getInstance().getStatus()
+		// .equals(SlotDefSatus.VALID)) {
+		// result = "valid";
+		// } else {
+		// result = "invalid";
+		// }
+		String validate = this.validate();
 		this.slotDefHome.persist();
-		return result;
+		return validate;
 		// slotDefValidator.validate();
 		// return this.slotDefHome.persist();
 	}
@@ -768,12 +781,12 @@ public class SlotDefEditBean {
 		this.conditional = conditional;
 	}
 
-	//
-	//
-
 	public void setConditioned(String conditioned) {
 		this.conditioned = conditioned;
 	}
+
+	//
+	//
 
 	public void setConverterPropertyMap(
 			Map<String, PropertyDef> converterPropertyMap) {
@@ -822,14 +835,17 @@ public class SlotDefEditBean {
 		// embeddedValues = this.checkEmbeddedPropertyValues();
 		// }
 		// if (names && references && embeddedValues) {
-		String result = null;
-		SlotDefValidator slotDefValidator = new SlotDefValidator(
-				this.slotDefHome.getInstance());
-		if (slotDefValidator.validate()) {
-			result = "valid";
-		} else {
-			result = "invalid";
-		}
+		// String result = null;
+		// SlotDefValidator slotDefValidator = new SlotDefValidator(
+		// this.slotDefHome.getInstance());
+		// slotDefValidator.validate();
+		// if (this.slotDefHome.getInstance().getStatus()
+		// .equals(SlotDefSatus.VALID)) {
+		// result = "valid";
+		// } else {
+		// result = "invalid";
+		// }
+		String validate = this.validate();
 
 		Set<PropertyDef> newPropertyDefs = new HashSet<PropertyDef>();
 		Set<DocDefCollection> newDocDefCollections = new HashSet<DocDefCollection>();
@@ -853,7 +869,19 @@ public class SlotDefEditBean {
 					newDocDefCollections);
 		}
 
-		return result;
+		return validate;
+	}
+
+	public String validate() {
+		SlotDefValidator slotDefValidator = new SlotDefValidator(
+				this.slotDefHome.getInstance());
+		slotDefValidator.validate();
+		if (this.slotDefHome.getInstance().getStatus()
+				.equals(SlotDefSatus.VALID)) {
+			return "valid";
+		} else {
+			return "invalid";
+		}
 	}
 
 }
