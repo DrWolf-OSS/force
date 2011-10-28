@@ -36,9 +36,40 @@
                    value="Chiudi"/>
           <rich:componentControl for="panel" attachTo="chiudiPanel" operation="hide" event="onclick"/>
     </rich:modalPanel>
+<!--    <rich:modalPanel id="addSOA" autosized="true" minWidth="500"-->
+<!--                resizeable="false">-->
+<!--            <f:facet name="header">-->
+<!--                <h:outputText value="Inserisci SOA" />-->
+<!--            </f:facet>-->
+<!--            <a4j:form id="soaPanelEdit">-->
+<!--                <s:decorate template="/layout/edit.xhtml">-->
+<!--                <ui:define name="label">-->
+<!--                    <h:outputText value="Categorie" />-->
+<!--                </ui:define>                    -->
+<!--                    <h:selectOneMenu value="#{soaList.resultList}">-->
+<!--                    -->
+<!--                    -->
+<!--                    </h:selectOneMenu>-->
+<!--                </s:decorate>-->
+<!--            </a4j:form>-->
+<!--     </rich:modalPanel>-->
 <h:form id="CatMerEdit" styleClass="edit">
 	<rich:panel>
 	   <f:facet name="header">Gestisci le SOA </f:facet>
+<!--	   <rich:dataTable id="soaDataTable" var="soa" value="#{aziendaHome.instance.SOAAsList}">-->
+<!--	       <h:column>-->
+<!--	           <f:facet name="header">Categoria</f:facet>-->
+<!--	           <h:outputText value="#{soa.codice} - #{soa.nome}" />-->
+<!--	       </h:column>-->
+<!--           <h:column>-->
+<!--               <f:facet name="header">Classe</f:facet>-->
+<!--               <h:outputText value="#{soa.classifica}" />-->
+<!--           </h:column>-->
+<!--	   </rich:dataTable>-->
+<!--	   <a4j:commandButton value="Aggiungi" -->
+<!--	                      oncomplete="#{rich:component('addSOA')}.show();"-->
+<!--	                      reRender="soaDataTable" />-->
+	                      
 	   <h:panelGrid columns="2" columnClasses="top, top">
 	        <rich:pickList value="#{aziendaHome.instance.SOAAsList}" sourceListWidth="400" targetListWidth="400" listsHeight="400"> 
                 <s:selectItems value="#{soaList.resultList}" var="cm" label="#{cm.codice} - #{cm.nome}"/>
