@@ -266,10 +266,9 @@ public class SlotDefValidator {
 		// - Uno SlotDef non modello
 		// - Un DependentSlotDef modello
 		// - Un DependentSlotDef associato ad uno SLotDef non modello (in
-		// questop
-		// caso il Dependent non sarà flaggato come modello ma il parent sì ed è
-		// quello che conta)
-		if ((slotDef instanceof SlotDef)
+		// questo caso il Dependent non sarà flaggato come modello ma
+		// il parent sì ed è quello che conta)
+		if (!(slotDef instanceof DependentSlotDef)
 				&& !slotDef.isTemplate()
 				|| (slotDef instanceof DependentSlotDef && !((DependentSlotDef) slotDef)
 						.getParentSlotDef().isTemplate())) {
