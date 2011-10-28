@@ -21,6 +21,7 @@ import it.drwolf.slot.interfaces.Deactivable;
 import it.drwolf.slot.interfaces.Definition;
 import it.drwolf.slot.pagebeans.support.PropertiesSourceContainer;
 import it.drwolf.slot.pagebeans.support.PropertyContainer;
+import it.drwolf.slot.ruleverifier.VerifierMessage;
 import it.drwolf.slot.ruleverifier.VerifierParameterDef;
 import it.drwolf.slot.session.RuleHome;
 import it.drwolf.slot.session.SlotDefHome;
@@ -83,6 +84,12 @@ public class SlotDefEditBean {
 	private SlotDefParameters slotDefParameters;
 
 	private DependentSlotDef dependentTmp;
+
+	@In(create = true)
+	SlotDefValidator slotDefValidator;
+
+	// main messages
+	private ArrayList<VerifierMessage> messages = new ArrayList<VerifierMessage>();
 
 	public void addCollection() {
 		if (!this.slotDefHome.getInstance().getDocDefCollectionsAsList()
@@ -206,6 +213,7 @@ public class SlotDefEditBean {
 	}
 
 	public void checkReference() {
+		// this.validate();
 		if (this.slotDefHome.isReferenced()) {
 			FacesMessages
 					.instance()
@@ -338,6 +346,10 @@ public class SlotDefEditBean {
 		return this.embeddedProperty;
 	}
 
+	public ArrayList<VerifierMessage> getMessages() {
+		return this.messages;
+	}
+
 	public PropertyDef getPropertyDef() {
 		return this.propertyDef;
 	}
@@ -370,16 +382,12 @@ public class SlotDefEditBean {
 	@Create
 	public void init() {
 		this.setKnownParameters();
+		//
+		this.validate();
 		// SlotDefValidator slotDefValidator = new SlotDefValidator(
 		// this.slotDefHome.getInstance());
 		// slotDefValidator.validate();
 	}
-
-	// public void initialValidation() {
-	// SlotDefValidator slotDefValidator = new SlotDefValidator(
-	// this.slotDefHome.getInstance());
-	// slotDefValidator.validate();
-	// }
 
 	public void invalidate(Object obj) {
 		Deactivable def = (Deactivable) obj;
@@ -393,6 +401,12 @@ public class SlotDefEditBean {
 			def.setActive(true);
 		}
 	}
+
+	// public void initialValidation() {
+	// SlotDefValidator slotDefValidator = new SlotDefValidator(
+	// this.slotDefHome.getInstance());
+	// slotDefValidator.validate();
+	// }
 
 	public boolean isConditional() {
 		return this.conditional;
@@ -606,7 +620,11 @@ public class SlotDefEditBean {
 	public void removeProp(PropertyDef prop) {
 		this.removeReferencesFromCollections(prop, false);
 		this.removeReferencesFromProperties(prop, false);
-		this.slotDefHome.getInstance().getPropertyDefs().remove(prop);
+		SlotDef instance = this.slotDefHome.getInstance();
+		// ????????????????
+		boolean contains = instance.getPropertyDefs().contains(prop);
+		//
+		instance.getPropertyDefs().remove(prop);
 		//
 
 		if (prop.getConditionalPropertyDef() != null) {
@@ -785,13 +803,13 @@ public class SlotDefEditBean {
 		this.conditioned = conditioned;
 	}
 
-	//
-	//
-
 	public void setConverterPropertyMap(
 			Map<String, PropertyDef> converterPropertyMap) {
 		this.converterPropertyMap = converterPropertyMap;
 	}
+
+	//
+	//
 
 	public void setDependentSlotDef(DependentSlotDef dependentSlotDef) {
 		this.dependentSlotDef = dependentSlotDef;
@@ -821,6 +839,10 @@ public class SlotDefEditBean {
 						SlotDefType.valueOf(this.slotDefParameters.getMode()));
 			}
 		}
+	}
+
+	public void setMessages(ArrayList<VerifierMessage> messages) {
+		this.messages = messages;
 	}
 
 	public void setPropertyDef(PropertyDef propertyDef) {
@@ -873,9 +895,12 @@ public class SlotDefEditBean {
 	}
 
 	public String validate() {
-		SlotDefValidator slotDefValidator = new SlotDefValidator(
-				this.slotDefHome.getInstance());
-		slotDefValidator.validate();
+		// SlotDefValidator slotDefValidator = new SlotDefValidator(
+		// this.slotDefHome.getInstance());
+		this.slotDefValidator.setSlotDef(this.slotDefHome.getInstance());
+		this.slotDefValidator.setMessages(this.messages);
+		//
+		this.slotDefValidator.validate();
 		if (this.slotDefHome.getInstance().getStatus()
 				.equals(SlotDefSatus.VALID)) {
 			return "valid";

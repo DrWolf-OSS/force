@@ -9,7 +9,7 @@
 
    <action execute="#{slotDefHome.wire}"/>
    
-   <action execute="#{slotDefEditBean.validate}"/>
+
 
    <param name="slotDefFrom"/>
    <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
@@ -33,7 +33,7 @@
    
    <navigation from-action="#{slotDefEditBean.save()}">
       <rule if-outcome="valid">
-         <end-conversation />
+         <end-conversation before-redirect="true" />
          <redirect view-id="/admin/SlotDefView.xhtml">
          	<param name="model" value="#{slotDefParameters.model}"/>
     		<param name="mode" value="#{slotDefParameters.mode}"/>
@@ -63,6 +63,7 @@
          </redirect>
       </rule>
       <rule if-outcome="invalid">
+      	<end-conversation before-redirect="true" />
          <redirect>
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
          	<param name="model" value="#{slotDefParameters.model}"/>
