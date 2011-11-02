@@ -15,6 +15,20 @@
     <h:form id="slotDef" styleClass="edit" onkeypress="dirty=true">
     
     	<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
+    	
+    	<s:div styleClass="messageBox" >
+		<ui:repeat var="message" value="#{slotDefEditBean.messages}">
+			<h:graphicImage value="/img/msgerror.png"  styleClass="fileIcon"
+				rendered="#{message.type == 'ERROR'}" />
+			<h:graphicImage value="/img/msgwarn.png"  styleClass="fileIcon"
+				rendered="#{message.type == 'WARNING'}" />
+			<h:graphicImage value="/img/tick.png"  styleClass="fileIcon"
+				rendered="#{message.type == 'VALID'}" />
+			<h:outputText value="#{message.text}" />
+			<br />
+		</ui:repeat>
+		</s:div>
+		<div style="clear: both"/>
 
         <rich:panel style="width:auto">
             <f:facet name="header">#{slotDefHome.managed ? 'Modifica' : 'Creazione'} #{slotDefParameters.model ? 'modello di' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Busta di Riferimento' : 'Busta Amministrativa'}</f:facet>
@@ -31,6 +45,10 @@
             
             <s:decorate id="statusField" template="/layout/display.xhtml">
                 <ui:define name="label">Stato</ui:define>
+                <h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
+							rendered="#{slotDefHome.instance.status == 'INVALID'}" />
+				<h:graphicImage value="/img/tick.png"  styleClass="fileIcon"
+							rendered="#{slotDefHome.instance.status == 'VALID'}" />
                 <h:outputText id="status" value="#{slotDefHome.instance.status.value()}" />
             </s:decorate>
             
@@ -47,7 +65,9 @@
             
 	            <s:decorate id="parentSlot" template="/layout/display.xhtml">
 	                <ui:define name="label">Busta Contenitrice</ui:define>
-	                <s:link view="/admin/SlotDefView.xhtml" value="#{slotDefHome.instance.parentSlotDef.name}" propagation="none">
+	                <s:link view="/admin/SlotDefView.xhtml" value="#{slotDefHome.instance.parentSlotDef.name}"
+	                		action="#{slotDefEditBean.validate}" 
+	                		propagation="none">
 	                	<f:param name="mode" value="#{slotDefHome.instance.parentSlotDef.type.name()}"/>
 						<f:param name="model" value="#{slotDefHome.instance.parentSlotDef.template}"/>
 						<f:param name="slotDefId" value="#{slotDefHome.instance.parentSlotDef.id}"/>
@@ -150,6 +170,8 @@
 						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" style="width:1024px" >
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
+						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
+							rendered="#{eprop.status == 'INVALID'}" />
 						<h:outputText value="#{eprop.name}" />
 					</rich:column>
 					<rich:column styleClass="#{!eprop.active ? 'invalidRow' : ''}">
@@ -226,6 +248,8 @@
 						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" >
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
+						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
+							rendered="#{prop.status == 'INVALID'}" />
 						<h:outputText value="#{prop.name}" />
 					</rich:column>
 					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
@@ -326,6 +350,8 @@
 						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" style="width:1024px">
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
+						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
+							rendered="#{coll.status == 'INVALID'}" />
 						<h:outputText value="#{coll.name}" />
 					</rich:column>
 					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
@@ -396,12 +422,10 @@
 				<h:outputText value="Nessuna sottobusta definita" rendered="#{empty slotDefHome.instance.dependentSlotDefsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.dependentSlotDefsAsList}" var="slot" 
 						rendered="#{not empty slotDefHome.instance.dependentSlotDefsAsList}" style="width:1024px">
-					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
-						<f:facet name="header">Id</f:facet>
-						<h:outputText value="#{slot.id}" />
-					</rich:column>
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
+						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
+							rendered="#{slot.status == 'INVALID'}" />
 						<h:outputText value="#{slot.name}" />
 					</rich:column>
 					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
@@ -439,7 +463,8 @@
 						 			
 						<s:link view="/admin/SlotDefWizardEdit.xhtml" value="Modifica" 
 								rendered="#{slot.id != null}"
-								propagation="none">
+								propagation="none"
+								action="#{slotDefEditBean.validate}">
 							<f:param name="mode" value="DEPENDENT"/>
 							<f:param name="model" value="true"/>
 							<f:param name="slotDefId" value="#{slot.id}"/>
@@ -1177,7 +1202,8 @@
 				<a:region>
 				<s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.dependentSlotDef != null}">
 	                <ui:define name="label">
-	                	<h:outputText value="Numero di copie" />
+	                	<h:outputText id="nclabel" value="Numero di copie" />
+	                	<rich:toolTip for="nclabel">Deve essere selezionata una informazione di tipo NUMERO segnata come OBBLIGATORIA</rich:toolTip>
 					</ui:define>
 					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef.numberOfInstances}" 
 								onchange="dirty = true"

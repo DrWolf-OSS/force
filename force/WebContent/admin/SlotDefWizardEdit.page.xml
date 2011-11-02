@@ -9,7 +9,7 @@
 
    <action execute="#{slotDefHome.wire}"/>
    
-   
+
 
    <param name="slotDefFrom"/>
    <param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
@@ -32,8 +32,8 @@
    </navigation>
    
    <navigation from-action="#{slotDefEditBean.save()}">
-      <rule if-outcome="persisted">
-         <end-conversation />
+      <rule if-outcome="valid">
+         <end-conversation before-redirect="true" />
          <redirect view-id="/admin/SlotDefView.xhtml">
          	<param name="model" value="#{slotDefParameters.model}"/>
     		<param name="mode" value="#{slotDefParameters.mode}"/>
@@ -41,7 +41,7 @@
     		<param name="garaId" value="#{garaHome.garaId}"/>
          </redirect>
       </rule>
-      <rule if-outcome="failed">
+      <rule if-outcome="invalid">
          <redirect>
          	<param name="model" value="#{slotDefParameters.model}"/>
     		<param name="mode" value="#{slotDefParameters.mode}"/>
@@ -52,7 +52,7 @@
    </navigation>
    
    <navigation from-action="#{slotDefEditBean.update()}">
-      <rule if-outcome="updated">
+      <rule if-outcome="valid">
          <end-conversation />
          <redirect view-id="/admin/SlotDefView.xhtml">
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
@@ -62,7 +62,8 @@
     		<param name="garaId" value="#{garaHome.garaId}"/>
          </redirect>
       </rule>
-      <rule if-outcome="failed">
+      <rule if-outcome="invalid">
+      	<end-conversation before-redirect="true" />
          <redirect>
          	<param name="slotDefId" value="#{slotDefHome.id}"/>
          	<param name="model" value="#{slotDefParameters.model}"/>

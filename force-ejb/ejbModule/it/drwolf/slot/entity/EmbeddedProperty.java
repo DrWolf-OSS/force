@@ -1,6 +1,7 @@
 package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.enums.DefStatus;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.DataInstance;
 import it.drwolf.slot.interfaces.Deactivable;
@@ -57,6 +58,8 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 	private Constraint constraint;
 
 	private Validator validator = new Validator();
+
+	private DefStatus status;
 
 	@Transient
 	public void clean() {
@@ -132,6 +135,11 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 
 	public String getName() {
 		return this.name;
+	}
+
+	@Transient
+	public DefStatus getStatus() {
+		return this.status;
 	}
 
 	public String getStringValue() {
@@ -224,6 +232,10 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setStatus(DefStatus status) {
+		this.status = status;
 	}
 
 	public void setStringValue(String stringValue) {
