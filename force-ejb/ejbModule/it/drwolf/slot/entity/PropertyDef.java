@@ -1,6 +1,7 @@
 package it.drwolf.slot.entity;
 
 import it.drwolf.slot.enums.DataType;
+import it.drwolf.slot.enums.DefStatus;
 import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.Deactivable;
@@ -63,6 +64,8 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 	private Constraint constraint;
 
 	private Validator validator = new Validator();
+
+	private DefStatus status;
 
 	public PropertyDef() {
 	}
@@ -188,6 +191,11 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 	}
 
 	@Transient
+	public DefStatus getStatus() {
+		return this.status;
+	}
+
+	@Transient
 	public String getUuid() {
 		return this.uuid;
 	}
@@ -281,6 +289,10 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 	public void setSlotDefsIsNumberOfInstancesOf(
 			Set<DependentSlotDef> slotDefsIsNumberOfInstancesOf) {
 		this.slotDefsIsNumberOfInstancesOf = slotDefsIsNumberOfInstancesOf;
+	}
+
+	public void setStatus(DefStatus status) {
+		this.status = status;
 	}
 
 	@Override
