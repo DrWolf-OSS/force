@@ -52,6 +52,11 @@ public class Gara implements Serializable {
 
 	private BigDecimal requisitoEconomico;
 
+	// Con questo si mappa lo stato della Gara ai fii della segnalazione
+	// Possiamo distinguere tra gare appena inserite, comunicate alle aziende,
+	// etc etc
+	private String stato;
+
 	// Con questo si mappa lo stato della Gara (Nuova, Attiva, Scaduta,
 	// Scartata)
 	// sarebbe stato meglio chimarlo stato
@@ -172,6 +177,11 @@ public class Gara implements Serializable {
 	}
 
 	@Column
+	public String getStato() {
+		return this.stato;
+	}
+
+	@Column
 	public String getTipoProcedura() {
 		return this.tipoProcedura;
 	}
@@ -187,8 +197,6 @@ public class Gara implements Serializable {
 		return this.type;
 	}
 
-	// deve essere inserito anche un riferimento al settore?
-
 	@Transient
 	public boolean isActive() {
 		if (this.getType().equals(TipoGara.GESTITA.getNome())) {
@@ -196,6 +204,8 @@ public class Gara implements Serializable {
 		}
 		return false;
 	}
+
+	// deve essere inserito anche un riferimento al settore?
 
 	@Transient
 	public boolean isNew() {
@@ -271,6 +281,10 @@ public class Gara implements Serializable {
 	@Transient
 	public void setSOAAsList(List<SOA> lista) {
 		this.setSOA(new HashSet<SOA>(lista));
+	}
+
+	public void setStato(String stato) {
+		this.stato = stato;
 	}
 
 	public void setTipoProcedura(String tipologia) {
