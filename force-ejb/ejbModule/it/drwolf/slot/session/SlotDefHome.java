@@ -269,18 +269,21 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		return (Long) this.getId();
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<SlotInst> getSlotInstsReferenced() {
-		if (this.getInstance().getId() != null) {
-			List<SlotInst> resultList = this.getEntityManager()
-					.createQuery("from SlotInst s where s.slotDef=:slotDef")
-					.setParameter("slotDef", this.getInstance())
-					.getResultList();
-			if (resultList != null) {
-				return resultList;
-			}
+		// if (this.getInstance().getId() != null) {
+		// List<SlotInst> resultList = this.getEntityManager()
+		// .createQuery("from SlotInst s where s.slotDef=:slotDef")
+		// .setParameter("slotDef", this.getInstance())
+		// .getResultList();
+		// if (resultList != null) {
+		// return resultList;
+		// }
+		// }
+		// return new ArrayList<SlotInst>();
+		if (this.getInstance() != null) {
+			return this.getInstance().getReferencedSlotInsts();
 		}
-		return new ArrayList<SlotInst>();
+		return null;
 	}
 
 	public boolean isReferenced() {

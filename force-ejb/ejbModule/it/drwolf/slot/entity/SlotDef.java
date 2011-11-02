@@ -45,15 +45,9 @@ public class SlotDef {
 
 	private boolean template = Boolean.FALSE;
 
-	// private PropertyDef conditionalPropertyDef;
-	//
-	// private PropertyInst conditionalPropertyInst;
-	//
-	// private boolean active = Boolean.TRUE;
-
 	private Set<DependentSlotDef> dependentSlotDefs = new HashSet<DependentSlotDef>();
 
-	private SlotDefSatus status = SlotDefSatus.INVALID;
+	private SlotDefSatus status = SlotDefSatus.UNKNOWN;
 
 	@OneToMany(mappedBy = "parentSlotDef", cascade = CascadeType.ALL)
 	public Set<DependentSlotDef> getDependentSlotDefs() {
@@ -111,6 +105,22 @@ public class SlotDef {
 	@Transient
 	public List<PropertyDef> getPropertyDefsAsList() {
 		return new ArrayList<PropertyDef>(this.propertyDefs);
+	}
+
+	@Transient
+	@SuppressWarnings("unchecked")
+	public List<SlotInst> getReferencedSlotInsts() {
+		EntityManager entityManager = (EntityManager) org.jboss.seam.Component
+				.getInstance("entityManager");
+		if (this.getId() != null) {
+			List<SlotInst> resultList = entityManager
+					.createQuery("from SlotInst s where s.slotDef=:slotDef")
+					.setParameter("slotDef", this).getResultList();
+			if (resultList != null) {
+				return resultList;
+			}
+		}
+		return new ArrayList<SlotInst>();
 	}
 
 	@OneToMany(mappedBy = "slotDef", cascade = CascadeType.ALL)

@@ -36,9 +36,6 @@ public class SlotInst {
 
 	private SlotInst parentSlotInst;
 
-	// private Set<MultiplePropertyInst> multiPropertyInsts = new
-	// HashSet<MultiplePropertyInst>();
-
 	private String ownerId;
 
 	private SlotInstStatus status = SlotInstStatus.EMPTY;
@@ -63,6 +60,7 @@ public class SlotInst {
 		}
 	}
 
+	@OrderBy("id")
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "parentSlotInst")
 	// @JoinColumn(name = "parentSlotInst_id")
 	public Set<SlotInst> getDependentSlotInsts() {
@@ -167,16 +165,5 @@ public class SlotInst {
 	public void setStatus(SlotInstStatus status) {
 		this.status = status;
 	}
-
-	// @OrderBy("propertyDef")
-	// @OneToMany(mappedBy = "slotInst", cascade = CascadeType.ALL)
-	// public Set<MultiplePropertyInst> getMultiPropertyInsts() {
-	// return multiPropertyInsts;
-	// }
-	//
-	// public void setMultiPropertyInsts(
-	// Set<MultiplePropertyInst> multiPropertyInsts) {
-	// this.multiPropertyInsts = multiPropertyInsts;
-	// }
 
 }
