@@ -185,17 +185,30 @@ public class UserSession implements Serializable {
 	// }
 	// }
 
+	// PALA
+	@SuppressWarnings("unchecked")
 	private SlotInst retriveSlotInst() {
-
 		List<SlotInst> resultList = this.entityManager
 				.createQuery(
 						"from SlotInst where slotDef = :slotDef and ownerId = :ownerId order by id desc")
 				.setParameter("slotDef",
 						this.getAzienda().getSettore().getSlotDef())
 				.setParameter("ownerId", this.getAzienda().getAlfrescoGroupId())
-				.setMaxResults(1).getResultList();
-		if (resultList != null && !resultList.isEmpty()) {
-			// this.setPrimarySlotInst(slonInst);
+				.getResultList();
+		if (resultList != null) {
+			if (resultList.size() > 1) {
+				System.out
+						.println("---> WARNING: Il gruppo "
+								+ this.getAzienda().getAlfrescoGroupId()
+								+ " ha "
+								+ resultList.size()
+								+ " istanze di SlotInst associate allo SlotDef di tipo primary con nome \""
+								+ this.getAzienda().getSettore().getSlotDef()
+										.getName()
+								+ "\" e id "
+								+ this.getAzienda().getSettore().getSlotDef()
+										.getId());
+			}
 			return resultList.get(0);
 		}
 
