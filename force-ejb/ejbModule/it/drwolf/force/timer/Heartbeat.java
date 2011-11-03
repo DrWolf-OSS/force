@@ -4,6 +4,7 @@ import it.drwolf.force.entity.CategoriaMerceologica;
 import it.drwolf.force.entity.Fonte;
 import it.drwolf.force.entity.Gara;
 import it.drwolf.force.entity.SOA;
+import it.drwolf.force.enums.StatoGara;
 import it.drwolf.force.enums.TipoGara;
 import it.drwolf.force.enums.TipoProceduraGara;
 import it.drwolf.force.enums.TipoSvolgimento;
@@ -178,6 +179,7 @@ public class Heartbeat {
 							Gara gara = new Gara(post.getTitle(),
 									post.getLink(), TipoGara.NUOVA.getNome(),
 									fonte);
+							gara.setStato(StatoGara.NUOVA.toString());
 							Date dataInizio = startFeed.getDataInizio();
 							if (dataInizio != null) {
 								gara.setDataPubblicazione(dataInizio);
