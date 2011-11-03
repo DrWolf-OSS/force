@@ -547,11 +547,14 @@
                        rendered="#{slotDefHome.managed}"
                        disabled="#{slotDefHome.referenced}"/>
                        
-            <s:button view="/admin/SlotDefView.xhtml" value="indietro" propagation="none">
+            <s:button view="/admin/SlotDefView.xhtml" value="Indietro" propagation="none">
                	<f:param name="mode" value="#{slotDefHome.instance.type.name()}"/>
 				<f:param name="model" value="#{slotDefHome.instance.template}"/>
 				<f:param name="slotDefId" value="#{slotDefHome.instance.id}"/>
 	        </s:button>
+	        
+	        <s:button view="/admin/SlotDefWizardEdit.xhtml" value="Annulla Modifiche" 
+	        	style="float:right"	propagation="none" includePageParams="true"/>
 
         </div>
 
