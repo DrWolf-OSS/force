@@ -11,6 +11,7 @@ import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
@@ -136,7 +137,7 @@ public class UserSession implements Serializable {
 		// this.slotDefHome.setInstance(this.primarySlotDef);
 		// /
 		this.setAzienda(azienda);
-		SlotInst slonInst = this.retriveSlotInst();
+		// SlotInst slonInst = this.retriveSlotInst();
 		// prelevo la cartella principale:
 		this.groupFolder = this.alfrescoWrapper.findOrCreateFolder(
 				this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH
@@ -185,24 +186,20 @@ public class UserSession implements Serializable {
 	// }
 
 	private SlotInst retriveSlotInst() {
-		SlotInst slonInst = null;
-		try {
-			slonInst = (SlotInst) this.entityManager
-					.createQuery(
-							"from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
-					.setParameter("slotDef",
-							this.getAzienda().getSettore().getSlotDef())
-					.setParameter("ownerId",
-							this.getAzienda().getAlfrescoGroupId())
-					.getSingleResult();
-			if (slonInst != null) {
-				this.setPrimarySlotInst(slonInst);
-			}
-		} catch (Exception e) {
-			// Non è ancora stato creato uno slotInst
-			System.out.println("---> Più di uno slot inst primary!!!!!");
+
+		List<SlotInst> resultList = this.entityManager
+				.createQuery(
+						"from SlotInst where slotDef = :slotDef and ownerId = :ownerId order by id desc")
+				.setParameter("slotDef",
+						this.getAzienda().getSettore().getSlotDef())
+				.setParameter("ownerId", this.getAzienda().getAlfrescoGroupId())
+				.setMaxResults(1).getResultList();
+		if (resultList != null && !resultList.isEmpty()) {
+			// this.setPrimarySlotInst(slonInst);
+			return resultList.get(0);
 		}
-		return slonInst;
+
+		return null;
 	}
 
 	public void setAzienda(Azienda azienda) {

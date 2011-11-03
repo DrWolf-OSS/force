@@ -49,6 +49,8 @@ public class SlotDef {
 
 	private SlotDefSatus status = SlotDefSatus.UNKNOWN;
 
+	private String ownerId;
+
 	@OneToMany(mappedBy = "parentSlotDef", cascade = CascadeType.ALL)
 	public Set<DependentSlotDef> getDependentSlotDefs() {
 		return this.dependentSlotDefs;
@@ -92,6 +94,10 @@ public class SlotDef {
 
 	public String getName() {
 		return this.name;
+	}
+
+	public String getOwnerId() {
+		return this.ownerId;
 	}
 
 	@OrderBy("name")
@@ -215,10 +221,6 @@ public class SlotDef {
 		return null;
 	}
 
-	public void setDependentSlotDefs(Set<DependentSlotDef> dependentSlotDefs) {
-		this.dependentSlotDefs = dependentSlotDefs;
-	}
-
 	// @Override
 	// public int hashCode() {
 	// final int prime = 31;
@@ -266,6 +268,10 @@ public class SlotDef {
 	// return true;
 	// }
 
+	public void setDependentSlotDefs(Set<DependentSlotDef> dependentSlotDefs) {
+		this.dependentSlotDefs = dependentSlotDefs;
+	}
+
 	@Transient
 	public void setDependentSlotDefsAsList(
 			List<DependentSlotDef> dependentSlotDefsAsList) {
@@ -301,6 +307,10 @@ public class SlotDef {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
 	}
 
 	public void setPropertyDefs(Set<PropertyDef> propertytDefs) {

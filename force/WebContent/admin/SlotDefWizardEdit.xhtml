@@ -1125,7 +1125,7 @@
 	                	<h:outputText value="Sottobusta" />
 					</ui:define>
 					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef}">
-     					<s:selectItems value="#{slotDefListManager.retrieveByType(true, 'DEPENDENT')}" label="#{slot.name}"
+     					<s:selectItems value="#{slotDefListManager.retrieveByType(true, 'DEPENDENT', null)}" label="#{slot.name}"
 									var="slot"  noSelectionLabel="-- select a value --"/>
 							<a:support event="onchange" reRender="condPD,condValue,numberOfIstances"/>		
 						<s:convertEntity/>

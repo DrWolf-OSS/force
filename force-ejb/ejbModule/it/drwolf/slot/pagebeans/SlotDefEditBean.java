@@ -1,5 +1,6 @@
 package it.drwolf.slot.pagebeans;
 
+import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.entity.DependentSlotDef;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInstCollection;
@@ -44,6 +45,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage.Severity;
+import org.jboss.seam.security.Identity;
 
 @Name("slotDefEditBean")
 @Scope(ScopeType.CONVERSATION)
@@ -87,6 +89,12 @@ public class SlotDefEditBean {
 
 	@In(create = true)
 	SlotDefValidator slotDefValidator;
+
+	@In
+	private AlfrescoUserIdentity alfrescoUserIdentity;
+
+	@In
+	private Identity identity;
 
 	// main messages
 	private ArrayList<VerifierMessage> messages = new ArrayList<VerifierMessage>();
@@ -391,7 +399,9 @@ public class SlotDefEditBean {
 	public void init() {
 		this.setKnownParameters();
 		//
-		this.validate();
+		if (this.slotDefHome.getInstance().getId() != null) {
+			this.validate();
+		}
 		// SlotDefValidator slotDefValidator = new SlotDefValidator(
 		// this.slotDefHome.getInstance());
 		// slotDefValidator.validate();
@@ -809,34 +819,16 @@ public class SlotDefEditBean {
 	}
 
 	public String save() {
-		// boolean names = this.checkNames();
-		// boolean references = this.checkCollectionReferences();
-		// boolean embeddedValues = true;
-		// if (!this.slotDefHome.getInstance().isTemplate()) {
-		// embeddedValues = this.checkEmbeddedPropertyValues();
-		// }
-		// if (names && references && embeddedValues) {
-		// // this.persistDependentSlotDefs();
-		//
-		// return this.slotDefHome.persist();
-		// } else {
-		// return "failed";
-		// }
-		// SlotDefValidator slotDefValidator = new SlotDefValidator(
-		// this.slotDefHome.getInstance());
-		// String result = null;
-		// slotDefValidator.validate();
-		// if (this.slotDefHome.getInstance().getStatus()
-		// .equals(SlotDefSatus.VALID)) {
-		// result = "valid";
-		// } else {
-		// result = "invalid";
-		// }
 		String validate = this.validate();
+		//
+		String ownerId = null;
+		if (!this.identity.hasRole("ADMIN")) {
+			ownerId = this.alfrescoUserIdentity.getActiveGroup().getShortName();
+		}
+		this.slotDefHome.getInstance().setOwnerId(ownerId);
+		//
 		this.slotDefHome.persist();
 		return validate;
-		// slotDefValidator.validate();
-		// return this.slotDefHome.persist();
 	}
 
 	public void setCollection(DocDefCollection collection) {
