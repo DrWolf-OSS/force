@@ -824,6 +824,8 @@ public class SlotDefEditBean {
 		String ownerId = null;
 		if (!this.identity.hasRole("ADMIN")) {
 			ownerId = this.alfrescoUserIdentity.getActiveGroup().getShortName();
+		} else {
+			ownerId = "ADMIN";
 		}
 		this.slotDefHome.getInstance().setOwnerId(ownerId);
 		//

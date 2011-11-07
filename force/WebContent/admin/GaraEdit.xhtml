@@ -95,7 +95,7 @@
                     id="create"
                     propagation="none"
                     value="Associa Busta" 
-                    rendered="#{garaHome.instance.slotDef==null}">
+                    rendered="#{garaHome.associatedSlotDef == null}">
                    	<f:param name="model" value="#{true}"/>
             		<f:param name="mode" value="GENERAL"/>
             		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
@@ -105,11 +105,11 @@
              <s:button view="/admin/SlotDefView.xhtml"
                     id="slotEdit"
                     propagation="none"
-                    value="Modifica Busta" rendered="#{garaHome.instance.slotDef!=null}">
+                    value="Modifica Busta" rendered="#{garaHome.associatedSlotDef != null}">
                    	<f:param name="model" value="#{false}"/>
             		<f:param name="mode" value="GENERAL"/>
             		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
-            		<f:param name="slotDefId" value="#{garaHome.instance.slotDef.id}"/>
+            		<f:param name="slotDefId" value="#{garaHome.associatedSlotDef.id}"/>
             		<f:param name="garaId" value="#{garaHome.garaId}"/>
                </s:button>
             </s:div>

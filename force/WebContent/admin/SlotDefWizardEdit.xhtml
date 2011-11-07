@@ -415,7 +415,7 @@
 			<rich:separator height="15px" lineType="none" />
 			
 			
-			<s:decorate template="/layout/display.xhtml" id="slotDefTable" rendered="#{slotDefHome.instance.type != 'DEPENDENT'}">
+			<s:decorate template="/layout/display.xhtml" id="slotDefTable" rendered="#{slotDefHome.instance.type == 'PRIMARY'}">
 				<ui:define name="label">
 	                <h:outputText value="Sottobuste" />
 				</ui:define>
@@ -463,8 +463,7 @@
 						 			
 						<s:link view="/admin/SlotDefWizardEdit.xhtml" value="Modifica" 
 								rendered="#{slot.id != null}"
-								propagation="none"
-								action="#{slotDefEditBean.validate}">
+								propagation="none">
 							<f:param name="mode" value="DEPENDENT"/>
 							<f:param name="model" value="true"/>
 							<f:param name="slotDefId" value="#{slot.id}"/>
@@ -507,8 +506,7 @@
 							rendered="#{slotDefParameters.mode != 'PRIMARY'}"
 							reRender="embeddedPropPanel"/>
 				<a:commandButton value="Aggiungi sottobusta"
-							rendered="#{slotDefHome.instance.type != 'DEPENDENT'}" 
-							 
+							rendered="#{slotDefHome.instance.type == 'PRIMARY'}" 						 
 							oncomplete="#{rich:component('dependentSlotDefPanel')}.show()" 
 							reRender="dependentSlotDefPanel"/>
 			</s:decorate>
@@ -525,7 +523,9 @@
                            onclick="dirty = false;"
                          action="#{slotDefGaraAssociationtBean.persistAssociation()}"
                        disabled="#{!slotDefHome.wired}"
-                       rendered="#{garaHome.garaId!=null and garaHome.instance.slotDef==null}"/>
+                       rendered="#{garaHome.garaId!=null and 
+                       				garaHome.associatedSlotDef==null
+                       				and slotDefHome.instance.type != 'DEPENDENT'}"/>
 
             <h:commandButton id="save"
                           value="Salva"

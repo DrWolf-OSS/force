@@ -101,6 +101,8 @@ public class SlotDefListManager {
 		String ownerId = null;
 		if (!this.identity.hasRole("ADMIN")) {
 			ownerId = this.alfrescoUserIdentity.getActiveGroup().getShortName();
+		} else {
+			ownerId = "ADMIN";
 		}
 
 		if (this.slotDefParameters.getMode() == null
