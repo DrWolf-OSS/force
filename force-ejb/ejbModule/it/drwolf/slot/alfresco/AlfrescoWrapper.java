@@ -80,7 +80,7 @@ public class AlfrescoWrapper {
 		if (last == length - 1) {
 			normalized = normalized.substring(0, length - 1);
 		}
-		return normalized;
+		return normalized.trim();
 	}
 
 	public static ObjectId ref2id(String ref) {

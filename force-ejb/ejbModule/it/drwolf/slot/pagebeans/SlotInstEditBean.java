@@ -1176,6 +1176,9 @@ public class SlotInstEditBean {
 
 		String fileName = item.getFileName();
 
+		// String name = item.getFile().getName();
+		// System.out.println("----> FILENAME: " + name);
+
 		// Metto un mimetype generico, ci pensa Alfresco a mettere il mimetype
 		// giusto tramite l'esecuzione di uno script
 		String mimetype = "application/octet-stream";
