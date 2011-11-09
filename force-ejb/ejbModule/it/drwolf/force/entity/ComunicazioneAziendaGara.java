@@ -38,8 +38,8 @@ public class ComunicazioneAziendaGara implements Serializable {
 
 	@EmbeddedId
 	@AttributeOverrides({
-			@AttributeOverride(name = "garaId", column = @Column(name = "id", nullable = true)),
-			@AttributeOverride(name = "aziendaId", column = @Column(name = "id", nullable = true)) })
+			@AttributeOverride(name = "garaId", column = @Column(name = "garaId", nullable = true)),
+			@AttributeOverride(name = "aziendaId", column = @Column(name = "aziendaId", nullable = true)) })
 	public ComunicazioneAziendaGaraId getId() {
 		return this.id;
 	}

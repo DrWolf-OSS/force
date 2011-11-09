@@ -117,7 +117,7 @@ public class Gara implements Serializable {
 		}
 	}
 
-	@OneToMany(mappedBy = "gare")
+	@OneToMany(mappedBy = "gara")
 	public Set<ComunicazioneAziendaGara> getAziende() {
 		return this.aziende;
 	}
