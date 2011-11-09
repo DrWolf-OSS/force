@@ -19,7 +19,9 @@
     		
     		<s:decorate id="oggettoField" template="/layout/display.xhtml">
                 <ui:define name="label">Oggetto</ui:define>
-                <h:outputText value="#{garaHome.instance.oggetto}" />
+                <s:link value="#{garaHome.instance.oggetto}" view="/user/Gara.xhtml" propagation="none">
+                	<f:param name="garaId" value="#{garaHome.instance.id}"/>
+                </s:link>
             </s:decorate>
 
             <s:decorate id="tecreqField" template="/layout/display.xhtml">
@@ -35,6 +37,18 @@
                                cols="80"
                                value="#{garaHome.instance.requisitoEconomico}"/>
             </s:decorate>
+            
+            <div style="clear:both"/>
+            
+            <s:button view="/user/SlotInstEdit.xhtml"
+                id="slotEdit"
+                propagation="none"
+                value="Partecipa" disabled="#{garaHome.associatedSlotDef == null}"
+                rendered="#{garaHome.associatedSlotInst == null}">
+                <f:param name="slotDefId" value="#{garaHome.associatedSlotDef.id}"/>
+                <f:param name="garaId" value="#{garaHome.garaId}"/>
+            </s:button>
+            
     	</rich:simpleTogglePanel>
     	
     	<rich:separator height="15px" lineType="none" rendered="#{garaHome.garaId != null}"/>
@@ -266,7 +280,7 @@
 			<div style="clear:both"/>
 			<rich:separator height="15px" lineType="none" />
 			
-			<s:decorate template="/layout/display.xhtml" id="slotDefTable">
+			<s:decorate template="/layout/display.xhtml" id="slotDefTable" rendered="#{slotDefHome.instance.type == 'PRIMARY'}">
 				<ui:define name="label">
 	                <h:outputText value="Sottobuste" />
 				</ui:define>

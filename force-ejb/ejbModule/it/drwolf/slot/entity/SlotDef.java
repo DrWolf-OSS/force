@@ -45,15 +45,11 @@ public class SlotDef {
 
 	private boolean template = Boolean.FALSE;
 
-	// private PropertyDef conditionalPropertyDef;
-	//
-	// private PropertyInst conditionalPropertyInst;
-	//
-	// private boolean active = Boolean.TRUE;
-
 	private Set<DependentSlotDef> dependentSlotDefs = new HashSet<DependentSlotDef>();
 
-	private SlotDefSatus status = SlotDefSatus.INVALID;
+	private SlotDefSatus status = SlotDefSatus.UNKNOWN;
+
+	private String ownerId;
 
 	@OneToMany(mappedBy = "parentSlotDef", cascade = CascadeType.ALL)
 	public Set<DependentSlotDef> getDependentSlotDefs() {
@@ -100,6 +96,10 @@ public class SlotDef {
 		return this.name;
 	}
 
+	public String getOwnerId() {
+		return this.ownerId;
+	}
+
 	@OrderBy("name")
 	@OneToMany(cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -111,6 +111,22 @@ public class SlotDef {
 	@Transient
 	public List<PropertyDef> getPropertyDefsAsList() {
 		return new ArrayList<PropertyDef>(this.propertyDefs);
+	}
+
+	@Transient
+	@SuppressWarnings("unchecked")
+	public List<SlotInst> getReferencedSlotInsts() {
+		EntityManager entityManager = (EntityManager) org.jboss.seam.Component
+				.getInstance("entityManager");
+		if (this.getId() != null) {
+			List<SlotInst> resultList = entityManager
+					.createQuery("from SlotInst s where s.slotDef=:slotDef")
+					.setParameter("slotDef", this).getResultList();
+			if (resultList != null) {
+				return resultList;
+			}
+		}
+		return new ArrayList<SlotInst>();
 	}
 
 	@OneToMany(mappedBy = "slotDef", cascade = CascadeType.ALL)
@@ -205,10 +221,6 @@ public class SlotDef {
 		return null;
 	}
 
-	public void setDependentSlotDefs(Set<DependentSlotDef> dependentSlotDefs) {
-		this.dependentSlotDefs = dependentSlotDefs;
-	}
-
 	// @Override
 	// public int hashCode() {
 	// final int prime = 31;
@@ -256,6 +268,10 @@ public class SlotDef {
 	// return true;
 	// }
 
+	public void setDependentSlotDefs(Set<DependentSlotDef> dependentSlotDefs) {
+		this.dependentSlotDefs = dependentSlotDefs;
+	}
+
 	@Transient
 	public void setDependentSlotDefsAsList(
 			List<DependentSlotDef> dependentSlotDefsAsList) {
@@ -291,6 +307,10 @@ public class SlotDef {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
 	}
 
 	public void setPropertyDefs(Set<PropertyDef> propertytDefs) {

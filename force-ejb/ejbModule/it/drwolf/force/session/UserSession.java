@@ -137,7 +137,7 @@ public class UserSession implements Serializable {
 		// this.slotDefHome.setInstance(this.primarySlotDef);
 		// /
 		this.setAzienda(azienda);
-		SlotInst slonInst = this.retriveSlotInst();
+		// SlotInst slonInst = this.retriveSlotInst();
 		// prelevo la cartella principale:
 		this.groupFolder = this.alfrescoWrapper.findOrCreateFolder(
 				this.preferences.getValue(PreferenceKey.FORCE_GROUPS_PATH

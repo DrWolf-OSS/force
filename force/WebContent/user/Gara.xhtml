@@ -44,7 +44,7 @@
                 <h:outputText value="#{garaHome.instance.importo} €" />
             </s:decorate>
 
-            <s:decorate id="catmerField" template="/layout/edit.xhtml" rendered="#{not empty garaHome.instance.categorieMerceologicheAsList}">
+            <s:decorate id="catmerField" template="/layout/display.xhtml" rendered="#{not empty garaHome.instance.categorieMerceologicheAsList}">
                 <ui:define name="label">Categorie Merceologiche</ui:define>
                 <rich:dataTable id="catmerList"
                                var="catMer"
@@ -78,13 +78,47 @@
 
         <div class="actionButtons">
             
-            <s:button view="/user/SlotInstEdit.xhtml"
-                    id="slotEdit"
+            <s:button view="/admin/SlotDefTemplateList.xhtml"
+                    id="create"
                     propagation="none"
-                    value="Partecipa" rendered="#{garaHome.instance.slotDef!=null}">
-                    <f:param name="slotDefId" value="#{garaHome.instance.slotDef.id}"/>
-                    <f:param name="garaId" value="#{garaHome.garaId}"/>
-               </s:button>
+                    value="Associa Busta" 
+                    rendered="#{garaHome.associatedSlotDef == null}">
+                   	<f:param name="model" value="#{true}"/>
+            		<f:param name="mode" value="GENERAL"/>
+            		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
+            		<f:param name="garaId" value="#{garaHome.garaId}"/>
+            </s:button>
+            
+            <s:button view="/admin/SlotDefView.xhtml"
+                    propagation="none"
+                    value="Modifica Busta" 
+                    rendered="#{garaHome.associatedSlotDef != null}">
+                    <f:param name="slotDefId" value="#{garaHome.associatedSlotDef.id}"/>
+                   	<f:param name="model" value="#{true}"/>
+            		<f:param name="mode" value="GENERAL"/>
+            		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
+            		<f:param name="garaId" value="#{garaHome.garaId}"/>
+            </s:button>
+            
+             
+            <s:button view="/user/SlotInstEdit.xhtml"
+                id="slotEdit"
+                propagation="none"
+                value="Partecipa" disabled="#{garaHome.associatedSlotDef == null}"
+                rendered="#{garaHome.associatedSlotInst == null}">
+                <f:param name="slotDefId" value="#{garaHome.associatedSlotDef.id}"/>
+                <f:param name="garaId" value="#{garaHome.garaId}"/>
+            </s:button>
+            
+            <s:button view="/user/SlotInstEdit.xhtml"
+                propagation="none"
+                value="Amministra"
+                rendered="#{garaHome.associatedSlotDef!=null and garaHome.associatedSlotInst!=null}">
+                <f:param name="slotDefId" value="#{garaHome.associatedSlotDef.id}"/>
+                <f:param name="slotInstId" value="#{garaHome.associatedSlotInst.id}"/>
+                <f:param name="garaId" value="#{garaHome.garaId}"/>
+            </s:button>
+            
                
 
 

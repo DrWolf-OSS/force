@@ -1,6 +1,7 @@
 package it.drwolf.force.entity;
 
 import it.drwolf.force.enums.TipoGara;
+import it.drwolf.force.exceptions.DuplicateCoupleGaraSlotDefOwner;
 import it.drwolf.slot.entity.SlotDef;
 
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -70,7 +72,9 @@ public class Gara implements Serializable {
 
 	private Fonte fonte;
 
-	private SlotDef slotDef;
+	// private SlotDef slotDef;
+
+	private Set<SlotDef> slotDefs = new HashSet<SlotDef>();
 
 	private Set<CategoriaMerceologica> categorieMerceologiche = new HashSet<CategoriaMerceologica>();
 
@@ -90,6 +94,27 @@ public class Gara implements Serializable {
 		this.link = link;
 		this.type = type;
 		this.fonte = fonte;
+	}
+
+	@Transient
+	public void addSlotDef(SlotDef slotDef)
+			throws DuplicateCoupleGaraSlotDefOwner {
+		if (slotDef != null) {
+			SlotDef previous = this
+					.retrieveSlotDefByOwner(slotDef.getOwnerId());
+			if (previous != null) {
+				throw new DuplicateCoupleGaraSlotDefOwner(
+						"La Gara \""
+								+ this.getOggetto()
+								+ "\" è già rappresentata da uno SlotDef di proprietà di "
+								+ previous.getOwnerId());
+				// System.out.println("La Gara \"" + this.getOggetto() +
+				// "\" è già rappresentata da uno SlotDef di proprietà di " +
+				// previous.getOwnerId());
+				// this.getSlotDefs().remove(previous);
+			}
+			this.getSlotDefs().add(slotDef);
+		}
 	}
 
 	@OneToMany(mappedBy = "gare")
@@ -161,16 +186,21 @@ public class Gara implements Serializable {
 		return this.requisitoTecnico;
 	}
 
+	// @ManyToOne
+	// @JoinColumn(name = "SlotDef")
+	// public SlotDef getSlotDef() {
+	// return this.slotDef;
+	// }
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "Settore", nullable = true)
 	public Settore getSettore() {
 		return this.settore;
 	}
 
-	@ManyToOne
-	@JoinColumn(name = "SlotDef")
-	public SlotDef getSlotDef() {
-		return this.slotDef;
+	@ManyToMany
+	public Set<SlotDef> getSlotDefs() {
+		return this.slotDefs;
 	}
 
 	@ManyToMany
@@ -205,6 +235,8 @@ public class Gara implements Serializable {
 		return this.type;
 	}
 
+	// deve essere inserito anche un riferimento al settore?
+
 	@Transient
 	public boolean isActive() {
 		if (this.getType().equals(TipoGara.GESTITA.getNome())) {
@@ -219,6 +251,18 @@ public class Gara implements Serializable {
 			return true;
 		}
 		return false;
+	}
+
+	@Transient
+	public SlotDef retrieveSlotDefByOwner(String ownerId) {
+		Iterator<SlotDef> iterator = this.getSlotDefs().iterator();
+		while (iterator.hasNext()) {
+			SlotDef slotDef = iterator.next();
+			if (slotDef.getOwnerId().equals(ownerId)) {
+				return slotDef;
+			}
+		}
+		return null;
 	}
 
 	// deve essere inserito anche un riferimento al settore?
@@ -278,12 +322,16 @@ public class Gara implements Serializable {
 		this.requisitoTecnico = requisitoTecnico;
 	}
 
+	// public void setSlotDef(SlotDef slotDef) {
+	// this.slotDef = slotDef;
+	// }
+
 	public void setSettore(Settore settore) {
 		this.settore = settore;
 	}
 
-	public void setSlotDef(SlotDef slotDef) {
-		this.slotDef = slotDef;
+	public void setSlotDefs(Set<SlotDef> slotDefs) {
+		this.slotDefs = slotDefs;
 	}
 
 	public void setSOA(Set<SOA> soa) {

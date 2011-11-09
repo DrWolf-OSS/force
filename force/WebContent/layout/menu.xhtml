@@ -167,9 +167,9 @@
                 propagation="none"/>
         </rich:menuItem>
     </rich:dropDownMenu>
-    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('ADMIN')}">
+    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none">
         <f:facet name="label">Gestione Modelli</f:facet>
-        <rich:menuItem>
+        <rich:menuItem  rendered="#{identity.hasRole('ADMIN')}">
             <s:link view="/admin/SlotDefTemplateList.xhtml"
                 value="Buste di Riferimento"
                 id="primaryTemplates"

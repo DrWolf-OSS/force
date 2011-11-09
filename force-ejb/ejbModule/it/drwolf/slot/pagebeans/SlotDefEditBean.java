@@ -1,5 +1,6 @@
 package it.drwolf.slot.pagebeans;
 
+import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.entity.DependentSlotDef;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInstCollection;
@@ -44,6 +45,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage.Severity;
+import org.jboss.seam.security.Identity;
 
 @Name("slotDefEditBean")
 @Scope(ScopeType.CONVERSATION)
@@ -87,6 +89,12 @@ public class SlotDefEditBean {
 
 	@In(create = true)
 	SlotDefValidator slotDefValidator;
+
+	@In
+	private AlfrescoUserIdentity alfrescoUserIdentity;
+
+	@In
+	private Identity identity;
 
 	// main messages
 	private ArrayList<VerifierMessage> messages = new ArrayList<VerifierMessage>();
@@ -223,6 +231,14 @@ public class SlotDefEditBean {
 											SlotDefType.PRIMARY.value()) ? " Busta di Riferimento "
 											: " Busta Amministrativa ")
 									+ "è referenziata da una o più istanze già compilate!");
+			// VerifierMessage message = new VerifierMessage(
+			// "ATTENZIONE! Questa"
+			// + (this.slotDefParameters.getMode().equals(
+			// SlotDefType.PRIMARY.value()) ? " Busta di Riferimento "
+			// : " Busta Amministrativa ")
+			// + "è referenziata da una o più istanze già compilate!",
+			// VerifierMessageType.WARNING);
+			// this.getMessages().add(message);
 		}
 	}
 
@@ -383,7 +399,9 @@ public class SlotDefEditBean {
 	public void init() {
 		this.setKnownParameters();
 		//
-		this.validate();
+		if (this.slotDefHome.getInstance().getId() != null) {
+			this.validate();
+		}
 		// SlotDefValidator slotDefValidator = new SlotDefValidator(
 		// this.slotDefHome.getInstance());
 		// slotDefValidator.validate();
@@ -464,9 +482,12 @@ public class SlotDefEditBean {
 	}
 
 	public void modifyReferencedSlotInsts(Set<PropertyDef> newPropertyDefs,
-			Set<DocDefCollection> newDocDefCollections) {
-		List<SlotInst> slotInstsReferenced = this.slotDefHome
-				.getSlotInstsReferenced();
+			Set<DocDefCollection> newDocDefCollections,
+			Set<DependentSlotDef> newDependentSlotDefs) {
+		// List<SlotInst> slotInstsReferenced = this.slotDefHome
+		// .getSlotInstsReferenced();
+		List<SlotInst> slotInstsReferenced = this.slotDefHome.getInstance()
+				.getReferencedSlotInsts();
 		for (SlotInst slotInst : slotInstsReferenced) {
 			for (PropertyDef propertyDef : newPropertyDefs) {
 				PropertyInst propertyInst = new PropertyInst(propertyDef,
@@ -479,6 +500,43 @@ public class SlotDefEditBean {
 						slotInst, docDefCollection);
 				slotInst.getDocInstCollections().add(docInstCollection);
 			}
+
+			//
+			for (DependentSlotDef dependentSlotDef : newDependentSlotDefs) {
+				if (dependentSlotDef.getConditionalPropertyDef() != null
+						&& dependentSlotDef
+								.getConditionalPropertyInst()
+								.getValue()
+								.equals(slotInst.retrievePropertyInstByDef(
+										dependentSlotDef
+												.getConditionalPropertyDef())
+										.getValue())) {
+
+					PropertyInst numberOfInstancesPropertyInst = slotInst
+							.retrievePropertyInstByDef(dependentSlotDef
+									.getNumberOfInstances());
+					if (numberOfInstancesPropertyInst != null
+							&& numberOfInstancesPropertyInst.getPropertyDef()
+									.getDataType().equals(DataType.INTEGER)) {
+						Integer numberOfInstances = numberOfInstancesPropertyInst
+								.getIntegerValue();
+						for (int i = 0; i < numberOfInstances; i++) {
+							//
+							SlotInst dependentSlotInst = new SlotInst(
+									dependentSlotDef);
+							//
+							dependentSlotInst.setOwnerId(slotInst.getOwnerId());
+
+							dependentSlotInst.setParentSlotInst(slotInst);
+							slotInst.getDependentSlotInsts().add(
+									dependentSlotInst);
+						}
+
+					}
+				}
+			}
+			//
+
 			this.slotInstHome.setInstance(slotInst);
 			this.slotInstHome.update();
 		}
@@ -761,34 +819,18 @@ public class SlotDefEditBean {
 	}
 
 	public String save() {
-		// boolean names = this.checkNames();
-		// boolean references = this.checkCollectionReferences();
-		// boolean embeddedValues = true;
-		// if (!this.slotDefHome.getInstance().isTemplate()) {
-		// embeddedValues = this.checkEmbeddedPropertyValues();
-		// }
-		// if (names && references && embeddedValues) {
-		// // this.persistDependentSlotDefs();
-		//
-		// return this.slotDefHome.persist();
-		// } else {
-		// return "failed";
-		// }
-		// SlotDefValidator slotDefValidator = new SlotDefValidator(
-		// this.slotDefHome.getInstance());
-		// String result = null;
-		// slotDefValidator.validate();
-		// if (this.slotDefHome.getInstance().getStatus()
-		// .equals(SlotDefSatus.VALID)) {
-		// result = "valid";
-		// } else {
-		// result = "invalid";
-		// }
 		String validate = this.validate();
+		//
+		String ownerId = null;
+		if (!this.identity.hasRole("ADMIN")) {
+			ownerId = this.alfrescoUserIdentity.getActiveGroup().getShortName();
+		} else {
+			ownerId = "ADMIN";
+		}
+		this.slotDefHome.getInstance().setOwnerId(ownerId);
+		//
 		this.slotDefHome.persist();
 		return validate;
-		// slotDefValidator.validate();
-		// return this.slotDefHome.persist();
 	}
 
 	public void setCollection(DocDefCollection collection) {
@@ -872,6 +914,10 @@ public class SlotDefEditBean {
 		Set<PropertyDef> newPropertyDefs = new HashSet<PropertyDef>();
 		Set<DocDefCollection> newDocDefCollections = new HashSet<DocDefCollection>();
 
+		//
+		Set<DependentSlotDef> newDependentSlotDefs = new HashSet<DependentSlotDef>();
+		//
+
 		for (PropertyDef propertyDef : this.slotDefHome.getInstance()
 				.getPropertyDefsAsList()) {
 			if (propertyDef.getId() == null) {
@@ -884,11 +930,20 @@ public class SlotDefEditBean {
 				newDocDefCollections.add(collection);
 			}
 		}
+
+		//
+		for (DependentSlotDef dependentSlotDef : this.slotDefHome.getInstance()
+				.getDependentSlotDefs()) {
+			if (dependentSlotDef.getId() == null) {
+				newDependentSlotDefs.add(dependentSlotDef);
+			}
+		}
+		//
 		this.slotDefHome.update();
-		if ((!newDocDefCollections.isEmpty() || !newPropertyDefs.isEmpty())
-				&& this.slotDefHome.isReferenced()) {
+		if ((!newDocDefCollections.isEmpty() || !newPropertyDefs.isEmpty() || !newDependentSlotDefs
+				.isEmpty()) && this.slotDefHome.isReferenced()) {
 			this.modifyReferencedSlotInsts(newPropertyDefs,
-					newDocDefCollections);
+					newDocDefCollections, newDependentSlotDefs);
 		}
 
 		return validate;

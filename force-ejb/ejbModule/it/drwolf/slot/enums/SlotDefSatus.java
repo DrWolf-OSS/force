@@ -1,7 +1,7 @@
 package it.drwolf.slot.enums;
 
 public enum SlotDefSatus {
-	VALID("Valida"), INVALID("Non valida");
+	VALID("Valida"), INVALID("Non valida"), UNKNOWN("Sconosciuto");
 	public static SlotDefSatus fromValue(String parameter) {
 		for (SlotDefSatus c : SlotDefSatus.values()) {
 			if (c.value.equals(parameter)) {

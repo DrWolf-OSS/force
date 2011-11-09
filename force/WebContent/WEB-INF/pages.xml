@@ -15,9 +15,9 @@
     </page>
     
     <!-- restrictions  -->
-    <page view-id="/admin/*" login-required="true">
-    	<restrict>#{s:hasRole('ADMIN')}</restrict>
-    </page>
+<!--    <page view-id="/admin/*" login-required="true">-->
+<!--    	<restrict>#{s:hasRole('ADMIN')}</restrict>-->
+<!--    </page>-->
     
     <page view-id="/user/*" login-required="true"/>
     <!--  -->
