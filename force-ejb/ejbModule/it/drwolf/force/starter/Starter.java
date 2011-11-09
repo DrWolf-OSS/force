@@ -62,11 +62,15 @@ public class Starter {
 		// faccio partire il fetcher dei feed
 		Calendar endDate = Calendar.getInstance();
 		endDate.set(2100, 1, 1);
-
-		this.heartbeat.startFetcher(Calendar.getInstance().getTime(), new Long(
-				30 * 60 * 1000), endDate.getTime());
-		this.heartbeat.avcpFetcher(Calendar.getInstance().getTime(), new Long(
-				30 * 60 * 1000), endDate.getTime());
+		Calendar now = Calendar.getInstance();
+		this.heartbeat.startFetcher(now.getTime(), new Long(60 * 60 * 1000),
+				endDate.getTime());
+		now.add(Calendar.MINUTE, 1);
+		this.heartbeat.comunicaGare(now.getTime(), new Long(60 * 60 * 1000),
+				endDate.getTime());
+		now.add(Calendar.MINUTE, 5);
+		this.heartbeat.avcpFetcher(now.getTime(), new Long(60 * 60 * 1000),
+				endDate.getTime());
 
 	}
 }

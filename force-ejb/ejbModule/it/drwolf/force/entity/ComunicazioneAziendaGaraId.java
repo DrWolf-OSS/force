@@ -16,6 +16,10 @@ public class ComunicazioneAziendaGaraId implements Serializable {
 	private Integer aziendaId;
 	private Integer garaId;
 
+	public ComunicazioneAziendaGaraId() {
+		super();
+	}
+
 	public ComunicazioneAziendaGaraId(Integer aziendaId, Integer garaId) {
 		super();
 		this.aziendaId = aziendaId;

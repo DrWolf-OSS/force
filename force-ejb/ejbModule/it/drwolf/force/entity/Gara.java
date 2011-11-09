@@ -20,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -71,9 +72,11 @@ public class Gara implements Serializable {
 
 	private SlotDef slotDef;
 
-	private Set<CategoriaMerceologica> categorieMerceologiche;
+	private Set<CategoriaMerceologica> categorieMerceologiche = new HashSet<CategoriaMerceologica>();
 
-	private Set<SOA> SOA;
+	private Set<SOA> SOA = new HashSet<SOA>();
+
+	private Set<ComunicazioneAziendaGara> aziende = new HashSet<ComunicazioneAziendaGara>();
 
 	private Settore settore;
 
@@ -87,6 +90,11 @@ public class Gara implements Serializable {
 		this.link = link;
 		this.type = type;
 		this.fonte = fonte;
+	}
+
+	@OneToMany(mappedBy = "gare")
+	public Set<ComunicazioneAziendaGara> getAziende() {
+		return this.aziende;
 	}
 
 	@ManyToMany
@@ -205,14 +213,18 @@ public class Gara implements Serializable {
 		return false;
 	}
 
-	// deve essere inserito anche un riferimento al settore?
-
 	@Transient
 	public boolean isNew() {
 		if (this.getType().equals(TipoGara.NUOVA.getNome())) {
 			return true;
 		}
 		return false;
+	}
+
+	// deve essere inserito anche un riferimento al settore?
+
+	public void setAziende(Set<ComunicazioneAziendaGara> aziende) {
+		this.aziende = aziende;
 	}
 
 	public void setCategorieMerceologiche(

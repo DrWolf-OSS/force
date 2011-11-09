@@ -1,6 +1,9 @@
 package it.drwolf.force.timer;
 
+import it.drwolf.force.entity.Azienda;
 import it.drwolf.force.entity.CategoriaMerceologica;
+import it.drwolf.force.entity.ComunicazioneAziendaGara;
+import it.drwolf.force.entity.ComunicazioneAziendaGaraId;
 import it.drwolf.force.entity.Fonte;
 import it.drwolf.force.entity.Gara;
 import it.drwolf.force.entity.SOA;
@@ -39,6 +42,7 @@ import org.jboss.seam.annotations.async.Expiration;
 import org.jboss.seam.annotations.async.FinalExpiration;
 import org.jboss.seam.annotations.async.IntervalDuration;
 import org.jboss.seam.async.QuartzTriggerHandle;
+import org.jboss.seam.transaction.UserTransaction;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -123,6 +127,88 @@ public class Heartbeat {
 
 	@Asynchronous
 	@Transactional
+	public QuartzTriggerHandle comunicaGare(@Expiration Date date,
+			@IntervalDuration Long intervall, @FinalExpiration Date end) {
+		System.out
+				.println("################parte il servizio di comunicaiozne delle Gare###############");
+		QuartzTriggerHandle handle = new QuartzTriggerHandle(
+				"Comunicatore gare");
+
+		EntityManager entityManager = null;
+
+		while (entityManager == null) {
+			try {
+				entityManager = (EntityManager) Component
+						.getInstance("entityManager");
+				System.out.println("---> Sleep!");
+				Thread.sleep(2000);
+			} catch (Exception e) {
+
+			}
+		}
+		// per prima cosa devo prelevare l'elenco delle gare inserite e non
+		// comunicate
+		ArrayList<Gara> gare = (ArrayList<Gara>) entityManager.createQuery(
+				"from Gara where type = 'GESTITA' and stato = 'INSERITA'")
+				.getResultList();
+		for (Gara gara : gare) {
+			// pre ogni gara devo prendere l'elenco delle aziende a cui devo
+			// comunicarla
+			List<ComunicazioneAziendaGara> resultList = entityManager
+					.createQuery(
+							" from ComunicazioneAziendaGara  where garaId = :gid and email = false")
+					.setParameter("gid", gara.getId()).getResultList();
+			// a questo punto devo predenre le singole aziende e mandargli una
+			// mail
+			for (ComunicazioneAziendaGara comunicazioneAziendaGara : resultList) {
+				System.out.println(comunicazioneAziendaGara.getId()
+						.getAziendaId());
+				System.out
+						.println(comunicazioneAziendaGara.getId().getGaraId());
+			}
+		}
+		return handle;
+	}
+
+	private void setComunicaizioneAziende(EntityManager entityManager, Gara gara) {
+		if (gara.getCategorieMerceologicheAsList().size() > 0) {
+			List<Azienda> resultList = entityManager
+					.createQuery(
+							" select distinct  a from Gara g join g.categorieMerceologiche cm join cm.aziende a where g.id = :g")
+					.setParameter("g", gara.getId()).getResultList();
+			for (Azienda azienda : resultList) {
+				// per ogni azienda devo andare a inserire un riga nelle
+				// comunicazioni
+				ComunicazioneAziendaGaraId id = new ComunicazioneAziendaGaraId(
+						azienda.getId(), gara.getId());
+				ComunicazioneAziendaGara cag = new ComunicazioneAziendaGara();
+				cag.setId(id);
+				cag.setEmail(false);
+				cag.setWeb(false);
+				this.storeOnDatabase(cag, entityManager);
+			}
+		}
+		if (gara.getSOAAsList().size() > 0) {
+			List<Azienda> resultList = entityManager
+					.createQuery(
+							" select distinct  a from Gara g join g.SOA s join s.aziende a where g.id = :g")
+					.setParameter("g", gara.getId()).getResultList();
+			for (Azienda azienda : resultList) {
+				// per ogni azienda devo andare a inserire un riga nelle
+				// comunicazioni
+				ComunicazioneAziendaGaraId id = new ComunicazioneAziendaGaraId(
+						azienda.getId(), gara.getId());
+				ComunicazioneAziendaGara cag = new ComunicazioneAziendaGara();
+				cag.setId(id);
+				cag.setEmail(false);
+				cag.setWeb(false);
+				this.storeOnDatabase(cag, entityManager);
+			}
+		}
+	}
+
+	@Asynchronous
+	@Transactional
 	public QuartzTriggerHandle startFetcher(@Expiration Date date,
 			@IntervalDuration Long intervall, @FinalExpiration Date end) {
 
@@ -179,7 +265,7 @@ public class Heartbeat {
 							Gara gara = new Gara(post.getTitle(),
 									post.getLink(), TipoGara.NUOVA.getNome(),
 									fonte);
-							gara.setStato(StatoGara.NUOVA.toString());
+							gara.setStato(StatoGara.INSERITA.toString());
 							Date dataInizio = startFeed.getDataInizio();
 							if (dataInizio != null) {
 								gara.setDataPubblicazione(dataInizio);
@@ -255,7 +341,11 @@ public class Heartbeat {
 								gara.setSOA(listaSOA);
 								gara.setType(TipoGara.GESTITA.getNome());
 							}
-							entityManager.persist(gara);
+							if (this.storeOnDatabase(gara, entityManager)) {
+								this.setComunicaizioneAziende(entityManager,
+										gara);
+							}
+
 						}
 					}
 				}
@@ -272,5 +362,32 @@ public class Heartbeat {
 
 		}
 		return handle;
+	}
+
+	private boolean storeOnDatabase(Object o, EntityManager entityManager) {
+		UserTransaction userTx = null;
+		try {
+			userTx = (UserTransaction) org.jboss.seam.Component
+					.getInstance("org.jboss.seam.transaction.transaction");
+			if (!userTx.isActive()) {
+				userTx.begin();
+			}
+			entityManager.joinTransaction();
+			entityManager.persist(o);
+			entityManager.flush();
+			userTx.commit();
+			userTx.begin();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			try {
+				if (userTx != null && userTx.isActive()) {
+					userTx.rollback();
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
+		return false;
 	}
 }

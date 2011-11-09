@@ -64,11 +64,13 @@ public class Azienda implements Serializable {
 	// per Alfresco
 	private String alfrescoGroupId;
 
-	private Set<CategoriaMerceologica> categorieMerceologiche;
+	private Set<CategoriaMerceologica> categorieMerceologiche = new HashSet<CategoriaMerceologica>();
 
-	private Set<SOA> SOA;
+	private Set<SOA> SOA = new HashSet<SOA>();
 
 	private Set<Commessa> commesse;
+
+	private Set<ComunicazioneAziendaGara> gare = new HashSet<ComunicazioneAziendaGara>();
 
 	public Azienda() {
 	}
@@ -171,6 +173,11 @@ public class Azienda implements Serializable {
 	@NotNull
 	public FormaGiuridica getFormaGiuridica() {
 		return this.formaGiuridica;
+	}
+
+	@OneToMany(mappedBy = "azienda")
+	public Set<ComunicazioneAziendaGara> getGare() {
+		return this.gare;
 	}
 
 	@Id
@@ -320,6 +327,10 @@ public class Azienda implements Serializable {
 
 	public void setFormaGiuridica(FormaGiuridica formaGiuridica) {
 		this.formaGiuridica = formaGiuridica;
+	}
+
+	public void setGare(Set<ComunicazioneAziendaGara> gare) {
+		this.gare = gare;
 	}
 
 	public void setId(Integer id) {
