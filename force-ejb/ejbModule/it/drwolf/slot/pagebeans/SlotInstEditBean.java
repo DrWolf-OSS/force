@@ -70,6 +70,7 @@ import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import org.apache.commons.io.FilenameUtils;
 import org.bouncycastle.cms.CMSProcessable;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSTypedStream;
@@ -842,7 +843,7 @@ public class SlotInstEditBean {
 	public void listener(UploadEvent event) {
 		UploadItem item = event.getUploadItem();
 
-		String fileName = item.getFileName();
+		String fileName = FilenameUtils.getName(item.getFileName());
 		Long docDefCollectionId = this.activeCollectionId;
 		List<FileContainer> list = this.datas.get(docDefCollectionId);
 		if (list == null) {
