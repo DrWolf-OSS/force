@@ -238,7 +238,7 @@
 										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
 								<rich:panel rendered="#{slotDefHome.instance.type != 'PRIMARY'}" styleClass="primaryRegionPanel">
 									<f:facet name="header">
-										<h:outputText value="Documenti di tipo #{coll.docDefCollection.docDef.name} disponibili nella Busta di Riferimento" />
+										<h:outputText value="#{coll.docDefCollection.docDef.name} disponibili" />
 									</f:facet>
 
 									<a:repeat
