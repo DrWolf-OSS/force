@@ -117,7 +117,7 @@ public class Gara implements Serializable {
 		}
 	}
 
-	@OneToMany(mappedBy = "gara")
+	@OneToMany(mappedBy = "gara", fetch = FetchType.EAGER)
 	public Set<ComunicazioneAziendaGara> getAziende() {
 		return this.aziende;
 	}

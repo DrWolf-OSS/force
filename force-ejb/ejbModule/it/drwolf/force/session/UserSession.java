@@ -1,6 +1,7 @@
 package it.drwolf.force.session;
 
 import it.drwolf.force.entity.Azienda;
+import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
@@ -63,9 +64,10 @@ public class UserSession implements Serializable {
 	private AlfrescoFolder groupFolder; // cartella di alfresco dell'azienda
 
 	private AlfrescoFolder primarySlotFolder; // caretella di alfreso dello slot
-												// primary dell'azienda
 
 	private boolean llpp = false;
+
+	// primary dell'azienda
 
 	public String checkStatus() {
 		if (this.isLlpp() && (this.azienda.getSOA().size() == 0)) {
@@ -79,15 +81,15 @@ public class UserSession implements Serializable {
 		return "GO";
 	}
 
+	public Azienda getAzienda() {
+		return this.azienda;
+	}
+
 	//
 	// @In(create = true)
 	// SlotDefHome slotDefHome;
 
 	//
-
-	public Azienda getAzienda() {
-		return this.azienda;
-	}
 
 	public AlfrescoFolder getGroupFolder() {
 		return this.groupFolder;
@@ -164,27 +166,6 @@ public class UserSession implements Serializable {
 		return null;
 	}
 
-	// Lo SlotInst può essere null all'inizo della Session ed essere
-	// visualizzato in seguito. In realtà potrebbe anche essere modificata
-	// l'istanza collegata nel corso della session (non basta controllare se
-	// null, potrebbe essere un'istanza cancellata e andrebbe aggiornata)
-	// private SlotInst retrievePrimarySlotInst() {
-	// SlotInst slonInst = null;
-	// try {
-	// slonInst = (SlotInst) this.entityManager
-	// .createQuery(
-	// "from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
-	// .setParameter("slotDef", azienda.getSettore().getSlotDef())
-	// .setParameter("ownerId", azienda.getAlfrescoGroupId())
-	// .getSingleResult();
-	// if (slonInst != null) {
-	// this.setPrimarySlotInst(slonInst);
-	// }
-	// } catch (Exception e) {
-	// // Non è ancora stato creato uno slotInst
-	// }
-	// }
-
 	// PALA
 	@SuppressWarnings("unchecked")
 	private SlotInst retriveSlotInst() {
@@ -212,8 +193,43 @@ public class UserSession implements Serializable {
 		return null;
 	}
 
+	// Lo SlotInst può essere null all'inizo della Session ed essere
+	// visualizzato in seguito. In realtà potrebbe anche essere modificata
+	// l'istanza collegata nel corso della session (non basta controllare se
+	// null, potrebbe essere un'istanza cancellata e andrebbe aggiornata)
+	// private SlotInst retrievePrimarySlotInst() {
+	// SlotInst slonInst = null;
+	// try {
+	// slonInst = (SlotInst) this.entityManager
+	// .createQuery(
+	// "from SlotInst where slotDef = :slotDef and ownerId = :ownerId")
+	// .setParameter("slotDef", azienda.getSettore().getSlotDef())
+	// .setParameter("ownerId", azienda.getAlfrescoGroupId())
+	// .getSingleResult();
+	// if (slonInst != null) {
+	// this.setPrimarySlotInst(slonInst);
+	// }
+	// } catch (Exception e) {
+	// // Non è ancora stato creato uno slotInst
+	// }
+	// }
+
 	public void setAzienda(Azienda azienda) {
 		this.azienda = azienda;
+	}
+
+	public void setGaraVisisted(Integer gara_id) {
+		List<ComunicazioneAziendaGara> resultList = this.entityManager
+				.createQuery(
+						"from ComunicazioneAziendaGara cag where cag.id.aziendaId = :a and cag.id.garaId= :g")
+				.setParameter("a", this.azienda.getId())
+				.setParameter("g", gara_id).setMaxResults(1).getResultList();
+		if (resultList.size() > 0) {
+			ComunicazioneAziendaGara cag = resultList.get(0);
+			cag.setWeb(true);
+			this.entityManager.merge(cag);
+			this.entityManager.flush();
+		}
 	}
 
 	public void setGroupFolder(AlfrescoFolder groupFolder) {

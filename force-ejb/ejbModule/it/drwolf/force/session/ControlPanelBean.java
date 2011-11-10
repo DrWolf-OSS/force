@@ -1,6 +1,6 @@
 package it.drwolf.force.session;
 
-import it.drwolf.force.entity.Gara;
+import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
@@ -67,26 +67,15 @@ public class ControlPanelBean {
 		return this.inScadenzaFC;
 	}
 
-	public List<Gara> getSelectedGare() {
-		ArrayList<Gara> lista = new ArrayList<Gara>();
-		if (this.userSession.getAzienda().getCategorieMerceologicheAsList()
-				.size() > 0) {
-			ArrayList<Gara> elenco = (ArrayList<Gara>) this.entityManager
-					.createQuery(
-							" select distinct  g from Azienda a join a.categorieMerceologiche cm join cm.gare g where a.id = :a")
-					.setParameter("a", this.userSession.getAzienda().getId())
-					.getResultList();
-			lista.addAll(elenco);
-		}
-		if (this.userSession.getAzienda().getSOAAsList().size() > 0) {
-			ArrayList<Gara> elenco = (ArrayList<Gara>) this.entityManager
-					.createQuery(
-							" select distinct  g from Azienda a join a.SOA soa join soa.gare g where a.id = :a")
-					.setParameter("a", this.userSession.getAzienda().getId())
-					.getResultList();
-			lista.addAll(elenco);
+	public List<ComunicazioneAziendaGara> getSelectedGare() {
+		ArrayList<ComunicazioneAziendaGara> lista = new ArrayList<ComunicazioneAziendaGara>();
+		ArrayList<ComunicazioneAziendaGara> elenco = (ArrayList<ComunicazioneAziendaGara>) this.entityManager
+				.createQuery(
+						"from ComunicazioneAziendaGara cag where cag.id.aziendaId = :a")
+				.setParameter("a", this.userSession.getAzienda().getId())
+				.getResultList();
+		lista.addAll(elenco);
 
-		}
 		return lista;
 	}
 
