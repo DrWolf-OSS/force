@@ -184,7 +184,7 @@ public class SlotInstEditBean {
 				e.printStackTrace();
 			}
 		}
-		this.cleanActiveElements();
+		// this.cleanActiveElements();
 	}
 
 	private void addCollectionMessage(Long collectionId, VerifierMessage message) {

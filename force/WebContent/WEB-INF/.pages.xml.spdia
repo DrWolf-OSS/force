@@ -67,6 +67,6 @@
   TYPE="page" model-entity="SeamPagesDiagramItem"/>
  <item NAME="#xerror.xhtml" PATH="/error.xhtml" SHAPE="472,225,0,0"
   TYPE="page" model-entity="SeamPagesDiagramItem"/>
- <item ID="#admin#*" NAME="#xadmin#x*" PATH="/admin/*"
-  SHAPE="344,1057,0,0" TYPE="page" model-entity="SeamPagesDiagramItem"/>
+ <item ID="#user#*" NAME="#xuser#x*" PATH="/user/*" SHAPE="664,1057,0,0"
+  TYPE="page" model-entity="SeamPagesDiagramItem"/>
 </diagram>
