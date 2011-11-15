@@ -8,36 +8,20 @@
    xmlns:s="http://jboss.com/products/seam/taglib"
    contentType="text/html">
 <html>
-   <head>
-      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-      <title>File yOuR raCE</title>
-      <link rel="shortcut icon" href="#{request.contextPath}/favicon.ico"/>
-      <a:loadScript src="resource://jquery.js"/>
-      <a:loadStyle src="/stylesheet/theme.xcss"/>
-      <a:loadStyle src="/stylesheet/theme.css"/>
-      <a:loadStyle src="/stylesheet/slot.css"/>
-      <ui:insert name="head"/>
-   </head>
-   <body>
-   <div id="contenitore2"><div id="contenitore">
-   <div class="titolo_cna">
-
-        <span>FORCE</span><br />
-        File yOuR raCE 
-    </div>
-    
-    <div id="container">
-	    <div id="cnt_header">
-	    <div id="header_sx">
-	        <h1 class="out">CNA Firenze</h1>
-	        <a href="/force/home.seam" title="Vai alla Home Page" accesskey="h"><img src="/force/img/logo_cna.gif"  width="160" height="140" alt="Logo del CNA di Firenze" style="border:0" /></a>
-	    </div>
-	    <div id="header_0">
-	            <img src="/force/img/0.gif" alt="Banner CNA" />
-	        </div>
-	   </div>
-	 </div>
-      <ui:include src="menu.xhtml">
+    <head>
+		<link href='http://fonts.googleapis.com/css?family=Orbitron:500' rel='stylesheet' type='text/css' />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<title>File yOuR raCE</title>
+		<link rel="shortcut icon" href="#{request.contextPath}/favicon.ico"/>
+		<a:loadScript src="resource://jquery.js"/>
+		<a:loadStyle src="/stylesheet/theme.xcss"/>
+		<a:loadStyle src="/stylesheet/theme.css"/>
+		<a:loadStyle src="/stylesheet/slot.css"/>
+		<ui:insert name="head"/>
+    </head>
+    <body>
+    <ui:include src="/layout/header.xhtml" />
+    <ui:include src="menu.xhtml">
          <ui:param name="projectName" value="File yOuR raCE"/>
       </ui:include>
       <div class="body">
@@ -60,8 +44,6 @@
       </div>
       <ui:include src="/layout/waitPanel.xhtml" />
      <ui:include src="/layout/footer.xhtml" />
-     </div>
-     </div>
    </body>
    <script type="text/javascript">
     	jQuery(document).ready(function(){

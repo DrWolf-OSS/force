@@ -3,8 +3,17 @@ html {
 }
 
 body {
-	font-size: 12px;
 	margin: 0px;
+	background-image: url('/force/img/sfondo.png');
+	padding-left: 1em;
+	padding-right: 1em;
+	font-size: 14px;
+}
+
+.orbitron {
+    font-family: 'Orbitron', sans-serif !important;
+    font-size: 16px;
+		
 }
 
 a img {
@@ -66,8 +75,9 @@ select {
 }
 
 .body {
-	padding: 30px;
+	padding-top: 20px;
 }
+
 .message {
 	padding: 5px;
 	list-style: none;
@@ -227,4 +237,139 @@ table.radio td {
 
 table.radio input[type=radio] {
    vertical-align: bottom;
+}
+
+.rounded, .roundedTop .rich-panel-body .shadow .roundedBottom .clean-gray .rich-panel-header .rich-panel{
+    behavior: url(PIE.htc);
+}
+
+.rounded{
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: #666 0px 2px 3px;
+    -moz-box-shadow: #666 0px 2px 3px;
+    box-shadow: #666 0px 2px 3px;
+    border: 0px;
+}
+
+.shadow {
+    -webkit-box-shadow: #666 0px 2px 3px;
+    -moz-box-shadow: #666 0px 2px 3px;
+    box-shadow: #666 0px 2px 3px;	
+}
+
+.roundedTop{
+    -webkit-border-radius: 5px 5px 0px 0px;
+    -moz-border-radius: 5px 5px 0px 0px;
+    border-radius: 5px 5px 0px 0px;
+    border: 0;
+}
+
+.rich-panel-header{
+    background:#93113f ! important;
+    border: 0px;
+}
+
+.rich-panel{
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px ;
+    border: 1px solid #93113f ! important;
+    -webkit-box-shadow: #666 0px 2px 3px;
+    -moz-box-shadow: #666 0px 2px 3px;
+    box-shadow: #666 0px 2px 3px;   
+     padding:0;
+    background-color: transparent;
+} 
+.roundedBottom{
+    -webkit-border-radius: 0px 0px 5px 5px;
+    -moz-border-radius: 0px 0px 5px 5px;
+    border-radius: 0px 0px 5px 5px;
+    border: 0;
+}
+
+#header{
+    position: relative;
+    display: block;
+    float: none;
+    clear: both;
+}
+
+#header div{
+	float : left;
+	display: block;
+}
+
+#headerText1{
+    padding-left: 50px;
+    padding-top: 120px;
+    font-size: 18px;
+}
+
+#headerText2{
+    padding-left: 100px;
+    padding-top: 100px;
+    font-size: 18px;
+}
+
+#headerButton{
+	float: right !important;
+	padding-right: 30px;
+	padding-top:  50px;
+}
+
+#headerButton li {
+    margin: 10px 0px 10px 0px;	
+}
+
+.forceColor{
+    color: #93113f;
+}
+
+
+.clean-gray {
+  background-color: #eeeeee;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#eeeeee), to(#cccccc));
+  /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: linear-gradient(top, #eeeeee, #cccccc);
+  border: 1px solid #ccc;
+  border-bottom: 1px solid #bbb;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  color: #333;
+  font: bold 11px "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  line-height: 1;
+  padding: 8px 0;
+  text-align: center;
+  text-shadow: 0 1px 0 #eee;
+  width: 150px; }
+  button.clean-gray:hover {
+    background-color: #dddddd;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#dddddd), to(#bbbbbb));
+    /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(top, #dddddd, #bbbbbb);
+    background-image: -moz-linear-gradient(top, #dddddd, #bbbbbb);
+    background-image: -ms-linear-gradient(top, #dddddd, #bbbbbb);
+    background-image: -o-linear-gradient(top, #dddddd, #bbbbbb);
+    background-image: linear-gradient(top, #dddddd, #bbbbbb);
+    border: 1px solid #bbb;
+    border-bottom: 1px solid #999;
+    cursor: pointer;
+    text-shadow: 0 1px 0 #ddd; }
+  button.clean-gray:active {
+    border: 1px solid #aaa;
+    border-bottom: 1px solid #888;
+    -webkit-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;
+    -moz-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;
+    -ms-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;
+    -o-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;
+    box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee; 
 }

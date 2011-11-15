@@ -1,0 +1,27 @@
+<div id="header"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:a="http://richfaces.org/a4j">
+    <div id="logo">
+            <a href="/force/home.seam" title="Vai alla Home Page" accesskey="h">
+            <img src="/force/img/logo_force_160.png" alt="Logo Force" style="border:0; margin:10px" />
+            </a>
+            </div>
+            <div id="headerText1" class="orbitron">I documenti che ti <br />servono</div>
+            <div id="headerText2" class="orbitron">Benvenuto<br /> nel Progetto <span class="forceColor">FORCE</span><br />(<span class="forceColor">F</span>ile y<span class="forceColor">O</span>u<span class="forceColor">R</span> ra<span class="forceColor">CE</span>)!</div>
+            <div id="headerButton">
+            <ul style="list-style: none">
+                <li>
+                    <s:button styleClass="clean-gray" id="menuAddId" view="/AddAzienda.xhtml" value="Registrati" rendered="#{not identity.loggedIn}" propagation="none" />
+                </li>
+                <li>
+                    <s:button styleClass="clean-gray" id="menuLoginId" view="/login.xhtml" value="Login" rendered="#{not identity.loggedIn}" propagation="none" />
+                    <s:button styleClass="clean-gray" id="menuLogoutId" view="/home.xhtml" action="#{identity.logout}" value="Logout" rendered="#{identity.loggedIn}" propagation="none" />
+                </li>
+            </ul>
+            </div>
+       </div>         

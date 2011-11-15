@@ -161,10 +161,6 @@ public class Heartbeat {
 			// a questo punto devo predenre le singole aziende e mandargli una
 			// mail
 			for (ComunicazioneAziendaGara comunicazioneAziendaGara : resultList) {
-				System.out.println(comunicazioneAziendaGara.getId()
-						.getAziendaId());
-				System.out
-						.println(comunicazioneAziendaGara.getId().getGaraId());
 			}
 		}
 		return handle;
