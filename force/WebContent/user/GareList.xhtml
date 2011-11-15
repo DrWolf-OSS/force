@@ -19,7 +19,7 @@
                rendered="#{empty controlPanelBean.selectedGare}"/>
 
     <rich:dataTable id="activeGareList"
-                var="_gara"
+                var="cag"
               value="#{controlPanelBean.selectedGare}"
            rendered="#{not empty controlPanelBean.selectedGare}">
         <h:column>
@@ -30,7 +30,7 @@
                     <ui:param name="propertyPath" value="gara.oggetto"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_gara.oggetto}"/>
+            <h:outputText value="#{cag.gara.oggetto}"/>
         </h:column>
         <h:column>
             <f:facet name="header">
@@ -40,7 +40,7 @@
                     <ui:param name="propertyPath" value="gara.fonte.nome"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_gara.fonte.nome} (#{_gara.fonte.tipo})"/>
+            <h:outputText value="#{cag.gara.fonte.nome} (#{cag.gara.fonte.tipo})"/>
         </h:column>
         <h:column>
             <f:facet name="header">
@@ -50,7 +50,7 @@
                     <ui:param name="propertyPath" value="gara.dataPubblicazione"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_gara.dataPubblicazione}">
+            <h:outputText value="#{cag.gara.dataPubblicazione}">
                 <f:convertDateTime pattern="dd/MM/yyyy"/>
             </h:outputText>
         </h:column>
@@ -82,7 +82,7 @@
              propagation="none"
                       id="gara">
                 <f:param name="garaId"
-                        value="#{_gara.id}"/>
+                        value="#{cag.gara.id}"/>
             </s:link></rich:column>
             
     </rich:dataTable>

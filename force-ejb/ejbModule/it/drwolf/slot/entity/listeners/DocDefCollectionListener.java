@@ -5,10 +5,12 @@ import it.drwolf.slot.enums.CollectionQuantifier;
 
 import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 
 public class DocDefCollectionListener {
 
 	@PrePersist
+	@PreUpdate
 	public void setMinMax(DocDefCollection docDefCollection) {
 		CollectionQuantifier quantifier = docDefCollection.getQuantifier();
 		if (quantifier != null) {
@@ -43,21 +45,22 @@ public class DocDefCollectionListener {
 	public void setQuantifier(DocDefCollection docDefCollection) {
 		if (docDefCollection.getMin() == null
 				&& docDefCollection.getMax() != null
-				&& docDefCollection.getMax() == 1)
+				&& docDefCollection.getMax() == 1) {
 			docDefCollection.setQuantifier(CollectionQuantifier.ANY_OR_ONE);
-		else if (docDefCollection.getMin() == null
-				&& docDefCollection.getMax() == null)
+		} else if (docDefCollection.getMin() == null
+				&& docDefCollection.getMax() == null) {
 			docDefCollection.setQuantifier(CollectionQuantifier.ANY_OR_MORE);
-		else if (docDefCollection.getMin() != null
+		} else if (docDefCollection.getMin() != null
 				&& docDefCollection.getMin() == 1
 				&& docDefCollection.getMax() != null
-				&& docDefCollection.getMax() == 1)
+				&& docDefCollection.getMax() == 1) {
 			docDefCollection.setQuantifier(CollectionQuantifier.ONLY_ONE);
-		else if (docDefCollection.getMin() != null
+		} else if (docDefCollection.getMin() != null
 				&& docDefCollection.getMin() == 1
-				&& docDefCollection.getMax() == null)
+				&& docDefCollection.getMax() == null) {
 			docDefCollection.setQuantifier(CollectionQuantifier.ONE_OR_MORE);
-		else
+		} else {
 			docDefCollection.setQuantifier(null);
+		}
 	}
 }

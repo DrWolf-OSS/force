@@ -184,6 +184,7 @@ public class SlotInstEditBean {
 				e.printStackTrace();
 			}
 		}
+		this.cleanActiveElements();
 	}
 
 	private void addCollectionMessage(Long collectionId, VerifierMessage message) {
@@ -342,6 +343,11 @@ public class SlotInstEditBean {
 			}
 		}
 		return passed;
+	}
+
+	public void cleanActiveElements() {
+		this.activeCollectionId = null;
+		this.activeFileContainer = null;
 	}
 
 	private void cleanCollection(Long docDefCollectionId) {
@@ -709,13 +715,13 @@ public class SlotInstEditBean {
 		return this.primaryDocs;
 	}
 
-	public List<PropertyInst> getPropertyInsts() {
-		return this.propertyInsts;
-	}
-
 	// public String getValidationResult() {
 	// return this.validationResult;
 	// }
+
+	public List<PropertyInst> getPropertyInsts() {
+		return this.propertyInsts;
+	}
 
 	public ArrayList<VerifierMessage> getSlotMessages() {
 		return this.slotMessages;

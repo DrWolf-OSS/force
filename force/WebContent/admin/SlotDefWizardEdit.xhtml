@@ -343,9 +343,9 @@
 			
 			<s:decorate template="/layout/display.xhtml" id="collTable">
 				<ui:define name="label">
-	                <h:outputText value="Richieste" />
+	                <h:outputText value="Documentazione richiesta" />
 				</ui:define>
-				<h:outputText value="Nessuna richiesta definita" rendered="#{empty slotDefHome.instance.docDefCollectionsAsList}"/>
+				<h:outputText value="Nessuna documentazione definita" rendered="#{empty slotDefHome.instance.docDefCollectionsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.docDefCollectionsAsList}" var="coll" 
 						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" style="width:1024px">
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!coll.active ? 'invalidRow' : ''}">
@@ -489,22 +489,20 @@
 				<ui:define name="label">
 	                <h:outputText value="" />
 				</ui:define>
+				<a:commandButton value="Aggiungi informazione relativa alla gara" 
+							action="#{slotDefEditBean.newEmbeddedProperty()}" 
+							oncomplete="#{rich:component('embeddedPropPanel')}.show()" 
+							rendered="#{slotDefParameters.mode != 'PRIMARY'}"
+							reRender="embeddedPropPanel"/>
 				<a:commandButton value="Aggiungi informazione #{slotDefParameters.mode == 'PRIMARY' ? 'sull azienda' : ''}" 
-							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
-							 
-							oncomplete="#{rich:component('propTypePanel')}.show()" 
-							
+							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 							 
+							oncomplete="#{rich:component('propTypePanel')}.show()" 	
 							reRender="pf,propPanel"/>
 				<a:commandButton value="Aggiungi richiesta" 
 							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
 							action="#{slotDefEditBean.newCollection()}" 
 							oncomplete="#{rich:component('collTypePanel')}.show()" 
 							reRender="collPanel"/>
-				<a:commandButton value="Aggiungi informazione relativa alla gara" 
-							action="#{slotDefEditBean.newEmbeddedProperty()}" 
-							oncomplete="#{rich:component('embeddedPropPanel')}.show()" 
-							rendered="#{slotDefParameters.mode != 'PRIMARY'}"
-							reRender="embeddedPropPanel"/>
 				<a:commandButton value="Aggiungi sottobusta"
 							rendered="#{slotDefHome.instance.type == 'PRIMARY'}" 						 
 							oncomplete="#{rich:component('dependentSlotDefPanel')}.show()" 

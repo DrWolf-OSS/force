@@ -11,6 +11,7 @@ import it.drwolf.slot.entity.Rule;
 import it.drwolf.slot.entity.RuleParameterInst;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
+import it.drwolf.slot.entity.listeners.DocDefCollectionListener;
 import it.drwolf.slot.entitymanager.SlotDefCloner;
 import it.drwolf.slot.entitymanager.SlotDefValidator;
 import it.drwolf.slot.enums.CollectionQuantifier;
@@ -106,6 +107,10 @@ public class SlotDefEditBean {
 			this.slotDefHome.getInstance().getDocDefCollections()
 					.add(this.collection);
 		}
+
+		//
+		DocDefCollectionListener docDefCollectionListener = new DocDefCollectionListener();
+		docDefCollectionListener.setMinMax(this.collection);
 	}
 
 	public void addConditionalPropertyForCollection() {
