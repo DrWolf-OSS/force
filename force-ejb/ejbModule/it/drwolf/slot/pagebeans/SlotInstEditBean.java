@@ -1383,7 +1383,6 @@ public class SlotInstEditBean {
 						SlotInstStatus.INVALID);
 			}
 			return "failed";
-
 		}
 
 		if (sizeCollectionPassed && rulesPassed) {

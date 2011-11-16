@@ -33,10 +33,12 @@
         <rich:panel style="width:auto">
             <f:facet name="header">#{slotDefHome.managed ? 'Modifica' : 'Creazione'} #{slotDefParameters.model ? 'modello di' : ''} #{slotDefParameters.mode=='PRIMARY' ? 'Busta di Riferimento' : 'Busta Amministrativa'}</f:facet>
 
-            <s:decorate id="templateField" template="/layout/edit.xhtml" rendered="#{not slotDefParameters.model}">
-                <ui:define name="label">Utilizza come modello</ui:define>
-               	<h:selectBooleanCheckbox value="#{slotDefHome.instance.template}" />
+			<ui:remove>   
+            <s:decorate id="templateFieldView" template="/layout/display.xhtml" rendered="#{not slotDefParameters.model}">
+                <ui:define name="label">Modello</ui:define>
+                <h:outputText value="#{slotDefParameters.model ? 'Sì' : 'No'}" />
             </s:decorate>
+            </ui:remove>
 
             <s:decorate id="nameField" template="/layout/edit.xhtml">
                 <ui:define name="label">Nome</ui:define>
@@ -237,9 +239,9 @@
 			</s:decorate>
             
             <div style="clear:both"/>
-            <rich:separator height="25px" lineType="none" />
+            <rich:separator height="25px" lineType="none" rendered="#{s:hasRole('ADMIN') or slotDefHome.instance.template}"/>
             
-			<s:decorate template="/layout/display.xhtml" id="propTable">
+			<s:decorate template="/layout/display.xhtml" id="propTable" rendered="#{s:hasRole('ADMIN') or slotDefHome.instance.template}">
 				<ui:define name="label">
 	                <h:outputText value="Informazioni sull'azienda" />
 				</ui:define>
@@ -494,15 +496,25 @@
 							oncomplete="#{rich:component('embeddedPropPanel')}.show()" 
 							rendered="#{slotDefParameters.mode != 'PRIMARY'}"
 							reRender="embeddedPropPanel"/>
-				<a:commandButton value="Aggiungi informazione #{slotDefParameters.mode == 'PRIMARY' ? 'sull azienda' : ''}" 
+							
+				<a:commandButton value="Aggiungi informazione sull'azienda"
 							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 							 
 							oncomplete="#{rich:component('propTypePanel')}.show()" 	
-							reRender="pf,propPanel"/>
+							reRender="pf,propPanel"
+							rendered="#{s:hasRole('ADMIN') or slotDefHome.instance.template}"/>
+							
 				<a:commandButton value="Aggiungi richiesta" 
 							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
 							action="#{slotDefEditBean.newCollection()}" 
 							oncomplete="#{rich:component('collTypePanel')}.show()" 
-							reRender="collPanel"/>
+							reRender="collPanel"
+							rendered="#{s:hasRole('ADMIN') or slotDefHome.instance.template}"/>
+				<a:commandButton action="#{slotDefEditBean.newStandardCollection()}" 
+							value="Aggiungi richiesta comune" 
+							oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('collPanel')}.show();"
+							reRender="collPanel,propPanel"
+							rendered="#{not s:hasRole('ADMIN') and not slotDefHome.instance.template}"/>
+							
 				<a:commandButton value="Aggiungi sottobusta"
 							rendered="#{slotDefHome.instance.type == 'PRIMARY'}" 						 
 							oncomplete="#{rich:component('dependentSlotDefPanel')}.show()" 
@@ -545,7 +557,9 @@
                        rendered="#{slotDefHome.managed}"
                        disabled="#{slotDefHome.referenced}"/>
                        
-            <s:button view="/admin/SlotDefView.xhtml" value="Indietro" propagation="none">
+            <s:button view="/admin/SlotDefView.xhtml" value="Indietro" 
+            		propagation="none"
+            		rendered="#{slotDefHome.instance.id != null}">
                	<f:param name="mode" value="#{slotDefHome.instance.type.name()}"/>
 				<f:param name="model" value="#{slotDefHome.instance.template}"/>
 				<f:param name="slotDefId" value="#{slotDefHome.instance.id}"/>

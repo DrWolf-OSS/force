@@ -153,9 +153,9 @@
 			</s:decorate>
             
             <div style="clear:both"/>
-            <rich:separator height="25px" lineType="none" />
+            <rich:separator height="25px" lineType="none" rendered="#{s:hasRole('ADMIN') or slotDefHome.instance.template}"/>
             
-			<s:decorate template="/layout/display.xhtml" id="propTable">
+			<s:decorate template="/layout/display.xhtml" id="propTable" rendered="#{s:hasRole('ADMIN') or slotDefHome.instance.template}">
 				<ui:define name="label">
 	                <h:outputText value="Informazioni sull'azienda" />
 				</ui:define>
