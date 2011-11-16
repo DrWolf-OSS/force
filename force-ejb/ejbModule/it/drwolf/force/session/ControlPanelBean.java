@@ -104,10 +104,14 @@ public class ControlPanelBean {
 		// PALA
 		// Il PrimarySlotInst potrebbe non essere ancora stato istanziato!
 		if (this.userSession.getPrimarySlotInst() != null) {
+			// mi tiro su tutti i documenti con slot:expirable
+			// dato che potrei avere documenti nella cartella che hanno anche
+			// l'aspect tmp
+			// cioè documenti caricati ma non agganciati allo slot.
 			ArrayList<String> ids = this.alfrescoWrapper
 					.getDocumentIdsInFolderByAspect("slot:expirable",
 							this.userSession.getPrimarySlotFolder().getId(),
-							"slot:expirationDate", 2);
+							"slot:expirationDate", 0);
 			this.inScadenza = new ArrayList<DocInstCollection>();
 			this.inScadenzaFC = new HashMap<Long, List<FileContainer>>();
 			HashSet<Property> properties = new HashSet<Property>();
@@ -119,6 +123,9 @@ public class ControlPanelBean {
 						docs.getSlotInst(), docs.getDocDefCollection());
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				boolean added = false;
+				// predo solo i documenti che hanno l'id associato sul db in
+				// modo
+				// da scartare quelli che hanno l'aspcet tmp
 				for (DocInst doc : docs.getDocInsts()) {
 					for (String id : ids) {
 						if (doc.getNodeRef().equals(id)) {
@@ -137,6 +144,10 @@ public class ControlPanelBean {
 					this.inScadenzaFC.put(
 							docInst.getDocDefCollection().getId(),
 							fileContainers);
+					// se la dimensione arriva a due esco
+					if (this.inScadenza.size() == 2) {
+						break;
+					}
 				}
 			}
 		}

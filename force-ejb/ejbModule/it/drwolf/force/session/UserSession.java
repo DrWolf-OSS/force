@@ -61,13 +61,18 @@ public class UserSession implements Serializable {
 
 	private Azienda azienda;
 
+	// mi tengo anche l'id dell'azienda per essere sicuro di poter accedere a
+	// tutte gli attributi dell'azienda.
+	// Essendo questo bean a scope session nel passare da una conversation ad un
+	// altra non riesco ad accedere
+	// agli attributi lazy
+	private Integer aziendaId;
+
 	private AlfrescoFolder groupFolder; // cartella di alfresco dell'azienda
 
 	private AlfrescoFolder primarySlotFolder; // caretella di alfreso dello slot
 
 	private boolean llpp = false;
-
-	// primary dell'azienda
 
 	public String checkStatus() {
 		if (this.isLlpp() && (this.azienda.getSOA().size() == 0)) {
@@ -82,7 +87,19 @@ public class UserSession implements Serializable {
 	}
 
 	public Azienda getAzienda() {
+		this.azienda = this.entityManager.find(Azienda.class,
+				this.getAziendaId());
 		return this.azienda;
+	}
+
+	// primary dell'azienda
+
+	public Integer getAziendaId() {
+		return this.aziendaId;
+	}
+
+	public AlfrescoFolder getGroupFolder() {
+		return this.groupFolder;
 	}
 
 	//
@@ -90,10 +107,6 @@ public class UserSession implements Serializable {
 	// SlotDefHome slotDefHome;
 
 	//
-
-	public AlfrescoFolder getGroupFolder() {
-		return this.groupFolder;
-	}
 
 	public SlotDef getPrimarySlotDef() {
 		return this.primarySlotDef;
@@ -193,6 +206,12 @@ public class UserSession implements Serializable {
 		return null;
 	}
 
+	public void setAzienda(Azienda azienda) {
+		this.azienda = azienda;
+		// quando setto l'azienda mi setto anche l'id
+		this.setAziendaId(azienda.getId());
+	}
+
 	// Lo SlotInst può essere null all'inizo della Session ed essere
 	// visualizzato in seguito. In realtà potrebbe anche essere modificata
 	// l'istanza collegata nel corso della session (non basta controllare se
@@ -214,8 +233,8 @@ public class UserSession implements Serializable {
 	// }
 	// }
 
-	public void setAzienda(Azienda azienda) {
-		this.azienda = azienda;
+	public void setAziendaId(Integer aziendaId) {
+		this.aziendaId = aziendaId;
 	}
 
 	public void setGaraVisisted(Integer gara_id) {

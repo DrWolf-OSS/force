@@ -168,7 +168,7 @@
                 propagation="none"/>
         </rich:menuItem>
     </rich:dropDownMenu>
-    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none">
+    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none"  rendered="#{identity.loggedIn}">
         <f:facet name="label">Gestione Modelli</f:facet>
         <rich:menuItem  rendered="#{identity.hasRole('ADMIN')}">
             <s:link view="/admin/SlotDefTemplateList.xhtml"
