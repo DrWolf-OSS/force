@@ -7,6 +7,10 @@
     xmlns:rich="http://richfaces.org/rich"
     styleClass="rounded">
     <rich:toolBarGroup>
+     <s:link view="/home.xhtml" value="Home" 
+                propagation="none" rendered="#{identity.loggedIn}"
+                style="font-size:11px; color : #FFF;"/>
+    
     </rich:toolBarGroup>
      <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('ADMIN')}">
         <f:facet name="label">Browse data</f:facet>
@@ -132,6 +136,7 @@
     </rich:dropDownMenu>
     <!-- @newMenuItem@ -->
     <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('AZIENDE')}">
+        
         <f:facet name="label">Gestione</f:facet>
         <rich:menuItem>
             <s:link view="/user/CatMerEdit.xhtml"
