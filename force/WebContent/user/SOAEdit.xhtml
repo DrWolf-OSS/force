@@ -21,20 +21,22 @@
             overflow:auto;
         }
     </style>
-    <rich:modalPanel id="panel" width="350" height="100" showWhenRendered="#{not aziendaHome.haveSoa()}">
+    <rich:modalPanel id="panel" width="350" height="200" showWhenRendered="#{not aziendaHome.haveSoa()}" >
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Attenzione"></h:outputText>
             </h:panelGroup>
         </f:facet>
-        <h:outputText value="Per ottenere un miglior servizio di alert sulle gare ti chiediamo di insere le tue SOA"></h:outputText>
+        <div  style="font-size: 14px;">
+        <h:outputText  style="font-size: 14px;" value="Per ottenere un miglior servizio di alert sulle gare ti chiediamo di insere le tue SOA"></h:outputText>
         <br />
-        <h:outputText value="Se non sei in possesso di una SOA....."></h:outputText>
+        <h:outputText value="Se non sei in possesso di una SOA....."></h:outputText><br /><br />
+        <h:outputText value="Se non sei in possesso di certificaizone SOA inserisci le tue Categorie Merceologiche" /><br />
         <br/>
-        <br/>
-          <h:commandButton  id="chiudiPanel"
-                   value="Chiudi"/>
-          <rich:componentControl for="panel" attachTo="chiudiPanel" operation="hide" event="onclick"/>
+        </div>
+                    <s:button styleClass="clean-gray" id="chiudiPanel" onclick="#{rich:component('panel')}.hide();return false;" value="Chiudi" />
+                    <s:button styleClass="clean-gray" id="cm" view="/user/CatMerEdit.xhtml"  value="Categorie Merceologiche"  />
+
     </rich:modalPanel>
 <!--    <rich:modalPanel id="addSOA" autosized="true" minWidth="500"-->
 <!--                resizeable="false">-->
@@ -54,7 +56,7 @@
 <!--            </a4j:form>-->
 <!--     </rich:modalPanel>-->
 <h:form id="CatMerEdit" styleClass="edit">
-	<rich:panel>
+	<rich:panel >
 	   <f:facet name="header">Gestisci le SOA </f:facet>
 <!--	   <rich:dataTable id="soaDataTable" var="soa" value="#{aziendaHome.instance.SOAAsList}">-->
 <!--	       <h:column>-->
@@ -70,7 +72,7 @@
 <!--	                      oncomplete="#{rich:component('addSOA')}.show();"-->
 <!--	                      reRender="soaDataTable" />-->
 	                      
-	   <h:panelGrid columns="2" columnClasses="top, top">
+	   <h:panelGrid columns="2" columnClasses="top, top" style="margin:0 auto;">
 	        <rich:pickList value="#{aziendaHome.instance.SOAAsList}" sourceListWidth="400" targetListWidth="400" listsHeight="400"> 
                 <s:selectItems value="#{soaList.resultList}" var="cm" label="#{cm.codice} - #{cm.nome}"/>
                 <s:convertEntity />

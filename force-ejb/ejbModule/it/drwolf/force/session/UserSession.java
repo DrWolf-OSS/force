@@ -75,7 +75,8 @@ public class UserSession implements Serializable {
 	private boolean llpp = false;
 
 	public String checkStatus() {
-		if (this.isLlpp() && (this.azienda.getSOA().size() == 0)) {
+		if (this.isLlpp() && (this.azienda.getSOA().size() == 0)
+				&& (this.azienda.getCategorieMerceologiche().size() == 0)) {
 			return "GO_TO_SOA";
 		} else if (!this.isLlpp()
 				&& (this.azienda.getCategorieMerceologiche().size() == 0)) {
