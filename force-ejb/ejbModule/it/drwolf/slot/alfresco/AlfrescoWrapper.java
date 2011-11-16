@@ -57,9 +57,6 @@ public class AlfrescoWrapper {
 	public static final int LENGHT_LIMIT = 150;
 	public static final String SPACER = " ";
 
-	// public static final String DRAWINGS_FOLDER_REF =
-	// "6880b7a5-ba84-464c-a328-f5428426b450";
-
 	public static String id2ref(String id) {
 		int slashIndex = id.lastIndexOf("/");
 		if (slashIndex > 0) {
@@ -105,6 +102,9 @@ public class AlfrescoWrapper {
 
 	@In(value = "#{facesContext.externalContext}", required = false)
 	private ExternalContext extCtx;
+
+	// public static final String DRAWINGS_FOLDER_REF =
+	// "6880b7a5-ba84-464c-a328-f5428426b450";
 
 	public void applyACL(Folder folder, String groupName) {
 		Session session = this.alfrescoUserIdentity.getSession();

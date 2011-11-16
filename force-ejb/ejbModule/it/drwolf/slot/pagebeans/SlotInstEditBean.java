@@ -41,6 +41,7 @@ import it.drwolf.slot.session.SlotInstHome;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.Principal;
@@ -56,8 +57,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
 import org.alfresco.cmis.client.AlfrescoFolder;
@@ -154,6 +161,9 @@ public class SlotInstEditBean {
 
 	@In(create = true)
 	private CertsController certsController;
+
+	@In(value = "#{facesContext.externalContext}", required = false)
+	private ExternalContext extCtx;
 
 	private static final int LENGHT_LIMIT = 150;
 	private static final String SPACER = " ";
@@ -542,6 +552,60 @@ public class SlotInstEditBean {
 
 			}
 		}
+	}
+
+	public void downloadDocumentsZip() {
+		Collection<List<FileContainer>> values = this.datas.values();
+		List<FileContainer> fileContainers = new ArrayList<FileContainer>();
+		for (List<FileContainer> list : values) {
+			fileContainers.addAll(list);
+		}
+
+		String outFilename = "outfile.zip";
+		HttpServletResponse response = (HttpServletResponse) this.extCtx
+				.getResponse();
+		response.setContentType("ZIP");
+
+		response.addHeader("Content-disposition", "attachment; filename=\""
+				+ outFilename + "\"");
+		response.setHeader("Expires", "0");
+		response.setHeader("Cache-Control",
+				"must-revalidate, post-check=0, pre-check=0");
+
+		// Create a buffer for reading the files
+		byte[] buf = new byte[1024];
+
+		try {
+
+			ServletOutputStream os = response.getOutputStream();
+			// Create the ZIP file
+			ZipOutputStream out = new ZipOutputStream(os);
+
+			// Compress the files
+			for (FileContainer fc : fileContainers) {
+				// FileInputStream in = new FileInputStream(fc.getFileName());
+				InputStream in = fc.getDocument().getContentStream()
+						.getStream();
+				// Add ZIP entry to output stream.
+				out.putNextEntry(new ZipEntry(fc.getFileName()));
+
+				// Transfer bytes from the file to the ZIP file
+				int len;
+				while ((len = in.read(buf)) > 0) {
+					out.write(buf, 0, len);
+				}
+
+				// Complete the entry
+				out.closeEntry();
+				in.close();
+			}
+			// Complete the ZIP file
+			out.close();
+			FacesContext.getCurrentInstance().responseComplete();
+
+		} catch (IOException e) {
+		}
+
 	}
 
 	public void editItem(Long docDefCollectionId, FileContainer container) {
