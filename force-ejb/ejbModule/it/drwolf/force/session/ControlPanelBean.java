@@ -124,7 +124,7 @@ public class ControlPanelBean {
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				boolean added = false;
 				// predo solo i documenti che hanno l'id associato sul db in
-				// modo
+				// modom
 				// da scartare quelli che hanno l'aspcet tmp
 				for (DocInst doc : docs.getDocInsts()) {
 					for (String id : ids) {
