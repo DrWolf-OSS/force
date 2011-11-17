@@ -179,7 +179,14 @@ a:HOVER {
     margin-left: -200em;
 }
 
-.controlPanelclass .rich-panel {
-    height: 350px;
-    overflow: auto;	
+.controlPanelclassSX .rich-panel {
+    height: 360px;
+    overflow: auto;
+    margin-right: 5px;	
+}
+
+.controlPanelclassDX .rich-panel {
+    height: 360px;
+    overflow: auto;
+    margin-left: 5px; 
 }
