@@ -1,5 +1,6 @@
 package it.drwolf.slot.entity;
 
+import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.enums.SlotInstStatus;
 
 import java.util.ArrayList;
@@ -18,6 +19,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Transient;
+
+import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.api.Session;
 
 @Entity
 public class SlotInst {
@@ -76,6 +80,22 @@ public class SlotInst {
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "slotInst")
 	public Set<DocInstCollection> getDocInstCollections() {
 		return this.docInstCollections;
+	}
+
+	@Transient
+	public List<Document> getDocumentsList() {
+		AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
+				.getInstance("alfrescoUserIdentity");
+		Session session = alfrescoUserIdentity.getSession();
+		List<Document> documents = new ArrayList<Document>();
+		for (DocInstCollection docInstCollection : this.getDocInstCollections()) {
+			for (DocInst docInst : docInstCollection.getDocInsts()) {
+				Document document = (Document) session.getObject(docInst
+						.getNodeRef());
+				documents.add(document);
+			}
+		}
+		return documents;
 	}
 
 	@Id

@@ -95,10 +95,10 @@ public class AlfrescoWrapper {
 	private AlfrescoUserIdentity alfrescoUserIdentity;
 
 	@In(create = true)
-	Preferences preferences;
+	private Preferences preferences;
 
 	@In(create = true)
-	AlfrescoInfo alfrescoInfo;
+	private AlfrescoInfo alfrescoInfo;
 
 	@In(value = "#{facesContext.externalContext}", required = false)
 	private ExternalContext extCtx;

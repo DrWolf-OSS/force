@@ -19,17 +19,10 @@ import java.util.UUID;
 import org.alfresco.cmis.client.AlfrescoDocument;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
+import org.apache.commons.io.FilenameUtils;
 import org.richfaces.model.UploadItem;
 
 public class FileContainer {
-	private UploadItem uploadItem;
-	private AlfrescoDocument document;
-	private List<DocumentPropertyInst> documentProperties = new ArrayList<DocumentPropertyInst>();
-	private boolean editable = true;
-	private String id = UUID.randomUUID().toString();
-	private List<Signature> signatures;
-	private String mimetype;
-
 	public final static String decodeFilename(String encoded) {
 		String name = encoded;
 		String extension = "";
@@ -73,13 +66,35 @@ public class FileContainer {
 		return name;
 	}
 
+	private UploadItem uploadItem;
+	private AlfrescoDocument document;
+	private List<DocumentPropertyInst> documentProperties = new ArrayList<DocumentPropertyInst>();
+	private boolean editable = true;
+
+	private String id = UUID.randomUUID().toString();
+
+	private List<Signature> signatures;
+
+	private String mimetype;
+
 	public FileContainer(AlfrescoDocument alfrescoDocument,
 			Set<Property> properties, boolean editable) {
 		super();
 		this.document = alfrescoDocument;
 		this.editable = editable;
-		retrieveSignatures();
-		buildPropertyInsts(properties);
+		this.retrieveSignatures();
+		this.buildPropertyInsts(properties);
+	}
+
+	public FileContainer(Object item, Set<Property> properties, boolean editable) {
+		if (item instanceof AlfrescoDocument) {
+			this.document = (AlfrescoDocument) item;
+			this.retrieveSignatures();
+		} else if (item instanceof UploadItem) {
+			this.uploadItem = (UploadItem) item;
+		}
+		this.editable = editable;
+		this.buildPropertyInsts(properties);
 	}
 
 	public FileContainer(UploadItem uploadItem, Set<Property> properties,
@@ -87,162 +102,14 @@ public class FileContainer {
 		super();
 		this.uploadItem = uploadItem;
 		this.editable = editable;
-		buildPropertyInsts(properties);
-	}
-
-	public FileContainer(Object item, Set<Property> properties, boolean editable) {
-		if (item instanceof AlfrescoDocument) {
-			this.document = (AlfrescoDocument) item;
-			retrieveSignatures();
-		} else if (item instanceof UploadItem) {
-			this.uploadItem = (UploadItem) item;
-		}
-		this.editable = editable;
-		buildPropertyInsts(properties);
-	}
-
-	public UploadItem getUploadItem() {
-		return uploadItem;
-	}
-
-	public void setUploadItem(UploadItem uploadItem) {
-		this.uploadItem = uploadItem;
-	}
-
-	public AlfrescoDocument getDocument() {
-		return document;
-	}
-
-	public void setDocument(AlfrescoDocument alfrescoDocument) {
-		this.document = alfrescoDocument;
-		retrieveSignatures();
-	}
-
-	public String getRealFileName() {
-		if (document != null && !document.getName().equals("")) {
-			return document.getName();
-		} else if (uploadItem != null && !uploadItem.getFileName().equals("")) {
-			return uploadItem.getFileName();
-		}
-		return "";
-	}
-
-	public String getFileName() {
-		if (document != null)
-			return FileContainer.decodeFilename(this.getRealFileName());
-		else if (uploadItem != null) {
-			return uploadItem.getFileName();
-		}
-		return "";
-	}
-
-	public String getNodeRef() {
-		if (this.document != null) {
-			return AlfrescoWrapper.id2ref(this.document.getId());
-		}
-		return "";
-	}
-
-	public String getExtension() {
-		String fileName = this.getFileName();
-		int dotIndex = fileName.lastIndexOf(".");
-		return fileName.substring(dotIndex + 1);
-	}
-
-	public String getMimetype() {
-		if (mimetype == null) {
-			mimetype = retrieveContentMimetype();
-		}
-		return this.mimetype;
-	}
-
-	private String retrieveContentMimetype() {
-		try {
-			if (document.hasAspect(Signature.ASPECT_SIGNED)) {
-				AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
-						.getInstance("alfrescoUserIdentity");
-				ItemIterable<QueryResult> results = alfrescoUserIdentity
-						.getSession().query(
-								"SELECT cmis:objectId, cmis:name FROM cmis:document WHERE IN_TREE('"
-										+ document.getId() + "')", true);
-				if (results.getTotalNumItems() != 0) {
-					Iterator<QueryResult> iterator = results.iterator();
-					while (iterator.hasNext()) {
-						QueryResult result = iterator.next();
-						String cmisName = result
-								.getPropertyValueById("cmis:name");
-						if (cmisName.equals(FileContainer
-								.retrieveContentFilename(document.getName()))) {
-							String contentNodeRef = result
-									.getPropertyValueById("cmis:objectId");
-							AlfrescoDocument content = (AlfrescoDocument) alfrescoUserIdentity
-									.getSession().getObject(contentNodeRef);
-							return content.getContentStreamMimeType();
-						}
-					}
-				}
-			}
-			return this.document.getContentStreamMimeType();
-
-		} catch (Exception e) {
-			return Resolver.mimetypeForExtension(this.getExtension());
-		}
-	}
-
-	public List<DocumentPropertyInst> getDocumentProperties() {
-		return documentProperties;
-	}
-
-	public void setDocumentProperties(
-			List<DocumentPropertyInst> documentProperties) {
-		this.documentProperties = documentProperties;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	private void retrieveSignatures() {
-		this.signatures = new ArrayList<Signature>();
-		if (this.document != null && this.document.hasAspect("P:dw:signed")) {
-			AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
-					.getInstance("alfrescoUserIdentity");
-			ItemIterable<QueryResult> results = alfrescoUserIdentity
-					.getSession().query(
-							"SELECT cmis:objectId," + Signature.VALIDITY + ","
-									+ Signature.EXPIRY + ","
-									+ Signature.AUTHORITY + ","
-									+ Signature.SIGN + "," + Signature.CF
-									+ " from " + Signature.SIGNATURE_TYPE
-									+ " WHERE IN_TREE('" + document.getId()
-									+ "')", true);
-			if (results.getTotalNumItems() != 0) {
-				Iterator<QueryResult> iterator = results.iterator();
-				while (iterator.hasNext()) {
-					QueryResult result = iterator.next();
-					String nodeRef = result
-							.getPropertyValueById("cmis:objectId");
-					Boolean validity = result
-							.getPropertyValueById(Signature.VALIDITY);
-					Calendar expiry = result
-							.getPropertyValueById(Signature.EXPIRY);
-					String authority = result
-							.getPropertyValueById(Signature.AUTHORITY);
-					String sign = result.getPropertyValueById(Signature.SIGN);
-					String cf = result.getPropertyValueById(Signature.CF);
-
-					Signature signature = new Signature(validity,
-							expiry.getTime(), authority, sign, cf, nodeRef);
-					signatures.add(signature);
-				}
-			}
-		}
+		this.buildPropertyInsts(properties);
 	}
 
 	private void buildPropertyInsts(Set<Property> properties) {
 		for (Property p : properties) {
-			DocumentPropertyInst documentProperty = buildValorisedDocumentPropertyInst(p);
-			documentProperties.add(documentProperty);
+			DocumentPropertyInst documentProperty = this
+					.buildValorisedDocumentPropertyInst(p);
+			this.documentProperties.add(documentProperty);
 		}
 	}
 
@@ -250,10 +117,12 @@ public class FileContainer {
 		DocumentPropertyInst documentPropertyInst = new DocumentPropertyInst(p);
 		if (this.document != null) {
 			if (!p.isMultiple()) {
-				Object propertyValue = document.getPropertyValue(p.getName());
+				Object propertyValue = this.document.getPropertyValue(p
+						.getName());
 				documentPropertyInst.setValue(propertyValue);
 			} else {
-				List<Object> objValues = document.getPropertyValue(p.getName());
+				List<Object> objValues = this.document.getPropertyValue(p
+						.getName());
 				List<String> stringValues = new ArrayList<String>();
 				if (p.getDataType().equals(DataType.STRING)) {
 					for (Object obj : objValues) {
@@ -275,40 +144,185 @@ public class FileContainer {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (!(obj instanceof FileContainer))
+		}
+		if (!(obj instanceof FileContainer)) {
 			return false;
+		}
 		FileContainer other = (FileContainer) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (this.id == null) {
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!this.id.equals(other.id)) {
 			return false;
+		}
 		return true;
 	}
 
+	public AlfrescoDocument getDocument() {
+		return this.document;
+	}
+
+	public List<DocumentPropertyInst> getDocumentProperties() {
+		return this.documentProperties;
+	}
+
+	public String getExtension() {
+		String fileName = this.getFileName();
+		int dotIndex = fileName.lastIndexOf(".");
+		return fileName.substring(dotIndex + 1);
+	}
+
+	public String getFileName() {
+		if (this.document != null) {
+			return FileContainer.decodeFilename(this.getRealFileName());
+		} else if (this.uploadItem != null) {
+			return this.uploadItem.getFileName();
+		}
+		return "";
+	}
+
+	public String getId() {
+		return this.id;
+	}
+
+	public String getMimetype() {
+		if (this.mimetype == null) {
+			this.mimetype = this.retrieveContentMimetype();
+		}
+		return this.mimetype;
+	}
+
+	public String getNodeRef() {
+		if (this.document != null) {
+			return AlfrescoWrapper.id2ref(this.document.getId());
+		}
+		return "";
+	}
+
+	public String getRealFileName() {
+		if (this.document != null && !this.document.getName().equals("")) {
+			return FilenameUtils.getName(this.document.getName());
+		} else if (this.uploadItem != null
+				&& !this.uploadItem.getFileName().equals("")) {
+			return FilenameUtils.getName(this.uploadItem.getFileName());
+		}
+		return "";
+	}
+
+	public List<Signature> getSignatures() {
+		return this.signatures;
+	}
+
+	public UploadItem getUploadItem() {
+		return this.uploadItem;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
+		return result;
+	}
+
 	public boolean isEditable() {
-		return editable;
+		return this.editable;
+	}
+
+	private String retrieveContentMimetype() {
+		try {
+			if (this.document.hasAspect(Signature.ASPECT_SIGNED)) {
+				AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
+						.getInstance("alfrescoUserIdentity");
+				ItemIterable<QueryResult> results = alfrescoUserIdentity
+						.getSession().query(
+								"SELECT cmis:objectId, cmis:name FROM cmis:document WHERE IN_TREE('"
+										+ this.document.getId() + "')", true);
+				if (results.getTotalNumItems() != 0) {
+					Iterator<QueryResult> iterator = results.iterator();
+					while (iterator.hasNext()) {
+						QueryResult result = iterator.next();
+						String cmisName = result
+								.getPropertyValueById("cmis:name");
+						if (cmisName.equals(FileContainer
+								.retrieveContentFilename(this.document
+										.getName()))) {
+							String contentNodeRef = result
+									.getPropertyValueById("cmis:objectId");
+							AlfrescoDocument content = (AlfrescoDocument) alfrescoUserIdentity
+									.getSession().getObject(contentNodeRef);
+							return content.getContentStreamMimeType();
+						}
+					}
+				}
+			}
+			return this.document.getContentStreamMimeType();
+
+		} catch (Exception e) {
+			return Resolver.mimetypeForExtension(this.getExtension());
+		}
+	}
+
+	private void retrieveSignatures() {
+		this.signatures = new ArrayList<Signature>();
+		if (this.document != null && this.document.hasAspect("P:dw:signed")) {
+			AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
+					.getInstance("alfrescoUserIdentity");
+			ItemIterable<QueryResult> results = alfrescoUserIdentity
+					.getSession().query(
+							"SELECT cmis:objectId," + Signature.VALIDITY + ","
+									+ Signature.EXPIRY + ","
+									+ Signature.AUTHORITY + ","
+									+ Signature.SIGN + "," + Signature.CF
+									+ " from " + Signature.SIGNATURE_TYPE
+									+ " WHERE IN_TREE('"
+									+ this.document.getId() + "')", true);
+			if (results.getTotalNumItems() != 0) {
+				Iterator<QueryResult> iterator = results.iterator();
+				while (iterator.hasNext()) {
+					QueryResult result = iterator.next();
+					String nodeRef = result
+							.getPropertyValueById("cmis:objectId");
+					Boolean validity = result
+							.getPropertyValueById(Signature.VALIDITY);
+					Calendar expiry = result
+							.getPropertyValueById(Signature.EXPIRY);
+					String authority = result
+							.getPropertyValueById(Signature.AUTHORITY);
+					String sign = result.getPropertyValueById(Signature.SIGN);
+					String cf = result.getPropertyValueById(Signature.CF);
+
+					Signature signature = new Signature(validity,
+							expiry.getTime(), authority, sign, cf, nodeRef);
+					this.signatures.add(signature);
+				}
+			}
+		}
+	}
+
+	public void setDocument(AlfrescoDocument alfrescoDocument) {
+		this.document = alfrescoDocument;
+		this.retrieveSignatures();
+	}
+
+	public void setDocumentProperties(
+			List<DocumentPropertyInst> documentProperties) {
+		this.documentProperties = documentProperties;
 	}
 
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 	}
 
-	public List<Signature> getSignatures() {
-		return signatures;
+	public void setUploadItem(UploadItem uploadItem) {
+		this.uploadItem = uploadItem;
 	}
 
 }

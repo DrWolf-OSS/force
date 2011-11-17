@@ -1,6 +1,7 @@
 package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
+import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
@@ -41,7 +42,6 @@ import it.drwolf.slot.session.SlotInstHome;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.Principal;
@@ -68,6 +68,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
 import org.alfresco.cmis.client.AlfrescoFolder;
+import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.Session;
@@ -555,27 +556,30 @@ public class SlotInstEditBean {
 	}
 
 	public void downloadDocumentsZip() {
-		Collection<List<FileContainer>> values = this.datas.values();
-		List<FileContainer> fileContainers = new ArrayList<FileContainer>();
-		for (List<FileContainer> list : values) {
-			fileContainers.addAll(list);
-		}
-
-		String outFilename = "outfile.zip";
-		HttpServletResponse response = (HttpServletResponse) this.extCtx
-				.getResponse();
-		response.setContentType("ZIP");
-
-		response.addHeader("Content-disposition", "attachment; filename=\""
-				+ outFilename + "\"");
-		response.setHeader("Expires", "0");
-		response.setHeader("Cache-Control",
-				"must-revalidate, post-check=0, pre-check=0");
-
-		// Create a buffer for reading the files
-		byte[] buf = new byte[1024];
-
 		try {
+
+			Collection<List<FileContainer>> values = this.datas.values();
+			List<FileContainer> fileContainers = new ArrayList<FileContainer>();
+			for (List<FileContainer> list : values) {
+				fileContainers.addAll(list);
+			}
+
+			String outFilename = AlfrescoWrapper.normalizeFolderName(
+					this.slotDefHome.getInstance().getName(),
+					AlfrescoWrapper.LENGHT_LIMIT, AlfrescoWrapper.SPACER);
+
+			HttpServletResponse response = (HttpServletResponse) this.extCtx
+					.getResponse();
+			response.setContentType("ZIP");
+
+			response.addHeader("Content-disposition", "attachment; filename=\""
+					+ outFilename + "\"");
+			response.setHeader("Expires", "0");
+			response.setHeader("Cache-Control",
+					"must-revalidate, post-check=0, pre-check=0");
+
+			// Create a buffer for reading the files
+			byte[] buf = new byte[1024];
 
 			ServletOutputStream os = response.getOutputStream();
 			// Create the ZIP file
@@ -599,11 +603,38 @@ public class SlotInstEditBean {
 				out.closeEntry();
 				in.close();
 			}
+
+			Set<SlotInst> dependentSlotInsts = this.slotInstHome.getInstance()
+					.getDependentSlotInsts();
+			for (SlotInst slotInst : dependentSlotInsts) {
+				List<Document> documentsList = slotInst.getDocumentsList();
+				for (Document document : documentsList) {
+					InputStream in = document.getContentStream().getStream();
+
+					out.putNextEntry(new ZipEntry("/"
+							+ AlfrescoWrapper.normalizeFolderName(
+									slotInst.getId() + " "
+											+ slotInst.getSlotDef().getName(),
+									AlfrescoWrapper.LENGHT_LIMIT,
+									AlfrescoWrapper.SPACER) + "/"
+							+ document.getName()));
+
+					int len;
+					while ((len = in.read(buf)) > 0) {
+						out.write(buf, 0, len);
+					}
+
+					out.closeEntry();
+					in.close();
+				}
+			}
+
 			// Complete the ZIP file
 			out.close();
 			FacesContext.getCurrentInstance().responseComplete();
 
-		} catch (IOException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
