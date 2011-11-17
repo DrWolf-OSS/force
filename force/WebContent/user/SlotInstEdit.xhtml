@@ -505,37 +505,39 @@
 
 			</rich:panel>
 
-			<div class="actionButtons">
-			<h:commandButton id="save"
-				value="Salva" action="#{slotInstEditBean.save()}"
-				onclick="dirty = false;"
-				rendered="#{slotInstHome.id == null}"
-				styleClass="modal" />
-			<h:commandButton id="update"
-				value="Salva" action="#{slotInstEditBean.update()}"
-				onclick="dirty = false;"
-				rendered="#{slotInstHome.id != null}" 
-				styleClass="modal"/>
-			<h:commandButton id="delete"
-				value="Elimina" action="#{slotInstEditBean.removeSlot()}" immediate="true"
-				onclick="return confirm('Sicuro di voler eliminare la busta?'); dirty = false;"
-				rendered="#{slotInstHome.instance.id != null}"
-				styleClass="modal"/>
-			<a:jsFunction name="setDirty" >
-				<a:actionparam name="dirty" assignTo="#{slotInstEditBean.dirty}"/>
-			</a:jsFunction>
-			<h:commandButton id="validate"
-				value="Verifica validazione" 
-				onclick="setDirty(dirty); dirty = false;"
-				action="#{slotInstEditBean.validate()}"
-				styleClass="modal"/>
+			<s:div id="actionButtons" styleClass="actionButtons">
+				<h:commandButton id="save"
+					value="Salva" action="#{slotInstEditBean.save()}"
+					onclick="dirty = false;"
+					rendered="#{slotInstHome.id == null}"
+					styleClass="modal" />
+				<h:commandButton id="update"
+					value="Salva" action="#{slotInstEditBean.update()}"
+					onclick="dirty = false;"
+					rendered="#{slotInstHome.id != null}" 
+					styleClass="modal"/>
+				<h:commandButton id="delete"
+					value="Elimina" action="#{slotInstEditBean.removeSlot()}" immediate="true"
+					onclick="return confirm('Sicuro di voler eliminare la busta?'); dirty = false;"
+					rendered="#{slotInstHome.instance.id != null}"
+					styleClass="modal"/>
+				<a:jsFunction name="setDirty" >
+					<a:actionparam name="dirty" assignTo="#{slotInstEditBean.dirty}"/>
+				</a:jsFunction>
+				<h:commandButton id="validate"
+					value="Verifica validazione" 
+					onclick="setDirty(dirty); dirty = false;"
+					action="#{slotInstEditBean.validate()}"
+					styleClass="modal"/>
+					
+				<h:commandButton onclick="setDirty(dirty); dirty = false;" value="Scarica documenti"
+								action="#{slotInstEditBean.downloadDocumentsZip()}"  
+								disabled="#{slotInstHome.instance.status != 'VALID'}"/>
 				
-			<h:commandButton action="#{slotInstEditBean.downloadDocumentsZip()}" value="Scarica documenti" />
-			
-			<s:button view="/user/SlotInstEdit.xhtml" value="Annulla Modifiche" style="float:right" 
-				propagation="none" includePageParams="true">
-			</s:button>
-			</div>
+				<s:button view="/user/SlotInstEdit.xhtml" value="Annulla Modifiche" style="float:right" 
+					propagation="none" includePageParams="true">
+				</s:button>
+			</s:div>
 		</a:form>
 
 			
