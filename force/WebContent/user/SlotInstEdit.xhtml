@@ -88,10 +88,20 @@
 					</s:link>
 				</s:decorate>
 				
+				<div style="clear: both"/>
+				<rich:spacer height="20"/>
+				<div style="clear: both"/>
+				
 				<s:decorate template="/layout/display.xhtml">
 					<ui:define name="label">
 						<h:outputText value="Stato" />
 					</ui:define>
+					<h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
+								rendered="#{slotInstHome.instance.status == 'EMPTY'}" />
+					<h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
+								rendered="#{slotInstHome.instance.status == 'VALID'}" />
+					<h:graphicImage value="/img/envelope-red-exclamation.png"  styleClass="fileIcon"
+								rendered="#{slotInstHome.instance.status == 'INVALID'}" />
 					<h:outputText value="#{slotInstHome.instance.status.value()}" />
 				</s:decorate>
 				
@@ -220,7 +230,7 @@
 				campi obbligatori</div>
 
 				<s:div id="collections">
-					<h:panelGrid columns="2">
+					<h:panelGrid columns="2" id="collectionsGrid" columnClasses="topColumn, topColumn">
 						<c:forEach var="coll" items="#{slotInstEditBean.docInstCollections}">
 
 						<s:fragment rendered="#{coll.docDefCollection.active}">	
@@ -287,6 +297,7 @@
 						
 						<s:fragment rendered="#{coll.docDefCollection.active}">
 						<s:div id="infoPanel_#{coll.docDefCollection.id}"
+							style="padding: 5px"
 							rendered="#{coll.docDefCollection.conditionalPropertyDef == null or 
 										(coll.docDefCollection.conditionalPropertyDef != null and slotInstEditBean.findPropertyInstByDefId(coll.docDefCollection.conditionalPropertyDef.id).value.equals(coll.docDefCollection.conditionalPropertyInst.value))}">
 							<s:div styleClass="messageBox" rendered="#{not empty slotInstEditBean.collectionsMessages[coll.docDefCollection.id]}">

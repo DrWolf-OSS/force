@@ -925,17 +925,23 @@ public class SlotInstEditBean {
 				this.primaryDocs.put(defCollection.getId(), fileContainers);
 			}
 
-			boolean verifyPassed = this.verify();
-			boolean checkCollectionsSizePassed = this.checkCollectionsSize();
-			if (verifyPassed && checkCollectionsSizePassed) {
-				this.slotInstHome.getInstance().setStatus(SlotInstStatus.VALID);
-				this.slotMessages.add(new VerifierMessage("La busta è valida",
-						VerifierMessageType.VALID));
-			} else {
-				this.slotInstHome.getInstance().setStatus(
-						SlotInstStatus.INVALID);
-				this.slotMessages.add(new VerifierMessage(
-						"La busta non è valida", VerifierMessageType.ERROR));
+			if (!this.slotInstHome.getInstance().getStatus()
+					.equals(SlotInstStatus.EMPTY)) {
+				boolean verifyPassed = this.verify();
+				boolean checkCollectionsSizePassed = this
+						.checkCollectionsSize();
+				if (verifyPassed && checkCollectionsSizePassed) {
+					this.slotInstHome.getInstance().setStatus(
+							SlotInstStatus.VALID);
+					this.slotMessages.add(new VerifierMessage(
+							"La busta è valida", VerifierMessageType.VALID));
+				} else {
+					this.slotInstHome.getInstance().setStatus(
+							SlotInstStatus.INVALID);
+					this.slotMessages
+							.add(new VerifierMessage("La busta non è valida",
+									VerifierMessageType.ERROR));
+				}
 			}
 		}
 

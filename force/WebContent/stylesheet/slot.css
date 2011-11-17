@@ -164,6 +164,10 @@ a:HOVER {
 	font-weight:bold";
 }
 
+.topColumn{
+	vertical-align: top;
+}
+
 
 /*
 .invalidRow.action.disabledLink a:LINK {
