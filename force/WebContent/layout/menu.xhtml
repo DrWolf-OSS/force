@@ -4,8 +4,13 @@
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:s="http://jboss.com/products/seam/taglib"
-    xmlns:rich="http://richfaces.org/rich">
+    xmlns:rich="http://richfaces.org/rich"
+    styleClass="rounded">
     <rich:toolBarGroup>
+     <s:link view="/home.xhtml" value="Home" 
+                propagation="none" rendered="#{identity.loggedIn}"
+                style="font-size:11px; color : #FFF;"/>
+    
     </rich:toolBarGroup>
      <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('ADMIN')}">
         <f:facet name="label">Browse data</f:facet>
@@ -131,6 +136,7 @@
     </rich:dropDownMenu>
     <!-- @newMenuItem@ -->
     <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('AZIENDE')}">
+        
         <f:facet name="label">Gestione</f:facet>
         <rich:menuItem>
             <s:link view="/user/CatMerEdit.xhtml"
@@ -167,7 +173,7 @@
                 propagation="none"/>
         </rich:menuItem>
     </rich:dropDownMenu>
-    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none">
+    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none"  rendered="#{identity.loggedIn}">
         <f:facet name="label">Gestione Modelli</f:facet>
         <rich:menuItem  rendered="#{identity.hasRole('ADMIN')}">
             <s:link view="/admin/SlotDefTemplateList.xhtml"
@@ -203,8 +209,5 @@
     <!-- @newMenuItem@ -->
     <rich:toolBarGroup location="right" styleClass="linkMenuBar">
         <h:outputText id="menuWelcomeId" value="Autenticato come: #{credentials.username} " rendered="#{identity.loggedIn}"/>
-        <s:link id="menuAddId" view="/AddAzienda.xhtml" value="Registrati" rendered="#{not identity.loggedIn}" propagation="none"/>
-        <s:link id="menuLoginId" view="/login.xhtml" value="Login" rendered="#{not identity.loggedIn}" propagation="none"/>
-        <s:link id="menuLogoutId" view="/home.xhtml" action="#{identity.logout}" value="Logout" rendered="#{identity.loggedIn}" propagation="none"/>
     </rich:toolBarGroup>
 </rich:toolBar>

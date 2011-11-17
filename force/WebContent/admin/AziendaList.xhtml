@@ -14,80 +14,24 @@
 
         <rich:simpleTogglePanel label="Ricerca nelle aziende attive" switchType="ajax">
 
-
             <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Cap</ui:define>
-                <h:inputText id="cap" value="#{aziendaList.azienda.cap}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Cellulare</ui:define>
-                <h:inputText id="cellulare" value="#{aziendaList.azienda.cellulare}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Cognome</ui:define>
-                <h:inputText id="cognome" value="#{aziendaList.azienda.cognome}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Comune</ui:define>
-                <h:inputText id="comune" value="#{aziendaList.azienda.comune}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Email</ui:define>
-                <h:inputText id="email" value="#{aziendaList.azienda.email}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Email certificata</ui:define>
-                <h:inputText id="emailCertificata" value="#{aziendaList.azienda.emailCertificata}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Email referente</ui:define>
-                <h:inputText id="emailReferente" value="#{aziendaList.azienda.emailReferente}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Fax</ui:define>
-                <h:inputText id="fax" value="#{aziendaList.azienda.fax}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Indirizzo</ui:define>
-                <h:inputText id="indirizzo" value="#{aziendaList.azienda.indirizzo}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Localita</ui:define>
-                <h:inputText id="localita" value="#{aziendaList.azienda.localita}"/>
+                <ui:define name="label">Ragione sociale</ui:define>
+                <h:inputText id="ragioneSociale" value="#{newAziendaList.azienda.ragioneSociale}"/>
             </s:decorate>
 
             <s:decorate template="/layout/display.xhtml">
                 <ui:define name="label">Nome</ui:define>
-                <h:inputText id="nome" value="#{aziendaList.azienda.nome}"/>
+                <h:inputText id="nome" value="#{newAziendaList.azienda.nome}"/>
             </s:decorate>
 
             <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Provincia</ui:define>
-                <h:inputText id="provincia" value="#{aziendaList.azienda.provincia}"/>
+                <ui:define name="label">Cognome</ui:define>
+                <h:inputText id="cognome" value="#{newAziendaList.azienda.cognome}"/>
             </s:decorate>
 
             <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Ragione sociale</ui:define>
-                <h:inputText id="ragioneSociale" value="#{aziendaList.azienda.ragioneSociale}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Stato</ui:define>
-                <h:inputText id="stato" value="#{aziendaList.azienda.stato}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Telefono</ui:define>
-                <h:inputText id="telefono" value="#{aziendaList.azienda.telefono}"/>
+                <ui:define name="label">Email referente</ui:define>
+                <h:inputText id="emailReferente" value="#{newAziendaList.azienda.emailReferente}"/>
             </s:decorate>
 
             <s:decorate template="/layout/display.xhtml">
@@ -121,7 +65,7 @@
         <h:column>
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
+                    <ui:param name="entityList" value="#{newAziendaList}"/>
                     <ui:param name="propertyLabel" value="Id"/>
                     <ui:param name="propertyPath" value="azienda.id"/>
                 </ui:include>
@@ -131,118 +75,7 @@
         <h:column>
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Cap"/>
-                    <ui:param name="propertyPath" value="azienda.cap"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.cap}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Cellulare"/>
-                    <ui:param name="propertyPath" value="azienda.cellulare"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.cellulare}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Cognome"/>
-                    <ui:param name="propertyPath" value="azienda.cognome"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.cognome}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Comune"/>
-                    <ui:param name="propertyPath" value="azienda.comune"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.comune}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Email"/>
-                    <ui:param name="propertyPath" value="azienda.email"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.email}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Email certificata"/>
-                    <ui:param name="propertyPath" value="azienda.emailCertificata"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.emailCertificata}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Email referente"/>
-                    <ui:param name="propertyPath" value="azienda.emailReferente"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.emailReferente}"/>
-        </h:column>
- 
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Indirizzo"/>
-                    <ui:param name="propertyPath" value="azienda.indirizzo"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.indirizzo}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Localita"/>
-                    <ui:param name="propertyPath" value="azienda.localita"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.localita}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Nome"/>
-                    <ui:param name="propertyPath" value="azienda.nome"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.nome}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Provincia"/>
-                    <ui:param name="propertyPath" value="azienda.provincia"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_azienda.provincia}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
+                    <ui:param name="entityList" value="#{newAziendaList}"/>
                     <ui:param name="propertyLabel" value="Ragione sociale"/>
                     <ui:param name="propertyPath" value="azienda.ragioneSociale"/>
                 </ui:include>
@@ -252,14 +85,64 @@
         <h:column>
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{aziendaList}"/>
-                    <ui:param name="propertyLabel" value="Settore"/>
+                    <ui:param name="entityList" value="#{newAziendaList}"/>
+                    <ui:param name="propertyLabel" value="Nome"/>
+                    <ui:param name="propertyPath" value="azienda.nome"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_azienda.nome}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{newAziendaList}"/>
+                    <ui:param name="propertyLabel" value="Cognome"/>
+                    <ui:param name="propertyPath" value="azienda.cognome"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_azienda.cognome}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{newAziendaList}"/>
+                    <ui:param name="propertyLabel" value="Email referente"/>
+                    <ui:param name="propertyPath" value="azienda.emailReferente"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_azienda.emailReferente}"/>
+        </h:column>
+
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{newAziendaList}"/>
+                    <ui:param name="propertyLabel" value="Forma giuridica"/>
+                    <ui:param name="propertyPath" value="azienda.formaGiuridica.nome"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_azienda.formaGiuridica.nome}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{newAziendaList}"/>
+                    <ui:param name="propertyLabel" value="Indirizzo"/>
+                    <ui:param name="propertyPath" value="azienda.indirizzo"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_azienda.indirizzo}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{newAziendaList}"/>
+                    <ui:param name="propertyLabel" value="Settore id"/>
                     <ui:param name="propertyPath" value="azienda.settore.nome"/>
                 </ui:include>
             </f:facet>
             <h:outputText value="#{_azienda.settore.nome}"/>
-        </h:column>
-      
+        </h:column>  
         <h:column>
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">
@@ -271,9 +154,9 @@
             <h:outputText value="#{_azienda.telefono}"/>
         </h:column>
         <rich:column styleClass="action">
-            <f:facet name="header">Action</f:facet>
+            <f:facet name="header">Azioni</f:facet>
             <s:link view="/admin/#{empty from ? 'Azienda' : from}.xhtml"
-                   value="#{empty from ? 'View' : 'Select'}"
+                   value="#{empty from ? 'Vedi' : 'Select'}"
              propagation="#{empty from ? 'none' : 'default'}"
                       id="aziendaViewId">
                 <f:param name="aziendaId"
@@ -281,7 +164,7 @@
             </s:link>
             #{' '}
             <s:link view="/admin/AziendaEdit.xhtml"
-                   value="Edit"
+                   value="Modifica"
              propagation="none"
                       id="aziendaEdit"
                 rendered="#{empty from}">

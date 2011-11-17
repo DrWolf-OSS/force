@@ -42,6 +42,10 @@
             <ui:define name="label">e-mail Impresa</ui:define>
             <h:outputText value="#{userSession.azienda.email}"/>
      </s:decorate>
+     <s:decorate id="emailImp" template="/layout/display.xhtml">
+            <ui:define name="label">PEC Impresa</ui:define>
+            <h:outputText value="#{userSession.azienda.emailCertificata}"/>
+     </s:decorate>
      <s:decorate id="referente" template="/layout/display.xhtml">
             <ui:define name="label">Referente</ui:define>
             <h:outputText value="#{userSession.azienda.referente}"/>
@@ -59,7 +63,7 @@
 </rich:panel>
 <rich:panel>
     <f:facet name="header"><s:span>
-    <s:link value="Vedi tutto" view="/user/SlotInstEdit.xhtml" styleClass="topCommandLink" propagation="none">
+    <s:link value="Vai alla documentazione" view="/user/SlotInstEdit.xhtml" styleClass="topCommandLink" propagation="none">
         <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
         <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
         <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
@@ -197,9 +201,10 @@
     </c:forEach>
 </rich:panel>
 </h:panelGrid>
+<rich:spacer height="5px;"/>
 <rich:panel>
     <f:facet name="header"><s:span>
-    <s:link value="Vedi tutto" view="/user/GareList.xhtml" styleClass="topCommandLink">
+    <s:link value="Vedi tutte" view="/user/GareList.xhtml" styleClass="topCommandLink">
         <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
         <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
         <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
@@ -235,9 +240,10 @@
     </rich:dataTable>
     
 </rich:panel>
+<rich:spacer height="5px;"/>
 <rich:panel >
     <f:facet name="header"><s:span>
-    <s:link value="Vedi tutto" view="/user/CommesseEdit.xhtml" styleClass="topCommandLink">
+    <s:link value="Vedi tutte" view="/user/CommesseEdit.xhtml" styleClass="topCommandLink">
         <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
         <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
         <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
@@ -258,24 +264,10 @@
     </rich:column>
     </rich:dataTable>
 </rich:panel>
-<rich:panel rendered="#{not userSession.llpp}">
-    <f:facet name="header"><s:span>
-    <s:link value="Vedi tutto" view="/user/CatMerEdit.xhtml" styleClass="topCommandLink">
-        <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
-    </s:link>
-    <h:outputText value="Le tue Categorie Merceologiche" /></s:span></f:facet>
-    <rich:dataTable id="catmerList"
-                var="catMer"
-              value="#{userSession.azienda.categorieMerceologicheAsList}"
-           rendered="#{not empty userSession.azienda.categorieMerceologicheAsList}">
-        <rich:column>
-        <h:outputText value="#{catMer.categoria}"></h:outputText>
-    </rich:column>
-    </rich:dataTable>
-</rich:panel>
+<rich:spacer height="5px;"/>
 <rich:panel rendered="#{userSession.llpp}">
     <f:facet name="header"><s:span>
-    <s:link value="Vedi tutto" view="/user/SOAEdit.xhtml" styleClass="topCommandLink">
+    <s:link value="Modifica" view="/user/SOAEdit.xhtml" styleClass="topCommandLink">
         <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
     </s:link>
     <h:outputText value="Le Tue SOA" /></s:span></f:facet>
@@ -291,7 +283,22 @@
     </rich:column>
     </rich:dataTable>
 </rich:panel>
+<rich:spacer height="5px;"/>
 
-
+<rich:panel>
+    <f:facet name="header"><s:span>
+    <s:link value="Modifica" view="/user/CatMerEdit.xhtml" styleClass="topCommandLink">
+        <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
+    </s:link>
+    <h:outputText value="Le tue Categorie Merceologiche" /></s:span></f:facet>
+    <rich:dataTable id="catmerList"
+                var="catMer"
+              value="#{userSession.azienda.categorieMerceologicheAsList}"
+           rendered="#{not empty userSession.azienda.categorieMerceologicheAsList}">
+        <rich:column>
+        <h:outputText value="#{catMer.categoria}"></h:outputText>
+    </rich:column>
+    </rich:dataTable>
+</rich:panel>
 </ui:define>
 </ui:composition>

@@ -150,10 +150,10 @@ public class AziendaHome extends EntityHome<Azienda> {
 			// persisto l'entity azienda
 			this.persist();
 			try {
+				String body = "Grazie per esserti registrato al servizio FORCE.\nA breve riceverai le  credenziali per accedere al servizio, appena concluse le pratiche di verifica dei dati inseriti.";
 				// una volta persistito mando una mail al referente
-				this.sendEmail("Progetto Force - Primo step",
-						"Grazie per esserti iscritto", this.getInstance()
-								.getEmailReferente());
+				this.sendEmail("Benvenuto nel servizio Force", body, this
+						.getInstance().getEmailReferente());
 			} catch (EmailException e) {
 				// TODO: handle exception
 			}
@@ -183,7 +183,7 @@ public class AziendaHome extends EntityHome<Azienda> {
 		Email email = new SimpleEmail();
 		email.setHostName("zimbra.drwolf.it");
 		email.setSmtpPort(25);
-		email.setFrom("force@drwolf.it");
+		email.setFrom("info@forcecna.it");
 		email.setSubject(subject);
 		email.addTo(to);
 		email.setMsg(body);
