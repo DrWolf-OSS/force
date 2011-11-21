@@ -142,9 +142,6 @@ public class SlotDefEditBean {
 	}
 
 	public void addDependentSlotDef() {
-		//
-		// this.dependentSlotDef.setParentSlotDef(this.slotDefHome.getInstance());
-		//
 		SlotDefCloner slotDefCloner = new SlotDefCloner();
 		slotDefCloner.setModel(this.dependentSlotDef);
 		slotDefCloner.cloneModel();
@@ -159,22 +156,17 @@ public class SlotDefEditBean {
 		//
 		dependentCloned.setNumberOfInstances(this.dependentSlotDef
 				.getNumberOfInstances());
+
+		dependentCloned.setEmbeddedNumberOfInstances(this.dependentSlotDef
+				.getEmbeddedNumberOfInstances());
 		//
 
-		// this.slotDefCloners.put(this.dependentSlotDef.getId(),
-		// slotDefCloner);
 		this.slotDefHome.getSlotDefCloner().getDependentSlotDefCloners()
 				.add(slotDefCloner);
-		//
 
 		this.slotDefHome.getInstance().getDependentSlotDefs()
 				.add(dependentCloned);
 		dependentCloned.setParentSlotDef(this.slotDefHome.getInstance());
-
-		// tengo l'originale per un eventuale successivo edit da interfaccia
-		// if (!this.clonedOriginalBiMap.containsValue(this.dependentSlotDef)) {
-		// this.clonedOriginalMap.put(dependentCloned, this.dependentSlotDef);
-		// }
 
 		this.resetDependentSlotDefModel();
 	}
@@ -213,6 +205,20 @@ public class SlotDefEditBean {
 
 		this.resetDependentSlotDefModel();
 		this.edit = false;
+	}
+
+	public void changeDependentSlotDefListener() {
+		if (this.dependentSlotDef != null) {
+			if (!this.identity.hasRole("ADMIN")
+					&& !this.slotDefHome.getInstance().isTemplate()) {
+				EmbeddedProperty embeddedNumberOfInstances = new EmbeddedProperty();
+				embeddedNumberOfInstances.setDataType(DataType.INTEGER);
+				embeddedNumberOfInstances.setMultiple(false);
+				embeddedNumberOfInstances.setName("Number of instances");
+				this.dependentSlotDef
+						.setEmbeddedNumberOfInstances(embeddedNumberOfInstances);
+			}
+		}
 	}
 
 	public void checkAndInstanceDependentSlotDef() {
@@ -412,6 +418,12 @@ public class SlotDefEditBean {
 		// slotDefValidator.validate();
 	}
 
+	// public void initialValidation() {
+	// SlotDefValidator slotDefValidator = new SlotDefValidator(
+	// this.slotDefHome.getInstance());
+	// slotDefValidator.validate();
+	// }
+
 	public void invalidate(Object obj) {
 		Deactivable def = (Deactivable) obj;
 		if (def.isActive()) {
@@ -424,12 +436,6 @@ public class SlotDefEditBean {
 			def.setActive(true);
 		}
 	}
-
-	// public void initialValidation() {
-	// SlotDefValidator slotDefValidator = new SlotDefValidator(
-	// this.slotDefHome.getInstance());
-	// slotDefValidator.validate();
-	// }
 
 	public boolean isConditional() {
 		return this.conditional;
@@ -733,6 +739,7 @@ public class SlotDefEditBean {
 			this.dependentSlotDef.setConditionalPropertyInst(null);
 			this.dependentSlotDef.setParentSlotDef(null);
 			this.dependentSlotDef.setNumberOfInstances(null);
+			this.dependentSlotDef.setEmbeddedNumberOfInstances(null);
 
 			this.dependentSlotDef = null;
 			//

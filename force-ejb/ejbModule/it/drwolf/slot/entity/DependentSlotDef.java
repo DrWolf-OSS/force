@@ -23,6 +23,8 @@ public class DependentSlotDef extends SlotDef implements Conditionable {
 
 	private PropertyDef numberOfInstances;
 
+	private EmbeddedProperty embeddedNumberOfInstances;
+
 	public DependentSlotDef() {
 		this.setType(SlotDefType.DEPENDENT);
 	}
@@ -36,6 +38,12 @@ public class DependentSlotDef extends SlotDef implements Conditionable {
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	public PropertyInst getConditionalPropertyInst() {
 		return this.conditionalPropertyInst;
+	}
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+	public EmbeddedProperty getEmbeddedNumberOfInstances() {
+		return this.embeddedNumberOfInstances;
 	}
 
 	@ManyToOne
@@ -62,6 +70,11 @@ public class DependentSlotDef extends SlotDef implements Conditionable {
 
 	public void setConditionalPropertyInst(PropertyInst conditionalPropertyInst) {
 		this.conditionalPropertyInst = conditionalPropertyInst;
+	}
+
+	public void setEmbeddedNumberOfInstances(
+			EmbeddedProperty embeddedNumberOfInstances) {
+		this.embeddedNumberOfInstances = embeddedNumberOfInstances;
 	}
 
 	public void setNumberOfInstances(PropertyDef numberOfInstances) {
