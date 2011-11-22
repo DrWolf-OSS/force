@@ -19,8 +19,7 @@
 	<navigation from-action="#{slotInstEditBean.save()}">
 	  <rule if-outcome="saved">
          <end-conversation before-redirect="true"/>
-         <redirect>
-         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         <redirect include-page-params="false">
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
       </rule>
@@ -32,8 +31,7 @@
       </rule>
       <rule if-outcome="warning">
      	 <end-conversation before-redirect="true"/>
-         <redirect>
-         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         <redirect include-page-params="false">
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
       </rule>
@@ -42,21 +40,18 @@
    <navigation from-action="#{slotInstEditBean.update()}">
       <rule if-outcome="updated">
          <end-conversation before-redirect="true"/>
-         <redirect>
-         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         <redirect include-page-params="false">
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
       </rule>
       <rule if-outcome="failed">
-         <redirect>
-         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         <redirect include-page-params="false">
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
       </rule>
       <rule if-outcome="warning">
       	 <end-conversation before-redirect="true"/>
-         <redirect>
-         	<param name="slotDefId" value="#{slotDefHome.id}"/>
+         <redirect include-page-params="false">
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
          </redirect>
       </rule>

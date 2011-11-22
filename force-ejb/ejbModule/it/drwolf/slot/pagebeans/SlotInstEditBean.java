@@ -919,6 +919,11 @@ public class SlotInstEditBean {
 			}
 
 		} else {
+			//
+			this.slotDefHome.setSlotDefId(this.slotInstHome.getInstance()
+					.getSlotDef().getId());
+			this.slotDefHome.find();
+			//
 			// this.propertyInsts = new
 			// ArrayList<PropertyInst>(this.slotInstHome
 			// .getInstance().getPropertyInsts());
