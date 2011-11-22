@@ -160,7 +160,7 @@
 								rendered="#{dataInstance.dataDefinition.dataType == 'INTEGER' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
 								disabled="#{not dataInstance.dataDefinition.editable or 
-											(slotInstHome.instance.id != null and not empty dataInstance.propertyDef.slotDefsIsNumberOfInstancesOf)}"
+											(slotInstHome.instance.id != null and not empty dataInstance.propertyDef.slotDefsIsNumberOfInstancesOf and dataInstance.integerValue != null)}"
 								validator="#{dataInstance.dataDefinition.validate}" />
 							<a:region>
 							<h:selectBooleanCheckbox value="#{dataInstance.booleanValue}"

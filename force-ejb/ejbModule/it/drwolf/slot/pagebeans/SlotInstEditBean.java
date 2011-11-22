@@ -589,7 +589,9 @@ public class SlotInstEditBean {
 		Set<DependentSlotDef> dependentSlotDefs = this.slotDefHome
 				.getInstance().getDependentSlotDefs();
 		for (DependentSlotDef dependentSlotDef : dependentSlotDefs) {
-			if (dependentSlotDef.getConditionalPropertyDef() != null
+
+			if (!this.isAlreadyInstanced(dependentSlotDef)
+					&& dependentSlotDef.getConditionalPropertyDef() != null
 					&& dependentSlotDef
 							.getConditionalPropertyInst()
 							.getValue()
@@ -861,13 +863,13 @@ public class SlotInstEditBean {
 		return null;
 	}
 
-	// public String getValidationResult() {
-	// return this.validationResult;
-	// }
-
 	public HashMap<Long, List<FileContainer>> getPrimaryDocs() {
 		return this.primaryDocs;
 	}
+
+	// public String getValidationResult() {
+	// return this.validationResult;
+	// }
 
 	public List<PropertyInst> getPropertyInsts() {
 		return this.propertyInsts;
@@ -1000,6 +1002,24 @@ public class SlotInstEditBean {
 			}
 		}
 
+	}
+
+	// Controlla se quel DependentSLotDef è stato già istanziato almeno una
+	// volta.
+	// Dal momento che non si può cambiare il numero di istanze dopo la prima
+	// volta se quello SlotDef è già presente vuol dire che è uno di cui non
+	// vanno create le rispettive Inst
+	private boolean isAlreadyInstanced(DependentSlotDef dependentSlotDef) {
+		Set<SlotInst> dependentSlotInsts = this.slotInstHome.getInstance()
+				.getDependentSlotInsts();
+		Iterator<SlotInst> iterator = dependentSlotInsts.iterator();
+		while (iterator.hasNext()) {
+			SlotInst slotInst = iterator.next();
+			if (slotInst.getSlotDef().equals(dependentSlotDef)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void listener(UploadEvent event) {
@@ -1466,6 +1486,10 @@ public class SlotInstEditBean {
 
 			this.addCollectionsNewDocumentsToSlot(slotFolder, instCollection);
 		}
+
+		//
+		this.createEmptyDependetSlotInsts();
+		//
 
 		this.entityManager.merge(instance);
 		this.entityManager.flush();

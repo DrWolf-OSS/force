@@ -522,7 +522,8 @@ public class SlotDefEditBean {
 									.getNumberOfInstances());
 					if (numberOfInstancesPropertyInst != null
 							&& numberOfInstancesPropertyInst.getPropertyDef()
-									.getDataType().equals(DataType.INTEGER)) {
+									.getDataType().equals(DataType.INTEGER)
+							&& numberOfInstancesPropertyInst.getIntegerValue() != null) {
 						Integer numberOfInstances = numberOfInstancesPropertyInst
 								.getIntegerValue();
 						for (int i = 0; i < numberOfInstances; i++) {
@@ -961,8 +962,9 @@ public class SlotDefEditBean {
 		this.slotDefValidator.setMessages(this.messages);
 		//
 		this.slotDefValidator.validate();
-		if (this.slotDefHome.getInstance().getStatus()
-				.equals(SlotDefSatus.VALID)) {
+		if (this.slotDefHome.getInstance().getStatus() != null
+				&& this.slotDefHome.getInstance().getStatus()
+						.equals(SlotDefSatus.VALID)) {
 			return "valid";
 		} else {
 			return "invalid";

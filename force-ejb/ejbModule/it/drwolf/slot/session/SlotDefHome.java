@@ -448,7 +448,8 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 	@Override
 	public String update() {
 		this.persistAddedDependentSlotDefs();
-		return super.update();
+		String update = super.update();
+		return update;
 	}
 
 	public void wire() {

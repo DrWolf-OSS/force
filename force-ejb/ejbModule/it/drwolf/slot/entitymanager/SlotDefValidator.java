@@ -296,27 +296,29 @@ public class SlotDefValidator {
 
 	public void validate() {
 		if (this.slotDef instanceof DependentSlotDef) {
-			boolean valid = this
-					.ricorsiveValidation(((DependentSlotDef) this.slotDef)
-							.getParentSlotDef());
-			if (!valid && this.slotDef.getStatus().equals(SlotDefSatus.VALID)) {
-				// FacesMessages
-				// .instance()
-				// .add(Severity.ERROR,
-				// "La busta contenitrice \""
-				// + ((DependentSlotDef) this.slotDef)
-				// .getParentSlotDef().getName()
-				// +
-				// "\" non è valida. Controllare la busta principale o altre sue sottobuste");
-				VerifierMessage message = new VerifierMessage(
-						"La busta contenitrice \""
-								+ ((DependentSlotDef) this.slotDef)
-										.getParentSlotDef().getName()
-								+ "\" non è valida. Controllare la busta principale o altre sue sottobuste",
-						VerifierMessageType.ERROR);
-				this.getMessages().add(message);
+			SlotDef parentSlotDef = ((DependentSlotDef) this.slotDef)
+					.getParentSlotDef();
+			if (parentSlotDef != null) {
+				boolean valid = this.ricorsiveValidation(parentSlotDef);
+				if (!valid
+						&& this.slotDef.getStatus().equals(SlotDefSatus.VALID)) {
+					// FacesMessages
+					// .instance()
+					// .add(Severity.ERROR,
+					// "La busta contenitrice \""
+					// + ((DependentSlotDef) this.slotDef)
+					// .getParentSlotDef().getName()
+					// +
+					// "\" non è valida. Controllare la busta principale o altre sue sottobuste");
+					VerifierMessage message = new VerifierMessage(
+							"La busta contenitrice \""
+									+ parentSlotDef.getName()
+									+ "\" non è valida. Controllare la busta principale o altre sue sottobuste",
+							VerifierMessageType.ERROR);
+					this.getMessages().add(message);
+				}
+				// return valid;
 			}
-			// return valid;
 		} else {
 			// return
 			this.ricorsiveValidation(this.slotDef);
