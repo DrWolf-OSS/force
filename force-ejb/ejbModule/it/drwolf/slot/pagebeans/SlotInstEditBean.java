@@ -311,6 +311,61 @@ public class SlotInstEditBean {
 				.getConditionedPropertyDefs()));
 	}
 
+	private Map<String, List<VerifierParameterInst>> buildVerifierParameterInstsMap(
+			Rule rule,
+			Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap) {
+		Map<String, String> encodedParametersMap = rule.getParametersMap();
+		IRuleVerifier verifier = rule.getVerifier();
+		List<VerifierParameterDef> inParams = verifier.getInParams();
+
+		// mappa da passare al Verifier
+		Map<String, List<VerifierParameterInst>> inInstParams = new HashMap<String, List<VerifierParameterInst>>();
+
+		for (VerifierParameterDef verifierParameterDef : inParams) {
+			String paramName = verifierParameterDef.getName();
+
+			RuleParameterInst embeddedParameter = rule
+					.getEmbeddedParametersMap().get(paramName);
+			String encodedParams = encodedParametersMap.get(paramName);
+
+			if (embeddedParameter != null) {
+				List<VerifierParameterInst> paramInsts = new ArrayList<VerifierParameterInst>();
+				VerifierParameterInst parameterInst = new VerifierParameterInst(
+						verifierParameterDef, embeddedParameter.getValue());
+				parameterInst.setFallible(false);
+				paramInsts.add(parameterInst);
+				inInstParams.put(paramName, paramInsts);
+			} else if ((encodedParams != null) && !encodedParams.equals("")) {
+				String[] splitted = encodedParams.split("\\|");
+				String source = splitted[0];
+				String field = splitted[1];
+				Object sourceDef = this.ruleParametersResolver
+						.resolveSourceDef(source);
+				Object fieldDef = this.ruleParametersResolver
+						.resolveFieldDef(field);
+				List<VerifierParameterInst> paramInsts = this
+						.retrieveValueInsts(rule,
+								processedPropertiesResolverMap,
+								verifierParameterDef, sourceDef, fieldDef);
+				inInstParams.put(paramName, paramInsts);
+			} else {
+				if (!verifierParameterDef.isOptional()) {
+					this.verifiable = false;
+					if (rule.isMandatory()) {
+						this.addMainMessage(new VerifierMessage(
+								verifierParameterDef.getLabel()
+										+ " not defined in rule!",
+								VerifierMessageType.ERROR));
+					} else {
+						this.failAllowed = true;
+					}
+				}
+			}
+
+		}
+		return inInstParams;
+	}
+
 	private boolean checkCollectionsSize() {
 		boolean passed = true;
 
@@ -806,13 +861,13 @@ public class SlotInstEditBean {
 		return null;
 	}
 
-	public HashMap<Long, List<FileContainer>> getPrimaryDocs() {
-		return this.primaryDocs;
-	}
-
 	// public String getValidationResult() {
 	// return this.validationResult;
 	// }
+
+	public HashMap<Long, List<FileContainer>> getPrimaryDocs() {
+		return this.primaryDocs;
+	}
 
 	public List<PropertyInst> getPropertyInsts() {
 		return this.propertyInsts;
@@ -1531,55 +1586,14 @@ public class SlotInstEditBean {
 		Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap = new HashMap<VerifierParameterInst, FileContainer>();
 		//
 
-		Map<String, String> encodedParametersMap = rule.getParametersMap();
+		// Map<String, String> encodedParametersMap = rule.getParametersMap();
 		IRuleVerifier verifier = rule.getVerifier();
-		List<VerifierParameterDef> inParams = verifier.getInParams();
+		// List<VerifierParameterDef> verifierParameterDefs = verifier
+		// .getInParams();
 
-		// mappa da passare al Verifier
-		Map<String, List<VerifierParameterInst>> inInstParams = new HashMap<String, List<VerifierParameterInst>>();
-
-		for (VerifierParameterDef verifierParameterDef : inParams) {
-			String paramName = verifierParameterDef.getName();
-
-			RuleParameterInst embeddedParameter = rule
-					.getEmbeddedParametersMap().get(paramName);
-			String encodedParams = encodedParametersMap.get(paramName);
-
-			if (embeddedParameter != null) {
-				List<VerifierParameterInst> paramInsts = new ArrayList<VerifierParameterInst>();
-				VerifierParameterInst parameterInst = new VerifierParameterInst(
-						verifierParameterDef, embeddedParameter.getValue());
-				parameterInst.setFallible(false);
-				paramInsts.add(parameterInst);
-				inInstParams.put(paramName, paramInsts);
-			} else if ((encodedParams != null) && !encodedParams.equals("")) {
-				String[] splitted = encodedParams.split("\\|");
-				String source = splitted[0];
-				String field = splitted[1];
-				Object sourceDef = this.ruleParametersResolver
-						.resolveSourceDef(source);
-				Object fieldDef = this.ruleParametersResolver
-						.resolveFieldDef(field);
-				List<VerifierParameterInst> paramInsts = this
-						.retrieveValueInsts(rule,
-								processedPropertiesResolverMap,
-								verifierParameterDef, sourceDef, fieldDef);
-				inInstParams.put(paramName, paramInsts);
-			} else {
-				if (!verifierParameterDef.isOptional()) {
-					this.verifiable = false;
-					if (rule.isMandatory()) {
-						this.addMainMessage(new VerifierMessage(
-								verifierParameterDef.getLabel()
-										+ " not defined in rule!",
-								VerifierMessageType.ERROR));
-					} else {
-						this.failAllowed = true;
-					}
-				}
-			}
-
-		}
+		Map<String, List<VerifierParameterInst>> verifierParameterInstsMap = this
+				.buildVerifierParameterInstsMap(rule,
+						processedPropertiesResolverMap);
 
 		//
 		//
@@ -1590,7 +1604,8 @@ public class SlotInstEditBean {
 		if (this.verifiable) {
 			try {
 				boolean passed = true;
-				VerifierReport report = verifier.verify(inInstParams);
+				VerifierReport report = verifier
+						.verify(verifierParameterInstsMap);
 				if (report.getResult().equals(VerifierResult.ERROR)) {
 					passed = false;
 				} else if (report.getResult().equals(VerifierResult.WARNING)) {
