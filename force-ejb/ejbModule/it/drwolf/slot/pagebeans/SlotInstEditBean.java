@@ -989,21 +989,22 @@ public class SlotInstEditBean {
 
 			if (!this.slotInstHome.getInstance().getStatus()
 					.equals(SlotInstStatus.EMPTY)) {
-				boolean verifyPassed = this.verify();
-				boolean checkCollectionsSizePassed = this
-						.checkCollectionsSize();
-				if (verifyPassed && checkCollectionsSizePassed) {
-					this.slotInstHome.getInstance().setStatus(
-							SlotInstStatus.VALID);
-					this.slotMessages.add(new VerifierMessage(
-							"La busta è valida", VerifierMessageType.VALID));
-				} else {
-					this.slotInstHome.getInstance().setStatus(
-							SlotInstStatus.INVALID);
-					this.slotMessages
-							.add(new VerifierMessage("La busta non è valida",
-									VerifierMessageType.ERROR));
-				}
+				// boolean verifyPassed = this.verify();
+				// boolean checkCollectionsSizePassed = this
+				// .checkCollectionsSize();
+				// if (verifyPassed && checkCollectionsSizePassed) {
+				// this.slotInstHome.getInstance().setStatus(
+				// SlotInstStatus.VALID);
+				// this.slotMessages.add(new VerifierMessage(
+				// "La busta è valida", VerifierMessageType.VALID));
+				// } else {
+				// this.slotInstHome.getInstance().setStatus(
+				// SlotInstStatus.INVALID);
+				// this.slotMessages
+				// .add(new VerifierMessage("La busta non è valida",
+				// VerifierMessageType.ERROR));
+				// }
+				this.validate();
 			}
 		}
 
@@ -1523,6 +1524,7 @@ public class SlotInstEditBean {
 		document.updateProperties(aspectsProperties);
 	}
 
+	@Transactional
 	public String validate() {
 		// Map<String, String> requestParameterMap = FacesContext
 		// .getCurrentInstance().getExternalContext()
@@ -1542,41 +1544,155 @@ public class SlotInstEditBean {
 				dirty = Boolean.TRUE;
 				e.printStackTrace();
 			}
+		} else {
+			dirty = new Boolean(false);
 		}
 
 		this.cleanMessages();
 		boolean sizeCollectionPassed = this.checkCollectionsSize();
 		if (!sizeCollectionPassed) {
-			FacesMessages
-					.instance()
-					.add(Severity.ERROR,
-							"Validazione fallita! Le dimensioni di alcune buste non rispettano le specifiche");
-			if (dirty != null && dirty == false) {
-				this.slotInstHome.getInstance().setStatus(
-						SlotInstStatus.INVALID);
-			}
-			return "failed";
+			this.addMainMessage(new VerifierMessage(
+					"Validazione fallita! Le dimensioni di alcune buste non rispettano le specifiche",
+					VerifierMessageType.ERROR));
+			// FacesMessages
+			// .instance()
+			// .add(Severity.ERROR,
+			// "Validazione fallita! Le dimensioni di alcune buste non rispettano le specifiche");
+			// if (dirty != null && dirty == false) {
+			// this.slotInstHome.getInstance().setStatus(
+			// SlotInstStatus.INVALID);
+			// }
+			// return "failed";
 		}
 
 		boolean rulesPassed = this.verify();
 		if (!rulesPassed) {
-			FacesMessages.instance().add(Severity.ERROR,
-					"Validazione fallita! Alcune regole non sono verificate");
-			// this.entityManager.clear();
+			// FacesMessages.instance().add(Severity.ERROR,
+			// "Validazione fallita! Alcune regole non sono verificate");
+			this.addMainMessage(new VerifierMessage(
+					"Validazione fallita! Alcune regole non sono verificate",
+					VerifierMessageType.ERROR));
+
+			// // this.entityManager.clear();
+			// if (dirty != null && dirty == false) {
+			// this.slotInstHome.getInstance().setStatus(
+			// SlotInstStatus.INVALID);
+			// }
+			// return "failed";
+		}
+
+		// La presente istanza ha passato la validazione
+		SlotInst parentSlotInst = this.slotInstHome.getInstance()
+				.getParentSlotInst();
+		if (sizeCollectionPassed && rulesPassed) {
+			//
 			if (dirty != null && dirty == false) {
+				if (parentSlotInst == null) { // E' uno SlotInst padre
+					boolean validityChildren = true;
+					Set<SlotInst> dependentSlotInsts = this.slotInstHome
+							.getInstance().getDependentSlotInsts();
+					for (SlotInst slotInst : dependentSlotInsts) {
+						if (slotInst.getStatus().equals(SlotInstStatus.INVALID)) {
+							// FacesMessages.instance().add(
+							// Severity.ERROR,
+							// "La sottobusta " + slotInst.getId() + " "
+							// + slotInst.getSlotDef().getName()
+							// + " non è valida");
+							this.addMainMessage(new VerifierMessage(
+									"La sottobusta " + slotInst.getId() + " "
+											+ slotInst.getSlotDef().getName()
+											+ " non è valida",
+									VerifierMessageType.ERROR));
+							validityChildren = false;
+						}
+					}
+					if (validityChildren) {
+						this.slotInstHome.getInstance().setStatus(
+								SlotInstStatus.VALID);
+						// FacesMessages.instance().add(Severity.INFO,
+						// "La busta ha passato la validazione");
+						this.addMainMessage(new VerifierMessage(
+								"La busta ha passato la validazione",
+								VerifierMessageType.VALID));
+						//
+						// this.slotInstHome.update();
+						// this.slotInstHome.getEntityManager().flush();
+						//
+						return "validated";
+					} else {
+						SlotInst instance = this.slotInstHome.getInstance();
+						instance.setStatus(SlotInstStatus.INVALID);
+						// FacesMessages
+						// .instance()
+						// .add(Severity.WARN,
+						// "La busta corrente ha passato la validazione ma alcune sottobuste non sono valide");
+						this.addMainMessage(new VerifierMessage(
+								"La busta corrente ha passato la validazione ma alcune sottobuste non sono valide",
+								VerifierMessageType.WARNING));
+
+						//
+						// this.slotInstHome.update();
+						// this.slotInstHome.getEntityManager().persist(instance);
+						// Conversation.instance().leave();
+						//
+						return "failed";
+					}
+				} else { // E' uno SlotInst figlio
+					this.slotInstHome.getInstance().setStatus(
+							SlotInstStatus.VALID);
+					if (parentSlotInst.getStatus().equals(SlotInstStatus.VALID)) {
+						// FacesMessages.instance().add(Severity.INFO,
+						// "La busta ha passato la validazione");
+						this.addMainMessage(new VerifierMessage(
+								"La busta ha passato la validazione",
+								VerifierMessageType.VALID));
+
+						return "validated";
+					}
+
+					Set<SlotInst> dependentSlotInsts = parentSlotInst
+							.getDependentSlotInsts();
+					boolean validityChildren = true;
+					for (SlotInst dependentSlotInst : dependentSlotInsts) {
+						if (dependentSlotInst.getStatus().equals(
+								SlotInstStatus.INVALID)) {
+							validityChildren = false;
+						}
+					}
+
+					if (validityChildren) {
+						// FacesMessages
+						// .instance()
+						// .add(Severity.INFO,
+						// "La busta corrente ha passato la validazione, controllare la validità globale dalla busta contenitrice");
+						this.addMainMessage(new VerifierMessage(
+								"La busta corrente ha passato la validazione, controllare la validità globale dalla busta contenitrice",
+								VerifierMessageType.WARNING));
+						return "failed";
+					} else {
+						// FacesMessages
+						// .instance()
+						// .add(Severity.INFO,
+						// "La busta corrente ha passato la validazione ma altre sottobuste non sono valide");
+						this.addMainMessage(new VerifierMessage(
+								"La busta corrente ha passato la validazione ma altre sottobuste non sono valide",
+								VerifierMessageType.WARNING));
+
+						return "failed";
+					}
+				}
+				// this.slotInstHome.getInstance().setStatus(SlotInstStatus.VALID);
+			}
+			// return "validated";
+		} else {
+			if (dirty != null && dirty == false) {
+				if (parentSlotInst != null) {
+					parentSlotInst.setStatus(SlotInstStatus.INVALID);
+				}
 				this.slotInstHome.getInstance().setStatus(
 						SlotInstStatus.INVALID);
 			}
 			return "failed";
-		}
-
-		if (sizeCollectionPassed && rulesPassed) {
-			FacesMessages.instance().add(Severity.INFO,
-					"La busta ha passato la validazione");
-			if (dirty != null && dirty == false) {
-				this.slotInstHome.getInstance().setStatus(SlotInstStatus.VALID);
-			}
-			return "validated";
 		}
 
 		// Con le entity non detached (senza entityManager.clear())
