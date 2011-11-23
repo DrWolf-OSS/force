@@ -77,14 +77,14 @@
 						<h:outputText value="Busta Principale" />
 					</ui:define>
 					<h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
-							rendered="#{slotInstHome.instance.parentSlotInst.status == 'EMPTY'}" />
+							rendered="#{slotInstHome.instance.parentSlotInst.transientStatus == 'EMPTY'}" />
 					<h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
-							rendered="#{slotInstHome.instance.parentSlotInst.status == 'VALID'}" />
+							rendered="#{slotInstHome.instance.parentSlotInst.transientStatus == 'VALID'}" />
 					<h:graphicImage value="/img/envelope-red-exclamation.png"  styleClass="fileIcon"
-							rendered="#{slotInstHome.instance.parentSlotInst.status == 'INVALID'}" />
+							rendered="#{slotInstHome.instance.parentSlotInst.transientStatus == 'INVALID'}" />
 					<s:link value="#{slotDefHome.instance.parentSlotDef.name}" view="/user/SlotInstEdit.xhtml" propagation="none">
-						<f:param name="slotDefId" value="#{slotDefHome.instance.parentSlotDef.id}"/>
 						<f:param name="slotInstId" value="#{slotInstHome.instance.parentSlotInst.id}"/>
+						<f:param name="slotDefId" value="#{slotInstHome.instance.parentSlotInst.slotDef.id}"/>
 					</s:link>
 				</s:decorate>
 				
@@ -97,12 +97,12 @@
 						<h:outputText value="Stato" />
 					</ui:define>
 					<h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
-								rendered="#{slotInstHome.instance.status == 'EMPTY'}" />
+								rendered="#{slotInstHome.instance.transientStatus == 'EMPTY'}" />
 					<h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
-								rendered="#{slotInstHome.instance.status == 'VALID'}" />
+								rendered="#{slotInstHome.instance.transientStatus == 'VALID'}" />
 					<h:graphicImage value="/img/envelope-red-exclamation.png"  styleClass="fileIcon"
-								rendered="#{slotInstHome.instance.status == 'INVALID'}" />
-					<h:outputText value="#{slotInstHome.instance.status.value()}" />
+								rendered="#{slotInstHome.instance.transientStatus == 'INVALID'}" />
+					<h:outputText value="#{slotInstHome.instance.transientStatus.value()}" />
 				</s:decorate>
 				
 

@@ -1,6 +1,7 @@
 package it.drwolf.slot.entity;
 
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
+import it.drwolf.slot.entity.listeners.SlotInstListener;
 import it.drwolf.slot.enums.SlotInstStatus;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -24,6 +26,7 @@ import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Session;
 
 @Entity
+@EntityListeners(value = SlotInstListener.class)
 public class SlotInst {
 
 	private Long id;
@@ -44,7 +47,10 @@ public class SlotInst {
 
 	private SlotInstStatus status = SlotInstStatus.EMPTY;
 
+	private SlotInstStatus transientStatus;
+
 	public SlotInst() {
+		this.transientStatus = this.status;
 	}
 
 	public SlotInst(SlotDef slotDef) {
@@ -62,6 +68,7 @@ public class SlotInst {
 					this, depDocDefCollection);
 			this.getDocInstCollections().add(depDocInstCollection);
 		}
+		this.transientStatus = this.status;
 	}
 
 	@OrderBy("id")
@@ -139,6 +146,11 @@ public class SlotInst {
 	}
 
 	@Transient
+	public SlotInstStatus getTransientStatus() {
+		return this.transientStatus;
+	}
+
+	@Transient
 	public PropertyInst retrievePropertyInstByDef(PropertyDef propertyDef) {
 		Iterator<PropertyInst> iterator = this.getPropertyInsts().iterator();
 		while (iterator.hasNext()) {
@@ -184,6 +196,10 @@ public class SlotInst {
 
 	public void setStatus(SlotInstStatus status) {
 		this.status = status;
+	}
+
+	public void setTransientStatus(SlotInstStatus transientStatus) {
+		this.transientStatus = transientStatus;
 	}
 
 }

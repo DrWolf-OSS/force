@@ -21,6 +21,7 @@
          <end-conversation before-redirect="true"/>
          <redirect include-page-params="false">
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
          </redirect>
       </rule>
       <rule if-outcome="failed">
@@ -33,6 +34,7 @@
      	 <end-conversation before-redirect="true"/>
          <redirect include-page-params="false">
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
          </redirect>
       </rule>
    </navigation>
@@ -42,17 +44,20 @@
          <end-conversation before-redirect="true"/>
          <redirect include-page-params="false">
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
          </redirect>
       </rule>
       <rule if-outcome="failed">
          <redirect include-page-params="false">
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
          </redirect>
       </rule>
       <rule if-outcome="warning">
       	 <end-conversation before-redirect="true"/>
          <redirect include-page-params="false">
          	<param name="slotInstId" value="#{slotInstHome.id}"/>
+         	<param name="slotDefId" value="#{slotDefHome.id}"/>
          </redirect>
       </rule>
    </navigation>
