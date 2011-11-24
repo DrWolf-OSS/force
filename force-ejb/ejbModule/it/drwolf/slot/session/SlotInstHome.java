@@ -99,8 +99,15 @@ public class SlotInstHome extends EntityHome<SlotInst> {
 		return slotFolder;
 	}
 
+	// Il codice commentato serve per controllare in modo programmatico che lo
+	// SlotDef nella home sia quello giusto (quello referenziato dallo SlotInst)
+	// Nel caso scommentare anche il corrispettivo in SlotDefHome
 	public void setSlotInstId(Long id) {
 		this.setId(id);
+		// if (this.isIdDefined()) {
+		// this.slotDefHome.setSlotDefId(this.getInstance().getSlotDef()
+		// .getId());
+		// }
 	}
 
 	public void wire() {

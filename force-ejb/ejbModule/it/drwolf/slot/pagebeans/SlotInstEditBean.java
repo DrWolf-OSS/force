@@ -1527,6 +1527,7 @@ public class SlotInstEditBean {
 			dirty = new Boolean(false);
 		}
 
+		// Se lo Slot non è stato modificato persisto gli status
 		String result = this.validationRoutine();
 		if (!dirty) {
 			this.copyTransientStatusInPersistedStatus();

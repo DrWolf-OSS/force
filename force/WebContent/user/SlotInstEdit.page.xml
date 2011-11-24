@@ -4,7 +4,11 @@
       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
       login-required="true">
       
-   <restrict>#{not slotInstHome.managed or slotInstHome.instance.ownerId == alfrescoUserIdentity.activeGroup.shortName or s:hasRole('ADMIN')}</restrict>
+   <restrict>
+   #{(not slotInstHome.managed or slotInstHome.instance.ownerId == alfrescoUserIdentity.activeGroup.shortName or s:hasRole('ADMIN'))
+   and (slotDefHome.instance.ownerId == alfrescoUserIdentity.activeGroup.shortName or slotDefHome.instance.ownerId == 'ADMIN')
+   and (slotDefHome.instance.id == slotInstHome.instance.slotDef.id)}
+   </restrict>
 
    <begin-conversation join="true" />
 
