@@ -155,7 +155,7 @@ public class SlotInstEditBean {
 	boolean warning = false;
 
 	// private String validationResult;
-	private String dirty;
+	private String dirty = "false";
 
 	@In(create = true)
 	private ValueChangeListener valueChangeListener;
@@ -1271,27 +1271,8 @@ public class SlotInstEditBean {
 	}
 
 	public String save() {
-		// this.cleanMessages();
-		// boolean sizeCollectionPassed = this.checkCollectionsSize();
-		// if (!sizeCollectionPassed) {
-		// FacesMessages
-		// .instance()
-		// .add(Severity.ERROR,
-		// "Le dimensioni di alcune collection non rispettano le specifiche");
-		// return "failed";
-		// }
-		//
-		// boolean rulesPassed = this.verify();
-		// if (!rulesPassed) {
-		// FacesMessages.instance().add(Severity.ERROR,
-		// "Alcune regole non sono verificate!");
-		// return "failed";
-		// }
-
-		// c'è bisogno di settare dirty a flase per far settare lo status
-		// risultante dalla validazione
-		this.dirty = "false";
-		this.validate();
+		this.validationRoutine();
+		this.copyTransientStatusInPersistedStatus();
 
 		this.slotInstHome.getInstance().setPropertyInsts(
 				new HashSet<PropertyInst>(this.propertyInsts));
@@ -1437,30 +1418,10 @@ public class SlotInstEditBean {
 	}
 
 	public String update() {
-		// this.cleanMessages();
 		SlotInst instance = this.slotInstHome.getInstance();
 
-		// boolean sizeCollectionPassed = this.checkCollectionsSize();
-		// if (!sizeCollectionPassed) {
-		// FacesMessages
-		// .instance()
-		// .add(Severity.ERROR,
-		// "Le dimensioni di alcune collection non rispettano le specifiche");
-		// return "failed";
-		// }
-		//
-		// boolean rulesPassed = this.verify();
-		// if (!rulesPassed) {
-		// FacesMessages.instance().add(Severity.ERROR,
-		// "Alcune regole non sono verificate!");
-		// this.entityManager.clear();
-		// return "failed";
-		// }
-
-		// c'è bisogno di settare dirty a flase per far settare lo status
-		// risultante dalla validazione
-		this.dirty = "false";
-		this.validate();
+		this.validationRoutine();
+		this.copyTransientStatusInPersistedStatus();
 
 		this.entityManager.merge(instance);
 
@@ -1643,7 +1604,9 @@ public class SlotInstEditBean {
 				for (SlotInst dependentSlotInst : dependentSlotInsts) {
 					if (dependentSlotInst.getStatus() != null
 							&& dependentSlotInst.getStatus().equals(
-									SlotInstStatus.INVALID)) {
+									SlotInstStatus.INVALID)
+							&& !dependentSlotInst.equals(this.slotInstHome
+									.getInstance())) {
 						validityChildren = false;
 					}
 				}

@@ -41,6 +41,9 @@
 	    
 		<a:form id="slotInst" styleClass="edit" onkeypress="dirty=true">
 		<script type="text/javascript" src="/force/javascript/exitInterceptor.js"/>
+		<script type="text/javascript">
+			dirty = #{slotInstEditBean.dirty};
+		</script>
 		
 			<rich:simpleTogglePanel id="summaryPanel" switchType="client" opened="#{not empty slotDefHome.instance.docDefCollectionsAsList ? 'true' : 'false'}">
 				<f:facet name="header">Pannello riassuntivo Documentazione Richiesta</f:facet>			
