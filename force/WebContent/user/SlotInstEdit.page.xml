@@ -6,8 +6,8 @@
       
    <restrict>
    #{(not slotInstHome.managed or slotInstHome.instance.ownerId == alfrescoUserIdentity.activeGroup.shortName or s:hasRole('ADMIN'))
-   and (slotDefHome.instance.ownerId == alfrescoUserIdentity.activeGroup.shortName or slotDefHome.instance.ownerId == 'ADMIN')
-   and (slotDefHome.instance.id == slotInstHome.instance.slotDef.id)}
+   and (slotDefHome.instance.ownerId == 'ADMIN' or slotDefHome.instance.ownerId == alfrescoUserIdentity.activeGroup.shortName)
+   and (not slotInstHome.managed or slotDefHome.instance.id == slotInstHome.instance.slotDef.id)}
    </restrict>
 
    <begin-conversation join="true" />
