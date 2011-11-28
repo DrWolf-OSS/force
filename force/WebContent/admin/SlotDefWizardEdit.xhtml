@@ -40,10 +40,12 @@
             </s:decorate>
             </ui:remove>
 
+			<a:region>
             <s:decorate id="nameField" template="/layout/edit.xhtml">
                 <ui:define name="label">Nome</ui:define>
                 <h:inputTextarea id="name" value="#{slotDefHome.instance.name}" required="true" style="width:525px" />
             </s:decorate>
+            </a:region>
             
             <s:decorate id="statusField" template="/layout/display.xhtml">
                 <ui:define name="label">Stato</ui:define>
@@ -241,7 +243,7 @@
             <div style="clear:both"/>
             <rich:separator height="25px" lineType="none" rendered="#{s:hasRole('ADMIN') or slotDefHome.instance.template}"/>
             
-			<s:decorate template="/layout/display.xhtml" id="propTable" rendered="#{s:hasRole('ADMIN') or slotDefHome.instance.template}">
+			<s:decorate template="/layout/display.xhtml" id="propTable" rendered="#{s:hasRole('ADMIN')}">
 				<ui:define name="label">
 	                <h:outputText value="Informazioni sull'azienda" />
 				</ui:define>
@@ -501,14 +503,14 @@
 							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 							 
 							oncomplete="#{rich:component('propTypePanel')}.show()" 	
 							reRender="pf,propPanel"
-							rendered="#{s:hasRole('ADMIN') or slotDefHome.instance.template}"/>
+							rendered="#{s:hasRole('ADMIN')}"/>
 							
 				<a:commandButton value="Aggiungi richiesta" 
 							onclick="if(#{slotDefHome.referenced}){if(!confirm('La Busta ha già istanze collegate, sicuri di volerlo modificare?')){return false;}}" 
 							action="#{slotDefEditBean.newCollection()}" 
 							oncomplete="#{rich:component('collTypePanel')}.show()" 
 							reRender="collPanel"
-							rendered="#{s:hasRole('ADMIN') or slotDefHome.instance.template}"/>
+							rendered="#{s:hasRole('ADMIN')}"/>
 				<a:commandButton action="#{slotDefEditBean.newStandardCollection()}" 
 							value="Aggiungi richiesta comune" 
 							oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('collPanel')}.show();"
@@ -1035,7 +1037,7 @@
 	            
 	            <s:div id="condPD">
 	            <a:region>
-	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef!=null or slotDefEditBean.edit}" >
+	            <s:decorate template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef!=null or slotDefEditBean.edit and s:hasRole('ADMIN')}" >
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
 					</ui:define>
@@ -1053,7 +1055,7 @@
 				
 				
 				<s:div id="condPI">
-	            <s:decorate  template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef != null}" >	            	
+	            <s:decorate  template="/layout/edit.xhtml" rendered="#{slotDefEditBean.collection.conditionalPropertyDef != null and s:hasRole('ADMIN')}" >	            	
 	                <ui:define name="label">
 	                	<h:outputText value="Valore vincolante" />
 					</ui:define>

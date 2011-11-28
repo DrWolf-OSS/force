@@ -155,7 +155,7 @@ public class SlotInstEditBean {
 	boolean warning = false;
 
 	// private String validationResult;
-	private String dirty;
+	private String dirty = "false";
 
 	@In(create = true)
 	private ValueChangeListener valueChangeListener;
@@ -311,6 +311,61 @@ public class SlotInstEditBean {
 				.getConditionedPropertyDefs()));
 	}
 
+	private Map<String, List<VerifierParameterInst>> buildVerifierParameterInstsMap(
+			Rule rule,
+			Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap) {
+		Map<String, String> encodedParametersMap = rule.getParametersMap();
+		IRuleVerifier verifier = rule.getVerifier();
+		List<VerifierParameterDef> inParams = verifier.getInParams();
+
+		// mappa da passare al Verifier
+		Map<String, List<VerifierParameterInst>> inInstParams = new HashMap<String, List<VerifierParameterInst>>();
+
+		for (VerifierParameterDef verifierParameterDef : inParams) {
+			String paramName = verifierParameterDef.getName();
+
+			RuleParameterInst embeddedParameter = rule
+					.getEmbeddedParametersMap().get(paramName);
+			String encodedParams = encodedParametersMap.get(paramName);
+
+			if (embeddedParameter != null) {
+				List<VerifierParameterInst> paramInsts = new ArrayList<VerifierParameterInst>();
+				VerifierParameterInst parameterInst = new VerifierParameterInst(
+						verifierParameterDef, embeddedParameter.getValue());
+				parameterInst.setFallible(false);
+				paramInsts.add(parameterInst);
+				inInstParams.put(paramName, paramInsts);
+			} else if ((encodedParams != null) && !encodedParams.equals("")) {
+				String[] splitted = encodedParams.split("\\|");
+				String source = splitted[0];
+				String field = splitted[1];
+				Object sourceDef = this.ruleParametersResolver
+						.resolveSourceDef(source);
+				Object fieldDef = this.ruleParametersResolver
+						.resolveFieldDef(field);
+				List<VerifierParameterInst> paramInsts = this
+						.retrieveValueInsts(rule,
+								processedPropertiesResolverMap,
+								verifierParameterDef, sourceDef, fieldDef);
+				inInstParams.put(paramName, paramInsts);
+			} else {
+				if (!verifierParameterDef.isOptional()) {
+					this.verifiable = false;
+					if (rule.isMandatory()) {
+						this.addMainMessage(new VerifierMessage(
+								verifierParameterDef.getLabel()
+										+ " not defined in rule!",
+								VerifierMessageType.ERROR));
+					} else {
+						this.failAllowed = true;
+					}
+				}
+			}
+
+		}
+		return inInstParams;
+	}
+
 	private boolean checkCollectionsSize() {
 		boolean passed = true;
 
@@ -330,7 +385,12 @@ public class SlotInstEditBean {
 
 				List<FileContainer> list = this.datas
 						.get(defCollection.getId());
-				int size = list.size();
+				//
+				int size = 0;
+				if (list != null) {
+					size = list.size();
+				}
+				// int size = list.size();
 				if ((defCollection.getMin() != null)
 						&& (size < defCollection.getMin())) {
 					passed = false;
@@ -506,6 +566,25 @@ public class SlotInstEditBean {
 		return nodeRef;
 	}
 
+	private void copyTransientStatusInPersistedStatus() {
+
+		SlotInst parent = this.slotInstHome.getInstance().getParentSlotInst();
+		Set<SlotInst> dependentSlotInsts = null;
+		if (parent != null) {
+			parent.setStatus(parent.getTransientStatus());
+			dependentSlotInsts = parent.getDependentSlotInsts();
+		} else {
+			this.slotInstHome.getInstance().setStatus(
+					this.slotInstHome.getInstance().getTransientStatus());
+			dependentSlotInsts = this.slotInstHome.getInstance()
+					.getDependentSlotInsts();
+		}
+
+		for (SlotInst slotInst : dependentSlotInsts) {
+			slotInst.setStatus(slotInst.getTransientStatus());
+		}
+	}
+
 	private void createDependentSlotInst(DependentSlotDef dependentSlotDef,
 			PropertyInst numberOfInstancesPropertyInst) {
 		if (numberOfInstancesPropertyInst != null
@@ -534,7 +613,9 @@ public class SlotInstEditBean {
 		Set<DependentSlotDef> dependentSlotDefs = this.slotDefHome
 				.getInstance().getDependentSlotDefs();
 		for (DependentSlotDef dependentSlotDef : dependentSlotDefs) {
-			if (dependentSlotDef.getConditionalPropertyDef() != null
+
+			if (!this.isAlreadyInstanced(dependentSlotDef)
+					&& dependentSlotDef.getConditionalPropertyDef() != null
 					&& dependentSlotDef
 							.getConditionalPropertyInst()
 							.getValue()
@@ -806,13 +887,13 @@ public class SlotInstEditBean {
 		return null;
 	}
 
-	public HashMap<Long, List<FileContainer>> getPrimaryDocs() {
-		return this.primaryDocs;
-	}
-
 	// public String getValidationResult() {
 	// return this.validationResult;
 	// }
+
+	public HashMap<Long, List<FileContainer>> getPrimaryDocs() {
+		return this.primaryDocs;
+	}
 
 	public List<PropertyInst> getPropertyInsts() {
 		return this.propertyInsts;
@@ -862,6 +943,11 @@ public class SlotInstEditBean {
 			}
 
 		} else {
+			//
+			// this.slotDefHome.setSlotDefId(this.slotInstHome.getInstance()
+			// .getSlotDef().getId());
+			// this.slotDefHome.find();
+			//
 			// this.propertyInsts = new
 			// ArrayList<PropertyInst>(this.slotInstHome
 			// .getInstance().getPropertyInsts());
@@ -925,26 +1011,49 @@ public class SlotInstEditBean {
 				this.primaryDocs.put(defCollection.getId(), fileContainers);
 			}
 
-			if (!this.slotInstHome.getInstance().getStatus()
-					.equals(SlotInstStatus.EMPTY)) {
-				boolean verifyPassed = this.verify();
-				boolean checkCollectionsSizePassed = this
-						.checkCollectionsSize();
-				if (verifyPassed && checkCollectionsSizePassed) {
-					this.slotInstHome.getInstance().setStatus(
-							SlotInstStatus.VALID);
-					this.slotMessages.add(new VerifierMessage(
-							"La busta è valida", VerifierMessageType.VALID));
-				} else {
-					this.slotInstHome.getInstance().setStatus(
-							SlotInstStatus.INVALID);
-					this.slotMessages
-							.add(new VerifierMessage("La busta non è valida",
-									VerifierMessageType.ERROR));
-				}
+			if (this.slotInstHome.getInstance().getStatus() != null
+					&& !this.slotInstHome.getInstance().getStatus()
+							.equals(SlotInstStatus.EMPTY)) {
+				// boolean verifyPassed = this.verify();
+				// boolean checkCollectionsSizePassed = this
+				// .checkCollectionsSize();
+				// if (verifyPassed && checkCollectionsSizePassed) {
+				// this.slotInstHome.getInstance().setStatus(
+				// SlotInstStatus.VALID);
+				// this.slotMessages.add(new VerifierMessage(
+				// "La busta è valida", VerifierMessageType.VALID));
+				// } else {
+				// this.slotInstHome.getInstance().setStatus(
+				// SlotInstStatus.INVALID);
+				// this.slotMessages
+				// .add(new VerifierMessage("La busta non è valida",
+				// VerifierMessageType.ERROR));
+				// }
+				this.validationRoutine();
+			} else {
+				this.slotInstHome.getInstance().setTransientStatus(
+						SlotInstStatus.EMPTY);
 			}
 		}
 
+	}
+
+	// Controlla se quel DependentSLotDef è stato già istanziato almeno una
+	// volta.
+	// Dal momento che non si può cambiare il numero di istanze dopo la prima
+	// volta se quello SlotDef è già presente vuol dire che è uno di cui non
+	// vanno create le rispettive Inst
+	private boolean isAlreadyInstanced(DependentSlotDef dependentSlotDef) {
+		Set<SlotInst> dependentSlotInsts = this.slotInstHome.getInstance()
+				.getDependentSlotInsts();
+		Iterator<SlotInst> iterator = dependentSlotInsts.iterator();
+		while (iterator.hasNext()) {
+			SlotInst slotInst = iterator.next();
+			if (slotInst.getSlotDef().equals(dependentSlotDef)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void listener(UploadEvent event) {
@@ -1162,27 +1271,8 @@ public class SlotInstEditBean {
 	}
 
 	public String save() {
-		// this.cleanMessages();
-		// boolean sizeCollectionPassed = this.checkCollectionsSize();
-		// if (!sizeCollectionPassed) {
-		// FacesMessages
-		// .instance()
-		// .add(Severity.ERROR,
-		// "Le dimensioni di alcune collection non rispettano le specifiche");
-		// return "failed";
-		// }
-		//
-		// boolean rulesPassed = this.verify();
-		// if (!rulesPassed) {
-		// FacesMessages.instance().add(Severity.ERROR,
-		// "Alcune regole non sono verificate!");
-		// return "failed";
-		// }
-
-		// c'è bisogno di settare dirty a flase per far settare lo status
-		// risultante dalla validazione
-		this.dirty = "false";
-		this.validate();
+		this.validationRoutine();
+		this.copyTransientStatusInPersistedStatus();
 
 		this.slotInstHome.getInstance().setPropertyInsts(
 				new HashSet<PropertyInst>(this.propertyInsts));
@@ -1328,30 +1418,10 @@ public class SlotInstEditBean {
 	}
 
 	public String update() {
-		// this.cleanMessages();
 		SlotInst instance = this.slotInstHome.getInstance();
 
-		// boolean sizeCollectionPassed = this.checkCollectionsSize();
-		// if (!sizeCollectionPassed) {
-		// FacesMessages
-		// .instance()
-		// .add(Severity.ERROR,
-		// "Le dimensioni di alcune collection non rispettano le specifiche");
-		// return "failed";
-		// }
-		//
-		// boolean rulesPassed = this.verify();
-		// if (!rulesPassed) {
-		// FacesMessages.instance().add(Severity.ERROR,
-		// "Alcune regole non sono verificate!");
-		// this.entityManager.clear();
-		// return "failed";
-		// }
-
-		// c'è bisogno di settare dirty a flase per far settare lo status
-		// risultante dalla validazione
-		this.dirty = "false";
-		this.validate();
+		this.validationRoutine();
+		this.copyTransientStatusInPersistedStatus();
 
 		this.entityManager.merge(instance);
 
@@ -1412,6 +1482,10 @@ public class SlotInstEditBean {
 			this.addCollectionsNewDocumentsToSlot(slotFolder, instCollection);
 		}
 
+		//
+		this.createEmptyDependetSlotInsts();
+		//
+
 		this.entityManager.merge(instance);
 		this.entityManager.flush();
 
@@ -1440,15 +1514,6 @@ public class SlotInstEditBean {
 	}
 
 	public String validate() {
-		// Map<String, String> requestParameterMap = FacesContext
-		// .getCurrentInstance().getExternalContext()
-		// .getRequestParameterMap();
-		// Boolean dirty = null;
-		// if (requestParameterMap != null) {
-		// String _dirty = requestParameterMap.get("dirty");
-		// dirty = new Boolean(_dirty);
-		// }
-
 		Boolean dirty = null;
 		if (this.dirty != null && !this.dirty.equals("")) {
 			try {
@@ -1458,56 +1523,115 @@ public class SlotInstEditBean {
 				dirty = Boolean.TRUE;
 				e.printStackTrace();
 			}
+		} else {
+			dirty = new Boolean(false);
 		}
+
+		// Se lo Slot non è stato modificato persisto gli status
+		String result = this.validationRoutine();
+		if (!dirty) {
+			this.copyTransientStatusInPersistedStatus();
+		}
+		return result;
+	}
+
+	@Transactional
+	private String validationRoutine() {
 
 		this.cleanMessages();
 		boolean sizeCollectionPassed = this.checkCollectionsSize();
 		if (!sizeCollectionPassed) {
-			FacesMessages
-					.instance()
-					.add(Severity.ERROR,
-							"Validazione fallita! Le dimensioni di alcune buste non rispettano le specifiche");
-			if (dirty != null && dirty == false) {
-				this.slotInstHome.getInstance().setStatus(
-						SlotInstStatus.INVALID);
-			}
-			return "failed";
+			this.addMainMessage(new VerifierMessage(
+					"Validazione fallita! Le dimensioni di alcune buste non rispettano le specifiche",
+					VerifierMessageType.ERROR));
 		}
 
 		boolean rulesPassed = this.verify();
 		if (!rulesPassed) {
-			FacesMessages.instance().add(Severity.ERROR,
-					"Validazione fallita! Alcune regole non sono verificate");
-			// this.entityManager.clear();
-			if (dirty != null && dirty == false) {
-				this.slotInstHome.getInstance().setStatus(
-						SlotInstStatus.INVALID);
+			this.addMainMessage(new VerifierMessage(
+					"Validazione fallita! Alcune regole non sono verificate",
+					VerifierMessageType.ERROR));
+		}
+
+		// La presente istanza ha passato la validazione
+		SlotInst parentSlotInst = this.slotInstHome.getInstance()
+				.getParentSlotInst();
+		if (sizeCollectionPassed && rulesPassed) {
+			if (parentSlotInst == null) { // E' uno SlotInst padre
+				boolean validityChildren = true;
+				Set<SlotInst> dependentSlotInsts = this.slotInstHome
+						.getInstance().getDependentSlotInsts();
+				for (SlotInst slotInst : dependentSlotInsts) {
+					if (slotInst.getStatus().equals(SlotInstStatus.INVALID)) {
+						this.addMainMessage(new VerifierMessage(
+								"La sottobusta " + slotInst.getId() + " "
+										+ slotInst.getSlotDef().getName()
+										+ " non è valida",
+								VerifierMessageType.ERROR));
+						validityChildren = false;
+					}
+				}
+				if (validityChildren) {
+					this.slotInstHome.getInstance().setTransientStatus(
+							SlotInstStatus.VALID);
+					this.addMainMessage(new VerifierMessage(
+							"La busta ha passato la validazione",
+							VerifierMessageType.VALID));
+					return "validated";
+				} else {
+					SlotInst instance = this.slotInstHome.getInstance();
+					instance.setTransientStatus(SlotInstStatus.INVALID);
+
+					this.addMainMessage(new VerifierMessage(
+							"La busta corrente ha passato la validazione ma alcune sottobuste non sono valide",
+							VerifierMessageType.WARNING));
+
+					return "failed";
+				}
+			} else { // E' uno SlotInst figlio
+				this.slotInstHome.getInstance().setTransientStatus(
+						SlotInstStatus.VALID);
+				if (parentSlotInst.getStatus().equals(SlotInstStatus.VALID)) {
+					this.addMainMessage(new VerifierMessage(
+							"La busta ha passato la validazione",
+							VerifierMessageType.VALID));
+
+					return "validated";
+				}
+
+				Set<SlotInst> dependentSlotInsts = parentSlotInst
+						.getDependentSlotInsts();
+				boolean validityChildren = true;
+				for (SlotInst dependentSlotInst : dependentSlotInsts) {
+					if (dependentSlotInst.getStatus() != null
+							&& dependentSlotInst.getStatus().equals(
+									SlotInstStatus.INVALID)
+							&& !dependentSlotInst.equals(this.slotInstHome
+									.getInstance())) {
+						validityChildren = false;
+					}
+				}
+
+				if (validityChildren) {
+					this.addMainMessage(new VerifierMessage(
+							"La busta corrente ha passato la validazione, controllare la validità globale dalla busta contenitrice",
+							VerifierMessageType.WARNING));
+					return "failed";
+				} else {
+					this.addMainMessage(new VerifierMessage(
+							"La busta corrente ha passato la validazione ma altre sottobuste non sono valide",
+							VerifierMessageType.WARNING));
+					return "failed";
+				}
 			}
+		} else {
+			if (parentSlotInst != null) {
+				parentSlotInst.setTransientStatus(SlotInstStatus.INVALID);
+			}
+			this.slotInstHome.getInstance().setTransientStatus(
+					SlotInstStatus.INVALID);
 			return "failed";
 		}
-
-		if (sizeCollectionPassed && rulesPassed) {
-			FacesMessages.instance().add(Severity.INFO,
-					"La busta ha passato la validazione");
-			if (dirty != null && dirty == false) {
-				this.slotInstHome.getInstance().setStatus(SlotInstStatus.VALID);
-			}
-			return "validated";
-		}
-
-		// Con le entity non detached (senza entityManager.clear())
-		// il valore calcolato dello status viene
-		// PERSISTITO anche se non viene invocato direttamente il metodo
-		// update()
-		// if (rulesPassed && sizeCollectionPassed) {
-		// this.slotInstHome.getInstance().setStatus(SlotInstStatus.VALID);
-		// FacesMessages.instance().add(Severity.INFO,
-		// "La busta ha passato la validazione");
-		// return "validated";
-		// } else {
-		// this.slotInstHome.getInstance().setStatus(SlotInstStatus.INVALID);
-		// }
-		return "failed";
 	}
 
 	private boolean verify() {
@@ -1531,55 +1655,14 @@ public class SlotInstEditBean {
 		Map<VerifierParameterInst, FileContainer> processedPropertiesResolverMap = new HashMap<VerifierParameterInst, FileContainer>();
 		//
 
-		Map<String, String> encodedParametersMap = rule.getParametersMap();
+		// Map<String, String> encodedParametersMap = rule.getParametersMap();
 		IRuleVerifier verifier = rule.getVerifier();
-		List<VerifierParameterDef> inParams = verifier.getInParams();
+		// List<VerifierParameterDef> verifierParameterDefs = verifier
+		// .getInParams();
 
-		// mappa da passare al Verifier
-		Map<String, List<VerifierParameterInst>> inInstParams = new HashMap<String, List<VerifierParameterInst>>();
-
-		for (VerifierParameterDef verifierParameterDef : inParams) {
-			String paramName = verifierParameterDef.getName();
-
-			RuleParameterInst embeddedParameter = rule
-					.getEmbeddedParametersMap().get(paramName);
-			String encodedParams = encodedParametersMap.get(paramName);
-
-			if (embeddedParameter != null) {
-				List<VerifierParameterInst> paramInsts = new ArrayList<VerifierParameterInst>();
-				VerifierParameterInst parameterInst = new VerifierParameterInst(
-						verifierParameterDef, embeddedParameter.getValue());
-				parameterInst.setFallible(false);
-				paramInsts.add(parameterInst);
-				inInstParams.put(paramName, paramInsts);
-			} else if ((encodedParams != null) && !encodedParams.equals("")) {
-				String[] splitted = encodedParams.split("\\|");
-				String source = splitted[0];
-				String field = splitted[1];
-				Object sourceDef = this.ruleParametersResolver
-						.resolveSourceDef(source);
-				Object fieldDef = this.ruleParametersResolver
-						.resolveFieldDef(field);
-				List<VerifierParameterInst> paramInsts = this
-						.retrieveValueInsts(rule,
-								processedPropertiesResolverMap,
-								verifierParameterDef, sourceDef, fieldDef);
-				inInstParams.put(paramName, paramInsts);
-			} else {
-				if (!verifierParameterDef.isOptional()) {
-					this.verifiable = false;
-					if (rule.isMandatory()) {
-						this.addMainMessage(new VerifierMessage(
-								verifierParameterDef.getLabel()
-										+ " not defined in rule!",
-								VerifierMessageType.ERROR));
-					} else {
-						this.failAllowed = true;
-					}
-				}
-			}
-
-		}
+		Map<String, List<VerifierParameterInst>> verifierParameterInstsMap = this
+				.buildVerifierParameterInstsMap(rule,
+						processedPropertiesResolverMap);
 
 		//
 		//
@@ -1590,7 +1673,8 @@ public class SlotInstEditBean {
 		if (this.verifiable) {
 			try {
 				boolean passed = true;
-				VerifierReport report = verifier.verify(inInstParams);
+				VerifierReport report = verifier
+						.verify(verifierParameterInstsMap);
 				if (report.getResult().equals(VerifierResult.ERROR)) {
 					passed = false;
 				} else if (report.getResult().equals(VerifierResult.WARNING)) {
