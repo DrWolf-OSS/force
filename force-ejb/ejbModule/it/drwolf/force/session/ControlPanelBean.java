@@ -67,13 +67,15 @@ public class ControlPanelBean {
 		return this.inScadenzaFC;
 	}
 
+	// questo metodo lo uso nel control panel per prendere le prime 5 gare
+	// segnalate
 	public List<ComunicazioneAziendaGara> getSelectedGare() {
 		ArrayList<ComunicazioneAziendaGara> lista = new ArrayList<ComunicazioneAziendaGara>();
 		ArrayList<ComunicazioneAziendaGara> elenco = (ArrayList<ComunicazioneAziendaGara>) this.entityManager
 				.createQuery(
-						"from ComunicazioneAziendaGara cag where cag.id.aziendaId = :a")
+						"from ComunicazioneAziendaGara cag where cag.id.aziendaId = :a order by cag.gara.dataScadenza desc")
 				.setParameter("a", this.userSession.getAzienda().getId())
-				.getResultList();
+				.setMaxResults(5).getResultList();
 		lista.addAll(elenco);
 
 		return lista;

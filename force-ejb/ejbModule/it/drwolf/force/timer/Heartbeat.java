@@ -13,9 +13,7 @@ import it.drwolf.force.enums.TipoProceduraGara;
 import it.drwolf.force.enums.TipoSvolgimento;
 import it.drwolf.force.utils.StartFeedParser;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,11 +26,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.jboss.seam.Component;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.Name;
@@ -44,6 +37,17 @@ import org.jboss.seam.annotations.async.IntervalDuration;
 import org.jboss.seam.async.QuartzTriggerHandle;
 import org.jboss.seam.transaction.UserTransaction;
 
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
+import com.gargoylesoftware.htmlunit.html.HtmlTable;
+import com.gargoylesoftware.htmlunit.html.HtmlTableBody;
+import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
+import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
+import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
@@ -54,7 +58,7 @@ import com.sun.syndication.io.XmlReader;
 @Name("heartbeat")
 public class Heartbeat {
 
-	private static String[] CPVcodes = { "90900000-6" };
+	private static String[] CPVcodes = { "90900000-6", "90910000-9" };
 
 	@Asynchronous
 	@Transactional
@@ -77,51 +81,80 @@ public class Heartbeat {
 
 			}
 		}
-		String url = "http://bandigara.avcp.it/AVCP-ConsultazioneBandiGara/GoToAdvancedSearch.action";
+		String url = "http://bandigara.avcp.it/AVCP-ConsultazioneBandiGara/AdvancedSearch.action";
 
-		String urlPost = "http://bandigara.avcp.it/AVCP-ConsultazioneBandiGara/AdvancedSearch.action";
+		String urlForm = "http://bandigara.avcp.it/AVCP-ConsultazioneBandiGara/GoToAdvancedSearch.action";
 
-		HttpClient client = new HttpClient();
-		client.getParams()
-				.setParameter(
-						"http.useragent",
-						"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:7.0.1) Gecko/20100101 Firefox/7.0.1");
-		client.getState().setCredentials(AuthScope.ANY, new Credentials() {
-		});
-		BufferedReader br = null;
+		String firstUrlToBeVisisted = "http://bandigara.avcp.it/AVCP-ConsultazioneBandiGara/";
+		WebClient webClient = new WebClient();
+		webClient.setJavaScriptEnabled(false);
 
-		PostMethod method = new PostMethod(urlPost);
-		method.addParameter("CPV", Heartbeat.CPVcodes[0]);
 		try {
-			int returnCode = client.executeMethod(method);
-			if (returnCode == HttpStatus.SC_NOT_IMPLEMENTED) {
-				System.err
-						.println("The Post method is not implemented by this URI");
-				// still consume the response body
-				method.getResponseBodyAsString();
+			// per prima cosa devo prendere la prima pagina della ricerca
+			// (quella base) in modo da ottenere la sessione corretta
+			HtmlPage firstPage = webClient.getPage(firstUrlToBeVisisted);
+			// In questa pagina cerco il link alla ricerca avanzata
+			List<HtmlAnchor> anchors = firstPage.getAnchors();
+			HtmlAnchor anchor = null;
+			// Non so come mai ma non mi trova l'acora giusta se la cerco per
+			// testo
+			// mi faccio dare tutte le ancore e mi prendo quella con il testo
+			// corretto
+			for (HtmlAnchor htmlAnchor : anchors) {
+				if (htmlAnchor.asText().equals("Ricerca avanzata")) {
+					anchor = htmlAnchor;
+				}
+			}
+			if (anchor != null) {
+				// Se ho trovato l'acora mi vado a prendere il form e il bottone
+				// da submittare
+				HtmlPage secondPage = anchor.click();
+				HtmlForm form = secondPage.getFormByName("AdvancedSearch");
+				HtmlSubmitInput button = form.getInputByValue("Cerca");
+				// Imposto il giusto valore di CPV e faccio submit
+				HtmlTextInput input = form.getInputByName("CPV");
+				for (String code : Heartbeat.CPVcodes) {
+					System.out.println(code);
+					input.setValueAttribute(code);
+					HtmlPage risposta = button.click();
+					HtmlTable table = (HtmlTable) risposta
+							.getElementById("listaGare");
+					if (table != null) {
+						List<HtmlTableBody> bodies = table.getBodies();
+						for (HtmlTableBody body : table.getBodies()) {
+							List<HtmlTableRow> rows = body.getRows();
+							for (HtmlTableRow row : rows) {
+								for (HtmlTableCell cell : row.getCells()) {
+									HtmlAnchor a = (HtmlAnchor) cell
+											.getHtmlElementsByTagName("a");
+									System.out.println("Found cell: "
+											+ cell.asText());
+								}
+							}
+						}
+						for (HtmlTableRow row : table.getRows()) {
+							for (HtmlTableCell cell : row.getCells()) {
+								System.out.println("Found cell: "
+										+ cell.asText());
+							}
+						}
+					}
+				}
 			} else {
-				br = new BufferedReader(new InputStreamReader(
-						method.getResponseBodyAsStream()));
-				String readLine;
-				while (((readLine = br.readLine()) != null)) {
-					// System.err.println(readLine);
-				}
+				System.out.println("Non trovate la ricerca avanzata");
 			}
-		} catch (Exception e) {
-			System.err.println(e);
-		} finally {
-			method.releaseConnection();
-			if (br != null) {
-				try {
-					br.close();
-				} catch (Exception fe) {
-				}
-			}
+
+		} catch (FailingHttpStatusCodeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-		for (String code : Heartbeat.CPVcodes) {
-			System.out.println(code);
-		}
 		return handle;
 	}
 
