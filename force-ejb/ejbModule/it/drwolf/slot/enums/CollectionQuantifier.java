@@ -2,7 +2,7 @@ package it.drwolf.slot.enums;
 
 public enum CollectionQuantifier {
 
-	ANY_OR_ONE("Zero o uno"), ANY_OR_MORE("Qualunque"), ONLY_ONE(
+	ANY_OR_MORE("Qualunque"), ANY_OR_ONE("Zero o uno"), ONLY_ONE(
 			"Esattamente uno"), ONE_OR_MORE("Almeno uno");
 	public static CollectionQuantifier fromValue(String parameter) {
 		for (CollectionQuantifier c : CollectionQuantifier.values()) {

@@ -79,11 +79,23 @@
         <div class="actionButtons">
             
             <s:button view="/admin/SlotDefTemplateList.xhtml"
-                    id="create"
+                    id="createAdmin"
                     propagation="none"
                     value="Associa Busta" 
-                    rendered="#{garaHome.associatedSlotDef == null}">
+                    rendered="#{garaHome.associatedSlotDef == null and s:hasRole('ADMIN')}">
                    	<f:param name="model" value="#{true}"/>
+            		<f:param name="mode" value="GENERAL"/>
+            		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
+            		<f:param name="garaId" value="#{garaHome.garaId}"/>
+            </s:button>
+            
+            <s:button view="/admin/SlotDefWizardEdit.xhtml" 
+            		id="createUser"
+                    propagation="none"
+                    value="Associa Busta" 
+                    rendered="#{garaHome.associatedSlotDef == null and not s:hasRole('ADMIN')}">
+                    <f:param name="slotDefId"/>
+                   	<f:param name="model" value="#{false}"/>
             		<f:param name="mode" value="GENERAL"/>
             		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
             		<f:param name="garaId" value="#{garaHome.garaId}"/>
