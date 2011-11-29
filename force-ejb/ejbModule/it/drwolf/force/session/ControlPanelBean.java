@@ -70,6 +70,7 @@ public class ControlPanelBean {
 	// questo metodo lo uso nel control panel per prendere le prime 5 gare
 	// segnalate
 	public List<ComunicazioneAziendaGara> getSelectedGare() {
+
 		ArrayList<ComunicazioneAziendaGara> lista = new ArrayList<ComunicazioneAziendaGara>();
 		ArrayList<ComunicazioneAziendaGara> elenco = (ArrayList<ComunicazioneAziendaGara>) this.entityManager
 				.createQuery(
