@@ -46,7 +46,7 @@ public class DependentSlotDef extends SlotDef implements Conditionable {
 		return this.embeddedNumberOfInstances;
 	}
 
-	@ManyToOne
+	@ManyToOne(cascade = { CascadeType.PERSIST })
 	public PropertyDef getNumberOfInstances() {
 		return this.numberOfInstances;
 	}

@@ -66,11 +66,11 @@ public class Starter {
 		this.heartbeat.startFetcher(now.getTime(), new Long(60 * 60 * 1000),
 				endDate.getTime());
 		now.add(Calendar.MINUTE, 1);
-		this.heartbeat.comunicaGare(now.getTime(), new Long(60 * 60 * 1000),
-				endDate.getTime());
-		now.add(Calendar.MINUTE, 5);
 		this.heartbeat.avcpFetcher(now.getTime(), new Long(60 * 60 * 1000),
 				endDate.getTime());
+		now.add(Calendar.MINUTE, 1);
+		// this.heartbeat.comunicaGare(now.getTime(), new Long(60 * 60 * 1000),
+		// endDate.getTime());
 
 	}
 }

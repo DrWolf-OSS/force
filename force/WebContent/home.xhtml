@@ -11,14 +11,13 @@
     <ui:define name="colonnaSx">
     <rich:panel  style="width : 300px; margin-right: 10px;"  >
      <f:facet name="header" >Menu</f:facet>
-        <ul>
-            <li>Servizi Gratuiti</li>
-            <li>Servizo Base</li>
-            <li>Abbonamento FORCE</li>
-            <li>Attiva Call Center</li>
-            <li>Formazione</li>
-            <li>Richiedi Documentaizone Amministrativa</li>
-            <li>Servizi di Consulenza</li>
+        <ul style="list-style: none;font-size: 16px;">
+            <li><a href="servizi.seam">Servizi Gratuiti</a></li>
+            <li><a href="servizi.seam">Servizo Base</a></li>
+            <li><a href="servizi.seam">Abbonamento FORCE</a></li>
+            <li><a href="servizi.seam">Attiva Call Center</a></li>
+            <li><a href="servizi.seam">Formazione</a></li>
+            <li><a href="servizi.seam">Servizi di Consulenza</a></li>
         </ul>    
     </rich:panel>
     </ui:define>
@@ -26,7 +25,14 @@
     <h:form>
  
     <div id="force_about">        
-        <h1>Benvenuto nel Progetto FORCE (File yOuR raCE)!</h1>
+        <div style="font-style: italic;font-size: 16px;"> &lt;&lt; Il mondo degli appalti e dei bandi è complesso e di difficile accesso.
+Non sempre è facile avere il quadro completo di tutti gli avvisi a disposizione o riuscire a selezionare quelli di effettivo interesse. A volte, poi, la partecipazione alla gara "giusta"" rischia di sfumare per la difficoltà di predisporre tempestivamente la documentazione necessaria.&gt;&gt;</div><br />
+<br />
+        <div style="text-align: justify;font-size: 16px;"><strong><span class="forceColor">FORCE</span></strong> – <strong><span class="forceColor">F</span>ile y<span class="forceColor">O</span>u<span class="forceColor">R</span> ra<span class="forceColor">CE</span></strong>, è la nuova piattaforma creata da CNA Firenze per aiutare le piccole e medie imprese ad
+orientarsi nel labirinto degli appalti e dei bandi di gara e agevolarne la partecipazione.
+FORCE offre gratuitamente un servizio di monitoraggio e segnalazione mirata degli avvisi di gara, permette di archiviare
+on-line la documentazione amministrativa indispensabile e consente la creazione automatica della busta di gara.
+Realizzato con il contributo della Regione Toscana, il supporto di Anci Toscana e Circondario Empolese Valdelsa e sviluppato in sinergia con CNA Toscana e Dr Wolf, FORCE è lo strumento giusto per le imprese che vogliono sfruttare l’opportunità di partecipare a bandi e gare.</div>
     </div>        
 	
 	</h:form>
@@ -37,8 +43,8 @@
      
     <rich:dataList id="activeGareList"
                 var="_gara"
-              value="#{garaList.getGaraAttive(5)}"
-           rendered="#{not empty garaList.getGaraAttive(5)}"
+              value="#{garaList.getGaraAttive(3)}"
+           rendered="#{not empty garaList.getGaraAttive(3)}"
            style="list-style:none;">
            <h:outputText value="#{_gara.oggetto} (Scad. #{_gara.dataScadenza})" />
            <br />

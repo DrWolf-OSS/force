@@ -190,18 +190,20 @@ public class UserSession implements Serializable {
 						this.getAzienda().getSettore().getSlotDef())
 				.setParameter("ownerId", this.getAzienda().getAlfrescoGroupId())
 				.getResultList();
-		if (resultList.size() > 1) {
-			System.out
-					.println("---> WARNING: Il gruppo "
-							+ this.getAzienda().getAlfrescoGroupId()
-							+ " ha "
-							+ resultList.size()
-							+ " istanze di SlotInst associate allo SlotDef di tipo primary con nome \""
-							+ this.getAzienda().getSettore().getSlotDef()
-									.getName()
-							+ "\" e id "
-							+ this.getAzienda().getSettore().getSlotDef()
-									.getId());
+		if (resultList != null && resultList.size() > 0) {
+			if (resultList.size() > 1) {
+				System.out
+						.println("---> WARNING: Il gruppo "
+								+ this.getAzienda().getAlfrescoGroupId()
+								+ " ha "
+								+ resultList.size()
+								+ " istanze di SlotInst associate allo SlotDef di tipo primary con nome \""
+								+ this.getAzienda().getSettore().getSlotDef()
+										.getName()
+								+ "\" e id "
+								+ this.getAzienda().getSettore().getSlotDef()
+										.getId());
+			}
 			return resultList.get(0);
 		}
 		return null;

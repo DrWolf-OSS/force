@@ -11,7 +11,7 @@
     template="/layout/template.xhtml">
 
 <ui:define name="body">
-<h:panelGrid columns="2" width="100%" columnClasses="controlPanelclass,controlPanelclass">
+<h:panelGrid columns="2" width="100%" columnClasses="controlPanelclassSX,controlPanelclassDX">
 <rich:panel >
      <f:facet name="header"><s:span>
      <s:link value="Vedi tutto" view="/user/Azienda.xhtml" styleClass="topCommandLink">
@@ -201,7 +201,7 @@
     </c:forEach>
 </rich:panel>
 </h:panelGrid>
-<rich:spacer height="5px;"/>
+<rich:spacer height="20px;"/>
 <rich:panel>
     <f:facet name="header"><s:span>
     <s:link value="Vedi tutte" view="/user/GareList.xhtml" styleClass="topCommandLink">
@@ -240,7 +240,7 @@
     </rich:dataTable>
     
 </rich:panel>
-<rich:spacer height="5px;"/>
+<rich:spacer height="20px;"/>
 <rich:panel >
     <f:facet name="header"><s:span>
     <s:link value="Vedi tutte" view="/user/CommesseEdit.xhtml" styleClass="topCommandLink">
@@ -264,7 +264,7 @@
     </rich:column>
     </rich:dataTable>
 </rich:panel>
-<rich:spacer height="5px;"/>
+<rich:spacer height="20px;"/>
 <rich:panel rendered="#{userSession.llpp}">
     <f:facet name="header"><s:span>
     <s:link value="Modifica" view="/user/SOAEdit.xhtml" styleClass="topCommandLink">
@@ -283,7 +283,7 @@
     </rich:column>
     </rich:dataTable>
 </rich:panel>
-<rich:spacer height="5px;"/>
+<rich:spacer height="20px;"/>
 
 <rich:panel>
     <f:facet name="header"><s:span>

@@ -7,6 +7,7 @@ body {
 	background-image: url('/force/img/sfondo.png');
 	padding-left: 1em;
 	padding-right: 1em;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 14px;
 }
 
@@ -267,16 +268,17 @@ table.radio input[type=radio] {
 }
 
 .rich-panel-header{
-    background:#93113f ! important;
+    background:#777777 ! important;
     border: 0px;
     font-size: 14px;    
+    padding : 5px;
 }
 
 .rich-panel{
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px ;
-    border: 1px solid #93113f ! important;
+    border: 1px solid #777777 ! important;
     -webkit-box-shadow: #666 0px 2px 3px;
     -moz-box-shadow: #666 0px 2px 3px;
     box-shadow: #666 0px 2px 3px;   
@@ -332,7 +334,9 @@ table.radio input[type=radio] {
 .forceColor{
     color: #93113f;
 }
-
+.rich-table-subheader {
+    background: #DDDDDD;
+}
 
 .clean-gray {
   background-color: #eeeeee;

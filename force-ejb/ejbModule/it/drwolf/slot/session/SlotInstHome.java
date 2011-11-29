@@ -32,45 +32,55 @@ public class SlotInstHome extends EntityHome<SlotInst> {
 	@In(create = true)
 	Preferences preferences;
 
-	public void setSlotInstId(Long id) {
-		setId(id);
-	}
-
-	public Long getSlotInstId() {
-		return (Long) getId();
-	}
-
 	@Override
 	protected SlotInst createInstance() {
 		SlotInst slotInst = new SlotInst();
 		return slotInst;
 	}
 
-	public void load() {
-		if (isIdDefined()) {
-			wire();
-		}
+	public SlotInst getDefinedInstance() {
+		return this.isIdDefined() ? this.getInstance() : null;
 	}
 
-	public void wire() {
-		getInstance();
-		SlotDef slotDef = slotDefHome.getDefinedInstance();
-		if (slotDef != null) {
-			getInstance().setSlotDef(slotDef);
-		}
+	public List<DocInstCollection> getDocInstCollections() {
+		return this.getInstance() == null ? null
+				: new ArrayList<DocInstCollection>(this.getInstance()
+						.getDocInstCollections());
+	}
+
+	public Long getSlotInstId() {
+		return (Long) this.getId();
 	}
 
 	public boolean isWired() {
 		return true;
 	}
 
-	public SlotInst getDefinedInstance() {
-		return isIdDefined() ? getInstance() : null;
+	public void load() {
+		if (this.isIdDefined()) {
+			this.wire();
+		}
 	}
 
-	public List<DocInstCollection> getDocInstCollections() {
-		return getInstance() == null ? null : new ArrayList<DocInstCollection>(
-				getInstance().getDocInstCollections());
+	public AlfrescoFolder retrieveOrCreateSlotFolder() {
+		AlfrescoFolder slotFolder = this.retrieveSlotFolder();
+		if (slotFolder == null) {
+			AlfrescoFolder groupFolder = this.alfrescoWrapper
+					.findOrCreateFolder(this.preferences
+							.getValue(PreferenceKey.FORCE_GROUPS_PATH.name()),
+							this.alfrescoUserIdentity.getActiveGroup()
+									.getShortName());
+			slotFolder = this.alfrescoWrapper.findOrCreateFolder(
+					groupFolder,
+					this.slotDefHome.getInstance().getId()
+							+ " "
+							+ AlfrescoWrapper.normalizeFolderName(
+									this.slotDefHome.getInstance().getName(),
+									AlfrescoWrapper.LENGHT_LIMIT,
+									AlfrescoWrapper.SPACER));
+			this.getInstance().setNodeRef(slotFolder.getId());
+		}
+		return slotFolder;
 	}
 
 	public AlfrescoFolder retrieveSlotFolder() {
@@ -89,25 +99,23 @@ public class SlotInstHome extends EntityHome<SlotInst> {
 		return slotFolder;
 	}
 
-	public AlfrescoFolder retrieveOrCreateSlotFolder() {
-		AlfrescoFolder slotFolder = retrieveSlotFolder();
-		if (slotFolder == null) {
-			AlfrescoFolder groupFolder = this.alfrescoWrapper
-					.findOrCreateFolder(this.preferences
-							.getValue(PreferenceKey.FORCE_GROUPS_PATH.name()),
-							this.alfrescoUserIdentity.getActiveGroup()
-									.getShortName());
-			slotFolder = this.alfrescoWrapper.findOrCreateFolder(
-					groupFolder,
-					this.slotDefHome.getInstance().getId()
-							+ " "
-							+ AlfrescoWrapper.normalizeFolderName(
-									this.slotDefHome.getInstance().getName(),
-									AlfrescoWrapper.LENGHT_LIMIT,
-									AlfrescoWrapper.SPACER));
-			this.getInstance().setNodeRef(slotFolder.getId());
+	// Il codice commentato serve per controllare in modo programmatico che lo
+	// SlotDef nella home sia quello giusto (quello referenziato dallo SlotInst)
+	// Nel caso scommentare anche il corrispettivo in SlotDefHome
+	public void setSlotInstId(Long id) {
+		this.setId(id);
+		// if (this.isIdDefined()) {
+		// this.slotDefHome.setSlotDefId(this.getInstance().getSlotDef()
+		// .getId());
+		// }
+	}
+
+	public void wire() {
+		this.getInstance();
+		SlotDef slotDef = this.slotDefHome.getDefinedInstance();
+		if (slotDef != null) {
+			this.getInstance().setSlotDef(slotDef);
 		}
-		return slotFolder;
 	}
 
 }
