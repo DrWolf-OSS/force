@@ -82,7 +82,8 @@
                     id="createAdmin"
                     propagation="none"
                     value="Associa Busta" 
-                    rendered="#{garaHome.associatedSlotDef == null and s:hasRole('ADMIN')}">
+                    rendered="#{garaHome.associatedSlotDef == null and s:hasRole('ADMIN')}"
+                    styleClass="modal">
                    	<f:param name="model" value="#{true}"/>
             		<f:param name="mode" value="GENERAL"/>
             		<f:param name="from" value="/admin/GaraEdit.xhtml"/>
@@ -94,7 +95,8 @@
                     propagation="none"
                     value="Associa Busta" 
                     action="#{slotDefGaraAssociationtBean.initSlotDefValues()}"
-                    rendered="#{garaHome.associatedSlotDef == null and not s:hasRole('ADMIN')}">
+                    rendered="#{garaHome.associatedSlotDef == null and not s:hasRole('ADMIN')}"
+                    styleClass="modal">
                     <f:param name="slotDefId"/>
                    	<f:param name="model" value="#{false}"/>
             		<f:param name="mode" value="GENERAL"/>

@@ -33,6 +33,16 @@ public class SlotDefListManager {
 	@In
 	private Identity identity;
 
+	// private String getMyOwnerId() {
+	// String ownerId = null;
+	// if (!this.identity.hasRole("ADMIN")) {
+	// ownerId = this.alfrescoUserIdentity.getActiveGroup().getShortName();
+	// } else {
+	// ownerId = "ADMIN";
+	// }
+	// return ownerId;
+	// }
+
 	@SuppressWarnings("unchecked")
 	private List<SlotDef> retrieve(Boolean areTemplates,
 			SlotDefType slotDefType, String ownerId) {
@@ -71,7 +81,6 @@ public class SlotDefListManager {
 		String query = "from SlotDef s " + where + " " + templates + " " + and
 				+ " " + type + " " + and2 + " " + owner;
 
-		// List<SlotDef> resultList = null;
 		Query createQuery = this.entityManager.createQuery(query);
 		if (areTemplates != null) {
 			createQuery.setParameter("areTemplates", areTemplates);
@@ -98,12 +107,8 @@ public class SlotDefListManager {
 
 	@Factory("slotDefsByParams")
 	public List<SlotDef> retrieveByParams() {
-		String ownerId = null;
-		if (!this.identity.hasRole("ADMIN")) {
-			ownerId = this.alfrescoUserIdentity.getActiveGroup().getShortName();
-		} else {
-			ownerId = "ADMIN";
-		}
+		// String ownerId = this.getMyOwnerId();
+		String ownerId = this.alfrescoUserIdentity.getMyOwnerId();
 
 		if (this.slotDefParameters.getMode() == null
 				|| this.slotDefParameters.getMode().equals("")) {
@@ -125,9 +130,10 @@ public class SlotDefListManager {
 		return null;
 	}
 
-	public List<SlotDef> retrieveByType(Boolean areTemplates,
-			String slotDefType, String ownerId) {
+	public List<SlotDef> retrieveMySlot(Boolean areTemplates, String slotDefType) {
 		SlotDefType type = SlotDefType.valueOf(slotDefType);
+		// String ownerId = this.getMyOwnerId();
+		String ownerId = this.alfrescoUserIdentity.getMyOwnerId();
 		return this.retrieve(areTemplates, type, ownerId);
 	}
 

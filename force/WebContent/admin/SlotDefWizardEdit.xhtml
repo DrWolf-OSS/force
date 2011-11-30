@@ -65,7 +65,8 @@
              	</h:selectOneMenu>
             </s:decorate>
             
-            <s:div rendered="#{slotDefHome.instance.id != null and slotDefHome.instance.type == 'DEPENDENT' and not slotDefHome.instance.template}">
+            <s:div rendered="#{slotDefHome.instance.id != null and slotDefHome.instance.type == 'DEPENDENT' and not slotDefHome.instance.template 
+            					and s:hasRole('ADMIN')}">
             
 	            <s:decorate id="parentSlot" template="/layout/display.xhtml">
 	                <ui:define name="label">Busta Contenitrice</ui:define>
@@ -144,9 +145,11 @@
 	            
 	            <s:div id="instances" >
 				<a:region>
-				<s:decorate template="/layout/edit.xhtml">
+				<s:decorate template="/layout/edit.xhtml" 
+							rendered="#{slotDefHome.instance.id != null and slotDefHome.instance.type == 'DEPENDENT' and not slotDefHome.instance.template 
+            					and not s:hasRole('ADMIN')}">
 	                <ui:define name="label">
-	                	<h:outputText value="Numero di copie" />
+	                	<h:outputText value="Info contenente numero di copie" />
 					</ui:define>
 					<h:selectOneMenu  value="#{slotDefHome.instance.numberOfInstances}" required="true"
 								converter="propertyDefConverter"
@@ -160,6 +163,16 @@
 	            </a:region>
 	            </s:div>
             
+            </s:div>
+            
+            <s:div rendered="#{slotDefHome.instance.id != null and slotDefHome.instance.type == 'DEPENDENT' and not slotDefHome.instance.template 
+            					and (not s:hasRole('ADMIN') and not slotDefHome.instance.parentSlotDef.template)}">
+            	<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Numero di copie" />
+					</ui:define>
+					<h:inputText value="#{slotDefHome.instance.embeddedNumberOfInstances.integerValue}" disabled="#{slotDefHome.instance.referenced}"/>
+	            </s:decorate>
             </s:div>
 			
 			<div style="clear:both"/>
@@ -276,11 +289,11 @@
 						<f:facet name="header">Dizionario associato</f:facet>
 						<h:outputText value="#{prop.dictionary!=null ? prop.dictionary.name : ''}" />
 					</rich:column>
-					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Informazione vincolante</f:facet>
 						<h:outputText value="#{prop.conditionalPropertyDef!=null ? prop.conditionalPropertyDef.name : ''}" />
 					</rich:column>
-					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Valore informazione vincolante</f:facet>
 						<h:outputText value="#{prop.conditionalPropertyInst.stringValue}"
 								rendered="#{prop.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
@@ -293,14 +306,14 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 						</h:outputText>
 					</rich:column>
-					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Vincolante per le informazioni</f:facet>
 						<a:repeat var="pr" value="#{prop.conditionedPropertyDefsAsList}" rowKeyVar="idx">
 							<h:outputText value="#{pr.label}" />
 							<h:outputText value=", " rendered="#{idx lt prop.conditionedPropertyDefsAsList.size()-1}"/>
 						</a:repeat>
 					</rich:column>
-					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Vincolante per le richieste</f:facet>
 						<a:repeat var="coll" value="#{prop.conditionedDocDefCollectionsAsList}" rowKeyVar="idx">
 							<h:outputText value="#{coll.label}" />
@@ -352,7 +365,7 @@
 				<h:outputText value="Nessuna documentazione definita" rendered="#{empty slotDefHome.instance.docDefCollectionsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.docDefCollectionsAsList}" var="coll" 
 						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" style="width:1024px">
-					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!coll.active ? 'invalidRow' : ''}">
+					<rich:column style="width:200px; font-weight:bold;" stylesimplifiedDependentSlotDefPanelClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
 							rendered="#{coll.status == 'INVALID'}" />
@@ -366,11 +379,11 @@
 						<f:facet name="header">Quantità</f:facet>
 						<h:outputText value="#{coll.quantifier.value()}" />
 					</rich:column>
-					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Informazione vincolante</f:facet>
 						<h:outputText value="#{coll.conditionalPropertyDef!=null ? coll.conditionalPropertyDef.name : ''}" />
 					</rich:column>
-					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Valore informazione vincolante</f:facet>
 						<h:outputText value="#{coll.conditionalPropertyInst.stringValue}"
 								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
@@ -426,7 +439,7 @@
 				<h:outputText value="Nessuna sottobusta definita" rendered="#{empty slotDefHome.instance.dependentSlotDefsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.dependentSlotDefsAsList}" var="slot" 
 						rendered="#{not empty slotDefHome.instance.dependentSlotDefsAsList}" style="width:1024px">
-					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!slot.active ? 'invalidRow' : ''}">
+					<rich:column style="font-weight:bold;" styleClass="#{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
 							rendered="#{slot.status == 'INVALID'}" />
@@ -436,11 +449,11 @@
 						<f:facet name="header">Stato</f:facet>
 						<h:outputText value="#{slot.status.value()}" />
 					</rich:column>
-					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}"  rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Informazione vincolante</f:facet>
 						<h:outputText value="#{slot.conditionalPropertyDef!=null ? slot.conditionalPropertyDef.name : ''}" />
 					</rich:column>
-					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}"  rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Valore informazione vincolante</f:facet>
 						<h:outputText value="#{slot.conditionalPropertyInst.stringValue}"
 								rendered="#{slot.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
@@ -453,9 +466,13 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 						</h:outputText>
 					</rich:column>
-					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Info contenente numero di copie</f:facet>
 						<h:outputText value="#{slot.numberOfInstances!=null ? slot.numberOfInstances.name : ''}" />
+					</rich:column>
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}"  rendered="#{not s:hasRole('ADMIN')}">
+						<f:facet id="header" name="header">Numero di copie</f:facet>
+						<h:outputText value="#{slot.embeddedNumberOfInstances!=null ? slot.embeddedNumberOfInstances.value : ''}" />
 					</rich:column>
 					<rich:column styleClass="action #{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Azioni</f:facet>
@@ -521,6 +538,13 @@
 							rendered="#{slotDefHome.instance.type == 'GENERAL' and s:hasRole('ADMIN')}" 						 
 							oncomplete="#{rich:component('dependentSlotDefPanel')}.show()" 
 							reRender="dependentSlotDefPanel"/>
+				
+				<a:commandButton value="Aggiungi sottobusta"
+							action="#{slotDefEditBean.newSimplifiedDependentSlotDef()}"
+							rendered="#{slotDefHome.instance.type == 'GENERAL' and not s:hasRole('ADMIN')}" 						 
+							oncomplete="#{rich:component('dependentSlotDefPanel')}.show()" 
+							reRender="dependentSlotDefPanel"/>					
+
 			</s:decorate>
 			
             <div style="clear:both">
@@ -983,7 +1007,7 @@
 		</rich:modalPanel>
 		
 		<!-- TODO: Per controllare il form uso la variabile invalid invece di cpfinvalid che non viene valorizzata.. -->
-		<rich:modalPanel id="collPanel" autosized="true" minWidth="600"
+		<rich:modalPanel id="collPanel" autosized="true" minWidth="650"
 				resizeable="false">
 			<f:facet name="header">
 				<h:outputText value="Descrizione della Richiesta #{slotDefEditBean.collection.conditionalPropertyDef != null ? 'Vincolata' : ''}" />
@@ -1126,22 +1150,33 @@
 				</script>
 				<ui:param name="prefix" value="dsd" />
 				
-				<s:decorate template="/layout/display.xhtml" rendered="#{slotDefEditBean.edit}">
+				<s:decorate template="/layout/display.xhtml" rendered="#{slotDefEditBean.edit and s:hasRole('ADMIN')}">
 	                <ui:define name="label">
 	                	<h:outputText value="Sottobusta" />
 					</ui:define>
 					<h:outputText value="#{slotDefEditBean.dependentSlotDef.name}" />
 	            </s:decorate>
+	            
+	            <a:region>
+				<s:decorate template="/layout/edit.xhtml" rendered="#{not s:hasRole('ADMIN')}">
+	                <ui:define name="label">
+	                	<h:outputText value="Nome Sottobusta" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.dependentSlotDef.name}" required="true"/>
+	            </s:decorate>
+	            </a:region>
 				
 				<a:region>
-				<s:decorate template="/layout/edit.xhtml" rendered="#{not slotDefEditBean.edit}">
+				<s:decorate template="/layout/edit.xhtml" rendered="#{not slotDefEditBean.edit and s:hasRole('ADMIN')}">
 	                <ui:define name="label">
 	                	<h:outputText value="Sottobusta" />
 					</ui:define>
-					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef}">
-     					<s:selectItems value="#{slotDefListManager.retrieveByType(true, 'DEPENDENT', null)}" label="#{slot.name}"
+					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef}" required="true">
+     					<s:selectItems value="#{slotDefListManager.retrieveMySlot(true, 'DEPENDENT')}" label="#{slot.name}"
 									var="slot"  noSelectionLabel="-- select a value --"/>
-							<a:support event="onchange" reRender="condPD,condValue,numberOfIstances"/>		
+							<a:support event="onchange" 
+									action="#{slotDefEditBean.changeDependentSlotDefListener()}"		
+									reRender="condPD,condValue,numberOfIstances" />
 						<s:convertEntity/>
 					</h:selectOneMenu>
 	            </s:decorate>
@@ -1153,7 +1188,7 @@
 	                <ui:define name="label">
 	                	<h:outputText value="Informazione vincolante" />
 					</ui:define>
-					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef}" 
+					<h:selectOneMenu  value="#{slotDefEditBean.dependentSlotDef.conditionalPropertyDef}"
 								converter="propertyDefConverter">
      					<s:selectItems value="#{slotDefHome.instance.propertyDefsAsList}" label="#{propertyDef.name}"
 									var="propertyDef"  noSelectionLabel="-- select a value --" 
@@ -1217,7 +1252,7 @@
 	            
 	            <s:div id="numberOfIstances" >
 				<a:region>
-				<s:decorate template="/layout/edit.xhtml" rendered="#{s:hasRole('ADMIN') or slotDefHome.instance.template}">
+				<s:decorate template="/layout/edit.xhtml" rendered="#{s:hasRole('ADMIN')}">
 	                <ui:define name="label">
 	                	<h:outputText id="nclabel" value="Numero di copie" />
 	                	<rich:toolTip for="nclabel">Deve essere selezionata una informazione di tipo NUMERO segnata come OBBLIGATORIA</rich:toolTip>
@@ -1232,6 +1267,14 @@
 									disabled="#{propertyDef.dataType != 'INTEGER' or not propertyDef.required}"/>
 					</h:selectOneMenu>
 	            </s:decorate>
+	            
+				<s:decorate template="/layout/edit.xhtml" rendered="#{not s:hasRole('ADMIN')}">
+	                <ui:define name="label">
+	                	<h:outputText value="Numero copie sottobusta" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.dependentSlotDef.embeddedNumberOfInstances.integerValue}" required="true"/>
+	            </s:decorate>
+
 	            </a:region>
 	            </s:div>
 	            
@@ -1240,14 +1283,20 @@
 	        </s:div>
 	        <a:jsFunction action="#{slotDefEditBean.clearEditing()}" name="clearEditing"/>
 	        <a:commandButton value="Ok"
-	        			action="#{slotDefEditBean.addDependentSlotDef()}" 
+	        			action="#{slotDefEditBean.addClonedDependentSlotDef()}" 
 	        			oncomplete="if(!dsdinvalid){#{rich:component('dependentSlotDefPanel')}.hide(); dirty=true;}"
-	        			rendered="#{not slotDefEditBean.edit}" 
+	        			rendered="#{not slotDefEditBean.edit and s:hasRole('ADMIN')}" 
 	        			reRender="dsdf,slotDefTable"/>
 	        			
 	        <a:commandButton value="Ok" 
 	        			oncomplete="if(!dsdinvalid){#{rich:component('dependentSlotDefPanel')}.hide(); clearEditing();}"
 	        			rendered="#{slotDefEditBean.edit}"
+	        			reRender="dsdf,slotDefTable"/>
+	        			
+	        <a:commandButton value="Ok"
+	        			action="#{slotDefEditBean.addSimplifiedDependentSlotDef()}" 
+	        			oncomplete="if(!sdsdinvalid){#{rich:component('dependentSlotDefPanel')}.hide(); dirty=true;}"
+	        			rendered="#{not slotDefEditBean.edit and not s:hasRole('ADMIN')}" 
 	        			reRender="dsdf,slotDefTable"/>
 	        			
 	        <a:region>
@@ -1262,6 +1311,52 @@
 							rendered="#{slotDefEditBean.edit == false}"
 							reRender="dsdf"/>
 			</a:region>
+			</a:form>
+		</rich:modalPanel>
+		
+		
+		<rich:modalPanel id="simplifiedDependentSlotDefPanel" domElementAttachment="body" autosized="true" minWidth="500"
+				resizeable="false" rendered="#{slotDefHome.instance.type != 'DEPENDENT'}">
+			<f:facet name="header">
+				<h:outputText value="Definisci i parametri della sottobusta" />
+			</f:facet>
+			<a:form id="sdsdf" onkeypress="dirty=true">
+				<ui:param name="customType" value="p" />
+				<script type="text/javascript">
+					var sdsdinvalid = false;
+				</script>
+				<ui:param name="prefix" value="sdsd" />
+				
+				<a:region>
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Nome Sottobusta" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.dependentSlotDef.name}" required="true"/>
+	            </s:decorate>
+	            </a:region>
+	            
+	            <a:region>
+				<s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Numero copie sottobusta" />
+					</ui:define>
+					<h:inputText value="#{slotDefEditBean.dependentSlotDef.embeddedNumberOfInstances.integerValue}" required="true"/>
+	            </s:decorate>
+	            </a:region>
+				
+				<div style="clear:both"/>
+				<a:jsFunction action="#{slotDefEditBean.clearEditing()}" name="clearEditing"/>
+				
+				<a:commandButton value="Ok"
+	        			action="#{slotDefEditBean.addSimplifiedDependentSlotDef()}" 
+	        			oncomplete="if(!sdsdinvalid){#{rich:component('simplifiedDependentSlotDefPanel')}.hide(); dirty=true;}"
+	        			rendered="#{not slotDefEditBean.edit}" 
+	        			reRender="sdsdf,slotDefTable"/>
+	        			
+				<a:commandButton value="Annulla"
+							oncomplete="#{rich:component('simplifiedDependentSlotDefPanel')}.hide(); clearEditing();" 
+							reRender="sdsdf"/>
 			</a:form>
 		</rich:modalPanel>
 		

@@ -28,6 +28,8 @@ public abstract class AlfrescoIdentity {
 
 	private Authority activeGroup;
 
+	// private Identity identity;
+
 	public boolean authenticate(String username, String password, String url) {
 
 		this.url = url;
@@ -73,6 +75,20 @@ public abstract class AlfrescoIdentity {
 	public List<Authority> getGroups() {
 		return this.groups;
 	}
+
+	// public String getMyOwnerId() {
+	// if (this.identity == null) {
+	// this.identity = (Identity) org.jboss.seam.Component
+	// .getInstance("identity");
+	// }
+	// String ownerId = null;
+	// if (!this.identity.hasRole("ADMIN")) {
+	// ownerId = this.getActiveGroup().getShortName();
+	// } else {
+	// ownerId = "ADMIN";
+	// }
+	// return ownerId;
+	// }
 
 	public String getPassword() {
 		return this.password;
@@ -123,4 +139,5 @@ public abstract class AlfrescoIdentity {
 	public void setGroups(List<Authority> groups) {
 		this.groups = groups;
 	}
+
 }

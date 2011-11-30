@@ -186,11 +186,11 @@
 						<f:facet name="header">Dizionario associato</f:facet>
 						<h:outputText value="#{prop.dictionary!=null ? prop.dictionary.name : ''}" />
 					</rich:column>
-					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Informazione vincolante</f:facet>
 						<h:outputText value="#{prop.conditionalPropertyDef!=null ? prop.conditionalPropertyDef.name : ''}" />
 					</rich:column>
-					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Valore informazione vincolante</f:facet>
 						<h:outputText value="#{prop.conditionalPropertyInst.stringValue}"
 								rendered="#{prop.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
@@ -203,7 +203,7 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 						</h:outputText>
 					</rich:column>
-					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!prop.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Vincolante per le informazioni</f:facet>
 						<a:repeat var="pr" value="#{prop.conditionedPropertyDefsAsList}" rowKeyVar="idx">
 							<h:outputText value="#{pr.name}" />
@@ -249,11 +249,11 @@
 						<f:facet name="header">Quantità</f:facet>
 						<h:outputText value="#{coll.quantifier.value()}" />
 					</rich:column>
-					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Informazione vincolante</f:facet>
 						<h:outputText value="#{coll.conditionalPropertyDef!=null ? coll.conditionalPropertyDef.name : ''}" />
 					</rich:column>
-					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!coll.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Valore informazione vincolante</f:facet>
 						<h:outputText value="#{coll.conditionalPropertyInst.stringValue}"
 								rendered="#{coll.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
@@ -286,7 +286,7 @@
 				</ui:define>
 				<h:outputText value="Nessuna sottobusta definita" rendered="#{empty slotDefHome.instance.dependentSlotDefsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.dependentSlotDefsAsList}" var="slot" 
-						rendered="#{not empty slotDefHome.instance.dependentSlotDefsAsList}" style="width:1024px">
+						rendered="#{not empty slotDefHome.instance.dependentSlotDefsAsList}">
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!slot.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:outputText value="#{slot.name}" />
@@ -295,11 +295,11 @@
 						<f:facet name="header">Stato</f:facet>
 						<h:outputText value="#{slot.status.value()}" />
 					</rich:column>
-					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Informazione vincolante</f:facet>
 						<h:outputText value="#{slot.conditionalPropertyDef!=null ? slot.conditionalPropertyDef.name : ''}" />
 					</rich:column>
-					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Valore informazione vincolante</f:facet>
 						<h:outputText value="#{slot.conditionalPropertyInst.stringValue}"
 								rendered="#{slot.conditionalPropertyInst.dataDefinition.dataType == 'STRING' or dataInstance.dataDefinition.dataType == 'LINK'}"/>
@@ -312,9 +312,13 @@
 							<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 						</h:outputText>
 					</rich:column>
-					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}" rendered="#{s:hasRole('ADMIN')}">
 						<f:facet name="header">Info contenente numero di copie</f:facet>
 						<h:outputText value="#{slot.numberOfInstances!=null ? slot.numberOfInstances.name : ''}" />
+					</rich:column>
+					<rich:column styleClass="#{!slot.active ? 'invalidRow' : ''}"  rendered="#{not s:hasRole('ADMIN')}">
+						<f:facet id="header" name="header">Numero di copie</f:facet>
+						<h:outputText value="#{slot.embeddedNumberOfInstances!=null ? slot.embeddedNumberOfInstances.value : ''}" />
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
