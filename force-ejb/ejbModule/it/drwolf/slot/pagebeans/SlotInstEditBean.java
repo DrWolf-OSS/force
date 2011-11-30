@@ -585,27 +585,27 @@ public class SlotInstEditBean {
 		}
 	}
 
-	private void createDependentSlotInst(DependentSlotDef dependentSlotDef,
-			PropertyInst numberOfInstancesPropertyInst) {
-		if (numberOfInstancesPropertyInst != null
-				&& numberOfInstancesPropertyInst.getPropertyDef().getDataType()
-						.equals(DataType.INTEGER)) {
-			Integer numberOfInstances = numberOfInstancesPropertyInst
-					.getIntegerValue();
-			for (int i = 0; i < numberOfInstances; i++) {
-				//
-				SlotInst dependentSlotInst = new SlotInst(dependentSlotDef);
-				//
-				dependentSlotInst.setOwnerId(this.slotInstHome.getInstance()
-						.getOwnerId());
+	private void createDependentSlotInsts(DependentSlotDef dependentSlotDef,
+			Integer numberOfInstances) {
+		// if (numberOfInstancesPropertyInst != null
+		// && numberOfInstancesPropertyInst.getPropertyDef().getDataType()
+		// .equals(DataType.INTEGER)) {
+		// Integer numberOfInstances = numberOfInstancesPropertyInst
+		// .getIntegerValue();
+		for (int i = 0; i < numberOfInstances; i++) {
+			//
+			SlotInst dependentSlotInst = new SlotInst(dependentSlotDef);
+			//
+			dependentSlotInst.setOwnerId(this.slotInstHome.getInstance()
+					.getOwnerId());
 
-				dependentSlotInst.setParentSlotInst(this.slotInstHome
-						.getInstance());
-				this.slotInstHome.getInstance().getDependentSlotInsts()
-						.add(dependentSlotInst);
-			}
-
+			dependentSlotInst
+					.setParentSlotInst(this.slotInstHome.getInstance());
+			this.slotInstHome.getInstance().getDependentSlotInsts()
+					.add(dependentSlotInst);
 		}
+
+		// }
 	}
 
 	private void createEmptyDependetSlotInsts() {
@@ -613,26 +613,44 @@ public class SlotInstEditBean {
 		Set<DependentSlotDef> dependentSlotDefs = this.slotDefHome
 				.getInstance().getDependentSlotDefs();
 		for (DependentSlotDef dependentSlotDef : dependentSlotDefs) {
+			if (!this.isAlreadyInstanced(dependentSlotDef)) {
 
-			if (!this.isAlreadyInstanced(dependentSlotDef)
-					&& dependentSlotDef.getConditionalPropertyDef() != null
-					&& dependentSlotDef
-							.getConditionalPropertyInst()
-							.getValue()
-							.equals(this.slotInstHome
-									.getInstance()
-									.retrievePropertyInstByDef(
-											dependentSlotDef
-													.getConditionalPropertyDef())
-									.getValue())) {
+				if (dependentSlotDef.getConditionalPropertyDef() != null
+						&& dependentSlotDef
+								.getConditionalPropertyInst()
+								.getValue()
+								.equals(this.slotInstHome
+										.getInstance()
+										.retrievePropertyInstByDef(
+												dependentSlotDef
+														.getConditionalPropertyDef())
+										.getValue())
+						|| dependentSlotDef.getConditionalPropertyDef() == null) {
 
-				PropertyInst numberOfInstancesPropertyInst = this.slotInstHome
-						.getInstance().retrievePropertyInstByDef(
-								dependentSlotDef.getNumberOfInstances());
-				this.createDependentSlotInst(dependentSlotDef,
-						numberOfInstancesPropertyInst);
+					Integer numberOfInstances = null;
+					if (dependentSlotDef.getEmbeddedNumberOfInstances() != null) {
+						numberOfInstances = dependentSlotDef
+								.getEmbeddedNumberOfInstances()
+								.getIntegerValue();
+					} else if (dependentSlotDef.getNumberOfInstances() != null) {
+						PropertyInst numberOfInstancesPropertyInst = this.slotInstHome
+								.getInstance()
+								.retrievePropertyInstByDef(
+										dependentSlotDef.getNumberOfInstances());
+						numberOfInstances = numberOfInstancesPropertyInst
+								.getIntegerValue();
+					}
 
+					// PropertyInst numberOfInstancesPropertyInst =
+					// this.slotInstHome
+					// .getInstance().retrievePropertyInstByDef(
+					// dependentSlotDef.getNumberOfInstances());
+					this.createDependentSlotInsts(dependentSlotDef,
+							numberOfInstances);
+
+				}
 			}
+
 		}
 	}
 

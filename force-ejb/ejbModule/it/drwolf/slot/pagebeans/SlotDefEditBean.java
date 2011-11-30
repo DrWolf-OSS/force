@@ -100,6 +100,36 @@ public class SlotDefEditBean {
 	// main messages
 	private ArrayList<VerifierMessage> messages = new ArrayList<VerifierMessage>();
 
+	public void addClonedDependentSlotDef() {
+		SlotDefCloner slotDefCloner = new SlotDefCloner();
+		slotDefCloner.setModel(this.dependentSlotDef);
+		slotDefCloner.cloneModel();
+		DependentSlotDef dependentCloned = (DependentSlotDef) slotDefCloner
+				.getCloned();
+
+		dependentCloned.setConditionalPropertyDef(this.dependentSlotDef
+				.getConditionalPropertyDef());
+		dependentCloned.setConditionalPropertyInst(this.dependentSlotDef
+				.getConditionalPropertyInst());
+
+		//
+		dependentCloned.setNumberOfInstances(this.dependentSlotDef
+				.getNumberOfInstances());
+
+		dependentCloned.setEmbeddedNumberOfInstances(this.dependentSlotDef
+				.getEmbeddedNumberOfInstances());
+		//
+
+		this.slotDefHome.getSlotDefCloner().getDependentSlotDefCloners()
+				.add(slotDefCloner);
+
+		this.slotDefHome.getInstance().getDependentSlotDefs()
+				.add(dependentCloned);
+		dependentCloned.setParentSlotDef(this.slotDefHome.getInstance());
+
+		this.resetDependentSlotDefModel();
+	}
+
 	public void addCollection() {
 		if (!this.slotDefHome.getInstance().getDocDefCollectionsAsList()
 				.contains(this.collection)) {
@@ -141,36 +171,6 @@ public class SlotDefEditBean {
 		this.conditional = false;
 	}
 
-	public void addDependentSlotDef() {
-		SlotDefCloner slotDefCloner = new SlotDefCloner();
-		slotDefCloner.setModel(this.dependentSlotDef);
-		slotDefCloner.cloneModel();
-		DependentSlotDef dependentCloned = (DependentSlotDef) slotDefCloner
-				.getCloned();
-
-		dependentCloned.setConditionalPropertyDef(this.dependentSlotDef
-				.getConditionalPropertyDef());
-		dependentCloned.setConditionalPropertyInst(this.dependentSlotDef
-				.getConditionalPropertyInst());
-
-		//
-		dependentCloned.setNumberOfInstances(this.dependentSlotDef
-				.getNumberOfInstances());
-
-		dependentCloned.setEmbeddedNumberOfInstances(this.dependentSlotDef
-				.getEmbeddedNumberOfInstances());
-		//
-
-		this.slotDefHome.getSlotDefCloner().getDependentSlotDefCloners()
-				.add(slotDefCloner);
-
-		this.slotDefHome.getInstance().getDependentSlotDefs()
-				.add(dependentCloned);
-		dependentCloned.setParentSlotDef(this.slotDefHome.getInstance());
-
-		this.resetDependentSlotDefModel();
-	}
-
 	public void addEmbeddedProperty() {
 		if (!this.slotDefHome.getInstance().getEmbeddedPropertiesAsList()
 				.contains(this.embeddedProperty)) {
@@ -189,6 +189,14 @@ public class SlotDefEditBean {
 					this.propertyDef);
 		}
 		this.edit = false;
+	}
+
+	public void addSimplifiedDependentSlotDef() {
+		this.dependentSlotDef.setOwnerId(this.alfrescoUserIdentity
+				.getMyOwnerId());
+		this.slotDefHome.getInstance().getDependentSlotDefs()
+				.add(this.dependentSlotDef);
+		this.dependentSlotDef.setParentSlotDef(this.slotDefHome.getInstance());
 	}
 
 	public void cancelDependentSlotDefEdit() {
@@ -581,6 +589,13 @@ public class SlotDefEditBean {
 		this.propertyDef = new PropertyDef();
 	}
 
+	public void newSimplifiedDependentSlotDef() {
+		this.dependentSlotDef = new DependentSlotDef();
+		EmbeddedProperty embeddedProperty = new EmbeddedProperty();
+		embeddedProperty.setDataType(DataType.INTEGER);
+		this.dependentSlotDef.setEmbeddedNumberOfInstances(embeddedProperty);
+	}
+
 	public void newStandardCollection() {
 		this.newCollection();
 		this.conditional = false;
@@ -834,12 +849,14 @@ public class SlotDefEditBean {
 	public String save() {
 		String validate = this.validate();
 		//
-		String ownerId = null;
-		if (!this.identity.hasRole("ADMIN")) {
-			ownerId = this.alfrescoUserIdentity.getActiveGroup().getShortName();
-		} else {
-			ownerId = "ADMIN";
-		}
+		// String ownerId = null;
+		// if (!this.identity.hasRole("ADMIN")) {
+		// ownerId = this.alfrescoUserIdentity.getActiveGroup().getShortName();
+		// } else {
+		// ownerId = "ADMIN";
+		// }
+
+		String ownerId = this.alfrescoUserIdentity.getMyOwnerId();
 		this.slotDefHome.getInstance().setOwnerId(ownerId);
 		//
 		this.slotDefHome.persist();
