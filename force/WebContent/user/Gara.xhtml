@@ -93,6 +93,7 @@
             		id="createUser"
                     propagation="none"
                     value="Associa Busta" 
+                    action="#{slotDefGaraAssociationtBean.initSlotDefValues()}"
                     rendered="#{garaHome.associatedSlotDef == null and not s:hasRole('ADMIN')}">
                     <f:param name="slotDefId"/>
                    	<f:param name="model" value="#{false}"/>
