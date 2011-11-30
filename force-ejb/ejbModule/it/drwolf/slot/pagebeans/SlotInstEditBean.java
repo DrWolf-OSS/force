@@ -73,7 +73,6 @@ import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
@@ -466,7 +465,7 @@ public class SlotInstEditBean {
 			}
 		}
 
-		// Repplicato per le Property
+		// Replicato per le Property
 		Iterator<PropertyInst> iterator2 = this.propertyInsts.iterator();
 		while (iterator2.hasNext()) {
 			PropertyInst instProperty = iterator2.next();
@@ -533,13 +532,19 @@ public class SlotInstEditBean {
 		String nodeRef = "";
 
 		Session session = this.alfrescoUserIdentity.getSession();
-		// AlfrescoFolder slotFolder = findOrCreateSlotFolder(session);
+		// ContentStream contentStream = document.getContentStream();
 
-		ContentStream contentStream = document.getContentStream();
+		//
+		String mimetype = "application/octet-stream";
+		ContentStreamImpl contentStreamImpl = (ContentStreamImpl) document
+				.getContentStream();
+		// resetto il mimetype per farlo decidere e settare direttamente da
+		// Alfresco
+		contentStreamImpl.setMimeType(mimetype);
+		//
+
 		Set<String> aspects = instCollection.getDocDefCollection().getDocDef()
 				.getAspectIds();
-		// Set<Property> properties =
-		// customModelController.getProperties(aspects);
 
 		Map<String, Object> props = new HashMap<String, Object>();
 		props.put(PropertyIds.NAME, FileContainer.encodeFilename(FileContainer
@@ -547,7 +552,7 @@ public class SlotInstEditBean {
 		props.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
 
 		ObjectId objectId = session.createDocument(props, slotFolder,
-				contentStream, VersioningState.NONE, null, null, null);
+				contentStreamImpl, VersioningState.NONE, null, null, null);
 		System.out.println(objectId);
 
 		AlfrescoDocument documentCopy = (AlfrescoDocument) session
@@ -587,29 +592,19 @@ public class SlotInstEditBean {
 
 	private void createDependentSlotInsts(DependentSlotDef dependentSlotDef,
 			Integer numberOfInstances) {
-		// if (numberOfInstancesPropertyInst != null
-		// && numberOfInstancesPropertyInst.getPropertyDef().getDataType()
-		// .equals(DataType.INTEGER)) {
-		// Integer numberOfInstances = numberOfInstancesPropertyInst
-		// .getIntegerValue();
 		for (int i = 0; i < numberOfInstances; i++) {
-			//
 			SlotInst dependentSlotInst = new SlotInst(dependentSlotDef);
-			//
 			dependentSlotInst.setOwnerId(this.slotInstHome.getInstance()
 					.getOwnerId());
-
 			dependentSlotInst
 					.setParentSlotInst(this.slotInstHome.getInstance());
 			this.slotInstHome.getInstance().getDependentSlotInsts()
 					.add(dependentSlotInst);
 		}
-
-		// }
 	}
 
 	private void createEmptyDependetSlotInsts() {
-		// SlotDef parent = slotDefHome.getInstance();
+
 		Set<DependentSlotDef> dependentSlotDefs = this.slotDefHome
 				.getInstance().getDependentSlotDefs();
 		for (DependentSlotDef dependentSlotDef : dependentSlotDefs) {
@@ -641,10 +636,6 @@ public class SlotInstEditBean {
 								.getIntegerValue();
 					}
 
-					// PropertyInst numberOfInstancesPropertyInst =
-					// this.slotInstHome
-					// .getInstance().retrievePropertyInstByDef(
-					// dependentSlotDef.getNumberOfInstances());
 					this.createDependentSlotInsts(dependentSlotDef,
 							numberOfInstances);
 
@@ -1392,9 +1383,6 @@ public class SlotInstEditBean {
 
 		String fileName = item.getFileName();
 
-		// String name = item.getFile().getName();
-		// System.out.println("----> FILENAME: " + name);
-
 		// Metto un mimetype generico, ci pensa Alfresco a mettere il mimetype
 		// giusto tramite l'esecuzione di uno script
 		String mimetype = "application/octet-stream";
@@ -1467,33 +1455,41 @@ public class SlotInstEditBean {
 			Iterator<DocInst> iterator = docInsts.iterator();
 			while (iterator.hasNext()) {
 				DocInst docInst = iterator.next();
-				AlfrescoDocument document = (AlfrescoDocument) this.alfrescoUserIdentity
-						.getSession().getObject(docInst.getNodeRef());
-				Long docDefCollectionId = instCollection.getDocDefCollection()
-						.getId();
-				List<FileContainer> filesList = this.datas
-						.get(docDefCollectionId);
+				try {
+					AlfrescoDocument document = (AlfrescoDocument) this.alfrescoUserIdentity
+							.getSession().getObject(docInst.getNodeRef());
+					Long docDefCollectionId = instCollection
+							.getDocDefCollection().getId();
+					List<FileContainer> filesList = this.datas
+							.get(docDefCollectionId);
 
-				// Controllo se il document è ancora presente nella lista dei
-				// file associati, se c'è ancora ne aggiorno le properties
-				// altrimenti lo cancello da alfresco e lo tolgo dalla relativa
-				// collection
-				FileContainer itemContained = this.getItemIfContained(
-						filesList, document.getId());
-				if (itemContained == null) {
-					document.deleteAllVersions();
-					iterator.remove();
-					Long id = docInst.getId();
-					DocInst foundDocInst = this.entityManager.find(
-							DocInst.class, id);
-					this.entityManager.remove(foundDocInst);
-				} else {
-					// il file è quello vecchio ma potrebbe necessitare di
-					// un aggiornamento delle properties
-					System.out.println("Doc " + document.getName()
-							+ " da aggiornare");
-					this.updateProperties(document,
-							itemContained.getDocumentProperties());
+					// Controllo se il document è ancora presente nella lista
+					// dei
+					// file associati, se c'è ancora ne aggiorno le properties
+					// altrimenti lo cancello da alfresco e lo tolgo dalla
+					// relativa
+					// collection
+					FileContainer itemContained = this.getItemIfContained(
+							filesList, document.getId());
+					if (itemContained == null) {
+						document.deleteAllVersions();
+						iterator.remove();
+						Long id = docInst.getId();
+						DocInst foundDocInst = this.entityManager.find(
+								DocInst.class, id);
+						this.entityManager.remove(foundDocInst);
+					} else {
+						// il file è quello vecchio ma potrebbe necessitare di
+						// un aggiornamento delle properties
+						System.out.println("Doc " + document.getName()
+								+ " da aggiornare");
+						this.updateProperties(document,
+								itemContained.getDocumentProperties());
+					}
+				} catch (CmisObjectNotFoundException e) {
+					System.out.println("----->" + docInst.getNodeRef()
+							+ " NOT FOUND on repository");
+					e.printStackTrace();
 				}
 			}
 

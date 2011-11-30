@@ -548,7 +548,8 @@
 								action="#{slotInstEditBean.downloadDocumentsZip()}"  
 								disabled="#{slotInstHome.instance.status != 'VALID'}"/>
 				
-				<s:button view="/user/SlotInstEdit.xhtml" value="Annulla Modifiche" style="float:right" 
+				<s:button view="/user/SlotInstEdit.xhtml" value="Annulla Modifiche" style="float:right"
+					onclick="dirty=false" 
 					propagation="none" includePageParams="true">
 				</s:button>
 			</s:div>
