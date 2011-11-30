@@ -9,9 +9,9 @@
     xmlns:rich="http://richfaces.org/rich"
     template="layout/templateHome.xhtml">
     <ui:define name="colonnaSx">
-    <rich:panel  style="width : 300px; margin-right: 10px;"  >
+    <rich:panel>
      <f:facet name="header" >Menu</f:facet>
-        <ul style="list-style: none;font-size: 16px;">
+        <ul style="font-size: 16px;">
             <li><a href="servizi.seam">Servizi Gratuiti</a></li>
             <li><a href="servizi.seam">Servizo Base</a></li>
             <li><a href="servizi.seam">Abbonamento FORCE</a></li>
@@ -59,7 +59,7 @@ inclusa la stipula del contratto in caso di aggiudicazione.</li>
 	</h:form>
     </ui:define>
     <ui:define name="colonnaDx">
-    <rich:panel style="width : 300px; margin-left: 10px;">
+    <rich:panel>
      <f:facet name="header">Gare in primo piano</f:facet>
      
     <rich:dataList id="activeGareList"

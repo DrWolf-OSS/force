@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
 import org.jboss.seam.ScopeType;
@@ -57,6 +58,25 @@ public class ControlPanelBean {
 			System.out.println(element);
 		}
 		return this.slotInstEditBean.getDocInstCollections();
+	}
+
+	// questo metodo lo uso nel control panel per prendere le prime 5 gare
+	// segnalate
+	public List<ComunicazioneAziendaGara> getGare(Integer limit) {
+
+		ArrayList<ComunicazioneAziendaGara> lista = new ArrayList<ComunicazioneAziendaGara>();
+		Query query = this.entityManager
+				.createQuery(
+						"from ComunicazioneAziendaGara cag where cag.id.aziendaId = :a order by cag.gara.dataScadenza desc")
+				.setParameter("a", this.userSession.getAzienda().getId());
+		if (limit > 0) {
+			query = query.setMaxResults(limit);
+		}
+		ArrayList<ComunicazioneAziendaGara> elenco = (ArrayList<ComunicazioneAziendaGara>) query
+				.getResultList();
+		lista.addAll(elenco);
+
+		return lista;
 	}
 
 	public ArrayList<DocInstCollection> getInScadenza() {

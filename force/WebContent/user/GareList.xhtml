@@ -16,12 +16,12 @@
     <div class="results" id="newGareList">
 
     <h:outputText value="La ricerca non ha prodotto nessun risultato."
-               rendered="#{empty controlPanelBean.selectedGare}"/>
+               rendered="#{empty controlPanelBean.getGare(0)}"/>
 
     <rich:dataTable id="activeGareList"
                 var="cag"
-              value="#{controlPanelBean.selectedGare}"
-           rendered="#{not empty controlPanelBean.selectedGare}">
+              value="#{controlPanelBean.getGare(0)}"
+           rendered="#{not empty controlPanelBean.getGare(0)}">
         <h:column>
             <f:facet name="header">
                 <ui:include src="/layout/sort.xhtml">
@@ -66,15 +66,11 @@
                 <f:convertDateTime pattern="dd/MM/yyyy"/>
             </h:outputText>
         </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Importanza"/>
-                </ui:include>
-            </f:facet>
-           <h:graphicImage value="/img/rating2stars.png" />
-        </h:column>
+	    <rich:column>
+	        <f:facet name="header">Stato</f:facet>
+	        <h:outputText value="Da vedere" rendered="#{not cag.web}"></h:outputText>
+	        <h:outputText value="Vista" rendered="#{cag.web}"></h:outputText>
+	    </rich:column>
          <rich:column styleClass="action">
             <f:facet name="header">Azioni</f:facet>
             <s:link view="/user/Gara.xhtml"

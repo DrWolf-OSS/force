@@ -31,6 +31,20 @@ public class ComunicazioneAziendaGara implements Serializable {
 
 	private Gara gara;
 
+	public ComunicazioneAziendaGara() {
+
+	}
+
+	public ComunicazioneAziendaGara(ComunicazioneAziendaGaraId id,
+			boolean email, boolean web, Azienda azienda, Gara gara) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.web = web;
+		this.azienda = azienda;
+		this.gara = gara;
+	}
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "aziendaId", nullable = true, insertable = false, updatable = false)
 	public Azienda getAzienda() {

@@ -162,8 +162,9 @@ public class StartFeedParser implements GaraFeedParserIF {
 
 	public void parse(String url) {
 		WebClient wc = new WebClient();
-		Pattern pCM = Pattern.compile("^[A-Z0-9\\-\\.\\s]+$");
+		Pattern pCM = Pattern.compile("^[A-Z0-9\\-\\.\\s,]+$");
 		Pattern pSOA = Pattern.compile("^O[GS]\\s\\d");
+		Pattern commento = Pattern.compile("^\\d+$");
 		try {
 			this.page = wc.getPage(url);
 			List<HtmlTableRow> rows = (List<HtmlTableRow>) this.page
@@ -178,11 +179,15 @@ public class StartFeedParser implements GaraFeedParserIF {
 						// provo a vedere se è una SOA o CM
 						Matcher mSOA = pSOA.matcher(row.getCell(0).asText());
 						Matcher mCM = pCM.matcher(row.getCell(0).asText());
-						if (mSOA.find()) {
-							// Ho individuato una categoria merceologica
-							this.soa.add(row.getCell(0).asText().trim());
-						} else if (mCM.find()) {
-							this.cm.add(row.getCell(0).asText().trim());
+						Matcher mCommento = commento.matcher(row.getCell(0)
+								.asText());
+						if (!mCommento.find()) {
+							if (mSOA.find()) {
+								// Ho individuato una categoria merceologica
+								this.soa.add(row.getCell(0).asText().trim());
+							} else if (mCM.find()) {
+								this.cm.add(row.getCell(0).asText().trim());
+							}
 						}
 					}
 				}
