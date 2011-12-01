@@ -59,7 +59,8 @@ public abstract class AlfrescoIdentity {
 			parameter.put(SessionParameter.OBJECT_FACTORY_CLASS,
 					"org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl");
 
-			this.session = new SynchSession(f.createSession(parameter));
+			// this.session = new SynchSession(f.createSession(parameter));
+			this.session = f.createSession(parameter);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

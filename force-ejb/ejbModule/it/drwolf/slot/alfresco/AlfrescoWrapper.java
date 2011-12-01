@@ -5,17 +5,13 @@ import it.drwolf.slot.pagebeans.support.FileContainer;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
@@ -37,11 +33,9 @@ import org.apache.chemistry.opencmis.commons.data.Ace;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.AclPropagation;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
-import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlEntryImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlPrincipalDataImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.io.IOUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
@@ -300,26 +294,6 @@ public class AlfrescoWrapper {
 	public AlfrescoFolder retrieveGroupFolder(String path, String shortName) {
 		return (AlfrescoFolder) this.alfrescoUserIdentity.getSession()
 				.getObjectByPath(path + "/" + shortName);
-	}
-
-	/**
-	 * DA TESTARE
-	 * 
-	 */
-	public void storeFile(Folder folder, File file) throws Exception {
-		Session adminSession = this.alfrescoUserIdentity.getSession();
-
-		HashMap<String, Object> props = new HashMap<String, Object>();
-		String contentType = new MimetypesFileTypeMap().getContentType(file
-				.getName());
-		ContentStreamImpl contentStreamImpl = new ContentStreamImpl(
-				file.getName(), new BigInteger("" + file.length()),
-				contentType, new FileInputStream(file));
-		props.put(PropertyIds.NAME, file.getName());
-		props.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
-
-		adminSession.createDocument(props, folder, contentStreamImpl,
-				VersioningState.NONE, null, null, null);
 	}
 
 }
