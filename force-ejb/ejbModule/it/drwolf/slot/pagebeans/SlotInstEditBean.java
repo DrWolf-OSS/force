@@ -151,9 +151,6 @@ public class SlotInstEditBean {
 	private static final int LENGHT_LIMIT = 150;
 	private static final String SPACER = " ";
 
-	// @In(create = true)
-	// PropertyInstsBean propertyInstsBean;
-
 	public void addActiveItemToDatas() {
 		if (!this.datas.get(this.activeCollectionId).contains(
 				this.activeFileContainer)) {
@@ -177,7 +174,6 @@ public class SlotInstEditBean {
 				e.printStackTrace();
 			}
 		}
-		// this.cleanActiveElements();
 	}
 
 	private void addCollectionMessage(Long collectionId, VerifierMessage message) {
@@ -782,10 +778,6 @@ public class SlotInstEditBean {
 		return null;
 	}
 
-	// public String getValidationResult() {
-	// return this.validationResult;
-	// }
-
 	public HashMap<Long, List<FileContainer>> getPrimaryDocs() {
 		return this.primaryDocs;
 	}
@@ -830,22 +822,12 @@ public class SlotInstEditBean {
 				for (AlfrescoDocument document : collPrimaryDocs) {
 					FileContainer fileContainer = new FileContainer(document,
 							properties, false);
-					// FileContainer fileContainer = buildFileContainer(
-					// properties, document, false);
 					fileContainers.add(fileContainer);
 				}
 				this.primaryDocs.put(defCollection.getId(), fileContainers);
 			}
 
 		} else {
-			//
-			// this.slotDefHome.setSlotDefId(this.slotInstHome.getInstance()
-			// .getSlotDef().getId());
-			// this.slotDefHome.find();
-			//
-			// this.propertyInsts = new
-			// ArrayList<PropertyInst>(this.slotInstHome
-			// .getInstance().getPropertyInsts());
 			List<PropertyInst> originalPropertyInsts = new ArrayList<PropertyInst>(
 					this.slotInstHome.getInstance().getPropertyInsts());
 			//
@@ -875,8 +857,6 @@ public class SlotInstEditBean {
 						String nodeRef = docInst.getNodeRef();
 						AlfrescoDocument document = (AlfrescoDocument) this.alfrescoUserIdentity
 								.getSession().getObject(nodeRef);
-						// FileContainer container = buildFileContainer(
-						// properties, document, true);
 						FileContainer container = new FileContainer(document,
 								properties, true);
 
@@ -909,21 +889,6 @@ public class SlotInstEditBean {
 			if (this.slotInstHome.getInstance().getStatus() != null
 					&& !this.slotInstHome.getInstance().getStatus()
 							.equals(SlotInstStatus.EMPTY)) {
-				// boolean verifyPassed = this.verify();
-				// boolean checkCollectionsSizePassed = this
-				// .checkCollectionsSize();
-				// if (verifyPassed && checkCollectionsSizePassed) {
-				// this.slotInstHome.getInstance().setStatus(
-				// SlotInstStatus.VALID);
-				// this.slotMessages.add(new VerifierMessage(
-				// "La busta è valida", VerifierMessageType.VALID));
-				// } else {
-				// this.slotInstHome.getInstance().setStatus(
-				// SlotInstStatus.INVALID);
-				// this.slotMessages
-				// .add(new VerifierMessage("La busta non è valida",
-				// VerifierMessageType.ERROR));
-				// }
 				this.validationRoutine();
 			} else {
 				this.slotInstHome.getInstance().setTransientStatus(

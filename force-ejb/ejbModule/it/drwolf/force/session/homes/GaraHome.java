@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityHome;
@@ -37,6 +38,16 @@ public class GaraHome extends EntityHome<Gara> {
 	protected Gara createInstance() {
 		Gara gara = new Gara();
 		return gara;
+	}
+
+	@Factory("allAssociatedSlotInst")
+	public List<SlotInst> getAllAssociatedSlotInst() {
+		List<SlotInst> resultList = this.entityManager
+				.createQuery(
+				// "select s.id from SlotInst s join Gara g where s.slotDef in elements(g.slotDefs) and g:=gara"
+						"select si from Gara g, SlotInst si inner join g.slotDefs sd where si.slotDef = sd and g=:gara")
+				.setParameter("gara", this.getInstance()).getResultList();
+		return resultList;
 	}
 
 	public SlotDef getAssociatedSlotDef() {
@@ -71,10 +82,9 @@ public class GaraHome extends EntityHome<Gara> {
 					.createQuery(
 							"from SlotInst s where s.slotDef=:slotDef and s.ownerId=:ownerId order by s.id desc")
 					.setParameter("slotDef", associatedSlotDef)
-					.setParameter(
-							"ownerId",
-							this.alfrescoUserIdentity.getActiveGroup()
-									.getShortName()).getResultList();
+					.setParameter("ownerId",
+							this.alfrescoUserIdentity.getMyOwnerId())
+					.getResultList();
 			if (!resultList.isEmpty()) {
 				return resultList.get(0);
 			}

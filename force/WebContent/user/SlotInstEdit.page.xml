@@ -5,9 +5,11 @@
       login-required="true">
       
    <restrict>
-   #{(not slotInstHome.managed or slotInstHome.instance.ownerId == alfrescoUserIdentity.activeGroup.shortName or s:hasRole('ADMIN'))
-   and (slotDefHome.instance.ownerId == 'ADMIN' or slotDefHome.instance.ownerId == alfrescoUserIdentity.activeGroup.shortName)
-   and (not slotInstHome.managed or slotDefHome.instance.id == slotInstHome.instance.slotDef.id)}
+   #{((not slotInstHome.managed) and (slotDefHome.instance.ownerId == 'ADMIN' or slotDefHome.instance.ownerId == alfrescoUserIdentity.activeGroup.shortName))
+   or 
+   (slotInstHome.managed and 
+   (slotDefHome.instance.id == slotInstHome.instance.slotDef.id) and
+   (slotInstHome.instance.ownerId == alfrescoAdminIdentity.activeGroup.shortName or s:hasRole('ADMIN')))}
    </restrict>
 
    <begin-conversation join="true" />

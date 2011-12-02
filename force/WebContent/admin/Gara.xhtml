@@ -1,0 +1,127 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:a4j="http://richfaces.org/a4j"
+    template="/layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="gara" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">Dettaglio Gara</f:facet>
+
+
+
+            <s:decorate id="oggettoField" template="/layout/display.xhtml">
+                <ui:define name="label">Oggetto</ui:define>
+                <h:outputText value="#{garaHome.instance.oggetto}" />
+            </s:decorate>
+            <s:decorate id="linkField" template="/layout/display.xhtml">
+                <ui:define name="label">Link</ui:define>
+                <a href="#{garaHome.instance.link}" target="_blank">#{garaHome.instance.link}</a>
+            </s:decorate>
+            <s:decorate id="dataInizioField" template="/layout/display.xhtml">
+                <ui:define name="label">Data inizio</ui:define>
+                <h:outputText value="#{garaHome.instance.dataPubblicazione}">
+                 <f:convertDateTime pattern="dd/MM/yyyy"/>
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="dataFineField" template="/layout/display.xhtml">
+                <ui:define name="label">Data Fine</ui:define>
+                <h:outputText value="#{garaHome.instance.dataScadenza}" >
+                 <f:convertDateTime pattern="dd/MM/yyyy"/>
+                </h:outputText>
+            </s:decorate>
+            <s:decorate id="importoField" template="/layout/display.xhtml">
+                <ui:define name="label">Importo</ui:define>
+                <h:outputText value="#{garaHome.instance.importo} €" />
+            </s:decorate>
+
+            <s:decorate id="catmerField" template="/layout/display.xhtml" rendered="#{not empty garaHome.instance.categorieMerceologicheAsList}">
+                <ui:define name="label">Categorie Merceologiche</ui:define>
+                <rich:dataTable id="catmerList"
+                               var="catMer"
+                                value="#{garaHome.instance.categorieMerceologicheAsList}"
+                               rendered="#{not empty garaHome.instance.categorieMerceologicheAsList}">
+                    <rich:column>
+                        <h:outputText value="#{catMer.categoria}"></h:outputText>
+                    </rich:column>
+                </rich:dataTable>
+            </s:decorate>
+
+            <s:decorate id="soaField" template="/layout/edit.xhtml" rendered="#{not empty garaHome.instance.SOAAsList}">
+                <ui:define name="label">SOA</ui:define>
+                <rich:dataTable id="soaList"
+                               var="soa"
+                                value="#{garaHome.instance.SOAAsList}"
+                               rendered="#{not empty garaHome.instance.SOAAsList}">
+                    <rich:column>
+                        <h:outputText value="#{soa.codice}"></h:outputText>
+                    </rich:column>
+                </rich:dataTable>
+            </s:decorate>
+
+
+            <div style="clear:both"/>
+			
+			<rich:dataTable value="#{allAssociatedSlotInst}" var="si">
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Id" />
+            		</f:facet>
+					<h:outputText value="#{si.id}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Owner" />
+            		</f:facet>
+					<h:outputText value="#{si.ownerId}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Busta definita da" />
+            		</f:facet>
+					<h:outputText value="#{si.slotDef.ownerId}" />
+				</rich:column>
+				<rich:column>
+					<f:facet name="header">
+						<h:outputText value="Stato" />
+            		</f:facet>
+					<h:outputText value="#{si.status.value()}" />
+				</rich:column>
+				
+				<rich:column styleClass="action">
+            		<f:facet name="header">Azioni</f:facet>
+            		<s:link view="/user/SlotInstEdit.xhtml"
+		                   value="Vedi"
+		             propagation="none">
+		                <f:param name="garaId" value="#{_gara.id}"/>
+		                <f:param name="slotInstId" value="#{si.id}"/>
+		                <f:param name="slotDefId" value="#{si.slotDef.id}"/>
+		            </s:link>
+            		#{' '}
+		            <s:link view="/admin/GaraEdit.xhtml"
+		                   value="Modifica"
+		             propagation="none"
+		                      id="garaEdit"
+		                rendered="#{empty from}">
+		                <f:param name="garaId"
+		                        value="#{_gara.id}"/>
+		            </s:link>
+        		</rich:column>
+			</rich:dataTable>
+
+        </rich:panel>
+
+    </h:form>
+
+</ui:define>
+
+</ui:composition>
