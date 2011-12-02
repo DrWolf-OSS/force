@@ -36,7 +36,7 @@
 	<rich:panel>
 	   <f:facet name="header">Gestisci le Categorie Merceologiche </f:facet>
 	   <h:panelGrid columns="2" columnClasses="top, top" style="margin:0 auto;">
-	        <rich:pickList value="#{aziendaHome.instance.categorieMerceologicheAsList}" sourceListWidth="300" targetListWidth="300" listsHeight="400"> 
+	        <rich:pickList value="#{aziendaHome.instance.categorieMerceologicheAsList}" sourceListWidth="400" targetListWidth="400" listsHeight="400"> 
                 <s:selectItems value="#{categoriaMerceologicaList.resultList}" var="cm" label="#{cm.categoria}"/>
                 <s:convertEntity />
                 <a4j:support event="onlistchanged" reRender="result"/>

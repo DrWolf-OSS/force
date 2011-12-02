@@ -472,7 +472,7 @@
 					</ui:define>
 					<ui:repeat var="slot" value="#{slotInstHome.instance.dependentSlotInstsAsList}">
 						<s:div>
-							<rich:toolTip>
+							<rich:toolTip rendered="#{slot.status != 'EMPTY'}">
 							<span>
 							<ui:repeat var="dataInstance" value="#{slot.propertyInstsAsList}">
 								<s:decorate template="/layout/display.xhtml">
@@ -498,6 +498,10 @@
 								</s:decorate>
 							</ui:repeat>
 							</span>
+							</rich:toolTip>
+							
+							<rich:toolTip rendered="#{slot.status == 'EMPTY'}">
+							Busta vuota, cliccare per aprire la pagina di editing
 							</rich:toolTip>
 							
 							<h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
@@ -548,7 +552,8 @@
 								action="#{slotInstEditBean.downloadDocumentsZip()}"  
 								disabled="#{slotInstHome.instance.status != 'VALID'}"/>
 				
-				<s:button view="/user/SlotInstEdit.xhtml" value="Annulla Modifiche" style="float:right" 
+				<s:button view="/user/SlotInstEdit.xhtml" value="Annulla Modifiche" style="float:right"
+					onclick="dirty=false" 
 					propagation="none" includePageParams="true">
 				</s:button>
 			</s:div>
