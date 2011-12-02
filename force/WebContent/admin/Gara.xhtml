@@ -100,6 +100,7 @@
 				<rich:column styleClass="action">
             		<f:facet name="header">Azioni</f:facet>
             		<s:link view="/user/SlotInstEdit.xhtml"
+            			styleClass="modal"
 		                   value="Vedi"
 		             propagation="none">
 		                <f:param name="garaId" value="#{_gara.id}"/>
@@ -107,14 +108,7 @@
 		                <f:param name="slotDefId" value="#{si.slotDef.id}"/>
 		            </s:link>
             		#{' '}
-		            <s:link view="/admin/GaraEdit.xhtml"
-		                   value="Modifica"
-		             propagation="none"
-		                      id="garaEdit"
-		                rendered="#{empty from}">
-		                <f:param name="garaId"
-		                        value="#{_gara.id}"/>
-		            </s:link>
+
         		</rich:column>
 			</rich:dataTable>
 

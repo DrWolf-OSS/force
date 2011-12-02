@@ -813,7 +813,8 @@ public class SlotInstEditBean {
 				this.datas.put(defCollection.getId(),
 						new ArrayList<FileContainer>());
 				List<AlfrescoDocument> collPrimaryDocs = this
-						.retrievePrimaryDocs(defCollection.getDocDef().getId());
+						.retrievePrimaryDocs(defCollection.getDocDef().getId(),
+								this.alfrescoUserIdentity.getMyOwnerId());
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				Set<String> aspectIds = defCollection.getDocDef()
 						.getAspectIds();
@@ -872,7 +873,8 @@ public class SlotInstEditBean {
 			for (DocDefCollection defCollection : this.slotDefHome
 					.getInstance().getDocDefCollections()) {
 				List<AlfrescoDocument> collPrimaryDocs = this
-						.retrievePrimaryDocs(defCollection.getDocDef().getId());
+						.retrievePrimaryDocs(defCollection.getDocDef().getId(),
+								this.slotInstHome.getInstance().getOwnerId());
 				Set<String> aspectIds = defCollection.getDocDef()
 						.getAspectIds();
 				Set<Property> properties = this.customModelController
@@ -963,15 +965,13 @@ public class SlotInstEditBean {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<AlfrescoDocument> retrievePrimaryDocs(Long docDefId) {
+	private List<AlfrescoDocument> retrievePrimaryDocs(Long docDefId,
+			String ownerId) {
 		List<AlfrescoDocument> primaryDocs = new ArrayList<AlfrescoDocument>();
 		List<DocInst> resultList = this.entityManager
 				.createQuery(
 						"from DocInst d where d.docInstCollection.slotInst.slotDef.type = 'Primary' and d.docInstCollection.slotInst.ownerId=:ownerId and d.docInstCollection.docDefCollection.docDef.id=:docDefId")
-				.setParameter(
-						"ownerId",
-						this.alfrescoUserIdentity.getActiveGroup()
-								.getShortName())
+				.setParameter("ownerId", ownerId)
 				.setParameter("docDefId", docDefId).getResultList();
 		if (resultList != null) {
 			for (DocInst docInst : resultList) {
