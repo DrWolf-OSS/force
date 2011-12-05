@@ -164,6 +164,10 @@ a:HOVER {
 	font-weight:bold";
 }
 
+.columnSlotInstStatus{
+	width:70px;
+}
+
 .topColumn{
 	vertical-align: top;
 }

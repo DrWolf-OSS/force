@@ -74,7 +74,9 @@
 			
 			<rich:dataTable id="garaSlotInsts" value="#{allAssociatedSlotInstsAsObjects}" 
 						var="field" 
-						rendered="#{not empty allAssociatedSlotInstsAsObjects}">
+						rendered="#{not empty allAssociatedSlotInstsAsObjects}"
+						onRowMouseOver="this.style.backgroundColor='#F2F2F2'"
+						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
 				<f:facet name="header">
 					<h:outputText value="Buste amministrative relative alla gara" />
             	</f:facet>
@@ -99,7 +101,7 @@
             		</f:facet>
 					<h:outputText value="#{field[6]}" />
 				</rich:column>
-				<rich:column>
+				<rich:column styleClass="columnSlotInstStatus">
 					<f:facet name="header">
 						<h:outputText value="Stato" />
             		</f:facet>
@@ -130,7 +132,7 @@
 		            #{' | '}
             		<s:link view="/user/SlotInstEdit.xhtml"
             			styleClass="modal"
-		                   value="Modifica Busta"
+		                   value="Modifica Contenuto"
 		             propagation="none">
 		                <f:param name="garaId" value="#{_gara.id}"/>
 		                <f:param name="slotInstId" value="#{field[0]}"/>

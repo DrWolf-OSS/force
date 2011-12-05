@@ -12,7 +12,7 @@
                 style="font-size:11px; color : #FFF;"/>
     
     </rich:toolBarGroup>
-     <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" >
+     <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{s:hasRole('ADMIN')}">
         <f:facet name="label">Browse data</f:facet>
 	<rich:menuItem>
     	<s:link view="/SlotDefList.xhtml"

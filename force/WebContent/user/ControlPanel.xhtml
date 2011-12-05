@@ -211,7 +211,10 @@
         <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
     </s:link>
     <h:outputText value="Gare del tuo Settore" /></s:span></f:facet>
-    <rich:dataTable value="#{controlPanelBean.selectedGare}" var="cag">
+    <rich:dataTable value="#{controlPanelBean.selectedGare}" 
+    		var="cag"
+    		onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
+			onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
     <rich:column>
         <f:facet name="header">Oggetto</f:facet>
         <h:outputText value="#{cag.gara.oggetto}"></h:outputText>
@@ -237,7 +240,8 @@
                       id="gara">
                 <f:param name="garaId"
                         value="#{cag.gara.id}"/>
-            </s:link>    </rich:column>
+            </s:link>
+    </rich:column>
     </rich:dataTable>
     
 </rich:panel>
@@ -250,12 +254,15 @@
         <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
     </s:link>
     <h:outputText value="Gare a cui partecipi" /></s:span></f:facet>
-    <rich:dataTable value="#{controlPanelBean.slotInst}" var="si">
+    <rich:dataTable value="#{controlPanelBean.slotInst}" 
+    			var="si"
+    			onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
+				onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
     <rich:column>
         <f:facet name="header">Oggetto</f:facet>
         <h:outputText value="#{si.slotDef.name}"></h:outputText>
     </rich:column>
-    <rich:column>
+    <rich:column styleClass="columnSlotInstStatus">
         <f:facet name="header">Stato</f:facet>
         <h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
 								rendered="#{si.status == 'EMPTY'}" />
