@@ -11,6 +11,7 @@
     template="/layout/template.xhtml">
 
 <ui:define name="body">
+<h:form>
 <h:panelGrid columns="2" width="100%" columnClasses="controlPanelclassSX,controlPanelclassDX">
 <rich:panel >
      <f:facet name="header"><s:span>
@@ -18,31 +19,31 @@
       <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
       </s:link>
     <h:outputText value="I Dati dell'Impresa" /></s:span></f:facet>
-     <s:decorate id="ragsoc" template="/layout/display.xhtml">
+     <s:decorate template="/layout/display.xhtml">
             <ui:define name="label">Ragione Sociale</ui:define>
             <h:outputText value="#{userSession.azienda.ragioneSociale}"/>
      </s:decorate>
-     <s:decorate id="ragsoc" template="/layout/display.xhtml">
+     <s:decorate template="/layout/display.xhtml">
             <ui:define name="label">Partita IVA</ui:define>
             <h:outputText value="#{userSession.azienda.partitaIva}"/>
      </s:decorate>
-     <s:decorate id="ragsoc" template="/layout/display.xhtml">
+     <s:decorate template="/layout/display.xhtml">
             <ui:define name="label">Forma giuridica</ui:define>
             <h:outputText value="#{userSession.azienda.formaGiuridica.nome}"/>
      </s:decorate>
-     <s:decorate id="indirizzo" template="/layout/display.xhtml">
+     <s:decorate template="/layout/display.xhtml">
             <ui:define name="label">Indirizzo</ui:define>
             <h:outputText value="#{userSession.azienda.indirizzo}"/>
      </s:decorate>
-     <s:decorate id="indirizzo" template="/layout/display.xhtml">
+     <s:decorate template="/layout/display.xhtml">
             <ui:define name="label">Comune</ui:define>
             <h:outputText value="#{userSession.azienda.comune}"/>
      </s:decorate>
-     <s:decorate id="emailImp" template="/layout/display.xhtml">
+     <s:decorate template="/layout/display.xhtml">
             <ui:define name="label">e-mail Impresa</ui:define>
             <h:outputText value="#{userSession.azienda.email}"/>
      </s:decorate>
-     <s:decorate id="emailImp" template="/layout/display.xhtml">
+     <s:decorate template="/layout/display.xhtml">
             <ui:define name="label">PEC Impresa</ui:define>
             <h:outputText value="#{userSession.azienda.emailCertificata}"/>
      </s:decorate>
@@ -50,7 +51,7 @@
             <ui:define name="label">Referente</ui:define>
             <h:outputText value="#{userSession.azienda.referente}"/>
      </s:decorate>
-     <s:decorate id="referente" template="/layout/display.xhtml">
+     <s:decorate template="/layout/display.xhtml">
             <ui:define name="label">CF Referente</ui:define>
             <h:outputText value="#{userSession.azienda.codiceFiscale}"/>
      </s:decorate>
@@ -249,16 +250,26 @@
         <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
     </s:link>
     <h:outputText value="Gare a cui partecipi" /></s:span></f:facet>
-    <rich:dataTable value="#{controlPanelBean.slotInst}" var="g">
-     <rich:column>
+    <rich:dataTable value="#{controlPanelBean.slotInst}" var="si">
+    <rich:column>
         <f:facet name="header">Oggetto</f:facet>
-        <h:outputText value="#{g.slotDef.name}"></h:outputText>
+        <h:outputText value="#{si.slotDef.name}"></h:outputText>
+    </rich:column>
+    <rich:column>
+        <f:facet name="header">Stato</f:facet>
+        <h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
+								rendered="#{si.status == 'EMPTY'}" />
+					<h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
+								rendered="#{si.status == 'VALID'}" />
+					<h:graphicImage value="/img/envelope-red-exclamation.png"  styleClass="fileIcon"
+								rendered="#{si.status == 'INVALID'}" />
+        <h:outputText value="#{si.status.value()}"></h:outputText>
     </rich:column>
      <rich:column>
         <f:facet name="header">Azioni</f:facet>
         <s:link value="Amministra" view="/user/SlotInstEdit.xhtml"  propagation="none" styleClass="modal">
-        <f:param name="slotInstId" value="#{g.id}"/>
-        <f:param name="slotDefId" value="#{g.slotDef.id}"/>
+        <f:param name="slotInstId" value="#{si.id}"/>
+        <f:param name="slotDefId" value="#{si.slotDef.id}"/>
         <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
     </s:link>
     </rich:column>
@@ -274,6 +285,7 @@
     <rich:dataTable id="soaList"
                 var="soa"
               value="#{userSession.azienda.SOAAsList}"
+              rows="10"
            rendered="#{not empty userSession.azienda.SOAAsList}">
         <rich:column>
         <h:outputText value="#{soa.codice}"></h:outputText>
@@ -282,6 +294,7 @@
         <h:outputText value="#{soa.nome}"></h:outputText>
     </rich:column>
     </rich:dataTable>
+    <rich:datascroller for="soaList" renderIfSinglePage="false" rendered="#{not empty userSession.azienda.SOAAsList}" />
 </rich:panel>
 <rich:spacer height="20px;"/>
 
@@ -294,11 +307,14 @@
     <rich:dataTable id="catmerList"
                 var="catMer"
               value="#{userSession.azienda.categorieMerceologicheAsList}"
+              rows="10"
            rendered="#{not empty userSession.azienda.categorieMerceologicheAsList}">
         <rich:column>
         <h:outputText value="#{catMer.categoria}"></h:outputText>
     </rich:column>
     </rich:dataTable>
+    <rich:datascroller for="catmerList" renderIfSinglePage="false" rendered="#{not empty userSession.azienda.categorieMerceologicheAsList}" />
 </rich:panel>
+</h:form>
 </ui:define>
 </ui:composition>

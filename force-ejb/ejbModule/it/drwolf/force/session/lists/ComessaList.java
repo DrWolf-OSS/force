@@ -21,7 +21,7 @@ public class ComessaList extends EntityQuery<Commessa> {
 
 	private static final String EJBQL = "select commessa from Commessa commessa";
 
-	@In
+	@In(create = true)
 	private AziendaHome aziendaHome;
 
 	private static final String[] RESTRICTIONS = {
