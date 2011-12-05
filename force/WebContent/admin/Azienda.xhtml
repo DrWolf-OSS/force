@@ -101,6 +101,7 @@
     <div class="actionButtons">
 
         <s:button view="/admin/AziendaEdit.xhtml"
+        		rendered="#{alfrescoUserIdentity.activeGroup.shortName == aziendaHome.instance.alfrescoGroupId or s:hasRole('ADMIN')}"
                     id="edit"
                  value="Modifica"/>
 

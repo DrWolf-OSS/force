@@ -27,7 +27,7 @@ public class GaraSlotInstsAssociationBean {
 	public List<Object[]> getAllAssociatedSlotInstsAsObjects() {
 		List<Object[]> resultList = this.entityManager
 				.createQuery(
-						"select si.id, si.ownerId, a.ragioneSociale, si.slotDef.id, si.slotDef.ownerId, si.status from Gara g, SlotInst si, Azienda a inner join g.slotDefs sd where si.slotDef = sd and g.id=:garaId and a.alfrescoGroupId = si.ownerId")
+						"select si.id, si.ownerId, a.ragioneSociale, si.slotDef.id, si.slotDef.ownerId, si.status, a.emailReferente, a.id from Gara g, SlotInst si, Azienda a inner join g.slotDefs sd where si.slotDef = sd and g.id=:garaId and a.alfrescoGroupId = si.ownerId")
 				.setParameter("garaId", this.garaHome.getGaraId())
 				.getResultList();
 		return resultList;

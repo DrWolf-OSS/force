@@ -3,6 +3,7 @@ package it.drwolf.force.entity;
 import it.drwolf.force.enums.TipoGara;
 import it.drwolf.force.exceptions.DuplicateCoupleGaraSlotDefOwner;
 import it.drwolf.slot.entity.SlotDef;
+import it.drwolf.slot.entity.SlotInst;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -117,6 +119,18 @@ public class Gara implements Serializable {
 		}
 	}
 
+	@Transient
+	@SuppressWarnings("unchecked")
+	public List<SlotInst> getAllAssociatedSlotInsts() {
+		EntityManager entityManager = (EntityManager) org.jboss.seam.Component
+				.getInstance("entityManager");
+		List<SlotInst> resultList = entityManager
+				.createQuery(
+						"select si from Gara g, SlotInst si inner join g.slotDefs sd where si.slotDef = sd and g=:gara")
+				.setParameter("gara", this).getResultList();
+		return resultList;
+	}
+
 	@OneToMany(mappedBy = "gara", fetch = FetchType.EAGER)
 	public Set<ComunicazioneAziendaGara> getAziende() {
 		return this.aziende;
@@ -181,16 +195,16 @@ public class Gara implements Serializable {
 		return this.requisitoEconomico;
 	}
 
-	@Column
-	public BigDecimal getRequisitoTecnico() {
-		return this.requisitoTecnico;
-	}
-
 	// @ManyToOne
 	// @JoinColumn(name = "SlotDef")
 	// public SlotDef getSlotDef() {
 	// return this.slotDef;
 	// }
+
+	@Column
+	public BigDecimal getRequisitoTecnico() {
+		return this.requisitoTecnico;
+	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "Settore", nullable = true)
