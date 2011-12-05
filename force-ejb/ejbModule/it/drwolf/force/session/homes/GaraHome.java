@@ -40,15 +40,26 @@ public class GaraHome extends EntityHome<Gara> {
 		return gara;
 	}
 
-	@Factory("allAssociatedSlotInst")
-	public List<SlotInst> getAllAssociatedSlotInst() {
+	@SuppressWarnings("unchecked")
+	@Factory("allAssociatedSlotInsts")
+	public List<SlotInst> getAllAssociatedSlotInsts() {
 		List<SlotInst> resultList = this.entityManager
 				.createQuery(
-				// "select s.id from SlotInst s join Gara g where s.slotDef in elements(g.slotDefs) and g:=gara"
 						"select si from Gara g, SlotInst si inner join g.slotDefs sd where si.slotDef = sd and g=:gara")
+				// "select si.id, a.ragioneSociale from Gara g, SlotInst si, Azienda a inner join g.slotDefs sd where si.slotDef = sd and g.id = 18 and a.alfrescoGroupId = si.ownerId"
 				.setParameter("gara", this.getInstance()).getResultList();
 		return resultList;
 	}
+
+	// @SuppressWarnings("unchecked")
+	// @Factory("allAssociatedSlotInstsAsObjects")
+	// public List<Object[]> getAllAssociatedSlotInstsAsObjects() {
+	// List<Object[]> resultList = this.entityManager
+	// .createQuery(
+	// "select si.id, si.ownerId, a.ragioneSociale, si.slotDef.id, si.slotDef.ownerId, si.status from Gara g, SlotInst si, Azienda a inner join g.slotDefs sd where si.slotDef = sd and g.id=:garaId and a.alfrescoGroupId = si.ownerId")
+	// .setParameter("garaId", this.getGaraId()).getResultList();
+	// return resultList;
+	// }
 
 	public SlotDef getAssociatedSlotDef() {
 		Identity identity = this.getIdentity();
