@@ -221,17 +221,20 @@
                 </property>
             </properties>
         </aspect>
-        <aspect name="slot:soa">
-            <title>SOA</title>
-            <properties>
-                <property name="slot:SOACode">
-                    <title>Codici</title>
-                    <type>d:text</type>
-                    <mandatory>true</mandatory>
-                    <multiple>true</multiple>
-                </property>
-            </properties>
-        </aspect>
+         <aspect name="slot:soa">
+            <title>SOA</title>
+            <properties>
+                <property name="slot:SOACode">
+                    <title>Codici</title>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <multiple>true</multiple>
+                    <constraints>
+                        <constraint ref="slot:SOACodeList"/>
+                    </constraints>
+                </property>
+            </properties>
+        </aspect>
         <aspect name="slot:certificazioni">
             <title>Certificazioni</title>
             <properties>
