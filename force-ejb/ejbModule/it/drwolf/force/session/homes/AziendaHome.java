@@ -1,12 +1,16 @@
 package it.drwolf.force.session.homes;
 
 import it.drwolf.force.entity.Azienda;
+import it.drwolf.force.entity.ComunicazioneAziendaGara;
+import it.drwolf.force.entity.ComunicazioneAziendaGaraId;
+import it.drwolf.force.entity.Gara;
 import it.drwolf.force.enums.PosizioneCNA;
 import it.drwolf.force.enums.StatoAzienda;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -192,6 +196,52 @@ public class AziendaHome extends EntityHome<Azienda> {
 
 	public void setAziendaId(Integer id) {
 		this.setId(id);
+	}
+
+	public String updateCategorieMerceologiche() {
+		this.update();
+		ArrayList<Gara> gare = (ArrayList<Gara>) this.entityManager
+				.createQuery(
+						"select distinct  g from Azienda a join a.categorieMerceologiche cm join cm.gare g where g.stato = 'INSERITA' and a.id= :id")
+				.setParameter("id", this.getInstance().getId()).getResultList();
+		// per ogni gara devo controllare se è già presente nelle comunicaiozni.
+		// Se non lo è la inserisco
+		for (Gara gara : gare) {
+			ComunicazioneAziendaGaraId id = new ComunicazioneAziendaGaraId(this
+					.getInstance().getId(), gara.getId());
+			ComunicazioneAziendaGara cag = this.entityManager.find(
+					ComunicazioneAziendaGara.class, id);
+			if (cag == null) {
+				cag = new ComunicazioneAziendaGara(id, false, false,
+						this.getInstance(), gara);
+				this.entityManager.persist(cag);
+			}
+
+		}
+		return "updated";
+	}
+
+	public String updateSOA() {
+		this.update();
+		ArrayList<Gara> gare = (ArrayList<Gara>) this.entityManager
+				.createQuery(
+						"select distinct  g from Azienda a join a.SOA soa join soa.gare g  where g.stato = 'INSERITA' and a.id= :id")
+				.setParameter("id", this.getInstance().getId()).getResultList();
+		// per ogni gara devo controllare se è già presente nelle comunicaiozni.
+		// Se non lo è la inserisco
+		for (Gara gara : gare) {
+			ComunicazioneAziendaGaraId id = new ComunicazioneAziendaGaraId(this
+					.getInstance().getId(), gara.getId());
+			ComunicazioneAziendaGara cag = this.entityManager.find(
+					ComunicazioneAziendaGara.class, id);
+			if (cag == null) {
+				cag = new ComunicazioneAziendaGara(id, false, false,
+						this.getInstance(), gara);
+				this.entityManager.persist(cag);
+			}
+
+		}
+		return "updated";
 	}
 
 	public void wire() {
