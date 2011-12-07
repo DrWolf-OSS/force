@@ -50,8 +50,6 @@ public class SlotDefGaraAssociationtBean {
 	@In(create = true)
 	private CustomModelController customModelController;
 
-	public final static String EP_DATA_SCANDENZA_GARA = "Data scadenza gara";
-
 	private final String EXPIRABLE_ASPECT = "P:slot:expirable";
 	private final String EXPIRATION_DATE_PROPERTY = "slot:expirationDate";
 
@@ -137,8 +135,7 @@ public class SlotDefGaraAssociationtBean {
 
 			if (gara.getDataScadenza() != null) {
 				this.embeddedDataScadenza = new EmbeddedProperty();
-				this.embeddedDataScadenza
-						.setName(SlotDefGaraAssociationtBean.EP_DATA_SCANDENZA_GARA);
+				this.embeddedDataScadenza.setName("Data scadenza gara");
 				this.embeddedDataScadenza.setDataType(DataType.DATE);
 				this.embeddedDataScadenza.setDateValue(gara.getDataScadenza());
 				slotDef.getEmbeddedProperties().add(this.embeddedDataScadenza);
