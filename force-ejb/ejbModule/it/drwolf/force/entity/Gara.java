@@ -2,6 +2,7 @@ package it.drwolf.force.entity;
 
 import it.drwolf.force.enums.TipoGara;
 import it.drwolf.force.exceptions.DuplicateCoupleGaraSlotDefOwner;
+import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 
@@ -129,6 +130,23 @@ public class Gara implements Serializable {
 						"select si from Gara g, SlotInst si inner join g.slotDefs sd where si.slotDef = sd and g=:gara")
 				.setParameter("gara", this).getResultList();
 		return resultList;
+	}
+
+	// Questo metodo dovrà essere modificato per tener conto del fatto che gli
+	// utenti "paganti" avranno a disposizione gli SlotDef definiti dal sistema
+	@Transient
+	public SlotDef getAssociatedSlotDef() {
+		AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
+				.getInstance("alfrescoUserIdentity");
+		Iterator<SlotDef> iterator = this.getSlotDefs().iterator();
+		String ownerId = alfrescoUserIdentity.getMyOwnerId();
+		while (iterator.hasNext()) {
+			SlotDef slotDef = iterator.next();
+			if (slotDef.getOwnerId().equals(ownerId)) {
+				return slotDef;
+			}
+		}
+		return null;
 	}
 
 	@OneToMany(mappedBy = "gara", fetch = FetchType.EAGER)

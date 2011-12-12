@@ -6,7 +6,6 @@ import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 
-import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -14,7 +13,6 @@ import javax.persistence.EntityManager;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityHome;
-import org.jboss.seam.security.Identity;
 
 @Name("garaHome")
 public class GaraHome extends EntityHome<Gara> {
@@ -40,24 +38,28 @@ public class GaraHome extends EntityHome<Gara> {
 	}
 
 	public SlotDef getAssociatedSlotDef() {
-		Identity identity = this.getIdentity();
-		Iterator<SlotDef> iterator = this.getInstance().getSlotDefs()
-				.iterator();
-
-		String ownerId = null;
-		if (identity.hasRole("ADMIN")
-		// OR il cliente è un cliente che sta pagando
-		) {
-			ownerId = "ADMIN";
-		} else {
-			ownerId = this.alfrescoUserIdentity.getActiveGroup().getShortName();
-		}
-
-		while (iterator.hasNext()) {
-			SlotDef slotDef = iterator.next();
-			if (slotDef.getOwnerId().equals(ownerId)) {
-				return slotDef;
-			}
+		// Identity identity = this.getIdentity();
+		// Iterator<SlotDef> iterator = this.getInstance().getSlotDefs()
+		// .iterator();
+		//
+		// String ownerId = null;
+		// if (identity.hasRole("ADMIN")
+		// // OR il cliente è un cliente che sta pagando
+		// ) {
+		// ownerId = "ADMIN";
+		// } else {
+		// ownerId = this.alfrescoUserIdentity.getActiveGroup().getShortName();
+		// }
+		//
+		// while (iterator.hasNext()) {
+		// SlotDef slotDef = iterator.next();
+		// if (slotDef.getOwnerId().equals(ownerId)) {
+		// return slotDef;
+		// }
+		// }
+		// return null;
+		if (this.getInstance() != null) {
+			return this.getInstance().getAssociatedSlotDef();
 		}
 		return null;
 	}
