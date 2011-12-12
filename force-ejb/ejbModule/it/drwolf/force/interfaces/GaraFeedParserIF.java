@@ -3,6 +3,8 @@ package it.drwolf.force.interfaces;
 import java.util.Date;
 import java.util.List;
 
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
 public interface GaraFeedParserIF {
 
 	public List<String> getCategorie();
@@ -11,5 +13,13 @@ public interface GaraFeedParserIF {
 
 	public Date getDataInizio();
 
-	public void parse(String url);
+	public List<String> getSOA();
+
+	public boolean haveCm();
+
+	public boolean haveSoa();
+
+	public boolean isValid();
+
+	public void parse(HtmlPage page);
 }

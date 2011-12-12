@@ -4,6 +4,7 @@ import it.drwolf.force.entity.Azienda;
 import it.drwolf.force.entity.CategoriaMerceologica;
 import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.force.entity.ComunicazioneAziendaGaraId;
+import it.drwolf.force.entity.EntePubblico;
 import it.drwolf.force.entity.Fonte;
 import it.drwolf.force.entity.Gara;
 import it.drwolf.force.entity.SOA;
@@ -11,6 +12,7 @@ import it.drwolf.force.enums.StatoGara;
 import it.drwolf.force.enums.TipoGara;
 import it.drwolf.force.enums.TipoProceduraGara;
 import it.drwolf.force.enums.TipoSvolgimento;
+import it.drwolf.force.utils.AvcpFeedParser;
 import it.drwolf.force.utils.StartFeedParser;
 
 import java.io.IOException;
@@ -18,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +43,7 @@ import org.jboss.seam.transaction.UserTransaction;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
@@ -59,6 +63,8 @@ import com.sun.syndication.io.XmlReader;
 public class Heartbeat {
 
 	private static String[] CPVcodes = { "90900000-6", "90910000-9" };
+	private static String[] CFAmm = { "01307110484", "00975370487",
+			"01329160483" };
 
 	@Asynchronous
 	@Transactional
@@ -81,24 +87,29 @@ public class Heartbeat {
 
 			}
 		}
-		String url = "http://bandigara.avcp.it/AVCP-ConsultazioneBandiGara/AdvancedSearch.action";
+		HashMap<String, HtmlAnchor> dettagliGare = new HashMap<String, HtmlAnchor>();
+		Fonte fonte = (Fonte) entityManager.createQuery(
+				"from Fonte where attiva = true and tipo='AVCP'")
+				.getSingleResult();
 
-		String urlForm = "http://bandigara.avcp.it/AVCP-ConsultazioneBandiGara/GoToAdvancedSearch.action";
-
-		String firstUrlToBeVisisted = "http://bandigara.avcp.it/AVCP-ConsultazioneBandiGara/";
+		ArrayList<EntePubblico> enti = (ArrayList<EntePubblico>) entityManager
+				.createQuery("from EntePubblico where attivo = true")
+				.getResultList();
 		WebClient webClient = new WebClient();
 		webClient.setJavaScriptEnabled(false);
 
 		try {
 			// per prima cosa devo prendere la prima pagina della ricerca
 			// (quella base) in modo da ottenere la sessione corretta
-			HtmlPage firstPage = webClient.getPage(firstUrlToBeVisisted);
+			HtmlPage firstPage = webClient.getPage(fonte.getUrl());
 			// In questa pagina cerco il link alla ricerca avanzata
 			List<HtmlAnchor> anchors = firstPage.getAnchors();
 			HtmlAnchor anchor = null;
-			// Non so come mai ma non mi trova l'acora giusta se la cerco per
+			// Non so come mai ma non mi trova l'acora giusta se la cerco
+			// per
 			// testo
-			// mi faccio dare tutte le ancore e mi prendo quella con il testo
+			// mi faccio dare tutte le ancore e mi prendo quella con il
+			// testo
 			// corretto
 			for (HtmlAnchor htmlAnchor : anchors) {
 				if (htmlAnchor.asText().equals("Ricerca avanzata")) {
@@ -106,16 +117,16 @@ public class Heartbeat {
 				}
 			}
 			if (anchor != null) {
-				// Se ho trovato l'acora mi vado a prendere il form e il bottone
+				// Se ho trovato l'acora mi vado a prendere il form e il
+				// bottone
 				// da submittare
 				HtmlPage secondPage = anchor.click();
 				HtmlForm form = secondPage.getFormByName("AdvancedSearch");
 				HtmlSubmitInput button = form.getInputByValue("Cerca");
 				// Imposto il giusto valore di CPV e faccio submit
-				HtmlTextInput input = form.getInputByName("CPV");
-				for (String code : Heartbeat.CPVcodes) {
-					System.out.println(code);
-					input.setValueAttribute(code);
+				HtmlTextInput input = form.getInputByName("CFAmm");
+				for (EntePubblico ente : enti) {
+					input.setValueAttribute(ente.getCodiceFiscale());
 					HtmlPage risposta = button.click();
 					HtmlTable table = (HtmlTable) risposta
 							.getElementById("listaGare");
@@ -124,19 +135,81 @@ public class Heartbeat {
 						for (HtmlTableBody body : table.getBodies()) {
 							List<HtmlTableRow> rows = body.getRows();
 							for (HtmlTableRow row : rows) {
+								String title = "";
+								HtmlAnchor link = null;
 								for (HtmlTableCell cell : row.getCells()) {
-									HtmlAnchor a = (HtmlAnchor) cell
+									if (!cell.getAttribute("title").equals("")) {
+										title = cell.getAttribute("title");
+									}
+									List<HtmlElement> a = cell
 											.getHtmlElementsByTagName("a");
-									System.out.println("Found cell: "
-											+ cell.asText());
+									if (a.size() == 1) {
+										link = (HtmlAnchor) a.get(0);
+
+									}
+								}
+								if (!title.equals("") && link != null) {
+									dettagliGare.put(title, link);
 								}
 							}
 						}
-						for (HtmlTableRow row : table.getRows()) {
-							for (HtmlTableCell cell : row.getCells()) {
-								System.out.println("Found cell: "
-										+ cell.asText());
+
+						AvcpFeedParser avcpFeed = new AvcpFeedParser();
+						for (String title : dettagliGare.keySet()) {
+							List results = entityManager
+									.createQuery(
+											"from Gara where oggetto = :oggetto")
+									.setParameter("oggetto", title)
+									.getResultList();
+							if (results.size() == 0) {
+								System.out.println("Nuova Gara : " + title);
+								HtmlAnchor dg = dettagliGare.get(title);
+								HtmlPage dettaglio = dg.click();
+								avcpFeed.parse(dettaglio);
+								if (avcpFeed.isValid()
+										&& avcpFeed.getOggetto() != null) {
+									Gara gara = new Gara(avcpFeed.getOggetto(),
+											ente.getLinkSezioneGare(),
+											TipoGara.NUOVA.getNome(), fonte);
+									gara.setStato(StatoGara.INSERITA.toString());
+									Date dataInizio = avcpFeed.getDataInizio();
+									if (dataInizio != null) {
+										gara.setDataPubblicazione(dataInizio);
+									}
+									Date dataFine = avcpFeed.getDataFine();
+									if (dataInizio != null) {
+										gara.setDataScadenza(dataFine);
+									}
+									if (avcpFeed.haveSoa()) {
+										System.out.println("trovate le soa : "
+												+ avcpFeed.getSOA());
+										HashSet<SOA> listaSOA = new HashSet<SOA>();
+										for (String element : avcpFeed.getSOA()) {
+											try {
+												SOA soa = (SOA) entityManager
+														.createQuery(
+																"from SOA where codice = :codice")
+														.setParameter("codice",
+																element)
+														.getSingleResult();
+												listaSOA.add(soa);
+											} catch (NoResultException e) {
+												e.printStackTrace();
+											} catch (NonUniqueResultException e) {
+												e.printStackTrace();
+											}
+										}
+										gara.setSOA(listaSOA);
+										gara.setType(TipoGara.GESTITA.getNome());
+									}
+									if (this.storeOnDatabase(gara,
+											entityManager)) {
+										this.setComunicaizioneAziende(
+												entityManager, gara);
+									}
+								}
 							}
+
 						}
 					}
 				}
@@ -154,7 +227,6 @@ public class Heartbeat {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return handle;
 	}
 
@@ -260,7 +332,8 @@ public class Heartbeat {
 		}
 
 		ArrayList<Fonte> listaFonti = (ArrayList<Fonte>) entityManager
-				.createQuery("from Fonte where attiva = true").getResultList();
+				.createQuery("from Fonte where attiva = true and tipo='START'")
+				.getResultList();
 		for (Fonte fonte : listaFonti) {
 			URL url = null;
 			try {
@@ -273,9 +346,11 @@ public class Heartbeat {
 			ClassLoader c1 = Heartbeat.class.getClassLoader();
 			Thread.currentThread().setContextClassLoader(c1);
 			SyndFeed feed = null;
+			WebClient wc = new WebClient();
 			try {
 				feed = new SyndFeedInput().build(new XmlReader(url));
 				Iterator i = feed.getEntries().iterator();
+				StartFeedParser startFeed = new StartFeedParser();
 				while (i.hasNext()) {
 					SyndEntry post = (SyndEntry) i.next();
 					List results = entityManager
@@ -288,8 +363,7 @@ public class Heartbeat {
 						System.out.println(post.getLink());
 						// devo prenderemi dal link i valori della gara che sono
 						// nella pagina del dettaglio
-						StartFeedParser startFeed = new StartFeedParser();
-						startFeed.parse(post.getLink());
+						startFeed.parse((HtmlPage) wc.getPage(url));
 						if (startFeed.isValid()) {
 							Gara gara = new Gara(post.getTitle(),
 									post.getLink(), TipoGara.NUOVA.getNome(),
@@ -319,9 +393,9 @@ public class Heartbeat {
 							}
 							if (startFeed.haveCm()) {
 								System.out.println("trovate le categorie : "
-										+ startFeed.getCM());
+										+ startFeed.getCategorie());
 								HashSet<CategoriaMerceologica> listaCategorie = new HashSet<CategoriaMerceologica>();
-								for (String element : startFeed.getCM()) {
+								for (String element : startFeed.getCategorie()) {
 									try {
 										String cat = element.toLowerCase()
 												.replaceAll("\\W", "_");

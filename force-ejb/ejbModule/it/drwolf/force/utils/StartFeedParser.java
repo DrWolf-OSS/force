@@ -2,8 +2,6 @@ package it.drwolf.force.utils;
 
 import it.drwolf.force.interfaces.GaraFeedParserIF;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,46 +11,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
 import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 
 public class StartFeedParser implements GaraFeedParserIF {
-
-	HtmlPage page;
 
 	private HashMap<String, String> feedElements = new HashMap<String, String>();
 	private ArrayList<String> soa = new ArrayList<String>();
 	private ArrayList<String> cm = new ArrayList<String>();
 
 	public List<String> getCategorie() {
-		Pattern pCM = Pattern.compile("^[A-Z0-9\\- ]+$");
-		Pattern pSOA = Pattern.compile("^O[GS]\\s\\d");
-		ArrayList<String> categorie = new ArrayList<String>();
-		List<HtmlTableRow> rows = (List<HtmlTableRow>) this.page
-				.getByXPath("//tr");
-		for (HtmlTableRow row : rows) {
-			for (HtmlTableCell cell : row.getCells()) {
-				String[] res = cell.asText().split(":");
-				if (res.length == 2) {
-					Matcher mCM = pCM.matcher(res[1]);
-					Matcher mSOA = pSOA.matcher(res[0]);
-					if (mCM.find()) {
-						// Ho individuato una categoria merceologica
-						categorie.add(res[1].trim());
-					} else if (mSOA.find()) {
-						categorie.add(res[0].trim());
-					}
-				}
-			}
-
-		}
-		return categorie;
-	}
-
-	public ArrayList<String> getCM() {
 		return this.cm;
 	}
 
@@ -160,14 +128,15 @@ public class StartFeedParser implements GaraFeedParserIF {
 		return true;
 	}
 
-	public void parse(String url) {
-		WebClient wc = new WebClient();
+	public void parse(HtmlPage page) {
+		this.feedElements = new HashMap<String, String>();
+		this.soa = new ArrayList<String>();
+		this.cm = new ArrayList<String>();
 		Pattern pCM = Pattern.compile("^[A-Z0-9\\-\\.\\s,]+$");
 		Pattern pSOA = Pattern.compile("^O[GS]\\s\\d");
 		Pattern commento = Pattern.compile("^\\d+$");
 		try {
-			this.page = wc.getPage(url);
-			List<HtmlTableRow> rows = (List<HtmlTableRow>) this.page
+			List<HtmlTableRow> rows = (List<HtmlTableRow>) page
 					.getByXPath("//tr");
 			for (HtmlTableRow row : rows) {
 				if (row.getCells().size() > 1) {
@@ -192,14 +161,7 @@ public class StartFeedParser implements GaraFeedParserIF {
 					}
 				}
 			}
-			System.out.println(this.feedElements);
-		} catch (FailingHttpStatusCodeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
