@@ -103,10 +103,20 @@ public class AziendaHome extends EntityHome<Azienda> {
 			this.entityManager.persist(azienda);
 			// mando la mail con i dati
 			String body = new String();
-			body = "Conferma iscrizione\n";
+			body = "Gentile " + this.getInstance().getNome() + " "
+					+ this.getInstance().getCognome() + "\n";
+			body += "ecco le credenziali per accedere al servizio ai servizi forniti dalla piattaforma FORCE:";
 			body += "Username : " + azienda.getEmailReferente() + "\n";
 			body += "Password : " + pwd + "\n";
-			this.sendEmail("Progetto force - Conferma iscrizione", body,
+			body += "Per completare la registrazione e rendere il servizio funzionante sono necessari ancora alcuni passi.\n";
+			body += "Una volta effettuato il primo login al seguente indirizzo:\n";
+			body += "http://forcecna.it\n\n";
+			if (this.getInstance().isEdile()) {
+				body += "Dovrete indicare le attestazioni SOA di cui l’azienda è in possesso o, in alternativa, indicare le attestazioni SOA che corrispondono all’attività svolta. In tal modo verrà creato un filtro che le permetterà di ricevere informazioni solo su gare e bandi di effettivo interesse.\n";
+			} else {
+				body += "Dovrete Inserire le Categorie Merceologiche per le quali è interessato a ricevere  informazioni su gare e bandi.\n";
+			}
+			this.sendEmail("Conferma iscrizione FORCE", body,
 					azienda.getEmailReferente());
 			return "ok";
 
@@ -154,10 +164,11 @@ public class AziendaHome extends EntityHome<Azienda> {
 			// persisto l'entity azienda
 			this.persist();
 			try {
-				String body = "Grazie per esserti registrato al servizio FORCE.\nA breve riceverai le  credenziali per accedere al servizio, appena concluse le pratiche di verifica dei dati inseriti.";
+				String body = "La ringraziamo per essersi registrato al servizio FORCE.\n";
+				body += "Non appena completata la verifica dei dati inseriti riceverà le credenziali per accedere ai servizi forniti dalla piattaforma FORCE\n.";
 				// una volta persistito mando una mail al referente
-				this.sendEmail("Benvenuto nel servizio Force", body, this
-						.getInstance().getEmailReferente());
+				this.sendEmail("Benvenuto in Force", body, this.getInstance()
+						.getEmailReferente());
 			} catch (EmailException e) {
 				// TODO: handle exception
 			}

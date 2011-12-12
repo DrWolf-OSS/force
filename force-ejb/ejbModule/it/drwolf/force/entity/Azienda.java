@@ -270,6 +270,14 @@ public class Azienda implements Serializable {
 		return result;
 	}
 
+	@Transient
+	public boolean isEdile() {
+		if (this.getSettore().getNome().equals("Edilizia")) {
+			return true;
+		}
+		return false;
+	}
+
 	public void setAlfrescoGroupId(String alfrescoGroupId) {
 		this.alfrescoGroupId = alfrescoGroupId;
 	}
