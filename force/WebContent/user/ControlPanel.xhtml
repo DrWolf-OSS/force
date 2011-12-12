@@ -223,10 +223,14 @@
         <f:facet name="header">Scadenza</f:facet>
         <h:outputText value="#{cag.gara.dataScadenza}"></h:outputText>
     </rich:column>
-    <rich:column>
+    <rich:column style="width:55px">
         <f:facet name="header">Stato</f:facet>
-        <h:outputText value="Da vedere" rendered="#{not cag.web}"></h:outputText>
-        <h:outputText value="Vista" rendered="#{cag.web}"></h:outputText>
+        <h:graphicImage id="garaIcon" value="/img/newspaper.png" styleClass="fileIcon #{not cag.web ? 'opaque' : ''}"/>
+        <h:graphicImage id="mailIcon" value="/img/mail.png" styleClass="fileIcon #{not cag.email ? 'opaque' : ''}"/>
+        <h:graphicImage id="bustaIcon" value="/img/envelope-string.png" styleClass="fileIcon #{controlPanelBean.getAssociatedSlotDef(cag.gara)==null ? 'opaque' : ''}"/>
+        <rich:toolTip for="garaIcon" direction="bottom-left">Gara #{not cag.web ? 'da vedere' : 'vista'}</rich:toolTip>
+        <rich:toolTip for="mailIcon" direction="bottom-left">Mail #{not cag.email ? 'non inviata' : 'inviata'} dal sistema</rich:toolTip>
+        <rich:toolTip for="bustaIcon" direction="bottom-left">Busta #{controlPanelBean.getAssociatedSlotDef(cag.gara)==null ? 'non definita' : 'definita'}</rich:toolTip>
     </rich:column>
     <rich:column>
         <f:facet name="header">Azioni</f:facet>
@@ -234,9 +238,8 @@
                    value="Dettaglio"
              propagation="none"
                       id="gara">
-                <f:param name="garaId"
-                        value="#{cag.gara.id}"/>
-            </s:link>
+            <f:param name="garaId" value="#{cag.gara.id}"/>
+         </s:link>
     </rich:column>
     </rich:dataTable>
     
@@ -279,6 +282,8 @@
     </rich:dataTable>
 </rich:panel>
 <rich:spacer height="20px;"/>
+
+
 <rich:panel rendered="#{userSession.llpp}">
     <f:facet name="header"><s:span>
     <s:link value="Modifica" view="/user/SOAEdit.xhtml" styleClass="topCommandLink">
@@ -288,7 +293,7 @@
     <rich:dataTable id="soaList"
                 var="soa"
               value="#{userSession.azienda.SOAAsList}"
-              rows="10"
+              rows="13"
            rendered="#{not empty userSession.azienda.SOAAsList}">
         <rich:column>
         <h:outputText value="#{soa.codice}"></h:outputText>
@@ -297,9 +302,8 @@
         <h:outputText value="#{soa.nome}"></h:outputText>
     </rich:column>
     </rich:dataTable>
-    <rich:datascroller for="soaList" renderIfSinglePage="false" rendered="#{not empty userSession.azienda.SOAAsList}" />
+    <rich:datascroller for="soaList" renderIfSinglePage="false" rendered="#{not empty userSession.azienda.SOAAsList}"/>
 </rich:panel>
-<rich:spacer height="20px;"/>
 
 <rich:panel>
     <f:facet name="header"><s:span>
@@ -310,7 +314,7 @@
     <rich:dataTable id="catmerList"
                 var="catMer"
               value="#{userSession.azienda.categorieMerceologicheAsList}"
-              rows="10"
+              rows="13"
            rendered="#{not empty userSession.azienda.categorieMerceologicheAsList}">
         <rich:column>
         <h:outputText value="#{catMer.categoria}"></h:outputText>
@@ -318,6 +322,7 @@
     </rich:dataTable>
     <rich:datascroller for="catmerList" renderIfSinglePage="false" rendered="#{not empty userSession.azienda.categorieMerceologicheAsList}" />
 </rich:panel>
+
 </h:form>
 </ui:define>
 </ui:composition>

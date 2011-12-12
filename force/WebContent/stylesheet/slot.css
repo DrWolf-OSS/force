@@ -172,6 +172,11 @@ a:HOVER {
 	vertical-align: top;
 }
 
+.opaque{
+	opacity: .3;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+	filter: alpha(opacity=30);
+}
 
 /*
 .invalidRow.action.disabledLink a:LINK {
@@ -190,7 +195,7 @@ a:HOVER {
 .controlPanelclassSX .rich-panel {
     height: 360px;
     overflow: auto;
-    margin-right: 5px;	
+    margin-right: 5px;
 }
 
 .controlPanelclassDX .rich-panel {

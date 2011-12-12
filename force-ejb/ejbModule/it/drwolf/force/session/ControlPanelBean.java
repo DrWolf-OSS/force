@@ -1,12 +1,14 @@
 package it.drwolf.force.session;
 
 import it.drwolf.force.entity.ComunicazioneAziendaGara;
+import it.drwolf.force.entity.Gara;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.entity.DocInst;
 import it.drwolf.slot.entity.DocInstCollection;
+import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.pagebeans.SlotInstEditBean;
 import it.drwolf.slot.pagebeans.support.FileContainer;
@@ -51,6 +53,10 @@ public class ControlPanelBean {
 	private ArrayList<DocInstCollection> inScadenza;
 
 	private HashMap<Long, List<FileContainer>> inScadenzaFC;
+
+	public SlotDef getAssociatedSlotDef(Gara gara) {
+		return gara.getAssociatedSlotDef();
+	}
 
 	public List<DocInstCollection> getDocInstCollections() {
 		for (DocInstCollection element : this.slotInstEditBean
