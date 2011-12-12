@@ -1,0 +1,172 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="/layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="docDefCollectionSearch" styleClass="edit">
+
+        <rich:simpleTogglePanel label="DocDefCollection Search Filter" switchType="ajax">
+
+            <s:decorate template="/layout/display.xhtml">
+                <ui:define name="label">Name</ui:define>
+                <h:inputText id="name" value="#{docDefCollectionList.docDefCollection.name}"/>
+            </s:decorate>
+
+            <s:decorate template="/layout/display.xhtml">
+                <ui:define name="label">Match</ui:define>
+                <h:selectOneRadio id="logic" value="#{docDefCollectionList.restrictionLogicOperator}" styleClass="radio">
+                    <f:selectItem itemLabel="All" itemValue="and"/>
+                    <f:selectItem itemLabel="Any" itemValue="or"/>
+                </h:selectOneRadio>
+            </s:decorate>
+
+        </rich:simpleTogglePanel>
+
+        <div class="actionButtons">
+            <h:commandButton id="search" value="Search" action="/DocDefCollectionList.xhtml"/>
+            <s:button id="reset" value="Reset" includePageParams="false"/>
+        </div>
+
+    </h:form>
+
+    <rich:panel>
+        <f:facet name="header">DocDefCollection Search Results (#{empty docDefCollectionList.resultList ? 0 : (docDefCollectionList.paginated ? docDefCollectionList.resultCount : docDefCollectionList.resultList.size)})</f:facet>
+    <div class="results" id="docDefCollectionList">
+
+    <h:outputText value="The docDefCollection search returned no results."
+               rendered="#{empty docDefCollectionList.resultList}"/>
+
+    <rich:dataTable id="docDefCollectionList"
+                var="_docDefCollection"
+              value="#{docDefCollectionList.resultList}"
+           rendered="#{not empty docDefCollectionList.resultList}">
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{docDefCollectionList}"/>
+                    <ui:param name="propertyLabel" value="Id"/>
+                    <ui:param name="propertyPath" value="docDefCollection.id"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_docDefCollection.id}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{docDefCollectionList}"/>
+                    <ui:param name="propertyLabel" value="DocDefId"/>
+                    <ui:param name="propertyPath" value="docDefCollection.docDef.id"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_docDefCollection.docDef.id}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{docDefCollectionList}"/>
+                    <ui:param name="propertyLabel" value="DocDef name"/>
+                    <ui:param name="propertyPath" value="docDefCollection.docDef.name"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_docDefCollection.docDef.name}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{docDefCollectionList}"/>
+                    <ui:param name="propertyLabel" value="Max"/>
+                    <ui:param name="propertyPath" value="docDefCollection.max"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_docDefCollection.max}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{docDefCollectionList}"/>
+                    <ui:param name="propertyLabel" value="Min"/>
+                    <ui:param name="propertyPath" value="docDefCollection.min"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_docDefCollection.min}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{docDefCollectionList}"/>
+                    <ui:param name="propertyLabel" value="Name"/>
+                    <ui:param name="propertyPath" value="docDefCollection.name"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_docDefCollection.name}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{docDefCollectionList}"/>
+                    <ui:param name="propertyLabel" value="SlotDefId"/>
+                    <ui:param name="propertyPath" value="docDefCollection.slotDef.id"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_docDefCollection.slotDef.id}"/>
+        </h:column>
+        <h:column>
+            <f:facet name="header">
+                <ui:include src="/layout/sort.xhtml">
+                    <ui:param name="entityList" value="#{docDefCollectionList}"/>
+                    <ui:param name="propertyLabel" value="Slot def name"/>
+                    <ui:param name="propertyPath" value="docDefCollection.slotDef.name"/>
+                </ui:include>
+            </f:facet>
+            <h:outputText value="#{_docDefCollection.slotDef.name}"/>
+        </h:column>
+    </rich:dataTable>
+
+    </div>
+    </rich:panel>
+
+    <div class="tableControl">
+
+        <s:link view="/DocDefCollectionList.xhtml"
+            rendered="#{docDefCollectionList.previousExists}"
+               value="#{messages.left}#{messages.left} First Page"
+                  id="firstPage">
+          <f:param name="firstResult" value="0"/>
+        </s:link>
+
+        <s:link view="/DocDefCollectionList.xhtml"
+            rendered="#{docDefCollectionList.previousExists}"
+               value="#{messages.left} Previous Page"
+                  id="previousPage">
+            <f:param name="firstResult"
+                    value="#{docDefCollectionList.previousFirstResult}"/>
+        </s:link>
+
+        <s:link view="/DocDefCollectionList.xhtml"
+            rendered="#{docDefCollectionList.nextExists}"
+               value="Next Page #{messages.right}"
+                  id="nextPage">
+            <f:param name="firstResult"
+                    value="#{docDefCollectionList.nextFirstResult}"/>
+        </s:link>
+
+        <s:link view="/DocDefCollectionList.xhtml"
+            rendered="#{docDefCollectionList.nextExists}"
+               value="Last Page #{messages.right}#{messages.right}"
+                  id="lastPage">
+            <f:param name="firstResult"
+                    value="#{docDefCollectionList.lastFirstResult}"/>
+        </s:link>
+
+    </div>
+
+</ui:define>
+
+</ui:composition>

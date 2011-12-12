@@ -200,9 +200,6 @@ public class SlotDefEditBean {
 	}
 
 	public void cancelDependentSlotDefEdit() {
-		// DependentSlotDef cloned = this.clonedOriginalBiMap.inverse().get(
-		// this.dependentSlotDef);
-
 		DependentSlotDef cloned = this.dependentTmp;
 
 		cloned.setConditionalPropertyDef(this.dependentSlotDef
@@ -421,16 +418,7 @@ public class SlotDefEditBean {
 		if (this.slotDefHome.getInstance().getId() != null) {
 			this.validate();
 		}
-		// SlotDefValidator slotDefValidator = new SlotDefValidator(
-		// this.slotDefHome.getInstance());
-		// slotDefValidator.validate();
 	}
-
-	// public void initialValidation() {
-	// SlotDefValidator slotDefValidator = new SlotDefValidator(
-	// this.slotDefHome.getInstance());
-	// slotDefValidator.validate();
-	// }
 
 	public void invalidate(Object obj) {
 		Deactivable def = (Deactivable) obj;
@@ -503,8 +491,6 @@ public class SlotDefEditBean {
 	public void modifyReferencedSlotInsts(Set<PropertyDef> newPropertyDefs,
 			Set<DocDefCollection> newDocDefCollections,
 			Set<DependentSlotDef> newDependentSlotDefs) {
-		// List<SlotInst> slotInstsReferenced = this.slotDefHome
-		// .getSlotInstsReferenced();
 		List<SlotInst> slotInstsReferenced = this.slotDefHome.getInstance()
 				.getReferencedSlotInsts();
 		for (SlotInst slotInst : slotInstsReferenced) {
@@ -669,9 +655,6 @@ public class SlotDefEditBean {
 	public void removeEmbeddedProp(EmbeddedProperty embeddedProp) {
 		this.slotDefHome.getInstance().getEmbeddedProperties()
 				.remove(embeddedProp);
-		//
-		// deactiveReferencedRules(embeddedProp);
-		//
 		if (embeddedProp.getId() == null) {
 			this.deactiveReferencedRules(embeddedProp);
 		} else {
@@ -848,14 +831,6 @@ public class SlotDefEditBean {
 
 	public String save() {
 		String validate = this.validate();
-		//
-		// String ownerId = null;
-		// if (!this.identity.hasRole("ADMIN")) {
-		// ownerId = this.alfrescoUserIdentity.getActiveGroup().getShortName();
-		// } else {
-		// ownerId = "ADMIN";
-		// }
-
 		String ownerId = this.alfrescoUserIdentity.getMyOwnerId();
 		this.slotDefHome.getInstance().setOwnerId(ownerId);
 		//
@@ -879,9 +854,6 @@ public class SlotDefEditBean {
 			Map<String, PropertyDef> converterPropertyMap) {
 		this.converterPropertyMap = converterPropertyMap;
 	}
-
-	//
-	//
 
 	public void setDependentSlotDef(DependentSlotDef dependentSlotDef) {
 		this.dependentSlotDef = dependentSlotDef;
@@ -922,23 +894,6 @@ public class SlotDefEditBean {
 	}
 
 	public String update() {
-		// boolean names = this.checkNames();
-		// boolean references = this.checkCollectionReferences();
-		// boolean embeddedValues = true;
-		// if (!this.slotDefHome.getInstance().isTemplate()) {
-		// embeddedValues = this.checkEmbeddedPropertyValues();
-		// }
-		// if (names && references && embeddedValues) {
-		// String result = null;
-		// SlotDefValidator slotDefValidator = new SlotDefValidator(
-		// this.slotDefHome.getInstance());
-		// slotDefValidator.validate();
-		// if (this.slotDefHome.getInstance().getStatus()
-		// .equals(SlotDefSatus.VALID)) {
-		// result = "valid";
-		// } else {
-		// result = "invalid";
-		// }
 		String validate = this.validate();
 
 		Set<PropertyDef> newPropertyDefs = new HashSet<PropertyDef>();
@@ -980,8 +935,6 @@ public class SlotDefEditBean {
 	}
 
 	public String validate() {
-		// SlotDefValidator slotDefValidator = new SlotDefValidator(
-		// this.slotDefHome.getInstance());
 		this.slotDefValidator.setSlotDef(this.slotDefHome.getInstance());
 		this.slotDefValidator.setMessages(this.messages);
 		//

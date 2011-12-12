@@ -21,6 +21,8 @@
     <rich:dataTable id="activeGareList"
                 var="_gara"
               value="#{garaList.getGaraAttive(0)}"
+            onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
+			onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
            rendered="#{not empty garaList.getGaraAttive(0)}">
         <h:column>
             <f:facet name="header">
@@ -30,7 +32,7 @@
                     <ui:param name="propertyPath" value="gara.oggetto"/>
                 </ui:include>
             </f:facet>
-            <h:outputText value="#{_gara.oggetto}"/>
+            <h:outputText value="#{_gara.oggetto}" />
         </h:column>
         <h:column>
             <f:facet name="header">
@@ -78,7 +80,12 @@
         </h:column>
         <rich:column styleClass="action">
             <f:facet name="header">Azioni</f:facet>
-             <h:outputLink value="#{_gara.link}" target="_blank">Vedi</h:outputLink>
+              	<s:link view="/admin/GaraView.xhtml"
+              		styleClass="modal"
+            		value="Vedi"
+           			propagation="none">
+            	<f:param name="garaId" value="#{_gara.id}"/>
+            </s:link>
             #{' '}
             <s:link view="/admin/GaraEdit.xhtml"
                    value="Modifica"

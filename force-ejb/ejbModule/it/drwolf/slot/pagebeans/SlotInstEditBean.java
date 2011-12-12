@@ -151,9 +151,6 @@ public class SlotInstEditBean {
 	private static final int LENGHT_LIMIT = 150;
 	private static final String SPACER = " ";
 
-	// @In(create = true)
-	// PropertyInstsBean propertyInstsBean;
-
 	public void addActiveItemToDatas() {
 		if (!this.datas.get(this.activeCollectionId).contains(
 				this.activeFileContainer)) {
@@ -177,7 +174,6 @@ public class SlotInstEditBean {
 				e.printStackTrace();
 			}
 		}
-		// this.cleanActiveElements();
 	}
 
 	private void addCollectionMessage(Long collectionId, VerifierMessage message) {
@@ -782,10 +778,6 @@ public class SlotInstEditBean {
 		return null;
 	}
 
-	// public String getValidationResult() {
-	// return this.validationResult;
-	// }
-
 	public HashMap<Long, List<FileContainer>> getPrimaryDocs() {
 		return this.primaryDocs;
 	}
@@ -821,7 +813,8 @@ public class SlotInstEditBean {
 				this.datas.put(defCollection.getId(),
 						new ArrayList<FileContainer>());
 				List<AlfrescoDocument> collPrimaryDocs = this
-						.retrievePrimaryDocs(defCollection.getDocDef().getId());
+						.retrievePrimaryDocs(defCollection.getDocDef().getId(),
+								this.alfrescoUserIdentity.getMyOwnerId());
 				List<FileContainer> fileContainers = new ArrayList<FileContainer>();
 				Set<String> aspectIds = defCollection.getDocDef()
 						.getAspectIds();
@@ -830,22 +823,12 @@ public class SlotInstEditBean {
 				for (AlfrescoDocument document : collPrimaryDocs) {
 					FileContainer fileContainer = new FileContainer(document,
 							properties, false);
-					// FileContainer fileContainer = buildFileContainer(
-					// properties, document, false);
 					fileContainers.add(fileContainer);
 				}
 				this.primaryDocs.put(defCollection.getId(), fileContainers);
 			}
 
 		} else {
-			//
-			// this.slotDefHome.setSlotDefId(this.slotInstHome.getInstance()
-			// .getSlotDef().getId());
-			// this.slotDefHome.find();
-			//
-			// this.propertyInsts = new
-			// ArrayList<PropertyInst>(this.slotInstHome
-			// .getInstance().getPropertyInsts());
 			List<PropertyInst> originalPropertyInsts = new ArrayList<PropertyInst>(
 					this.slotInstHome.getInstance().getPropertyInsts());
 			//
@@ -875,8 +858,6 @@ public class SlotInstEditBean {
 						String nodeRef = docInst.getNodeRef();
 						AlfrescoDocument document = (AlfrescoDocument) this.alfrescoUserIdentity
 								.getSession().getObject(nodeRef);
-						// FileContainer container = buildFileContainer(
-						// properties, document, true);
 						FileContainer container = new FileContainer(document,
 								properties, true);
 
@@ -892,7 +873,8 @@ public class SlotInstEditBean {
 			for (DocDefCollection defCollection : this.slotDefHome
 					.getInstance().getDocDefCollections()) {
 				List<AlfrescoDocument> collPrimaryDocs = this
-						.retrievePrimaryDocs(defCollection.getDocDef().getId());
+						.retrievePrimaryDocs(defCollection.getDocDef().getId(),
+								this.slotInstHome.getInstance().getOwnerId());
 				Set<String> aspectIds = defCollection.getDocDef()
 						.getAspectIds();
 				Set<Property> properties = this.customModelController
@@ -909,21 +891,6 @@ public class SlotInstEditBean {
 			if (this.slotInstHome.getInstance().getStatus() != null
 					&& !this.slotInstHome.getInstance().getStatus()
 							.equals(SlotInstStatus.EMPTY)) {
-				// boolean verifyPassed = this.verify();
-				// boolean checkCollectionsSizePassed = this
-				// .checkCollectionsSize();
-				// if (verifyPassed && checkCollectionsSizePassed) {
-				// this.slotInstHome.getInstance().setStatus(
-				// SlotInstStatus.VALID);
-				// this.slotMessages.add(new VerifierMessage(
-				// "La busta è valida", VerifierMessageType.VALID));
-				// } else {
-				// this.slotInstHome.getInstance().setStatus(
-				// SlotInstStatus.INVALID);
-				// this.slotMessages
-				// .add(new VerifierMessage("La busta non è valida",
-				// VerifierMessageType.ERROR));
-				// }
 				this.validationRoutine();
 			} else {
 				this.slotInstHome.getInstance().setTransientStatus(
@@ -998,15 +965,13 @@ public class SlotInstEditBean {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<AlfrescoDocument> retrievePrimaryDocs(Long docDefId) {
+	private List<AlfrescoDocument> retrievePrimaryDocs(Long docDefId,
+			String ownerId) {
 		List<AlfrescoDocument> primaryDocs = new ArrayList<AlfrescoDocument>();
 		List<DocInst> resultList = this.entityManager
 				.createQuery(
 						"from DocInst d where d.docInstCollection.slotInst.slotDef.type = 'Primary' and d.docInstCollection.slotInst.ownerId=:ownerId and d.docInstCollection.docDefCollection.docDef.id=:docDefId")
-				.setParameter(
-						"ownerId",
-						this.alfrescoUserIdentity.getActiveGroup()
-								.getShortName())
+				.setParameter("ownerId", ownerId)
 				.setParameter("docDefId", docDefId).getResultList();
 		if (resultList != null) {
 			for (DocInst docInst : resultList) {

@@ -18,9 +18,9 @@ import org.apache.commons.lang.time.DateUtils;
 
 public class DateComparison implements IRuleVerifier {
 
-	private final String EARLIER_DATE = "EarlierDate";
-	private final String FOLLOWING_DATE = "FollowingDate";
-	private final String WARNING_THRESHOLD = "WarningThreshold";
+	public static final String EARLIER_DATE = "EarlierDate";
+	public static final String FOLLOWING_DATE = "FollowingDate";
+	public static final String WARNING_THRESHOLD = "WarningThreshold";
 
 	private final String DESCRIPTION = "La regola controlla che la data selezionata per il parametro \"Data Anteriore\" "
 			+ "sia anteriore a quella selezionata per \"Data Posteriore\". "
@@ -33,43 +33,36 @@ public class DateComparison implements IRuleVerifier {
 	private List<VerifierParameterInst> wrongDataTypeParameters = new ArrayList<VerifierParameterInst>();
 
 	public DateComparison() {
-		params.add(new VerifierParameterDef(this.EARLIER_DATE,
+		this.params.add(new VerifierParameterDef(DateComparison.EARLIER_DATE,
 				"Data Anteriore", DataType.DATE, false, false, false));
-		params.add(new VerifierParameterDef(this.FOLLOWING_DATE,
+		this.params.add(new VerifierParameterDef(DateComparison.FOLLOWING_DATE,
 				"Data Posteriore", DataType.DATE, false, false, false));
-		params.add(new VerifierParameterDef(this.WARNING_THRESHOLD,
+		this.params.add(new VerifierParameterDef(
+				DateComparison.WARNING_THRESHOLD,
 				"Giorni prima di notifica di avvertimento", DataType.INTEGER,
 				true, true, false));
 	}
 
-	public VerifierReport verify(Map<String, List<VerifierParameterInst>> params)
-			throws WrongDataTypeException {
-		List<VerifierParameterInst> earlierParametersInst = params
-				.get(this.EARLIER_DATE);
-		List<VerifierParameterInst> followingParametersInst = params
-				.get(this.FOLLOWING_DATE);
-
-		VerifierParameterInst warningThresholdParameterInst = params.get(
-				this.WARNING_THRESHOLD).get(0);
-
-		this.verifierReport = new VerifierReport();
-		this.verifierReport.setResult(VerifierResult.PASSED);
-
-		if (!earlierParametersInst.get(0).isFallible()) {
-			fromEarliers(earlierParametersInst, followingParametersInst,
-					warningThresholdParameterInst);
-		} else if (!followingParametersInst.get(0).isFallible()) {
-			fromFollowers(earlierParametersInst, followingParametersInst,
-					warningThresholdParameterInst);
-		} else if (earlierParametersInst.size() == 1) {
-			fromEarliers(earlierParametersInst, followingParametersInst,
-					warningThresholdParameterInst);
-		} else {
-			fromFollowers(earlierParametersInst, followingParametersInst,
-					warningThresholdParameterInst);
+	// Metodi di test per recuperare un Dictionary da associare
+	@SuppressWarnings("unchecked")
+	private Dictionary findDateListFromDB() {
+		EntityManager entityManager = (EntityManager) org.jboss.seam.Component
+				.getInstance("entityManager");
+		List<Dictionary> resultList = entityManager
+				.createQuery("from Dictionary d where d.name=:name")
+				.setParameter("name", "dizionario di date 2").getResultList();
+		if (resultList != null && !resultList.isEmpty()) {
+			return resultList.get(0);
 		}
+		return null;
+	}
 
-		return this.verifierReport;
+	@SuppressWarnings("unchecked")
+	private Dictionary findDateListFromModel() {
+		CustomModelController customModelController = (CustomModelController) org.jboss.seam.Component
+				.getInstance("customModelController");
+		return customModelController.makeDictionaryFromConstraint(
+				"slot:DATEList", DataType.DATE);
 	}
 
 	private void fromEarliers(
@@ -184,15 +177,6 @@ public class DateComparison implements IRuleVerifier {
 		}
 	}
 
-	public List<VerifierParameterDef> getInParams() {
-		return params;
-	}
-
-	@Override
-	public String toString() {
-		return this.getClass().getName();
-	}
-
 	public String getDefaultErrorMessage() {
 		return "Time validity rule not verified!";
 	}
@@ -205,26 +189,43 @@ public class DateComparison implements IRuleVerifier {
 		return this.DESCRIPTION;
 	}
 
-	// Metodi di test per recuperare un Dictionary da associare
-	@SuppressWarnings("unchecked")
-	private Dictionary findDateListFromDB() {
-		EntityManager entityManager = (EntityManager) org.jboss.seam.Component
-				.getInstance("entityManager");
-		List<Dictionary> resultList = entityManager
-				.createQuery("from Dictionary d where d.name=:name")
-				.setParameter("name", "dizionario di date 2").getResultList();
-		if (resultList != null && !resultList.isEmpty()) {
-			return resultList.get(0);
-		}
-		return null;
+	public List<VerifierParameterDef> getInParams() {
+		return this.params;
 	}
 
-	@SuppressWarnings("unchecked")
-	private Dictionary findDateListFromModel() {
-		CustomModelController customModelController = (CustomModelController) org.jboss.seam.Component
-				.getInstance("customModelController");
-		return customModelController.makeDictionaryFromConstraint(
-				"slot:DATEList", DataType.DATE);
+	@Override
+	public String toString() {
+		return this.getClass().getName();
+	}
+
+	public VerifierReport verify(Map<String, List<VerifierParameterInst>> params)
+			throws WrongDataTypeException {
+		List<VerifierParameterInst> earlierParametersInst = params
+				.get(DateComparison.EARLIER_DATE);
+		List<VerifierParameterInst> followingParametersInst = params
+				.get(DateComparison.FOLLOWING_DATE);
+
+		VerifierParameterInst warningThresholdParameterInst = params.get(
+				DateComparison.WARNING_THRESHOLD).get(0);
+
+		this.verifierReport = new VerifierReport();
+		this.verifierReport.setResult(VerifierResult.PASSED);
+
+		if (!earlierParametersInst.get(0).isFallible()) {
+			this.fromEarliers(earlierParametersInst, followingParametersInst,
+					warningThresholdParameterInst);
+		} else if (!followingParametersInst.get(0).isFallible()) {
+			this.fromFollowers(earlierParametersInst, followingParametersInst,
+					warningThresholdParameterInst);
+		} else if (earlierParametersInst.size() == 1) {
+			this.fromEarliers(earlierParametersInst, followingParametersInst,
+					warningThresholdParameterInst);
+		} else {
+			this.fromFollowers(earlierParametersInst, followingParametersInst,
+					warningThresholdParameterInst);
+		}
+
+		return this.verifierReport;
 	}
 
 }

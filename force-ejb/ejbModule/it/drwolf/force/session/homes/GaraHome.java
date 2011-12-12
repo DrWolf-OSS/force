@@ -71,10 +71,9 @@ public class GaraHome extends EntityHome<Gara> {
 					.createQuery(
 							"from SlotInst s where s.slotDef=:slotDef and s.ownerId=:ownerId order by s.id desc")
 					.setParameter("slotDef", associatedSlotDef)
-					.setParameter(
-							"ownerId",
-							this.alfrescoUserIdentity.getActiveGroup()
-									.getShortName()).getResultList();
+					.setParameter("ownerId",
+							this.alfrescoUserIdentity.getMyOwnerId())
+					.getResultList();
 			if (!resultList.isEmpty()) {
 				return resultList.get(0);
 			}

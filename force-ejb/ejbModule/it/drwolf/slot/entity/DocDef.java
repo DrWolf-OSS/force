@@ -1,6 +1,7 @@
 package it.drwolf.slot.entity;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -22,36 +23,48 @@ public class DocDef {
 
 	private Set<String> aspectIds = new HashSet<String>();
 
-	@Id
-	@GeneratedValue
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	@Transient
+	public void addAspectId(String aspectId) {
+		this.aspectIds.add(aspectId);
 	}
 
 	@CollectionOfElements
 	public Set<String> getAspectIds() {
-		return aspectIds;
+		return this.aspectIds;
+	}
+
+	@Id
+	@GeneratedValue
+	public Long getId() {
+		return this.id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	@Transient
+	public boolean hasAspect(String aspectId) {
+		Iterator<String> iterator = this.getAspectIds().iterator();
+		while (iterator.hasNext()) {
+			String currentAspectId = iterator.next();
+			if (currentAspectId.equals(aspectId)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void setAspectIds(Set<String> aspects) {
 		this.aspectIds = aspects;
 	}
 
-	@Transient
-	public void addAspectId(String aspectId) {
-		this.aspectIds.add(aspectId);
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Override
