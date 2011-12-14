@@ -5,6 +5,7 @@
    xmlns:f="http://java.sun.com/jsf/core"
    xmlns:h="http://java.sun.com/jsf/html"
    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
    xmlns:s="http://jboss.com/products/seam/taglib"
    contentType="text/html">
 <html>
@@ -27,16 +28,27 @@
       <div class="body">
       <table>
       <tr>
-        <td valign="top" style="width : 300px; margin-right: 5px;">
+        <td valign="top" class="column leftColumn">
+         <rich:panel>
+		     <f:facet name="header" >Menu</f:facet>
+		        <ul class="menu">
+		            <li><a href="servizi.seam">Servizi Gratuiti</a></li>
+		            <li><a href="servizi.seam">Servizo Base</a></li>
+		            <li><a href="servizi.seam">Abbonamento FORCE</a></li>
+		            <li><a href="servizi.seam">Attiva Call Center</a></li>
+		            <li><a href="servizi.seam">Formazione</a></li>
+		            <li><a href="servizi.seam">Servizi di Consulenza</a></li>
+		        </ul>    
+		    </rich:panel>
         <ui:insert name="colonnaSx"/>
         </td>
-        <td width="99%" valign="top">
+        <td valign="top">
          <h:messages id="messages" globalOnly="true" styleClass="message"
             errorClass="errormsg" infoClass="infomsg" warnClass="warnmsg"
             rendered="#{showGlobalMessages != 'false'}"/>
          <ui:insert name="body"/>
          </td>
-         <td valign="top" style="width : 300px; margin-left: 5px;">
+         <td valign="top" class="column rightColumn">
         <ui:insert name="colonnaDx"/>
         </td>
       </tr>   

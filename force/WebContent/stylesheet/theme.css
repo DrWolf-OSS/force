@@ -338,6 +338,31 @@ table.radio input[type=radio] {
     background: #DDDDDD;
 }
 
+.column {
+    width: 220px;	
+}
+
+.leftColumn{
+    margin-left: 5px;	
+}
+
+.rightColumn{
+    margin-right: 5px;	
+}
+
+ul.menu {
+    padding-left: 10px;
+    font-size: 14px;
+    list-style: none;
+}
+
+ul.menu li {
+    margin-bottom: 10px;    	
+}
+
+ul.menu li a {
+    color: #93113F;	
+}
 .clean-gray {
   background-color: #eeeeee;
   background-image: -webkit-gradient(linear, left top, left bottom, from(#eeeeee), to(#cccccc));
