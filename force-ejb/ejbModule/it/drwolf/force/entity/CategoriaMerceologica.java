@@ -30,6 +30,8 @@ public class CategoriaMerceologica implements Serializable {
 
 	private Set<Gara> gare;
 
+	private Set<CodiciCPV> codiciCPV;
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -63,6 +65,11 @@ public class CategoriaMerceologica implements Serializable {
 	}
 
 	@ManyToMany(mappedBy = "categorieMerceologiche")
+	public Set<CodiciCPV> getCodiciCPV() {
+		return this.codiciCPV;
+	}
+
+	@ManyToMany(mappedBy = "categorieMerceologiche")
 	public Set<Gara> getGare() {
 		return this.gare;
 	}
@@ -92,6 +99,10 @@ public class CategoriaMerceologica implements Serializable {
 
 	public void setCategoria(String categoria) {
 		this.categoria = categoria;
+	}
+
+	public void setCodiciCPV(Set<CodiciCPV> codiciCPV) {
+		this.codiciCPV = codiciCPV;
 	}
 
 	public void setGare(Set<Gara> gare) {

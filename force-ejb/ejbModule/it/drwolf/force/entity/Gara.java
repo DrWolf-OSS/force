@@ -203,7 +203,7 @@ public class Gara implements Serializable {
 		return this.link;
 	}
 
-	@Column
+	@Column(length = 500)
 	public String getOggetto() {
 		return this.oggetto;
 	}
