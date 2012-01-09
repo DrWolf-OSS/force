@@ -62,10 +62,6 @@ import com.sun.syndication.io.XmlReader;
 @Name("heartbeat")
 public class Heartbeat {
 
-	private static String[] CPVcodes = { "90900000-6", "90910000-9" };
-	private static String[] CFAmm = { "01307110484", "00975370487",
-			"01329160483" };
-
 	@Asynchronous
 	@Transactional
 	public QuartzTriggerHandle avcpFetcher(@Expiration Date date,
@@ -117,7 +113,7 @@ public class Heartbeat {
 				}
 			}
 			if (anchor != null) {
-				// Se ho trovato l'acora mi vado a prendere il form e il
+				// Se ho trovato l'ancora mi vado a prendere il form e il
 				// bottone
 				// da submittare
 				HtmlPage secondPage = anchor.click();
@@ -126,12 +122,14 @@ public class Heartbeat {
 				// Imposto il giusto valore di CPV e faccio submit
 				HtmlTextInput input = form.getInputByName("CFAmm");
 				for (EntePubblico ente : enti) {
+					System.out.println("Ricerco per codice fiscale : "
+							+ ente.getCodiceFiscale());
+					dettagliGare.clear();
 					input.setValueAttribute(ente.getCodiceFiscale());
 					HtmlPage risposta = button.click();
 					HtmlTable table = (HtmlTable) risposta
 							.getElementById("listaGare");
 					if (table != null) {
-						List<HtmlTableBody> bodies = table.getBodies();
 						for (HtmlTableBody body : table.getBodies()) {
 							List<HtmlTableRow> rows = body.getRows();
 							for (HtmlTableRow row : rows) {
@@ -156,10 +154,12 @@ public class Heartbeat {
 
 						AvcpFeedParser avcpFeed = new AvcpFeedParser();
 						for (String title : dettagliGare.keySet()) {
+							String oggettoLike = title.toLowerCase()
+									.replaceAll("\\W+", "%");
 							List results = entityManager
 									.createQuery(
-											"from Gara where oggetto = :oggetto")
-									.setParameter("oggetto", title)
+											"from Gara where lower(oggetto) like lower(:oggetto)")
+									.setParameter("oggetto", oggettoLike)
 									.getResultList();
 							if (results.size() == 0) {
 								System.out.println("Nuova Gara : " + title);
@@ -367,7 +367,9 @@ public class Heartbeat {
 						// devo prenderemi dal link i valori della gara che sono
 						// nella pagina del dettaglio
 						try {
-							startFeed.parse((HtmlPage) wc.getPage(url));
+
+							startFeed.parse((HtmlPage) wc.getPage(post
+									.getLink()));
 							if (startFeed.isValid()) {
 								Gara gara = new Gara(post.getTitle(),
 										post.getLink(),
