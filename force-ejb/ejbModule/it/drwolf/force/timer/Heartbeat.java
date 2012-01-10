@@ -2,6 +2,7 @@ package it.drwolf.force.timer;
 
 import it.drwolf.force.entity.Azienda;
 import it.drwolf.force.entity.CategoriaMerceologica;
+import it.drwolf.force.entity.CodiciCPV;
 import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.force.entity.ComunicazioneAziendaGaraId;
 import it.drwolf.force.entity.EntePubblico;
@@ -201,6 +202,40 @@ public class Heartbeat {
 										}
 										gara.setSOA(listaSOA);
 										gara.setType(TipoGara.GESTITA.getNome());
+									}
+									if (avcpFeed.haveCm()) {
+										System.out
+												.println("trovati seguenti codici cpv : "
+														+ avcpFeed
+																.getCategorie());
+										HashSet<CategoriaMerceologica> listaCM = new HashSet<CategoriaMerceologica>();
+										for (String element : avcpFeed
+												.getCategorie()) {
+											try {
+												// in questo caso mi stanno
+												// arrivando codici CPV devo
+												// andare
+												// a codificarli
+												// in categorie merceologiche
+												// utilizzando l'apposita
+												// tabella
+												CodiciCPV codice = (CodiciCPV) entityManager
+														.createQuery(
+																"from CodiciCPV where code = :code")
+														.setParameter("code",
+																element)
+														.getSingleResult();
+												System.out
+														.println(codice
+																.getCategorieMerceologiche());
+											} catch (NoResultException e) {
+												System.out
+														.println("CPV non riconosciuto");
+											} catch (NonUniqueResultException e) {
+												System.out
+														.println("CPV non univoco");
+											}
+										}
 									}
 									if (this.storeOnDatabase(gara,
 											entityManager)) {

@@ -23,7 +23,7 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 
 	private HashMap<String, String> feedElements = new HashMap<String, String>();
 	private ArrayList<String> soa = new ArrayList<String>();
-	private ArrayList<String> cm = new ArrayList<String>();
+	private ArrayList<String> cpv = new ArrayList<String>();
 
 	private static final Map<String, String> codificaSOA = new HashMap<String, String>();
 	static {
@@ -81,8 +81,19 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 		AvcpFeedParser.codificaSOA.put("OS35", "OS 35");
 	}
 
+	private void extractCPV(String stringCPV) {
+		Pattern pCPV = Pattern.compile("^(\\d+-\\d)\\s-\\s.*$");
+		Matcher mCPV = pCPV.matcher(stringCPV);
+		if (mCPV.find()) {
+			// metto i codici cpv come se fossero categorie merceologiche perchè
+			// in questa classe non ho l'entity manager
+			// La conversione da cpv a cm la faccio nell'hearthbeat
+			String codice = mCPV.group(1);
+			this.cpv.add(codice);
+		}
+	}
+
 	private void extractSoa(String stringaSOA) {
-		// forse è meglio se mi faccio una mappa
 		Pattern pSOA = Pattern.compile("(O[GS]\\d)");
 		Matcher mSOA = pSOA.matcher(stringaSOA);
 		if (mSOA.find()) {
@@ -101,7 +112,7 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 	}
 
 	public List<String> getCategorie() {
-		return this.cm;
+		return this.cpv;
 	}
 
 	public Date getDataFine() {
@@ -141,7 +152,7 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 	}
 
 	public boolean haveCm() {
-		if (this.cm.size() > 0) {
+		if (this.cpv.size() > 0) {
 			return true;
 		}
 		return false;
@@ -164,7 +175,7 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 	public void parse(HtmlPage page) {
 		this.feedElements = new HashMap<String, String>();
 		this.soa = new ArrayList<String>();
-		this.cm = new ArrayList<String>();
+		this.cpv = new ArrayList<String>();
 		// prima prelevo le informazioni dalla pagina di dettaglio
 		HtmlTable table = page.getHtmlElementById("detail");
 		for (HtmlTableRow row : table.getRows()) {
@@ -191,6 +202,9 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 								if (r.getCell(0).asText()
 										.equals("Categoria di qualificazione")) {
 									this.extractSoa(r.getCell(1).asText());
+								}
+								if (r.getCell(0).asText().equals("CPV")) {
+									this.extractCPV(r.getCell(1).asText());
 								}
 							} else {
 								this.feedElements.put(r.getCell(0).asText()
