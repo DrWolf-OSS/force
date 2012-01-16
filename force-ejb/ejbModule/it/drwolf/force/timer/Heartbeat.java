@@ -225,6 +225,17 @@ public class Heartbeat {
 														.setParameter("code",
 																element)
 														.getSingleResult();
+												if (codice
+														.getCategorieMerceologiche()
+														.size() > 0) {
+													for (CategoriaMerceologica cm : codice
+															.getCategorieMerceologiche()) {
+														listaCM.add(cm);
+													}
+												}
+												gara.setCategorieMerceologiche(listaCM);
+												gara.setType(TipoGara.GESTITA
+														.toString());
 												System.out
 														.println(codice
 																.getCategorieMerceologiche());
