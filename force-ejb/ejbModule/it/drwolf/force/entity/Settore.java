@@ -57,8 +57,15 @@ public class Settore implements Serializable {
 
 	private Integer id;
 	private String nome;
+	private String descrizione;
 	private SlotDef slotDef;
+
 	private Set<Gara> gare;
+
+	@Column(name = "descrizione", nullable = true)
+	public String getDescrizione() {
+		return this.descrizione;
+	}
 
 	@OneToMany(mappedBy = "settore")
 	public Set<Gara> getGare() {
@@ -80,6 +87,10 @@ public class Settore implements Serializable {
 	@JoinColumn(name = "SlotDef")
 	public SlotDef getSlotDef() {
 		return this.slotDef;
+	}
+
+	public void setDescrizione(String descrizione) {
+		this.descrizione = descrizione;
 	}
 
 	public void setGare(Set<Gara> gare) {

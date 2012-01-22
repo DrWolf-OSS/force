@@ -97,6 +97,18 @@
         </rich:menuItem>
     </rich:dropDownMenu>
     <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('ADMIN')}">
+        <f:facet name="label">Gestione Settori</f:facet>
+        <rich:menuItem>
+            <s:link view="/admin/SettoreList.xhtml"
+                value="Elenco Settori"
+                id="listSettore"
+                includePageParams="false"
+                propagation="none"/>
+        </rich:menuItem>
+ 
+    </rich:dropDownMenu>
+    <!-- @newMenuItem@ -->
+    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.hasRole('ADMIN')}">
         <f:facet name="label">Gestione Gare</f:facet>
         <rich:menuItem>
             <s:link view="/admin/NewGareList.xhtml"
