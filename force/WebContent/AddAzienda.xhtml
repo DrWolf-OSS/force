@@ -38,7 +38,7 @@
                 <h:selectOneMenu required="true" value="#{aziendaHome.instance.settore}"
                                  defaultLabel="seleziona">
                     <s:selectItems noSelectionLabel="-- Seleziona"
-                                   value="#{settoreList.resultList}" var="r" label="#{r.nome}" />
+                                   value="#{listaSettori}" var="r" label="#{r.nome}" />
                                 <s:convertEntity />
                 </h:selectOneMenu>
             </s:decorate>

@@ -10,139 +10,67 @@
 
 <ui:define name="body">
 
-    <h:form id="aziendaSearch" styleClass="edit">
-
-        <rich:simpleTogglePanel label="Ricerca nell'elenco delle Aziende in attesa di attivazione" switchType="ajax">
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Ragione sociale</ui:define>
-                <h:inputText id="ragioneSociale" value="#{newAziendaList.azienda.ragioneSociale}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Nome</ui:define>
-                <h:inputText id="nome" value="#{newAziendaList.azienda.nome}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Cognome</ui:define>
-                <h:inputText id="cognome" value="#{newAziendaList.azienda.cognome}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Email referente</ui:define>
-                <h:inputText id="emailReferente" value="#{newAziendaList.azienda.emailReferente}"/>
-            </s:decorate>
-
-            <s:decorate template="/layout/display.xhtml">
-                <ui:define name="label">Match</ui:define>
-                <h:selectOneRadio id="logic" value="#{newAziendaList.restrictionLogicOperator}" styleClass="radio">
-                    <f:selectItem itemLabel="All" itemValue="and"/>
-                    <f:selectItem itemLabel="Any" itemValue="or"/>
-                </h:selectOneRadio>
-            </s:decorate>
-
-        </rich:simpleTogglePanel>
-
-        <div class="actionButtons">
-            <h:commandButton id="search" value="Search" action="/NewAziendaList.xhtml"/>
-            <s:button id="reset" value="Reset" includePageParams="false"/>
-        </div>
-
-    </h:form>
-    <h:form id="aziendaActive" >
     <rich:panel>
-        <f:facet name="header">Elenco delle aziende in attesa di attivazione (#{empty newAziendaList.resultList ? 0 : (newAziendaList.paginated ? newAziendaList.resultCount : newAziendaList.resultList.size)})</f:facet>
+        <f:facet name="header">Elenco delle aziende in attesa di attivazione</f:facet>
     <div class="results" id="aziendaList">
+    <h:outputText value="Non ci sono nuove aziende in attesa di attivazione."
+               rendered="#{empty aziendeNuove}"/>
 
-    <h:outputText value="La ricerca non ha prodotto nessun risultato."
-               rendered="#{empty newAziendaList.resultList}"/>
-
+    <h:form id="aziendeNuove" >
     <rich:dataTable id="aziendaList"
                 var="_azienda"
-              value="#{newAziendaList.resultList}"
-           rendered="#{not empty newAziendaList.resultList}">
-        <h:column>
+              value="#{aziendeNuove}"
+           rendered="#{not empty aziendeNuove}"
+           rows="15"
+           reRender="ds">
+        <rich:column sortBy="#{_azienda.id}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{newAziendaList}"/>
-                    <ui:param name="propertyLabel" value="Id"/>
-                    <ui:param name="propertyPath" value="azienda.id"/>
-                </ui:include>
+                Id
             </f:facet>
             <h:outputText value="#{_azienda.id}"/>
-        </h:column>
-        <h:column>
+        </rich:column>
+        <rich:column  sortBy="#{_azienda.ragioneSociale}" filterBy="#{_azienda.ragioneSociale}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{newAziendaList}"/>
-                    <ui:param name="propertyLabel" value="Ragione sociale"/>
-                    <ui:param name="propertyPath" value="azienda.ragioneSociale"/>
-                </ui:include>
+                Ragione Sociale
             </f:facet>
             <h:outputText value="#{_azienda.ragioneSociale}"/>
-        </h:column>
-        <h:column>
+        </rich:column>
+        <rich:column sortBy="#{_azienda.nome}" filterBy="#{_azienda.nome}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{newAziendaList}"/>
-                    <ui:param name="propertyLabel" value="Nome"/>
-                    <ui:param name="propertyPath" value="azienda.nome"/>
-                </ui:include>
+                Nome
             </f:facet>
             <h:outputText value="#{_azienda.nome}"/>
-        </h:column>
-        <h:column>
+        </rich:column>
+        <rich:column  sortBy="#{_azienda.cognome}" filterBy="#{_azienda.cognome}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{newAziendaList}"/>
-                    <ui:param name="propertyLabel" value="Cognome"/>
-                    <ui:param name="propertyPath" value="azienda.cognome"/>
-                </ui:include>
+                Cognome
             </f:facet>
             <h:outputText value="#{_azienda.cognome}"/>
-        </h:column>
-        <h:column>
+        </rich:column>
+        <rich:column  sortBy="#{_azienda.emailReferente}" filterBy="#{_azienda.emailReferente}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{newAziendaList}"/>
-                    <ui:param name="propertyLabel" value="Email referente"/>
-                    <ui:param name="propertyPath" value="azienda.emailReferente"/>
-                </ui:include>
+                Email Referente
             </f:facet>
             <h:outputText value="#{_azienda.emailReferente}"/>
-        </h:column>
-
-        <h:column>
+        </rich:column>
+        <rich:column  sortBy="#{_azienda.formaGiuridica.nome}" filterBy="#{_azienda.formaGiuridica.nome}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{newAziendaList}"/>
-                    <ui:param name="propertyLabel" value="Forma giuridica"/>
-                    <ui:param name="propertyPath" value="azienda.formaGiuridica.nome"/>
-                </ui:include>
+                Forma Giuridica
             </f:facet>
             <h:outputText value="#{_azienda.formaGiuridica.nome}"/>
-        </h:column>
-        <h:column>
+        </rich:column>
+        <rich:column sortBy="#{_azienda.indirizzo}" filterBy="#{_azienda.indirizzo}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{newAziendaList}"/>
-                    <ui:param name="propertyLabel" value="Indirizzo"/>
-                    <ui:param name="propertyPath" value="azienda.indirizzo"/>
-                </ui:include>
+                Indirizzo
             </f:facet>
             <h:outputText value="#{_azienda.indirizzo}"/>
-        </h:column>
-        <h:column>
+        </rich:column>
+        <rich:column  sortBy="#{_azienda.settore.nome}" filterBy="#{_azienda.settore.nome}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{newAziendaList}"/>
-                    <ui:param name="propertyLabel" value="Settore id"/>
-                    <ui:param name="propertyPath" value="azienda.settore.nome"/>
-                </ui:include>
+                Settore
             </f:facet>
             <h:outputText value="#{_azienda.settore.nome}"/>
-        </h:column>
+        </rich:column>
         <rich:column styleClass="action">
             <f:facet name="header">Azioni</f:facet>
             <s:link view="/admin/#{empty from ? 'Azienda' : from}.xhtml"
@@ -164,15 +92,14 @@
              #{' '}
             <h:commandButton value="Attiva"
                           styleClass="DeleteAction Action"
-                          action="#{aziendaHome.attivaAzienda(_azienda)}"
+                          action="#{adminUserSession.attivaAzienda(_azienda)}"
                            onclick="if (!confirm('Sei sicuro di voler attiva #{_azienda.ragioneSociale}?')) return false"
                           id="attivaAzienda" />
         </rich:column>
     </rich:dataTable>
-
+    </h:form>
     </div>
     </rich:panel>
-    </h:form>
     <div class="tableControl">
 
         <s:link view="/AziendaList.xhtml"

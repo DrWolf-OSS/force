@@ -2,50 +2,64 @@ package it.drwolf.force.session.lists;
 
 import it.drwolf.force.entity.Azienda;
 
-import java.util.Arrays;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.EntityManager;
+
+import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Factory;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.framework.EntityQuery;
+import org.jboss.seam.annotations.Out;
+import org.jboss.seam.annotations.Scope;
 
 @Name("aziendaList")
-public class AziendaList extends EntityQuery<Azienda> {
+@Scope(ScopeType.CONVERSATION)
+public class AziendaList implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -1502080967471880085L;
 
-	private static final String EJBQL = "select azienda from Azienda azienda";
+	@In
+	private EntityManager entityManager;
 
-	private static final String[] RESTRICTIONS = {
-			"lower(azienda.alfrescoGroupId) like lower(concat(#{aziendaList.azienda.alfrescoGroupId},'%'))",
-			"lower(azienda.cap) like lower(concat(#{aziendaList.azienda.cap},'%'))",
-			"lower(azienda.cellulare) like lower(concat(#{aziendaList.azienda.cellulare},'%'))",
-			"lower(azienda.cognome) like lower(concat(#{aziendaList.azienda.cognome},'%'))",
-			"lower(azienda.comune) like lower(concat(#{aziendaList.azienda.comune},'%'))",
-			"lower(azienda.email) like lower(concat(#{aziendaList.azienda.email},'%'))",
-			"lower(azienda.emailCertificata) like lower(concat(#{aziendaList.azienda.emailCertificata},'%'))",
-			"lower(azienda.emailReferente) like lower(concat(#{aziendaList.azienda.emailReferente},'%'))",
-			"lower(azienda.fax) like lower(concat(#{aziendaList.azienda.fax},'%'))",
-			"lower(azienda.indirizzo) like lower(concat(#{aziendaList.azienda.indirizzo},'%'))",
-			"lower(azienda.localita) like lower(concat(#{aziendaList.azienda.localita},'%'))",
-			"lower(azienda.nome) like lower(concat(#{aziendaList.azienda.nome},'%'))",
-			"lower(azienda.provincia) like lower(concat(#{aziendaList.azienda.provincia},'%'))",
-			"lower(azienda.ragioneSociale) like lower(concat(#{aziendaList.azienda.ragioneSociale},'%'))",
-			"lower(azienda.stato) like lower(concat(#{'ATTIVA'},'%'))",
-			"lower(azienda.telefono) like lower(concat(#{aziendaList.azienda.telefono},'%'))", };
+	@SuppressWarnings("unused")
+	@Out(required = false)
+	private List<Azienda> aziendeAttive = null;
 
-	private Azienda azienda = new Azienda();
+	@SuppressWarnings("unused")
+	@Out(required = false)
+	private List<Azienda> aziendeNuove = null;
 
-	public AziendaList() {
-		this.setEjbql(AziendaList.EJBQL);
-		this.setRestrictionExpressionStrings(Arrays
-				.asList(AziendaList.RESTRICTIONS));
-		this.setMaxResults(25);
+	@SuppressWarnings("unchecked")
+	@Factory("aziendeAttive")
+	public void getListaAziendeAttive() {
+		this.aziendeAttive = this.entityManager.createQuery(
+				"from Azienda where stato = 'ATTIVA'").getResultList();
 	}
 
-	public Azienda getAzienda() {
-		return this.azienda;
+	public ArrayList<Azienda> getListaAziendeBySettore(Integer settoreId) {
+		ArrayList<Azienda> lista = new ArrayList<Azienda>();
+		System.out.println(settoreId);
+		return lista;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Factory("aziendeNuove")
+	public void getListaAziendeNuove() {
+		this.aziendeNuove = this.entityManager.createQuery(
+				"from Azienda where stato = 'NUOVA'").getResultList();
+	}
+
+	public void setAziendeAttive(List<Azienda> aziendeAttive) {
+		this.aziendeAttive = aziendeAttive;
+	}
+
+	public void setAziendeNuove(List<Azienda> aziendeNuove) {
+		this.aziendeNuove = aziendeNuove;
+	}
 }

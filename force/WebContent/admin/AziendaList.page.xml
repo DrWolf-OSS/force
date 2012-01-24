@@ -1,28 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <page xmlns="http://jboss.com/products/seam/pages"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd">
-
-   <param name="firstResult" value="#{aziendaList.firstResult}"/>
-   <param name="sort" value="#{aziendaList.orderColumn}"/>
-   <param name="dir" value="#{aziendaList.orderDirection}"/>
-   <param name="logic" value="#{aziendaList.restrictionLogicOperator}"/>
-
-   <param name="from"/>
-   <param name="cap" value="#{aziendaList.azienda.cap}"/>
-   <param name="cellulare" value="#{aziendaList.azienda.cellulare}"/>
-   <param name="cognome" value="#{aziendaList.azienda.cognome}"/>
-   <param name="comune" value="#{aziendaList.azienda.comune}"/>
-   <param name="email" value="#{aziendaList.azienda.email}"/>
-   <param name="emailCertificata" value="#{aziendaList.azienda.emailCertificata}"/>
-   <param name="emailReferente" value="#{aziendaList.azienda.emailReferente}"/>
-   <param name="fax" value="#{aziendaList.azienda.fax}"/>
-   <param name="indirizzo" value="#{aziendaList.azienda.indirizzo}"/>
-   <param name="localita" value="#{aziendaList.azienda.localita}"/>
-   <param name="nome" value="#{aziendaList.azienda.nome}"/>
-   <param name="provincia" value="#{aziendaList.azienda.provincia}"/>
-   <param name="ragioneSociale" value="#{aziendaList.azienda.ragioneSociale}"/>
-   <param name="stato" value="#{aziendaList.azienda.stato}"/>
-   <param name="telefono" value="#{aziendaList.azienda.telefono}"/>
-
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd">
+ 
+ <begin-conversation join="true"/>
 </page>

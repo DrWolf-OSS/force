@@ -2,35 +2,42 @@ package it.drwolf.force.session.lists;
 
 import it.drwolf.force.entity.Settore;
 
-import java.util.Arrays;
+import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.EntityManager;
+
+import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Factory;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.framework.EntityQuery;
+import org.jboss.seam.annotations.Out;
+import org.jboss.seam.annotations.Scope;
 
 @Name("settoreList")
-public class SettoreList extends EntityQuery<Settore> {
+@Scope(ScopeType.CONVERSATION)
+public class SettoreList implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7649921355945017542L;
 
-	private static final String EJBQL = "select settore from Settore settore";
+	@In
+	private EntityManager entityManager;
 
-	private static final String[] RESTRICTIONS = { "lower(settore.nome) like lower(concat(#{settoreList.settore.nome},'%'))", };
+	@SuppressWarnings("unused")
+	@Out(required = true)
+	private List<Settore> listaSettori = null;
 
-	private Settore settore = new Settore();
-
-	public SettoreList() {
-		this.setEjbql(SettoreList.EJBQL);
-		this.setRestrictionExpressionStrings(Arrays
-				.asList(SettoreList.RESTRICTIONS));
-		this.setMaxResults(null);
-		this.setOrder("settore.nome");
+	@SuppressWarnings("unchecked")
+	@Factory("listaSettori")
+	public void getListaSettori() {
+		this.listaSettori = this.entityManager.createQuery("from Settore")
+				.getResultList();
 	}
 
-	public Settore getSettore() {
-		return this.settore;
+	public void setListaSettori(List<Settore> settoreList) {
+		this.listaSettori = settoreList;
 	}
-
 }
