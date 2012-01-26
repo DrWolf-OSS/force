@@ -142,6 +142,29 @@
 			</rich:dataTable>
 			<rich:datascroller for="garaSlotInsts" renderIfSinglePage="false" rendered="#{not empty allAssociatedSlotInstsAsObjects}"/>
         </rich:panel>
+         <s:div rendered="#{garaHome.instance.active}">
+             <s:button view="/admin/SlotDefTemplateList.xhtml"
+                    id="create"
+                    propagation="none"
+                    value="Associa Busta" 
+                    rendered="#{garaHome.associatedSlotDef == null}">
+                    <f:param name="model" value="#{true}"/>
+                    <f:param name="mode" value="GENERAL"/>
+                    <f:param name="from" value="/admin/GaraEdit.xhtml"/>
+                    <f:param name="garaId" value="#{garaHome.garaId}"/>
+             </s:button>
+               
+             <s:button view="/admin/SlotDefView.xhtml"
+                    id="slotEdit"
+                    propagation="none"
+                    value="Modifica Busta" rendered="#{garaHome.associatedSlotDef != null}">
+                    <f:param name="model" value="#{false}"/>
+                    <f:param name="mode" value="GENERAL"/>
+                    <f:param name="from" value="/admin/GaraEdit.xhtml"/>
+                    <f:param name="slotDefId" value="#{garaHome.associatedSlotDef.id}"/>
+                    <f:param name="garaId" value="#{garaHome.garaId}"/>
+               </s:button>
+            </s:div>
 
     </h:form>
 

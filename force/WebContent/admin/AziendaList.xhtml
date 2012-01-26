@@ -69,12 +69,6 @@
             </f:facet>
             <h:outputText value="#{_azienda.settore.nome}"/>
         </rich:column>  
-        <rich:column sortBy="#{_azienda.telefono}" filterBy="#{_azienda.telefono}">
-            <f:facet name="header">
-            Telefono
-            </f:facet>
-            <h:outputText value="#{_azienda.telefono}"/>
-        </rich:column>
         <rich:column styleClass="action">
             <f:facet name="header">Azioni</f:facet>
             <s:link view="/admin/#{empty from ? 'Azienda' : from}.xhtml"

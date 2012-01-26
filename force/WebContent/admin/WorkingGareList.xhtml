@@ -10,21 +10,21 @@
 
 <ui:define name="body">
 
-    <h:form id="gareNuove" >
+    <h:form id="gareInCorso" >
     <rich:panel>
-        <f:facet name="header">Elenco delle gare attive</f:facet>
+        <f:facet name="header">Elenco delle gare in corso</f:facet>
     <div class="results" id="newGareList">
 
     <h:outputText value="La ricerca non ha prodotto nessun risultato."
-               rendered="#{empty listaGareGestite}"/>
+               rendered="#{empty listaGareAttive}"/>
 
     <rich:dataTable id="activeGareList"
                 var="_gara"
-              value="#{listaGareGestite}"
+              value="#{listaGareAttive}"
             onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
 			onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
 			rows="20"
-           rendered="#{not empty listaGareGestite}"
+           rendered="#{not empty listaGareAttive}"
            reRender="ds">
         <rich:column sortBy="#{_gara.oggetto}" filterBy="#{_gara.oggetto}">
             <f:facet name="header">
@@ -44,12 +44,6 @@
             </f:facet>
             <h:outputText value="#{_gara.tipoProcedura}"/>
         </rich:column>
-          <rich:column sortBy="#{_gara.importo}">
-            <f:facet name="header">
-                Importo
-            </f:facet>
-            <h:outputText value="#{_gara.importo}"/>
-        </rich:column>
         <rich:column sortBy="#{_gara.dataPubblicazione}">
             <f:facet name="header">
                 Data di Pubblicazione
@@ -68,22 +62,24 @@
         </rich:column>
         <rich:column styleClass="action">
             <f:facet name="header">Azioni</f:facet>
-              	<s:link id="garaDetails" view="/admin/GaraView.xhtml"
-              		styleClass="modal">
+            
+            <s:link id="garaDetails" view="/admin/GaraView.xhtml"
+                    styleClass="modal">
                    <h:graphicImage value="/img/document-list.png" />
-            	   <f:param name="garaId" value="#{_gara.id}"/>
-            	   <rich:toolTip for="garaDetails" direction="bottom-left">Vedi Dettaglio</rich:toolTip>
+                   <f:param name="garaId" value="#{_gara.id}"/>
+                   <rich:toolTip for="garaDetails" direction="bottom-left">Vedi Dettaglio</rich:toolTip>
             </s:link>
             #{' '}
-            <s:link view="/admin/SlotDefTemplateList.xhtml"
-                    id="create">
-                    <f:param name="model" value="#{true}"/>
+            <s:link view="/admin/SlotDefView.xhtml"
+                    id="slotEdit">
+                    <f:param name="model" value="#{false}"/>
                     <f:param name="mode" value="GENERAL"/>
                     <f:param name="from" value="/admin/GaraEdit.xhtml"/>
+                    <f:param name="slotDefId" value="#{garaHome.associatedSlotDef.id}"/>
                     <f:param name="garaId" value="#{garaHome.garaId}"/>
-                   <h:graphicImage value="/img/envelope-plus.png"/>
-                   <rich:toolTip for="create" direction="bottom-left">Associa Busta</rich:toolTip>
-            </s:link>
+                    <h:graphicImage value="/img/envelope.png"/>
+                   <rich:toolTip for="slotEdit" direction="bottom-left">Modifica Busta</rich:toolTip>
+            </s:link>   
              #{' '}
              
         </rich:column>

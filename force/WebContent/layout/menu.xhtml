@@ -112,14 +112,21 @@
         <f:facet name="label">Gestione Gare</f:facet>
         <rich:menuItem>
             <s:link view="/admin/NewGareList.xhtml"
-                value="Nuove Gare"
+                value="Gare Non Gestire"
                 id="newGare"
                 includePageParams="false"
                 propagation="none"/>
         </rich:menuItem>
         <rich:menuItem>
             <s:link view="/admin/ActiveGareList.xhtml"
-                value="Gare Attive"
+                value="Gare Gestite"
+                id="gestGare"
+                includePageParams="false"
+                propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem>
+            <s:link view="/admin/WorkingGareList.xhtml"
+                value="Gare In Corso"
                 id="actGare"
                 includePageParams="false"
                 propagation="none"/>
