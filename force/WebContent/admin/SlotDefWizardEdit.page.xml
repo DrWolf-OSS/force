@@ -19,6 +19,7 @@
    <param name="wizard" value="#{slotDefParameters.wizard}"/>
    
    <param name="garaId" value="#{garaHome.garaId}"/>
+   <param name="settoreId" value="#{settoreHome.settoreId}"/>
 
    <navigation from-action="#{slotDefHome.remove}">
       <rule if-outcome="removed">
@@ -39,6 +40,7 @@
     		<param name="mode" value="#{slotDefParameters.mode}"/>
     		<param name="wizard" value="#{slotDefParameters.wizard}"/>
     		<param name="garaId" value="#{garaHome.garaId}"/>
+    		<param name="settoreId" value="#{settoreHome.settoreId}"/>
          </redirect>
       </rule>
       <rule if-outcome="invalid">
@@ -47,6 +49,7 @@
     		<param name="mode" value="#{slotDefParameters.mode}"/>
     		<param name="wizard" value="#{slotDefParameters.wizard}"/>
     		<param name="garaId" value="#{garaHome.garaId}"/>
+            <param name="settoreId" value="#{settoreHome.settoreId}"/>
          </redirect>
       </rule>
    </navigation>

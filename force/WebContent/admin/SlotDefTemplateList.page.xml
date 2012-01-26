@@ -15,6 +15,7 @@
    <param name="mode" value="#{slotDefParameters.mode}"/> 
    
    <param name="garaId" value="#{garaHome.garaId}"/>
+   <param name="settoreId" value="#{settoreHome.settoreId}"/>
    
    <navigation from-action="#{slotDefHome.slotDefClone(_slotDef)}">
          <redirect view-id="/admin/SlotDefWizardEdit.xhtml">
@@ -23,6 +24,7 @@
             <param name="mode" value="#{slotDefParameters.mode}"/>
             <param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
             <param name="garaId" value="#{garaHome.garaId}"/>
+            <param name="settoreId" value="#{settoreHome.settoreId}"/>
          </redirect>
    </navigation>
    

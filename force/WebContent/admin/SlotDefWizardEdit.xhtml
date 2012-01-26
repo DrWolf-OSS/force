@@ -562,6 +562,14 @@
                        rendered="#{garaHome.garaId!=null and 
                        				garaHome.associatedSlotDef==null
                        				and slotDefHome.instance.type != 'DEPENDENT'}"/>
+            <h:commandButton id="assignSettore"
+                          value="Associa al settore"
+                           onclick="dirty = false;"
+                         action="#{slotDefGaraAssociationtBean.persistAssociation()}"
+                       disabled="#{!slotDefHome.wired}"
+                       rendered="#{settoreHome.settoreId != null and 
+                                    settoreHome.associatedSlotDef==null
+                                    and slotDefHome.instance.type == 'PRIMARY'}"/>
 
             <h:commandButton id="save"
                           value="Salva"
