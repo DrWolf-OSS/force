@@ -565,7 +565,7 @@
             <h:commandButton id="assignSettore"
                           value="Associa al settore"
                            onclick="dirty = false;"
-                         action="#{slotDefGaraAssociationtBean.persistAssociation()}"
+                         action="#{slotDefSettoreAssociationBean.persistAssociation()}"
                        disabled="#{!slotDefHome.wired}"
                        rendered="#{settoreHome.settoreId != null and 
                                     settoreHome.associatedSlotDef==null

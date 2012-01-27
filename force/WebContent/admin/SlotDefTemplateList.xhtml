@@ -48,10 +48,12 @@
         <rich:column styleClass="action">
             <f:facet name="header">Azioni</f:facet>
             <h:commandLink action="#{slotDefHome.slotDefClone(_slotDef)}" value="Clona" 
-            		rendered="#{slotDefParameters.model and not slotDefParameters.from.equals('/admin/GaraEdit.xhtml')}"/>
+            		rendered="#{slotDefParameters.model and not slotDefParameters.from.equals('/admin/GaraEdit.xhtml') and not slotDefParameters.from.equals('/admin/SettoreList.xhtml')}"/>
             <s:fragment rendered="#{slotDefParameters.from != null}">
         	#{' '}
-        	<h:commandLink value="Usa" action="#{slotDefGaraAssociationtBean.useSlotDef(_slotDef)}" />
+        	<h:commandLink value="Usa" action="#{slotDefGaraAssociationtBean.useSlotDef(_slotDef)}"  rendered="#{slotDefParameters.from.equals('/admin/GaraEdit.xhtml')}"/>
+            #{' '}
+            <h:commandLink value="Usa" action="#{slotDefSettoreAssociationBean.useSlotDef(_slotDef)}"  rendered="#{slotDefParameters.from.equals('/admin/SettoreList.xhtml')}"/>
         	</s:fragment>
         </rich:column>
     </rich:dataTable>

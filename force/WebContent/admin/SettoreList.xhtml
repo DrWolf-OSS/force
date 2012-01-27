@@ -48,7 +48,8 @@
 		            <s:link rendered="#{_settore.getSlotDef() == null}" view="/admin/SlotDefTemplateList.xhtml">
 		              <h:graphicImage id="bustaIconOpaque" value="/img/envelope-string.png" styleClass="fileIcon opaque"/>
 		                <f:param name="model" value="#{true}"/>
-                        <f:param name="mode" value="PRIMARY"/>
+		                <f:param name="from" value="/admin/SettoreList.xhtml" />
+		                <f:param name="mode" value="PRIMARY"/>
                         <f:param name="settoreId" value="#{_settore.id}"/>
                     </s:link>
                     <s:link rendered="#{_settore.getSlotDef() != null}" view="/admin/SlotDefView.xhtml">

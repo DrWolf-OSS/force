@@ -24,7 +24,6 @@
             <param name="mode" value="#{slotDefParameters.mode}"/>
             <param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
             <param name="garaId" value="#{garaHome.garaId}"/>
-            <param name="settoreId" value="#{settoreHome.settoreId}"/>
          </redirect>
    </navigation>
    
@@ -46,5 +45,15 @@
             <param name="garaId" value="#{garaHome.garaId}"/>
          </redirect>
    </navigation>
+      <navigation from-action="#{slotDefSettoreAssociationBean.useSlotDef(_slotDef)}">
+         <redirect view-id="/admin/SlotDefWizardEdit.xhtml">
+            <param name="model" value="#{slotDefParameters.from.equals('/admin/SettoreList.xhtml') ? false : slotDefParameters.model}"/>
+            <param name="wizard" value="#{true}"/>
+            <param name="mode" value="#{slotDefParameters.mode}"/>
+            <param name="from" value="/admin/SlotDefTemplateList.xhtml"/>
+            <param name="settoreId" value="#{settoreHome.settoreId}"/>
+         </redirect>
+   </navigation>
+   
 
 </page>

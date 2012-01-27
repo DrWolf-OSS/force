@@ -101,4 +101,28 @@
        </rule>
    </navigation>
 
+   <navigation from-action="#{slotDefSettoreAssociationBean.persistAssociation()}">
+      <rule if-outcome="associated">
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/admin/SlotDefView.xhtml">
+            <param name="slotDefId" value="#{slotDefHome.id}"/>
+            <param name="model" value="#{slotDefParameters.model}"/>
+            <param name="mode" value="#{slotDefParameters.mode}"/>
+            <param name="wizard" value="#{slotDefParameters.wizard}"/>
+            <param name="settoreId" value="#{settoreHome.settoreId}"/>
+            <param name="from" value="#{slotDefParameters.from}"/>
+         </redirect>
+      </rule>
+      <rule if-outcome="failed">
+         <redirect>
+            <param name="slotDefId" value="#{slotDefHome.id}"/>
+            <param name="model" value="#{slotDefParameters.model}"/>
+            <param name="mode" value="#{slotDefParameters.mode}"/>
+            <param name="wizard" value="#{slotDefParameters.wizard}"/>
+            <param name="settoreId" value="#{settoreHome.settoreId}"/>
+            <param name="from" value="#{slotDefParameters.from}"/>
+         </redirect>
+       </rule>
+   </navigation>
+
 </page>
