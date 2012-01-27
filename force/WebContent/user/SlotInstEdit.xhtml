@@ -360,17 +360,18 @@
 																	and not item.mimetype.contains('excel') and not item.mimetype.contains('opendocument.spreadsheet') and not item.mimetype.contains('image') 
 																	and not item.mimetype.contains('text') and not item.mimetype.contains('rtf') and not item.mimetype.contains('zip')}" 
 														styleClass="fileIcon"/>
-										<h:graphicImage value="/img/tick-small.png" rendered="#{item.document.hasAspect('P:dw:signed')}" style="margin-left:-6px; " />
 										<a href="/force/download/#{item.fileName}?ref=#{item.document.id}">
 										<h:outputText value="#{item.fileName}" />
 										</a>
 									</s:decorate>
-									<s:decorate template="/layout/display.xhtml">
+									<s:decorate template="/layout/display.xhtml" rendered="#{item.document.hasAspect('P:dw:signed')}">
 										<ui:define name="label">
-											<h:outputText value="Firmato digitalmente" />
+											<h:outputText value="Firma Digitale" />
 										</ui:define>
-										<h:outputText value="#{item.document.hasAspect('P:dw:signed') ? 'Sì' : 'No'}"/>
-										<rich:toolTip mode="client" rendered="#{item.document.hasAspect('P:dw:signed')}">
+										<h:graphicImage value="/img/cheque-red-exclamation.png" rendered="#{item.notYetValid or item.expired}" styleClass="fileIcon"/>
+										<h:graphicImage value="/img/cheque--exclamation.png" rendered="#{!item.globalValidity and not item.notYetValid and not item.expired}" styleClass="fileIcon"/>
+										<h:graphicImage value="/img/cheque-sign.png" rendered="#{item.globalValidity and not item.notYetValid and not item.expired}" styleClass="fileIcon"/>
+										<rich:toolTip mode="client">
 											<s:span>
 												<a:repeat var="sign" value="#{item.signatures}" rowKeyVar="key">										
 													<s:decorate template="/layout/display.xhtml">

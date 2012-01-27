@@ -12,6 +12,7 @@ import it.drwolf.utils.mimetypes.Resolver;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -77,6 +78,10 @@ public class FileContainer {
 	private List<Signature> signatures;
 
 	private String mimetype;
+
+	private Boolean notYetValid;
+	private Boolean expired;
+	private Boolean globalValidity;
 
 	public FileContainer(AlfrescoDocument alfrescoDocument,
 			Set<Property> properties, boolean editable) {
@@ -174,6 +179,10 @@ public class FileContainer {
 		return this.documentProperties;
 	}
 
+	public Boolean getExpired() {
+		return this.expired;
+	}
+
 	public String getExtension() {
 		String fileName = this.getFileName();
 		int dotIndex = fileName.lastIndexOf(".");
@@ -187,6 +196,10 @@ public class FileContainer {
 			return this.uploadItem.getFileName();
 		}
 		return "";
+	}
+
+	public Boolean getGlobalValidity() {
+		return this.globalValidity;
 	}
 
 	public String getId() {
@@ -205,6 +218,10 @@ public class FileContainer {
 			return AlfrescoWrapper.id2ref(this.document.getId());
 		}
 		return "";
+	}
+
+	public Boolean getNotYetValid() {
+		return this.notYetValid;
 	}
 
 	public String getRealFileName() {
@@ -316,6 +333,15 @@ public class FileContainer {
 					this.signatures.add(signature);
 				}
 			}
+
+			this.expired = ((Calendar) this.document
+					.getPropertyValue(DigsigModel.SIGNED_SIGNATURE_EXPIRATION))
+					.getTime().before(new Date());
+			this.notYetValid = ((Calendar) this.document
+					.getPropertyValue(DigsigModel.SIGNED_SIGNATURE_BEGINNING))
+					.getTime().after(new Date());
+			this.globalValidity = this.document
+					.getPropertyValue(DigsigModel.SIGNED_GLOBAL_VALIDITY);
 		}
 	}
 
@@ -331,6 +357,18 @@ public class FileContainer {
 
 	public void setEditable(boolean editable) {
 		this.editable = editable;
+	}
+
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
+	}
+
+	public void setGlobalValidity(Boolean globalValidity) {
+		this.globalValidity = globalValidity;
+	}
+
+	public void setNotYetValid(Boolean notYetValid) {
+		this.notYetValid = notYetValid;
 	}
 
 	public void setUploadItem(UploadItem uploadItem) {
