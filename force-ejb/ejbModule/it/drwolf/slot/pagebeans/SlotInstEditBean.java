@@ -2,7 +2,6 @@ package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
-import it.drwolf.slot.alfresco.SignatureVerifier;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
 import it.drwolf.slot.application.CustomModelController;
@@ -105,9 +104,6 @@ public class SlotInstEditBean {
 	//
 	// @In(create = true)
 	// private Preferences preferences;
-
-	@In(create = true)
-	SignatureVerifier signatureVerifier;
 
 	@In(create = true)
 	private RuleParametersResolver ruleParametersResolver;
@@ -499,7 +495,7 @@ public class SlotInstEditBean {
 		// poi si aggiungono i valori delle relative properties
 		this.updateProperties(documentCopy, documentProperties);
 		// this.verifySignature(documentCopy);
-		this.signatureVerifier.verify(documentCopy);
+
 		nodeRef = objectId.getId();
 
 		return nodeRef;
@@ -1269,7 +1265,7 @@ public class SlotInstEditBean {
 		this.updateProperties(document, fileContainer.getDocumentProperties());
 
 		// this.verifySignature(document);
-		this.signatureVerifier.verify(document);
+
 		fileContainer.setDocument(document);
 
 		return document;

@@ -4,6 +4,7 @@ import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
+import it.drwolf.slot.digsig.DigsigModel;
 import it.drwolf.slot.digsig.Signature;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.utils.mimetypes.Resolver;
@@ -238,7 +239,9 @@ public class FileContainer {
 
 	private String retrieveContentMimetype() {
 		try {
-			if (this.document.hasAspect(Signature.ASPECT_SIGNED)) {
+			if (this.document.hasAspect(DigsigModel.ASPECT_SIGNED)
+					&& !this.document.getContentStream().getMimeType()
+							.contains("pdf")) {
 				AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
 						.getInstance("alfrescoUserIdentity");
 				ItemIterable<QueryResult> results = alfrescoUserIdentity
@@ -251,9 +254,10 @@ public class FileContainer {
 						QueryResult result = iterator.next();
 						String cmisName = result
 								.getPropertyValueById("cmis:name");
-						if (cmisName.equals(FileContainer
-								.retrieveContentFilename(this.document
-										.getName()))) {
+						int p7mIndex = this.document.getName().lastIndexOf(
+								".p7m");
+						if (cmisName.equals(this.document.getName().substring(
+								0, p7mIndex))) {
 							String contentNodeRef = result
 									.getPropertyValueById("cmis:objectId");
 							AlfrescoDocument content = (AlfrescoDocument) alfrescoUserIdentity
@@ -277,11 +281,14 @@ public class FileContainer {
 					.getInstance("alfrescoUserIdentity");
 			ItemIterable<QueryResult> results = alfrescoUserIdentity
 					.getSession().query(
-							"SELECT cmis:objectId," + Signature.VALIDITY + ","
-									+ Signature.EXPIRY + ","
-									+ Signature.AUTHORITY + ","
-									+ Signature.SIGN + "," + Signature.CF
-									+ " from " + Signature.SIGNATURE_TYPE
+							"SELECT cmis:objectId,"
+									+ DigsigModel.SIGNATURE_VALIDITY + ","
+									+ DigsigModel.SIGNATURE_NOT_AFTER + ","
+									+ DigsigModel.SIGNATURE_NOT_BEFORE + ","
+									+ DigsigModel.SIGNATURE_AUTHORITY + ","
+									+ DigsigModel.SIGNATURE_SIGN + ","
+									+ DigsigModel.SIGNATURE_CF + " from "
+									+ DigsigModel.TYPE_SIGNATURE
 									+ " WHERE IN_TREE('"
 									+ this.document.getId() + "')", true);
 			if (results.getTotalNumItems() != 0) {
@@ -291,16 +298,21 @@ public class FileContainer {
 					String nodeRef = result
 							.getPropertyValueById("cmis:objectId");
 					Boolean validity = result
-							.getPropertyValueById(Signature.VALIDITY);
+							.getPropertyValueById(DigsigModel.SIGNATURE_VALIDITY);
 					Calendar expiry = result
-							.getPropertyValueById(Signature.EXPIRY);
+							.getPropertyValueById(DigsigModel.SIGNATURE_NOT_AFTER);
+					Calendar notBefore = result
+							.getPropertyValueById(DigsigModel.SIGNATURE_NOT_BEFORE);
 					String authority = result
-							.getPropertyValueById(Signature.AUTHORITY);
-					String sign = result.getPropertyValueById(Signature.SIGN);
-					String cf = result.getPropertyValueById(Signature.CF);
+							.getPropertyValueById(DigsigModel.SIGNATURE_AUTHORITY);
+					String sign = result
+							.getPropertyValueById(DigsigModel.SIGNATURE_SIGN);
+					String cf = result
+							.getPropertyValueById(DigsigModel.SIGNATURE_CF);
 
 					Signature signature = new Signature(validity,
-							expiry.getTime(), authority, sign, cf, nodeRef);
+							expiry.getTime(), notBefore.getTime(), authority,
+							sign, cf, nodeRef);
 					this.signatures.add(signature);
 				}
 			}

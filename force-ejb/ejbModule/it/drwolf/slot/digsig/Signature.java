@@ -4,17 +4,9 @@ import java.util.Date;
 
 public class Signature {
 
-	public static final String ASPECT_SIGNED = "P:dw:signed";
-
-	public static final String SIGNATURE_TYPE = "dw:signature";
-	public static final String VALIDITY = "dw:validity";
-	public static final String EXPIRY = "dw:expiry";
-	public static final String AUTHORITY = "dw:authority";
-	public static final String SIGN = "dw:sign";
-	public static final String CF = "dw:cf";
-
 	private boolean validity;
-	private Date expiry;
+	private Date notAfter;
+	private Date notBefore;
 	private String authority;
 	private String sign;
 	private String cf;
@@ -24,63 +16,72 @@ public class Signature {
 	public Signature() {
 	}
 
-	public Signature(boolean validity, Date expiry, String authority,
-			String sign, String cf, String nodeRef) {
+	public Signature(boolean validity, Date expiry, Date notBefore,
+			String authority, String sign, String cf, String nodeRef) {
 		super();
 		this.validity = validity;
-		this.expiry = expiry;
+		this.notAfter = expiry;
+		this.notBefore = notBefore;
 		this.authority = authority;
 		this.sign = sign;
 		this.cf = cf;
 		this.nodeRef = nodeRef;
 	}
 
-	public boolean isValidity() {
-		return validity;
-	}
-
-	public void setValidity(boolean validity) {
-		this.validity = validity;
-	}
-
-	public Date getExpiry() {
-		return expiry;
-	}
-
-	public void setExpiry(Date expiry) {
-		this.expiry = expiry;
-	}
-
 	public String getAuthority() {
-		return authority;
+		return this.authority;
+	}
+
+	public String getCf() {
+		return this.cf;
+	}
+
+	public String getNodeRef() {
+		return this.nodeRef;
+	}
+
+	public Date getNotAfter() {
+		return this.notAfter;
+	}
+
+	public Date getNotBefore() {
+		return this.notBefore;
+	}
+
+	public String getSign() {
+		return this.sign;
+	}
+
+	public boolean isValidity() {
+		return this.validity;
 	}
 
 	public void setAuthority(String authority) {
 		this.authority = authority;
 	}
 
-	public String getSign() {
-		return sign;
+	public void setCf(String cf) {
+		this.cf = cf;
+	}
+
+	public void setNodeRef(String nodeRef) {
+		this.nodeRef = nodeRef;
+	}
+
+	public void setNotAfter(Date expiry) {
+		this.notAfter = expiry;
+	}
+
+	public void setNotBefore(Date notBefore) {
+		this.notBefore = notBefore;
 	}
 
 	public void setSign(String sign) {
 		this.sign = sign;
 	}
 
-	public String getCf() {
-		return cf;
-	}
-
-	public void setCf(String cf) {
-		this.cf = cf;
-	}
-
-	public String getNodeRef() {
-		return nodeRef;
-	}
-
-	public void setNodeRef(String nodeRef) {
-		this.nodeRef = nodeRef;
+	public void setValidity(boolean validity) {
+		this.validity = validity;
 	}
 
 }

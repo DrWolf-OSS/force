@@ -1,7 +1,5 @@
 package it.drwolf.slot.alfresco;
 
-import it.drwolf.slot.digsig.Signature;
-import it.drwolf.slot.pagebeans.support.FileContainer;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
@@ -255,26 +253,26 @@ public class AlfrescoWrapper {
 				AlfrescoDocument doc = (AlfrescoDocument) session.getObject(
 						AlfrescoWrapper.ref2id(id), context);
 
-				if (doc.hasAspect(Signature.ASPECT_SIGNED)) {
-					ItemIterable<QueryResult> results = session.query(
-							"SELECT cmis:objectId, cmis:name FROM cmis:document WHERE IN_TREE('"
-									+ doc.getId() + "')", true);
-					if (results.getTotalNumItems() != 0) {
-						Iterator<QueryResult> iterator = results.iterator();
-						while (iterator.hasNext()) {
-							QueryResult result = iterator.next();
-							String cmisName = result
-									.getPropertyValueById("cmis:name");
-							if (cmisName.equals(FileContainer
-									.retrieveContentFilename(doc.getName()))) {
-								String contentNodeRef = result
-										.getPropertyValueById("cmis:objectId");
-								doc = (AlfrescoDocument) session.getObject(
-										contentNodeRef, context);
-							}
-						}
-					}
-				}
+				// if (doc.hasAspect(Signature.ASPECT_SIGNED)) {
+				// ItemIterable<QueryResult> results = session.query(
+				// "SELECT cmis:objectId, cmis:name FROM cmis:document WHERE IN_TREE('"
+				// + doc.getId() + "')", true);
+				// if (results.getTotalNumItems() != 0) {
+				// Iterator<QueryResult> iterator = results.iterator();
+				// while (iterator.hasNext()) {
+				// QueryResult result = iterator.next();
+				// String cmisName = result
+				// .getPropertyValueById("cmis:name");
+				// if (cmisName.equals(FileContainer
+				// .retrieveContentFilename(doc.getName()))) {
+				// String contentNodeRef = result
+				// .getPropertyValueById("cmis:objectId");
+				// doc = (AlfrescoDocument) session.getObject(
+				// contentNodeRef, context);
+				// }
+				// }
+				// }
+				// }
 
 				for (Rendition r : doc.getRenditions()) {
 					if (name.equals(r.getTitle())) {

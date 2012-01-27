@@ -375,12 +375,6 @@
 												<a:repeat var="sign" value="#{item.signatures}" rowKeyVar="key">										
 													<s:decorate template="/layout/display.xhtml">
 														<ui:define name="label">
-															<h:outputText value="Authority" />
-														</ui:define>
-														<h:outputText value="#{sign.authority}" />
-													</s:decorate>
-													<s:decorate template="/layout/display.xhtml">
-														<ui:define name="label">
 															<h:outputText value="Firma" />
 														</ui:define>
 														<h:outputText value="#{sign.sign}" />
@@ -393,11 +387,25 @@
 													</s:decorate>
 													<s:decorate template="/layout/display.xhtml">
 														<ui:define name="label">
-															<h:outputText value="Data di scadenza" />
+															<h:outputText value="Inizio Validità" />
 														</ui:define>
-														<h:outputText value="#{sign.expiry}" >
+														<h:outputText value="#{sign.notBefore}" >
 															<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 														</h:outputText>
+													</s:decorate>
+													<s:decorate template="/layout/display.xhtml">
+														<ui:define name="label">
+															<h:outputText value="Fine Validità" />
+														</ui:define>
+														<h:outputText value="#{sign.notAfter}" >
+															<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+														</h:outputText>
+													</s:decorate>
+													<s:decorate template="/layout/display.xhtml">
+														<ui:define name="label">
+															<h:outputText value="Authority" />
+														</ui:define>
+														<h:outputText value="#{sign.authority}" />
 													</s:decorate>
 													<div style="clear: both" />
 													<rich:separator styleClass="tooltipSeparator" height="1" rendered="#{key ge 1}"/>
