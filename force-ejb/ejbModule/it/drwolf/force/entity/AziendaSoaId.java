@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class AziendaSOAid implements Serializable {
+public class AziendaSoaId implements Serializable {
 
 	/**
 	 * 
@@ -17,11 +17,11 @@ public class AziendaSOAid implements Serializable {
 
 	private Integer soaId;
 
-	public AziendaSOAid() {
+	public AziendaSoaId() {
 		super();
 	}
 
-	public AziendaSOAid(Integer aziendaId, Integer soaId) {
+	public AziendaSoaId(Integer aziendaId, Integer soaId) {
 		super();
 		this.aziendaId = aziendaId;
 		this.soaId = soaId;
@@ -38,7 +38,7 @@ public class AziendaSOAid implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		AziendaSOAid other = (AziendaSOAid) obj;
+		AziendaSoaId other = (AziendaSoaId) obj;
 		if (this.aziendaId == null) {
 			if (other.aziendaId != null) {
 				return false;

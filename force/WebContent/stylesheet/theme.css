@@ -331,6 +331,11 @@ table.radio input[type=radio] {
     margin: 10px 0px 10px 0px;	
 }
 
+#force_about{
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
 .forceColor{
     color: #93113f;
 }

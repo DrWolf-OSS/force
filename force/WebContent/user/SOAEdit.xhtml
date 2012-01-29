@@ -21,7 +21,7 @@
             overflow:auto;
         }
     </style>
-    <rich:modalPanel id="panel" width="400" height="200" showWhenRendered="#{not aziendaHome.haveSoa()}" >
+    <rich:modalPanel id="panel" minWidth="400"  showWhenRendered="#{not aziendaHome.haveSoa()}" >
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Attenzione"></h:outputText>
@@ -30,65 +30,96 @@
         <div  style="font-size: 14px;">
         <h:outputText  style="font-size: 14px;" value="Per ottenere un miglior servizio di alert sulle gare ti chiediamo di insere le tue SOA"></h:outputText>
         <br />
-        <h:outputText value="Se non sei in possesso di certificaizone SOA inserisci le tue Categorie Merceologiche" /><br />
+        <h:outputText value="Se non sei in possesso di certificaizone SOA puoi secgliere dall'elenco quelle del tuo settore e selezionare come classificaiozne 'Sotto Soglia'" /><br />
         <br/>
         </div>
-                    <s:button styleClass="clean-gray" id="chiudiPanel" onclick="#{rich:component('panel')}.hide();return false;" value="Chiudi" />
-                    <s:button styleClass="clean-gray" id="cm" view="/user/CatMerEdit.xhtml"  value="Categorie Merceologiche"  />
+        <s:button styleClass="clean-gray" id="chiudiPanel" onclick="#{rich:component('panel')}.hide();return false;" value="Chiudi" />
+        <s:button styleClass="clean-gray" id="cm" view="/user/CatMerEdit.xhtml"  value="Categorie Merceologiche"  />
 
     </rich:modalPanel>
-<!--    <rich:modalPanel id="addSOA" autosized="true" minWidth="500"-->
-<!--                resizeable="false">-->
-<!--            <f:facet name="header">-->
-<!--                <h:outputText value="Inserisci SOA" />-->
-<!--            </f:facet>-->
-<!--            <a4j:form id="soaPanelEdit">-->
-<!--                <s:decorate template="/layout/edit.xhtml">-->
-<!--                <ui:define name="label">-->
-<!--                    <h:outputText value="Categorie" />-->
-<!--                </ui:define>                    -->
-<!--                    <h:selectOneMenu value="#{soaList.resultList}">-->
-<!--                    -->
-<!--                    -->
-<!--                    </h:selectOneMenu>-->
-<!--                </s:decorate>-->
-<!--            </a4j:form>-->
-<!--     </rich:modalPanel>-->
-<h:form id="CatMerEdit" styleClass="edit">
-	<rich:panel >
+    
+    <rich:modalPanel id="addSOA" autosized="true" minWidth="500"
+                resizeable="false">
+            <f:facet name="header">
+                <h:outputText value="Inserisci SOA" />
+            </f:facet>
+             <a4j:form id="soaPanelEdit">
+             <s:div id="soaDiv" style="font-size: 14px;float:left;">
+                <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                    <h:outputText value="Categorie" />
+	                </ui:define>            
+	                <h:selectOneMenu required="true" value="#{aziendaHome.soa}"
+	                                 defaultLabel="seleziona">
+	                    <s:selectItems value="#{soaList.resultList}" var="cm" label="#{cm.codice} - #{cm.nome}" 
+	                                    hideNoSelectionLabel="false" noSelectionLabel="--Scegli--" itemValue="#{cm}"/>
+	                                    <s:convertEntity />
+	                </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                    <h:outputText value="Classifica" />
+	                </ui:define>                    
+	                <h:selectOneMenu required="true" value="#{aziendaHome.classificaSoa}"
+	                                 defaultLabel="seleziona">
+	                    <s:selectItems value="#{controlPanelBean.classificheSoa}" var="c" label="#{c.testo}" 
+	                                    hideNoSelectionLabel="false" noSelectionLabel="--Scegli--" itemValue="#{c}"/>
+	                </h:selectOneMenu>
+                </s:decorate>
+            </s:div>
+            <div  style="float:left;">
+                        <a4j:commandButton value="Aggiungi SOA" styleClass="clean-gray" id="aggiungiSoa" action="#{aziendaHome.addSoa()}" reRender="soaPanel,soaDiv" oncomplete="#{rich:component('addSOA')}.hide();return false;" rendered="#{aziendaHome.soa == null}" />
+                        <a4j:commandButton value="Modifica SOA" styleClass="clean-gray" id="modificaSoa" action="#{aziendaHome.mergeSoa()}" reRender="soaPanel,soaDiv" oncomplete="#{rich:component('addSOA')}.hide();return false;" rendered="#{aziendaHome.soa != null}" />
+                        <s:button styleClass="clean-gray" id="chiudiAddSoa" onclick="#{rich:component('addSOA')}.hide();return false;" value="Chiudi" />
+            </div>
+            </a4j:form>
+            
+     </rich:modalPanel>
+     
+<a4j:form id="CatMerEdit" styleClass="edit">
+	<rich:panel id="soaPanel">
 	   <f:facet name="header">Gestisci le SOA </f:facet>
-<!--	   <rich:dataTable id="soaDataTable" var="soa" value="#{aziendaHome.instance.SOAAsList}">-->
-<!--	       <h:column>-->
-<!--	           <f:facet name="header">Categoria</f:facet>-->
-<!--	           <h:outputText value="#{soa.codice} - #{soa.nome}" />-->
-<!--	       </h:column>-->
-<!--           <h:column>-->
-<!--               <f:facet name="header">Classe</f:facet>-->
-<!--               <h:outputText value="#{soa.classifica}" />-->
-<!--           </h:column>-->
-<!--	   </rich:dataTable>-->
-<!--	   <a4j:commandButton value="Aggiungi" -->
-<!--	                      oncomplete="#{rich:component('addSOA')}.show();"-->
-<!--	                      reRender="soaDataTable" />-->
+	   <rich:dataTable id="soaDataTable" var="aziendaSoa" value="#{aziendaHome.instance.soaAsList}">
+	       <h:column>
+	           <f:facet name="header">Categoria</f:facet>
+	           <h:outputText value="#{aziendaSoa.soa.codice} - #{aziendaSoa.soa.nome}" />
+	       </h:column>
+           <h:column>
+               <f:facet name="header">Classificazione</f:facet>
+               <h:outputText value="#{controlPanelBean.getClassficaSoaByName(aziendaSoa.classifica).testo}" />
+           </h:column>
+           <h:column>
+               <f:facet name="header">Azioni</f:facet>
+               <a4j:commandLink action="#{aziendaHome.setAziendaSoa(aziendaSoa)}" oncomplete="#{rich:component('addSOA')}.show();"  reRender="addSOA" id="editSoa">
+                      <h:graphicImage id="modifyIcon" value="/img/edit-signiture.png" styleClass="fileIcon"/>
+               </a4j:commandLink>
+               <a4j:commandLink action="#{aziendaHome.deleteAziendaSoa(aziendaSoa)}" onclick="if (!confirm('Sei sicuro di voler cancellare la SOA #{aziendaSoa.soa.nome}?')) return false" reRender="soaPanel" id="deleteSoa">
+                      <h:graphicImage id="deleteIcon" value="/img/cross.png" styleClass="fileIcon"/>
+                    </a4j:commandLink>
+                    
+           </h:column>
+   </rich:dataTable>
 	                      
-	   <h:panelGrid columns="2" columnClasses="top, top" style="margin:0 auto;">
-	        <rich:pickList value="#{aziendaHome.instance.SOAAsList}" sourceListWidth="400" targetListWidth="400" listsHeight="400"> 
+<!-- 	   <h:panelGrid columns="2" columnClasses="top, top" style="margin:0 auto;">
+	        <rich:pickList value="#{aziendaHome.instance.soaAsList}" sourceListWidth="400" targetListWidth="400" listsHeight="400"> 
                 <s:selectItems value="#{soaList.resultList}" var="cm" label="#{cm.codice} - #{cm.nome}"/>
                 <s:convertEntity />
                 <a4j:support event="onlistchanged" reRender="result"/>
         </rich:pickList>
 	   </h:panelGrid>
-	
+ -->	
 	
 	</rich:panel>
 	<div class="actionButtons">
+   <a4j:commandButton value="Aggiungi SOA"
+                      oncomplete="#{rich:component('addSOA')}.show();"
+                      reRender="soaDataTable" />
 
-            <h:commandButton id="save"
-                          value="Salva"
-                         action="#{aziendaHome.updateSOA()}"
-                         />
-        </div>
-</h:form>
-
+            <s:button id="done"
+                   value="Fatto"
+             propagation="end"
+                    view="/home.xhtml"/>
+   </div>
+</a4j:form>
 </ui:define>
 </ui:composition>

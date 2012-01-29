@@ -74,8 +74,12 @@ public class UserSession implements Serializable {
 
 	private boolean llpp = false;
 
+	private boolean beni = false;
+
+	private boolean servizi = false;
+
 	public String checkStatus() {
-		if (this.isLlpp() && (this.azienda.getSOA().size() == 0)
+		if (this.isLlpp() && (this.azienda.getSoa().size() == 0)
 				&& (this.azienda.getCategorieMerceologiche().size() == 0)) {
 			return "GO_TO_SOA";
 		} else if (!this.isLlpp()
@@ -93,8 +97,6 @@ public class UserSession implements Serializable {
 		return this.azienda;
 	}
 
-	// primary dell'azienda
-
 	public Integer getAziendaId() {
 		return this.aziendaId;
 	}
@@ -102,12 +104,6 @@ public class UserSession implements Serializable {
 	public AlfrescoFolder getGroupFolder() {
 		return this.groupFolder;
 	}
-
-	//
-	// @In(create = true)
-	// SlotDefHome slotDefHome;
-
-	//
 
 	public SlotDef getPrimarySlotDef() {
 		return this.primarySlotDef;
@@ -122,6 +118,8 @@ public class UserSession implements Serializable {
 		}
 		return this.primarySlotFolder;
 	}
+
+	// primary dell'azienda
 
 	public SlotInst getPrimarySlotInst() {
 		if (this.primarySlotInst == null) {
@@ -140,12 +138,16 @@ public class UserSession implements Serializable {
 				.setParameter("username",
 						this.identity.getCredentials().getUsername())
 				.getSingleResult();
-		if (azienda.getSettore().getNome().equals("Edilizia")) {
+		if (azienda.getSettore().getNome().equals("Lavori")) {
 			this.setLlpp(true);
+		} else if (azienda.getSettore().getNome().equals("Beni")) {
+			this.setBeni(true);
+		} else if (azienda.getSettore().getNome().equals("Servizi")) {
+			this.setServizi(true);
 		}
 		// una volta individuata l'azienda devo vedere se ha delle
 		// categorie merceologiche già settate o delle SOA
-		if (this.llpp && (azienda.getSOA().size() == 0)) {
+		if (this.llpp && (azienda.getSoa().size() == 0)) {
 			// mando l'impresa alla pagina di edit delle SOA
 		}
 		this.setPrimarySlotDef(azienda.getSettore().getSlotDef());
@@ -168,8 +170,22 @@ public class UserSession implements Serializable {
 		}
 	}
 
+	//
+	// @In(create = true)
+	// SlotDefHome slotDefHome;
+
+	//
+
+	public boolean isBeni() {
+		return this.beni;
+	}
+
 	public boolean isLlpp() {
 		return this.llpp;
+	}
+
+	public boolean isServizi() {
+		return this.servizi;
 	}
 
 	private AlfrescoFolder retriveSlotFolder() {
@@ -215,6 +231,14 @@ public class UserSession implements Serializable {
 		this.setAziendaId(azienda.getId());
 	}
 
+	public void setAziendaId(Integer aziendaId) {
+		this.aziendaId = aziendaId;
+	}
+
+	public void setBeni(boolean beni) {
+		this.beni = beni;
+	}
+
 	// Lo SlotInst può essere null all'inizo della Session ed essere
 	// visualizzato in seguito. In realtà potrebbe anche essere modificata
 	// l'istanza collegata nel corso della session (non basta controllare se
@@ -235,10 +259,6 @@ public class UserSession implements Serializable {
 	// // Non è ancora stato creato uno slotInst
 	// }
 	// }
-
-	public void setAziendaId(Integer aziendaId) {
-		this.aziendaId = aziendaId;
-	}
 
 	public void setGaraVisisted(Integer gara_id) {
 		List<ComunicazioneAziendaGara> resultList = this.entityManager
@@ -272,5 +292,9 @@ public class UserSession implements Serializable {
 
 	public void setPrimarySlotInst(SlotInst primarySlotInst) {
 		this.primarySlotInst = primarySlotInst;
+	}
+
+	public void setServizi(boolean servizi) {
+		this.servizi = servizi;
 	}
 }

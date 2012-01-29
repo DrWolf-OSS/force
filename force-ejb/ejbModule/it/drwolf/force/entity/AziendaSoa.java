@@ -13,24 +13,28 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "AziendaSOA")
-public class AziendaSOA implements Serializable {
+@Table(name = "AziendaSoa")
+public class AziendaSoa implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 8472703086674783775L;
 
-	private AziendaSOAid id;
+	private AziendaSoaId id;
 
 	private String classifica;
 
 	private Azienda azienda;
 
-	private SOA soa;
+	private Soa soa;
 
-	public AziendaSOA(AziendaSOAid id, String classifica, Azienda azienda,
-			SOA soa) {
+	public AziendaSoa() {
+
+	}
+
+	public AziendaSoa(AziendaSoaId id, String classifica, Azienda azienda,
+			Soa soa) {
 		super();
 		this.id = id;
 		this.classifica = classifica;
@@ -38,7 +42,7 @@ public class AziendaSOA implements Serializable {
 		this.soa = soa;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "aziendaId", nullable = true, insertable = false, updatable = false)
 	public Azienda getAzienda() {
 		return this.azienda;
@@ -52,13 +56,13 @@ public class AziendaSOA implements Serializable {
 	@AttributeOverrides({
 			@AttributeOverride(name = "soaId", column = @Column(name = "soaId", nullable = true)),
 			@AttributeOverride(name = "aziendaId", column = @Column(name = "aziendaId", nullable = true)) })
-	public AziendaSOAid getId() {
+	public AziendaSoaId getId() {
 		return this.id;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "soaId", nullable = true, insertable = false, updatable = false)
-	public SOA getSoa() {
+	public Soa getSoa() {
 		return this.soa;
 	}
 
@@ -70,11 +74,11 @@ public class AziendaSOA implements Serializable {
 		this.classifica = classifica;
 	}
 
-	public void setId(AziendaSOAid id) {
+	public void setId(AziendaSoaId id) {
 		this.id = id;
 	}
 
-	public void setSoa(SOA soa) {
+	public void setSoa(Soa soa) {
 		this.soa = soa;
 	}
 

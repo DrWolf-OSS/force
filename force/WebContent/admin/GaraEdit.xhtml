@@ -46,7 +46,7 @@
 
             <s:decorate id="soaField" template="/layout/edit.xhtml">
                 <ui:define name="label">SOA</ui:define>
-                    <rich:pickList value="#{garaHome.instance.SOAAsList}" sourceListWidth="150" targetListWidth="150" listsHeight="200"> 
+                    <rich:pickList value="#{garaHome.instance.soaAsList}" sourceListWidth="150" targetListWidth="150" listsHeight="200"> 
                         <s:selectItems value="#{soaList.resultList}" var="cm" label="#{cm.codice}"/>
                         <s:convertEntity />
                         <a4j:support event="onlistchanged" reRender="result"/>

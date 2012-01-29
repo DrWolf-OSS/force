@@ -2,6 +2,7 @@ package it.drwolf.force.session;
 
 import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.force.entity.Gara;
+import it.drwolf.force.enums.ClassificaSoa;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
@@ -14,6 +15,7 @@ import it.drwolf.slot.pagebeans.SlotInstEditBean;
 import it.drwolf.slot.pagebeans.support.FileContainer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +58,14 @@ public class ControlPanelBean {
 
 	public SlotDef getAssociatedSlotDef(Gara gara) {
 		return gara.getAssociatedSlotDef();
+	}
+
+	public ClassificaSoa getClassficaSoaByName(String value) {
+		return ClassificaSoa.valueOf(value);
+	}
+
+	public List<ClassificaSoa> getClassificheSoa() {
+		return Arrays.asList(ClassificaSoa.values());
 	}
 
 	public List<DocInstCollection> getDocInstCollections() {

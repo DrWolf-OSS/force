@@ -56,12 +56,12 @@
                 </rich:dataTable>
             </s:decorate>
 
-            <s:decorate id="soaField" template="/layout/edit.xhtml" rendered="#{not empty garaHome.instance.SOAAsList}">
+            <s:decorate id="soaField" template="/layout/edit.xhtml" rendered="#{not empty garaHome.instance.soaAsList}">
                 <ui:define name="label">SOA</ui:define>
                 <rich:dataTable id="soaList"
                                var="soa"
-                                value="#{garaHome.instance.SOAAsList}"
-                               rendered="#{not empty garaHome.instance.SOAAsList}">
+                                value="#{garaHome.instance.soaAsList}"
+                               rendered="#{not empty garaHome.instance.soaAsList}">
                     <rich:column>
                         <h:outputText value="#{soa.codice}"></h:outputText>
                     </rich:column>

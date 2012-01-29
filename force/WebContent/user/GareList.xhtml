@@ -21,51 +21,39 @@
     <rich:dataTable id="activeGareList"
                 var="cag"
               value="#{controlPanelBean.getGare(0)}"
-           rendered="#{not empty controlPanelBean.getGare(0)}">
-        <h:column>
+           rendered="#{not empty controlPanelBean.getGare(0)}"
+           onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
+            onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+            rows="10"
+            reRender="ds">
+        <rich:column sortBy="#{cag.gara.oggetto}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Oggetto"/>
-                    <ui:param name="propertyPath" value="gara.oggetto"/>
-                </ui:include>
+                Oggetto
             </f:facet>
             <h:outputText value="#{cag.gara.oggetto}"/>
-        </h:column>
-        <h:column>
+        </rich:column>
+        <rich:column sortBy="#{cag.gara.fonte.tipo}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Provenienza"/>
-                    <ui:param name="propertyPath" value="gara.fonte.nome"/>
-                </ui:include>
+                Fonte
             </f:facet>
             <h:outputText value="#{cag.gara.fonte.nome} (#{cag.gara.fonte.tipo})"/>
-        </h:column>
-        <h:column>
+        </rich:column>
+        <rich:column sortBy="#{cag.gara.dataPubblicazione}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Data Inizio"/>
-                    <ui:param name="propertyPath" value="gara.dataPubblicazione"/>
-                </ui:include>
+                    Data Pubblicazione
             </f:facet>
             <h:outputText value="#{cag.gara.dataPubblicazione}">
                 <f:convertDateTime pattern="dd/MM/yyyy"/>
             </h:outputText>
-        </h:column>
-        <h:column>
+        </rich:column>
+        <rich:column sortBy="#{cag.gara.dataScadenza}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Data Fine"/>
-                    <ui:param name="propertyPath" value="gara.dataScadenza"/>
-                </ui:include>
+                Data Scadenza
             </f:facet>
-            <h:outputText value="#{_gara.dataScadenza}">
+            <h:outputText value="#{cag.gara.dataScadenza}">
                 <f:convertDateTime pattern="dd/MM/yyyy"/>
             </h:outputText>
-        </h:column>
+        </rich:column>
 	    <rich:column>
 	        <f:facet name="header">Stato</f:facet>
 	        <h:outputText value="Da vedere" rendered="#{not cag.web}"></h:outputText>
@@ -80,10 +68,16 @@
                 <f:param name="garaId"
                         value="#{cag.gara.id}"/>
             </s:link></rich:column>
-            
+ <f:facet name="footer">
+             <rich:datascroller id="ds" renderIfSinglePage="false"></rich:datascroller>
+        </f:facet>            
     </rich:dataTable>
     </div>
     </rich:panel>
+    <s:button id="done"
+                   value="Fatto"
+             propagation="end"
+                    view="/home.xhtml"/>
     </h:form>
 </ui:define>
 

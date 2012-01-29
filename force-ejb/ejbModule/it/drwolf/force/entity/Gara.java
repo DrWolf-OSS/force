@@ -81,7 +81,7 @@ public class Gara implements Serializable {
 
 	private Set<CategoriaMerceologica> categorieMerceologiche = new HashSet<CategoriaMerceologica>();
 
-	private Set<SOA> SOA = new HashSet<SOA>();
+	private Set<Soa> soa = new HashSet<Soa>();
 
 	private Set<ComunicazioneAziendaGara> aziende = new HashSet<ComunicazioneAziendaGara>();
 
@@ -236,13 +236,13 @@ public class Gara implements Serializable {
 	}
 
 	@ManyToMany
-	public Set<SOA> getSOA() {
-		return this.SOA;
+	public Set<Soa> getSoa() {
+		return this.soa;
 	}
 
 	@Transient
-	public List<SOA> getSOAAsList() {
-		return new ArrayList<SOA>(this.getSOA());
+	public List<Soa> getSoaAsList() {
+		return new ArrayList<Soa>(this.getSoa());
 
 	}
 
@@ -366,13 +366,13 @@ public class Gara implements Serializable {
 		this.slotDefs = slotDefs;
 	}
 
-	public void setSOA(Set<SOA> soa) {
-		this.SOA = soa;
+	public void setSoa(Set<Soa> soa) {
+		this.soa = soa;
 	}
 
 	@Transient
-	public void setSOAAsList(List<SOA> lista) {
-		this.setSOA(new HashSet<SOA>(lista));
+	public void setSoaAsList(List<Soa> lista) {
+		this.setSoa(new HashSet<Soa>(lista));
 	}
 
 	public void setStato(String stato) {

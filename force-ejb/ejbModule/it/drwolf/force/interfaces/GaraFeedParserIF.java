@@ -13,7 +13,7 @@ public interface GaraFeedParserIF {
 
 	public Date getDataInizio();
 
-	public List<String> getSOA();
+	public List<String> getSoa();
 
 	public boolean haveCm();
 

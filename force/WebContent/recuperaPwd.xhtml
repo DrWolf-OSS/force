@@ -1,0 +1,45 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="loginForm">
+
+        <rich:panel>
+            <f:facet name="header">Hai dimenticato la password?</f:facet>
+            <s:div rendered="#{userUtil.statoRecuperoEmail.equals('OK')}">
+                <p>Invio password avvenuto con successo. Tra poco riceverei una email contenete le nuove credenziali</p>            
+            </s:div>       
+            <s:div rendered="#{userUtil.statoRecuperoEmail.equals('NO_RESULT')}">
+                <p>Non è stato inidividuato nessun account con l'email inserita.</p>            
+            </s:div>       
+            <s:div rendered="#{not userUtil.statoRecuperoEmail.equals('OK')}">
+
+            <p>Per reimpostare la password, inserisci l'email con cui ti sei registrato a FORCE. Riceverai un email con le nuove credenziali.</p>
+
+            <div class="dialog">
+                <h:panelGrid columns="2" rowClasses="prop" columnClasses="name,value">
+                    <h:outputLabel >Email</h:outputLabel>
+                    <h:inputText id="email"
+                              value="#{userUtil.email}"/>
+                    </h:panelGrid>
+            </div>
+            </s:div>
+        </rich:panel>
+
+        <div class="actionButtons">
+            <h:commandButton id="submit" value="Invia" action="#{userUtil.recuperaPassword()}" rendered="#{not userUtil.statoRecuperoEmail.equals('OK')}"/>
+            <h:commandButton id="login" value="Torna al Login" action="/login.xhtml" rendered="#{userUtil.statoRecuperoEmail.equals('OK')}"/>
+        </div>
+
+    </h:form>
+
+ </ui:define>
+</ui:composition>

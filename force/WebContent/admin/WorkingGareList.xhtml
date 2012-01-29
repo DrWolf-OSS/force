@@ -49,7 +49,7 @@
                 Data di Pubblicazione
             </f:facet>
             <h:outputText value="#{_gara.dataPubblicazione}">
-                <!--<f:convertDateTime pattern="dd/MM/yyyy"/> -->
+                <f:convertDateTime pattern="dd/MM/yyyy"/>
             </h:outputText>
         </rich:column>
         <rich:column sortBy="#{_gara.dataScadenza}">
@@ -57,7 +57,7 @@
                 Data di Scadenza
             </f:facet>
             <h:outputText value="#{_gara.dataScadenza}">
-                <!--<f:convertDateTime pattern="dd/MM/yyyy"/> -->
+                <f:convertDateTime pattern="dd/MM/yyyy"/>
             </h:outputText>
         </rich:column>
         <rich:column styleClass="action">
