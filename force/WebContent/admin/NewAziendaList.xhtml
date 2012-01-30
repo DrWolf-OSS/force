@@ -96,6 +96,10 @@
                            onclick="if (!confirm('Sei sicuro di voler attiva #{_azienda.ragioneSociale}?')) return false"
                           id="attivaAzienda" />
         </rich:column>
+                <f:facet name="footer">
+             <rich:datascroller id="ds" renderIfSinglePage="false"></rich:datascroller>
+        </f:facet>
+        
     </rich:dataTable>
     </h:form>
     </div>

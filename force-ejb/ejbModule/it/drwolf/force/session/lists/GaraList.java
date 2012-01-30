@@ -46,7 +46,7 @@ public class GaraList implements Serializable {
 	public void getListaGareAttive() {
 		this.listaGareAttive = this.entityManager
 				.createQuery(
-						"from Gara g left join g.slotDefs sd where g.type = 'GESTITA' and sd.ownerId='ADMIN'")
+						"select g from Gara g left join g.slotDefs sd where g.type = 'GESTITA' and sd.ownerId='ADMIN'")
 				.getResultList();
 	}
 

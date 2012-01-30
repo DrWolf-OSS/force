@@ -341,7 +341,7 @@ public class Heartbeat {
 		if (gara.getSoaAsList().size() > 0) {
 			List<Azienda> resultList = entityManager
 					.createQuery(
-							" select distinct  a from Gara g join g.Soa s join s.aziende a where g.id = :g")
+							" select distinct  a from Gara g join g.soa s join s.aziende a where g.id = :g")
 					.setParameter("g", gara.getId()).getResultList();
 			for (Azienda azienda : resultList) {
 				// per ogni azienda devo andare a inserire un riga nelle

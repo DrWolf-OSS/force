@@ -33,12 +33,23 @@ public class CategoriaMerceologichaList {
 	@Out(required = false)
 	private List<CategoriaMerceologica> listaServizi = null;
 
+	@SuppressWarnings("unused")
+	@Out(required = false)
+	private List<CategoriaMerceologica> listaCategorieMerceologiche = null;
+
 	@SuppressWarnings("unchecked")
 	@Factory("listaBeni")
 	public void getListaBeni() {
 		this.listaBeni = this.entityManager.createQuery(
 				"from CategoriaMerceologica cm where cm.type = 'BENE'")
 				.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Factory("listaCategorieMerceologiche")
+	public void getListaCategorieMerceologiche() {
+		this.listaCategorieMerceologiche = this.entityManager.createQuery(
+				"from CategoriaMerceologica").getResultList();
 	}
 
 	@SuppressWarnings("unchecked")

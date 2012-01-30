@@ -22,7 +22,9 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.framework.EntityHome;
+import org.jboss.seam.international.StatusMessage.Severity;
 import org.jboss.seam.security.Identity;
 
 @Name("aziendaHome")
@@ -110,8 +112,20 @@ public class AziendaHome extends EntityHome<Azienda> {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public String inserisciAzienda() {
 		try {
+			List<Object> l = this.entityManager
+					.createQuery(
+							"from Azienda a where a.emailReferente = :email")
+					.setParameter("email",
+							this.getInstance().getEmailReferente())
+					.getResultList();
+			if (l.size() > 0) {
+				FacesMessages.instance().add(Severity.ERROR,
+						"Email del referente già presente nel nostro database");
+				return "KO";
+			}
 			this.getInstance().setStato(StatoAzienda.NUOVA.toString());
 			// persisto l'entity azienda
 			this.persist();
@@ -209,7 +223,7 @@ public class AziendaHome extends EntityHome<Azienda> {
 		this.update();
 		ArrayList<Gara> gare = (ArrayList<Gara>) this.entityManager
 				.createQuery(
-						"select distinct  g from Azienda a join a.Soa soa join soa.gare g  where g.stato = 'INSERITA' and a.id= :id")
+						"select distinct  g from Azienda a join a.soa s join s.soa.gare g  where g.stato = 'INSERITA' and a.id= :id")
 				.setParameter("id", this.getInstance().getId()).getResultList();
 		// per ogni gara devo controllare se è già presente nelle comunicaiozni.
 		// Se non lo è la inserisco
