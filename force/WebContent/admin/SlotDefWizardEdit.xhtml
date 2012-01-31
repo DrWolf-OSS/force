@@ -690,6 +690,7 @@
 			<s:div>
 	        <div style="clear:both"/>
 	        </s:div>
+	        <s:div id="selectCondProp_buttons">
 	        <a:commandButton value="Ok" 
 	        			oncomplete="#{rich:component('selectCondProp')}.hide();#{rich:component('collPanel')}.show();" 
 	        			reRender="pf,propPanel,collPanel"
@@ -707,6 +708,7 @@
 	        <a:region>
 			<a:commandButton value="Annulla" action="#{slotDefEditBean.clearEditing()}" oncomplete="#{rich:component('selectCondProp')}.hide()" reRender="pf,propPanel,collPanel,selectCondProp"/>
 			</a:region>
+			</s:div>
 			</a:form>
 		</rich:modalPanel>
     

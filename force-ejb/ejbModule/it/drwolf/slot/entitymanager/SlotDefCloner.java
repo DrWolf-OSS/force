@@ -1,6 +1,7 @@
 package it.drwolf.slot.entitymanager;
 
 import it.drwolf.slot.alfresco.custom.model.Property;
+import it.drwolf.slot.converters.PropertyDefConverterBean;
 import it.drwolf.slot.entity.DependentSlotDef;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.EmbeddedProperty;
@@ -29,6 +30,9 @@ public class SlotDefCloner {
 	// HashMap<Long, SlotDefCloner>();
 
 	private Set<SlotDefCloner> dependentSlotDefCloners = new HashSet<SlotDefCloner>();
+
+	private PropertyDefConverterBean propertyDefConverterBean = (PropertyDefConverterBean) org.jboss.seam.Component
+			.getInstance("propertyDefConverterBean");
 
 	// @In(create = true)
 	// private RuleHome ruleHome;
@@ -248,6 +252,7 @@ public class SlotDefCloner {
 				PropertyDef clonedPropertyDef = this.clonePropertyDef(
 						propertyDef, clonedSlotDef);
 				clonedSlotDef.getPropertyDefs().add(clonedPropertyDef);
+				this.propertyDefConverterBean.addPropertyDef(clonedPropertyDef);
 			}
 		}
 

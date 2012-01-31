@@ -5,17 +5,19 @@
 
    
    <begin-conversation join="true"/>
-      <navigation from-action="#{identity.login}">
-       <rule if="#{identity.hasRole('AZIENDE')}">
-         <redirect view-id="/user/ControlPanel.xhtml">
-            <param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
+   
+   <navigation from-action="#{identity.login}">
+   		<rule if="#{identity.hasRole('AZIENDE')}">
+       	<end-conversation before-redirect="true"/>
+        <redirect view-id="/user/ControlPanel.xhtml">
+        	<param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
             <param name="slotInstId" value="#{userSession.primarySlotInst.id}"/>
             <param name="aziendaId" value="#{userSession.azienda.id}" />
-         </redirect>
-         
+        </redirect>
       </rule>
       <rule if="#{identity.loggedIn}">
-         <redirect view-id="/home.xhtml"/>
+      	<end-conversation before-redirect="true"/>
+        <redirect view-id="/home.xhtml"/>
       </rule>
    </navigation>
 </page>

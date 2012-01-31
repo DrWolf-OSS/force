@@ -1,7 +1,6 @@
 package it.drwolf.slot.converters;
 
 import it.drwolf.slot.entity.PropertyDef;
-import it.drwolf.slot.pagebeans.SlotDefEditBean;
 
 import java.util.Map;
 
@@ -28,12 +27,18 @@ public class PropertyDefConverter implements Converter {
 			Long id = new Long(_id);
 			propertyDef = entityManager.find(PropertyDef.class, id);
 		} else {
-			SlotDefEditBean slotDefEditBean = (SlotDefEditBean) org.jboss.seam.Component
-					.getInstance("slotDefEditBean");
+			// SlotDefEditBean slotDefEditBean = (SlotDefEditBean)
+			// org.jboss.seam.Component
+			// .getInstance("slotDefEditBean");
+			// Map<String, PropertyDef> converterPropertyMap = slotDefEditBean
+			// .getConverterPropertyMap();
+			// String uuid = split[1];
+			// propertyDef = converterPropertyMap.get(uuid);
 
-			Map<String, PropertyDef> converterPropertyMap = slotDefEditBean
-					.getConverterPropertyMap();
-
+			PropertyDefConverterBean propertyDefConverterBean = (PropertyDefConverterBean) org.jboss.seam.Component
+					.getInstance("propertyDefConverterBean");
+			Map<String, PropertyDef> converterPropertyMap = propertyDefConverterBean
+					.getMap();
 			String uuid = split[1];
 			propertyDef = converterPropertyMap.get(uuid);
 		}
