@@ -122,13 +122,14 @@ public class UserSession implements Serializable {
 	// primary dell'azienda
 
 	public SlotInst getPrimarySlotInst() {
-		if (this.primarySlotInst == null) {
-			SlotInst slotInst = this.retriveSlotInst();
-			if (slotInst != null) {
-				this.setPrimarySlotInst(slotInst);
-			}
-		}
-		return this.primarySlotInst;
+		// if (this.primarySlotInst == null) {
+		// SlotInst slotInst = this.retriveSlotInst();
+		// if (slotInst != null) {
+		// this.setPrimarySlotInst(slotInst);
+		// }
+		// }
+		// return this.primarySlotInst;
+		return this.retriveSlotInst();
 	}
 
 	public void init() {

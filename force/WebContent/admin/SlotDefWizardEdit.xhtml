@@ -184,7 +184,10 @@
 				</ui:define>
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.embeddedPropertiesAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.embeddedPropertiesAsList}" var="eprop" 
-						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" style="width:1024px" >
+						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" 
+						style="width:1024px" 
+						onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
+						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
@@ -262,7 +265,9 @@
 				</ui:define>
 				<h:outputText value="Nessuna informazione definita" rendered="#{empty slotDefHome.instance.propertyDefsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
-						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" >
+						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" 
+						onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
+						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
@@ -364,7 +369,10 @@
 				</ui:define>
 				<h:outputText value="Nessuna documentazione definita" rendered="#{empty slotDefHome.instance.docDefCollectionsAsList}"/>
 				<rich:dataTable value="#{slotDefHome.instance.docDefCollectionsAsList}" var="coll" 
-						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" style="width:1024px">
+						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" 
+						style="width:1024px"
+						onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
+						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
 					<rich:column style="width:200px; font-weight:bold;" stylesimplifiedDependentSlotDefPanelClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"

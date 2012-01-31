@@ -51,9 +51,9 @@
             		rendered="#{slotDefParameters.model and not slotDefParameters.from.equals('/admin/GaraEdit.xhtml') and not slotDefParameters.from.equals('/admin/SettoreList.xhtml')}"/>
             <s:fragment rendered="#{slotDefParameters.from != null}">
         	#{' '}
-        	<h:commandLink value="Usa" action="#{slotDefGaraAssociationtBean.useSlotDef(_slotDef)}"  rendered="#{slotDefParameters.from.equals('/admin/GaraEdit.xhtml')}"/>
+        	<h:commandLink value="Usa" action="#{slotDefGaraAssociationtBean.useSlotDef(_slotDef)}"  rendered="#{slotDefParameters.from.equals('/admin/GaraEdit.xhtml')}" styleClass="modal"/>
             #{' '}
-            <h:commandLink value="Usa" action="#{slotDefSettoreAssociationBean.useSlotDef(_slotDef)}"  rendered="#{slotDefParameters.from.equals('/admin/SettoreList.xhtml')}"/>
+            <h:commandLink value="Usa" action="#{slotDefSettoreAssociationBean.useSlotDef(_slotDef)}"  rendered="#{slotDefParameters.from.equals('/admin/SettoreList.xhtml')}" styleClass="modal"/>
         	</s:fragment>
         </rich:column>
     </rich:dataTable>
