@@ -1,6 +1,7 @@
 package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
+import it.drwolf.slot.converters.PropertyDefConverterBean;
 import it.drwolf.slot.entity.DependentSlotDef;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.DocInstCollection;
@@ -97,6 +98,9 @@ public class SlotDefEditBean {
 	@In
 	private Identity identity;
 
+	@In(create = true)
+	private PropertyDefConverterBean propertyDefConverterBean;
+
 	// main messages
 	private ArrayList<VerifierMessage> messages = new ArrayList<VerifierMessage>();
 
@@ -184,10 +188,12 @@ public class SlotDefEditBean {
 		if (!instance.getPropertyDefsAsList().contains(this.propertyDef)) {
 			instance.getPropertyDefs().add(this.propertyDef);
 		}
-		if (this.converterPropertyMap.get(this.propertyDef.getUuid()) == null) {
-			this.converterPropertyMap.put(this.propertyDef.getUuid(),
-					this.propertyDef);
-		}
+		// if (this.converterPropertyMap.get(this.propertyDef.getUuid()) ==
+		// null) {
+		// this.converterPropertyMap.put(this.propertyDef.getUuid(),
+		// this.propertyDef);
+		// }
+		this.propertyDefConverterBean.addPropertyDef(this.propertyDef);
 		this.edit = false;
 	}
 

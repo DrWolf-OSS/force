@@ -1,8 +1,10 @@
 package it.drwolf.force.session.lists;
 
+import it.drwolf.force.entity.Azienda;
 import it.drwolf.force.entity.Settore;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -26,9 +28,17 @@ public class SettoreList implements Serializable {
 	@In
 	private EntityManager entityManager;
 
+	private Settore settore = null;
+
+	private List<Azienda> listaAziende = new ArrayList<Azienda>();
+
 	@SuppressWarnings("unused")
 	@Out(required = true)
 	private List<Settore> listaSettori = null;
+
+	public List<Azienda> getListaAziende() {
+		return this.listaAziende;
+	}
 
 	@SuppressWarnings("unchecked")
 	@Factory("listaSettori")
@@ -37,7 +47,23 @@ public class SettoreList implements Serializable {
 				.getResultList();
 	}
 
+	public Settore getSettore() {
+		return this.settore;
+	}
+
+	public void setListaAziende(List<Azienda> listaAziende) {
+		this.listaAziende = listaAziende;
+	}
+
 	public void setListaSettori(List<Settore> settoreList) {
 		this.listaSettori = settoreList;
+	}
+
+	public void setSettore(Settore setttore) {
+		this.settore = setttore;
+		this.listaAziende = this.entityManager
+				.createQuery("from Azienda a where a.settore = :settore")
+				.setParameter("settore", setttore).getResultList();
+
 	}
 }

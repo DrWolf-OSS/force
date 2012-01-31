@@ -5,15 +5,17 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "SOA")
-public class SOA implements Serializable {
+@Table(name = "Soa")
+public class Soa implements Serializable {
 
 	/**
 	 * 
@@ -32,7 +34,7 @@ public class SOA implements Serializable {
 
 	private Boolean qualifica;
 
-	private Set<Azienda> aziende;
+	private Set<AziendaSoa> aziende;
 
 	private Set<Gara> gare;
 
@@ -47,7 +49,7 @@ public class SOA implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		SOA other = (SOA) obj;
+		Soa other = (Soa) obj;
 		if (this.id == null) {
 			if (other.id != null) {
 				return false;
@@ -58,8 +60,8 @@ public class SOA implements Serializable {
 		return true;
 	}
 
-	@ManyToMany(mappedBy = "SOA")
-	public Set<Azienda> getAziende() {
+	@OneToMany(mappedBy = "soa", fetch = FetchType.EAGER)
+	public Set<AziendaSoa> getAziende() {
 		return this.aziende;
 	}
 
@@ -72,7 +74,7 @@ public class SOA implements Serializable {
 		return this.descrizione;
 	}
 
-	@ManyToMany(mappedBy = "SOA")
+	@ManyToMany(mappedBy = "soa")
 	public Set<Gara> getGare() {
 		return this.gare;
 	}
@@ -106,7 +108,7 @@ public class SOA implements Serializable {
 		return result;
 	}
 
-	public void setAziende(Set<Azienda> aziende) {
+	public void setAziende(Set<AziendaSoa> aziende) {
 		this.aziende = aziende;
 	}
 

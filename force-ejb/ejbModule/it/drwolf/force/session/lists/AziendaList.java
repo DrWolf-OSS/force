@@ -3,7 +3,6 @@ package it.drwolf.force.session.lists;
 import it.drwolf.force.entity.Azienda;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -40,12 +39,6 @@ public class AziendaList implements Serializable {
 	public void getListaAziendeAttive() {
 		this.aziendeAttive = this.entityManager.createQuery(
 				"from Azienda where stato = 'ATTIVA'").getResultList();
-	}
-
-	public ArrayList<Azienda> getListaAziendeBySettore(Integer settoreId) {
-		ArrayList<Azienda> lista = new ArrayList<Azienda>();
-		System.out.println(settoreId);
-		return lista;
 	}
 
 	@SuppressWarnings("unchecked")

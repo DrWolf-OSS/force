@@ -147,7 +147,7 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 		return null;
 	}
 
-	public List<String> getSOA() {
+	public List<String> getSoa() {
 		return this.soa;
 	}
 

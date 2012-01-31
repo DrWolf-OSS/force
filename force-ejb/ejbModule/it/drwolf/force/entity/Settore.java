@@ -1,5 +1,6 @@
 package it.drwolf.force.entity;
 
+import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.entity.SlotDef;
 
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.validator.NotNull;
 
@@ -62,6 +64,20 @@ public class Settore implements Serializable {
 
 	private Set<Gara> gare;
 
+	// Questo metodo dovrà essere modificato per tener conto del fatto che gli
+	// utenti "paganti" avranno a disposizione gli SlotDef definiti dal sistema
+	@Transient
+	public SlotDef getAssociatedSlotDef() {
+		AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
+				.getInstance("alfrescoUserIdentity");
+		SlotDef slotDef = this.slotDef;
+		String ownerId = alfrescoUserIdentity.getMyOwnerId();
+		if ((slotDef != null) && (slotDef.getOwnerId().equals(ownerId))) {
+			return slotDef;
+		}
+		return null;
+	}
+
 	@Column(name = "descrizione", nullable = true)
 	public String getDescrizione() {
 		return this.descrizione;
@@ -108,4 +124,5 @@ public class Settore implements Serializable {
 	public void setSlotDef(SlotDef slotDef) {
 		this.slotDef = slotDef;
 	}
+
 }

@@ -8,7 +8,7 @@ import it.drwolf.force.entity.ComunicazioneAziendaGaraId;
 import it.drwolf.force.entity.EntePubblico;
 import it.drwolf.force.entity.Fonte;
 import it.drwolf.force.entity.Gara;
-import it.drwolf.force.entity.SOA;
+import it.drwolf.force.entity.Soa;
 import it.drwolf.force.enums.StatoGara;
 import it.drwolf.force.enums.TipoGara;
 import it.drwolf.force.enums.TipoProceduraGara;
@@ -183,13 +183,13 @@ public class Heartbeat {
 									}
 									if (avcpFeed.haveSoa()) {
 										System.out.println("trovate le soa : "
-												+ avcpFeed.getSOA());
-										HashSet<SOA> listaSOA = new HashSet<SOA>();
-										for (String element : avcpFeed.getSOA()) {
+												+ avcpFeed.getSoa());
+										HashSet<Soa> listaSOA = new HashSet<Soa>();
+										for (String element : avcpFeed.getSoa()) {
 											try {
-												SOA soa = (SOA) entityManager
+												Soa soa = (Soa) entityManager
 														.createQuery(
-																"from SOA where codice = :codice")
+																"from Soa where codice = :codice")
 														.setParameter("codice",
 																element)
 														.getSingleResult();
@@ -200,7 +200,7 @@ public class Heartbeat {
 												e.printStackTrace();
 											}
 										}
-										gara.setSOA(listaSOA);
+										gara.setSoa(listaSOA);
 										gara.setType(TipoGara.GESTITA.getNome());
 									}
 									if (avcpFeed.haveCm()) {
@@ -338,10 +338,10 @@ public class Heartbeat {
 				this.storeOnDatabase(cag, entityManager);
 			}
 		}
-		if (gara.getSOAAsList().size() > 0) {
+		if (gara.getSoaAsList().size() > 0) {
 			List<Azienda> resultList = entityManager
 					.createQuery(
-							" select distinct  a from Gara g join g.SOA s join s.aziende a where g.id = :g")
+							" select distinct  a from Gara g join g.soa s join s.aziende a where g.id = :g")
 					.setParameter("g", gara.getId()).getResultList();
 			for (Azienda azienda : resultList) {
 				// per ogni azienda devo andare a inserire un riga nelle
@@ -479,13 +479,13 @@ public class Heartbeat {
 								}
 								if (startFeed.haveSoa()) {
 									System.out.println("trovate le soa : "
-											+ startFeed.getSOA());
-									HashSet<SOA> listaSOA = new HashSet<SOA>();
-									for (String element : startFeed.getSOA()) {
+											+ startFeed.getSoa());
+									HashSet<Soa> listaSOA = new HashSet<Soa>();
+									for (String element : startFeed.getSoa()) {
 										try {
-											SOA soa = (SOA) entityManager
+											Soa soa = (Soa) entityManager
 													.createQuery(
-															"from SOA where codice = :codice")
+															"from Soa where codice = :codice")
 													.setParameter("codice",
 															element)
 													.getSingleResult();
@@ -496,7 +496,7 @@ public class Heartbeat {
 											e.printStackTrace();
 										}
 									}
-									gara.setSOA(listaSOA);
+									gara.setSoa(listaSOA);
 									gara.setType(TipoGara.GESTITA.getNome());
 								}
 								if (this.storeOnDatabase(gara, entityManager)) {

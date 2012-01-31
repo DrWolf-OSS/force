@@ -6,6 +6,7 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:rich="http://richfaces.org/rich"
+    xmlns:a4j="http://richfaces.org/a4j"
     template="/layout/template.xhtml">
 
 <ui:define name="body">
@@ -14,7 +15,6 @@
     <rich:panel>
         <f:facet name="header">Elenco dei Settori Attivi</f:facet>
          <div class="results" id="settoreDiv">
-         <h:form>
 		    <rich:dataTable id="settoreList"
 		                var="_settore"
 		              value="#{listaSettori}"
@@ -27,13 +27,13 @@
 		            </f:facet>
 		            <h:outputText value="#{_settore.id}"/>
 		        </rich:column>
-		        <rich:column sortBy="#{_settore.nome}" filterBy="#{_settore.nome}">
+		        <rich:column sortBy="#{_settore.nome}">
 		            <f:facet name="header">
 		            Nome
 		            </f:facet>
 		            <h:outputText value="#{_settore.nome}"/>
 		        </rich:column>
-                <rich:column sortBy="#{_settore.descrizione}" filterBy="#{_settore.descrizione}">
+                <rich:column sortBy="#{_settore.descrizione}">
 		            <f:facet name="header">
                         Descrizione
 		            </f:facet>
@@ -41,18 +41,76 @@
 		        </rich:column>
 		        <rich:column styleClass="action">
 		            <f:facet name="header">Azioni</f:facet>
-		            <h:graphicImage id="aziendaListIcon" value="/img/building.png" styleClass="fileIcon"/>
-		            <h:graphicImage id="bustaIcon" value="/img/envelope-string.png" styleClass="fileIcon"/>
+		            <a4j:commandLink action="#{settoreList.setSettore(_settore)}" oncomplete="#{rich:component('waitPanel')}.hide()" reRender="elencoAziende" id="aziendeList"
+                        styleClass="modal">
+		              <h:graphicImage id="aziendaListIcon" value="/img/building.png" styleClass="fileIcon"/>
+		            </a4j:commandLink>
+		            <s:link rendered="#{_settore.getSlotDef() == null}" view="/admin/SlotDefTemplateList.xhtml">
+		              <h:graphicImage id="bustaIconOpaque" value="/img/envelope-string.png" styleClass="fileIcon opaque"/>
+		                <f:param name="model" value="#{true}"/>
+		                <f:param name="from" value="/admin/SettoreList.xhtml" />
+		                <f:param name="mode" value="PRIMARY"/>
+                        <f:param name="settoreId" value="#{_settore.id}"/>
+                    </s:link>
+                    <s:link rendered="#{_settore.getSlotDef() != null}" view="/admin/SlotDefView.xhtml">
+                        <h:graphicImage id="bustaIcon" value="/img/envelope-string.png" styleClass="fileIcon"/>
+                        <f:param name="model" value="#{false}"/>
+	                    <f:param name="mode" value="PRIMARY"/>
+	                    <f:param name="slotDefId" value="#{_settore.associatedSlotDef.id}"/>
+	                    <f:param name="settoreId" value="#{_settore.id}"/>
+                    </s:link>
 		            <rich:toolTip for="aziendaListIcon" direction="bottom-left">Elenco delle aziende associate a questo settore</rich:toolTip>
+                    <rich:toolTip for="bustaIconOpaque" direction="bottom-left">Associa Busta</rich:toolTip>
+                    <rich:toolTip for="bustaIcon" direction="bottom-left">Modifica Busta</rich:toolTip>
 		        
 		        </rich:column>
 		        <f:facet name="footer">
              <rich:datascroller id="ds" renderIfSinglePage="false"></rich:datascroller>
         </f:facet>
     </rich:dataTable>
-        </h:form>
         </div>
+
     </rich:panel>
+    <s:div id="elencoAziende" >
+    
+    <rich:panel id="panelloAziende" rendered="#{not empty settoreList.listaAziende or settoreList.settore != null}">
+        <f:facet name="header">Elenco delle Aziende del settore #{settoreList.settore.nome}</f:facet>
+
+        <h:outputText value="Non sono presenti aziende per il settore #{settoreList.settore.nome}" rendered="#{empty settoreList.listaAziende and settoreList.settore != null}"/>
+
+        <rich:dataTable id="aziendaList"
+                            var="_azienda"
+                          value="#{settoreList.listaAziende}"
+                           rows="15"
+                           rendered="#{not empty settoreList.listaAziende}"
+                           reRender="aziendeDs">
+            
+            <rich:column sortBy="#{_azienda.ragioneSociale}" filterBy="#{_azienda.ragioneSociale}">
+                <f:facet name="header">
+                Ragione Sociale
+                </f:facet>
+                <h:outputText value="#{_azienda.ragioneSociale}"/>
+            </rich:column>
+            <rich:column sortBy="#{_azienda.nome}" filterBy="#{_azienda.nome}">
+                <f:facet name="header">
+                Nome
+                </f:facet>
+                <h:outputText value="#{_azienda.nome}"/>
+            </rich:column>
+            <rich:column sortBy="#{_azienda.cognome}" filterBy="#{_azienda.cognome}">
+                <f:facet name="header">
+                Nome
+                </f:facet>
+                <h:outputText value="#{_azienda.cognome}"/>
+            </rich:column>
+                <f:facet name="footer">
+             <rich:datascroller id="aziendeDs" renderIfSinglePage="false"></rich:datascroller>
+        </f:facet>
+        
+        </rich:dataTable>
+    </rich:panel>
+            </s:div>
+    
 </h:form>
 
 </ui:define>

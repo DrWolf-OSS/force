@@ -66,7 +66,7 @@ public class Azienda implements Serializable {
 
 	private Set<CategoriaMerceologica> categorieMerceologiche = new HashSet<CategoriaMerceologica>();
 
-	private Set<SOA> SOA = new HashSet<SOA>();
+	private Set<AziendaSoa> soa = new HashSet<AziendaSoa>();
 
 	private Set<Commessa> commesse;
 
@@ -230,24 +230,24 @@ public class Azienda implements Serializable {
 		return this.getNome() + " " + this.getCognome();
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(nullable = false)
 	@NotNull
 	public Settore getSettore() {
 		return this.settore;
 	}
 
-	@ManyToMany
-	public Set<SOA> getSOA() {
-		return this.SOA;
+	@OneToMany(mappedBy = "azienda", fetch = FetchType.EAGER)
+	public Set<AziendaSoa> getSoa() {
+		return this.soa;
 	}
 
 	@Transient
-	public List<SOA> getSOAAsList() {
-		if (this.getSOA() != null) {
-			return new ArrayList<SOA>(this.getSOA());
+	public List<AziendaSoa> getSoaAsList() {
+		if (this.getSoa() != null) {
+			return new ArrayList<AziendaSoa>(this.getSoa());
 		}
-		return new ArrayList<SOA>();
+		return new ArrayList<AziendaSoa>();
 
 	}
 
@@ -271,8 +271,24 @@ public class Azienda implements Serializable {
 	}
 
 	@Transient
+	public boolean isBene() {
+		if (this.getSettore().getNome().equals("Beni")) {
+			return true;
+		}
+		return false;
+	}
+
+	@Transient
 	public boolean isEdile() {
-		if (this.getSettore().getNome().equals("Edilizia")) {
+		if (this.getSettore().getNome().equals("Lavori")) {
+			return true;
+		}
+		return false;
+	}
+
+	@Transient
+	public boolean isServizio() {
+		if (this.getSettore().getNome().equals("Servizi")) {
 			return true;
 		}
 		return false;
@@ -377,13 +393,13 @@ public class Azienda implements Serializable {
 		this.settore = settore;
 	}
 
-	public void setSOA(Set<SOA> categoriaOpereGenerali) {
-		this.SOA = categoriaOpereGenerali;
+	public void setSoa(Set<AziendaSoa> categoriaOpereGenerali) {
+		this.soa = categoriaOpereGenerali;
 	}
 
 	@Transient
-	public void setSOAAsList(List<SOA> lista) {
-		this.setSOA(new HashSet<SOA>(lista));
+	public void setSoaAsList(List<AziendaSoa> lista) {
+		this.setSoa(new HashSet<AziendaSoa>(lista));
 	}
 
 	public void setStato(String stato) {

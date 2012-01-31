@@ -575,6 +575,22 @@ public class SlotInstEditBean {
 		}
 	}
 
+	private void deleteAllDocuments(SlotInst slotInst) {
+		Set<SlotInst> dependentSlotInsts = slotInst.getDependentSlotInsts();
+		if (dependentSlotInsts != null && !dependentSlotInsts.isEmpty()) {
+			for (SlotInst dependent : dependentSlotInsts) {
+				this.deleteAllDocuments(dependent);
+			}
+		}
+
+		for (DocInstCollection docInstCollection : slotInst
+				.getDocInstCollections()) {
+			for (DocInst docInst : docInstCollection.getDocInsts()) {
+				docInst.getDocument().deleteAllVersions();
+			}
+		}
+	}
+
 	public void downloadDocumentsZip() {
 		try {
 
@@ -951,6 +967,11 @@ public class SlotInstEditBean {
 		SlotInst instance = this.slotInstHome.getInstance();
 		SlotInst merged = this.entityManager.merge(instance);
 		this.slotInstHome.setInstance(merged);
+
+		//
+		this.deleteAllDocuments(merged);
+		//
+
 		return this.slotInstHome.remove();
 	}
 

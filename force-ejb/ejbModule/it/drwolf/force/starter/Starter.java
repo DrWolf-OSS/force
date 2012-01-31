@@ -72,6 +72,5 @@ public class Starter {
 		now.add(Calendar.MINUTE, 1);
 		this.heartbeat.comunicaGare(now.getTime(), new Long(60 * 60 * 1000),
 				endDate.getTime());
-
 	}
 }

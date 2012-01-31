@@ -3,18 +3,21 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd">
 
+   
+   <begin-conversation join="true"/>
+   
    <navigation from-action="#{identity.login}">
-       <rule if="#{identity.hasRole('AZIENDE')}">
-         <redirect view-id="/user/ControlPanel.xhtml">
-            <param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
+   		<rule if="#{identity.hasRole('AZIENDE')}">
+       	<end-conversation before-redirect="true"/>
+        <redirect view-id="/user/ControlPanel.xhtml">
+        	<param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
             <param name="slotInstId" value="#{userSession.primarySlotInst.id}"/>
             <param name="aziendaId" value="#{userSession.azienda.id}" />
-         </redirect>
-         
+        </redirect>
       </rule>
       <rule if="#{identity.loggedIn}">
-         <redirect view-id="/home.xhtml"/>
+      	<end-conversation before-redirect="true"/>
+        <redirect view-id="/home.xhtml"/>
       </rule>
    </navigation>
-
 </page>

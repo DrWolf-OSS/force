@@ -65,7 +65,7 @@ public class StartFeedParser implements GaraFeedParserIF {
 		return null;
 	}
 
-	public ArrayList<String> getSOA() {
+	public ArrayList<String> getSoa() {
 		return this.soa;
 	}
 

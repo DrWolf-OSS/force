@@ -93,7 +93,7 @@
    
    <navigation from-action="#{slotInstEditBean.removeSlot()}">
       <rule if-outcome="removed">
-         <end-conversation/>
+         <end-conversation before-redirect="true"/>
          <redirect view-id="/home.xhtml"/>
       </rule>
    </navigation>

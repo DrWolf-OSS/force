@@ -2,46 +2,70 @@ package it.drwolf.force.session.lists;
 
 import it.drwolf.force.entity.CategoriaMerceologica;
 
-import java.util.Arrays;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
+import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Factory;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.framework.EntityQuery;
+import org.jboss.seam.annotations.Out;
+import org.jboss.seam.annotations.Scope;
 
 @Name("categoriaMerceologicaList")
-public class CategoriaMerceologichaList extends
-		EntityQuery<CategoriaMerceologica> {
+@Scope(ScopeType.CONVERSATION)
+public class CategoriaMerceologichaList {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4942397425343823929L;
 
-	private static final String EJBQL = "select categoriaMerceologica from CategoriaMerceologica categoriaMerceologica";
+	@In
+	private EntityManager entityManager;
 
-	private static final String[] RESTRICTIONS = {
-			"lower(categoriaMerceologica.categoria) like lower(concat(#{categoriaMerceologicaList.categoriaMerceologica.categoria},'%'))",
-			"lower(categoriaMerceologica.type) like lower(concat(#{categoriaMerceologicaList.categoriaMerceologica.type},'%'))", };
+	@SuppressWarnings("unused")
+	@Out(required = false)
+	private List<CategoriaMerceologica> listaBeni = null;
 
-	private CategoriaMerceologica categoriaMerceologica = new CategoriaMerceologica();
+	@SuppressWarnings("unused")
+	@Out(required = false)
+	private List<CategoriaMerceologica> listaServizi = null;
 
-	public CategoriaMerceologichaList() {
-		this.setEjbql(CategoriaMerceologichaList.EJBQL);
-		this.setRestrictionExpressionStrings(Arrays
-				.asList(CategoriaMerceologichaList.RESTRICTIONS));
+	@SuppressWarnings("unused")
+	@Out(required = false)
+	private List<CategoriaMerceologica> listaCategorieMerceologiche = null;
+
+	@SuppressWarnings("unchecked")
+	@Factory("listaBeni")
+	public void getListaBeni() {
+		this.listaBeni = this.entityManager.createQuery(
+				"from CategoriaMerceologica cm where cm.type = 'BENE'")
+				.getResultList();
 	}
 
-	public CategoriaMerceologica getCategoriaMerceologica() {
-		return this.categoriaMerceologica;
+	@SuppressWarnings("unchecked")
+	@Factory("listaCategorieMerceologiche")
+	public void getListaCategorieMerceologiche() {
+		this.listaCategorieMerceologiche = this.entityManager.createQuery(
+				"from CategoriaMerceologica").getResultList();
 	}
 
-	public List<CategoriaMerceologica> getElencoBeni() {
-		this.getCategoriaMerceologica().setType("BENE");
-		return this.getResultList();
+	@SuppressWarnings("unchecked")
+	@Factory("listaServizi")
+	public void getListaServizi() {
+		this.listaServizi = this.entityManager.createQuery(
+				"from CategoriaMerceologica cm where cm.type = 'SERVIZIO'")
+				.getResultList();
 	}
 
-	public List<CategoriaMerceologica> getElencoServizi() {
-		this.categoriaMerceologica.setType("SERVIZO");
-		return this.getResultList();
+	public void setListaBeni(List<CategoriaMerceologica> listaBeni) {
+		this.listaBeni = listaBeni;
 	}
+
+	public void setListaServizi(List<CategoriaMerceologica> listaServizi) {
+		this.listaServizi = listaServizi;
+	}
+
 }

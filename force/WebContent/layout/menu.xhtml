@@ -112,14 +112,21 @@
         <f:facet name="label">Gestione Gare</f:facet>
         <rich:menuItem>
             <s:link view="/admin/NewGareList.xhtml"
-                value="Nuove Gare"
+                value="Gare Non Gestire"
                 id="newGare"
                 includePageParams="false"
                 propagation="none"/>
         </rich:menuItem>
         <rich:menuItem>
             <s:link view="/admin/ActiveGareList.xhtml"
-                value="Gare Attive"
+                value="Gare Gestite"
+                id="gestGare"
+                includePageParams="false"
+                propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem>
+            <s:link view="/admin/WorkingGareList.xhtml"
+                value="Gare In Corso"
                 id="actGare"
                 includePageParams="false"
                 propagation="none"/>
@@ -146,15 +153,6 @@
                 propagation="none">
                 <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
            </s:link>
-        </rich:menuItem>
-        <rich:menuItem>
-            <s:link view="/user/CommesseEdit.xhtml"
-                value="Gestione Archivio Commesse"
-                id="tobed"
-                includePageParams="false"
-                propagation="none">
-                <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
-            </s:link>
         </rich:menuItem>
         <rich:menuItem>
             <s:link view="/user/GareList.xhtml"
@@ -199,6 +197,23 @@
     </rich:dropDownMenu>
     <!-- @newMenuItem@ -->
     <rich:toolBarGroup location="right" styleClass="linkMenuBar">
-        <h:outputText id="menuWelcomeId" value="Autenticato come: #{credentials.username} " rendered="#{identity.loggedIn}"/>
+        <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none"  rendered="#{identity.loggedIn}">
+         <f:facet name="label">Autenticato come: #{credentials.username} </f:facet>
+         <rich:menuItem>
+            <s:link view="/home.xhtml"
+                value="Cambio Password"
+                id="chgpwd"
+                propagation="none">
+            </s:link>
+        </rich:menuItem>
+         <rich:menuItem>
+            <s:link view="/home.xhtml"
+                value="Logout"
+                id="logout"
+                propagation="none"
+                action="#{identity.logout}">
+            </s:link>
+         </rich:menuItem>
+        </rich:dropDownMenu>
     </rich:toolBarGroup>
 </rich:toolBar>

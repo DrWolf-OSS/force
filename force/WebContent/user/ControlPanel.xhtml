@@ -291,18 +291,21 @@
     </s:link>
     <h:outputText value="Le Tue SOA" /></s:span></f:facet>
     <rich:dataTable id="soaList"
-                var="soa"
-              value="#{userSession.azienda.SOAAsList}"
+                var="aziendaSoa"
+              value="#{userSession.azienda.soaAsList}"
               rows="13"
-           rendered="#{not empty userSession.azienda.SOAAsList}">
+           rendered="#{not empty userSession.azienda.soaAsList}">
         <rich:column>
-        <h:outputText value="#{soa.codice}"></h:outputText>
+        <h:outputText value="#{aziendaSoa.soa.codice}"></h:outputText>
     </rich:column>
-        <rich:column>
-        <h:outputText value="#{soa.nome}"></h:outputText>
+    <rich:column>
+        <h:outputText value="#{controlPanelBean.getClassficaSoaByName(aziendaSoa.classifica).testo}"></h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{aziendaSoa.soa.nome}"></h:outputText>
     </rich:column>
     </rich:dataTable>
-    <rich:datascroller for="soaList" renderIfSinglePage="false" rendered="#{not empty userSession.azienda.SOAAsList}"/>
+    <rich:datascroller for="soaList" renderIfSinglePage="false" rendered="#{not empty userSession.azienda.soaAsList}"/>
 </rich:panel>
 
 <rich:panel>

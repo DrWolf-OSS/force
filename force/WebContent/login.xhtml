@@ -25,16 +25,16 @@
                     <h:outputLabel for="password">Password</h:outputLabel>
                     <h:inputSecret id="password"
                                 value="#{credentials.password}"/>
-                    <h:outputLabel for="rememberMe">Ricordami</h:outputLabel>
-                    <h:selectBooleanCheckbox id="rememberMe"
-                                          value="#{rememberMe.enabled}"/>
-                </h:panelGrid>
+                    </h:panelGrid>
+                    <h:outputLabel style="font-weight : bold;" >Hai dimenticato la 
+                    <h:commandLink action="/recuperaPwd.xhtml" value="password?" />
+                    </h:outputLabel>
             </div>
 
         </rich:panel>
 
         <div class="actionButtons">
-            <h:commandButton id="submit" value="Login" action="#{identity.login}" styleClass="modal"/>
+            <h:commandButton id="submit" value="Login" action="#{identity.login}" styleClass="modal" />
         </div>
 
     </h:form>

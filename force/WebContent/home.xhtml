@@ -30,8 +30,9 @@ Realizzato con il contributo della Regione Toscana, il supporto di Anci Toscana 
      
     <rich:dataList id="activeGareList"
                 var="_gara"
-              value="#{garaList.getGaraAttive(3)}"
-           rendered="#{not empty garaList.getGaraAttive(3)}"
+              value="#{listaGareGestite}"
+           rendered="#{not empty listaGareGestite}"
+           rows="3"
            style="list-style:none;">
            <h:outputText value="#{_gara.oggetto} (Scad. #{_gara.dataScadenza})" />
            <br />

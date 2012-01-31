@@ -1,9 +1,13 @@
 package it.drwolf.force.session.homes;
 
 import it.drwolf.force.entity.Azienda;
+import it.drwolf.force.entity.AziendaSoa;
+import it.drwolf.force.entity.AziendaSoaId;
 import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.force.entity.ComunicazioneAziendaGaraId;
 import it.drwolf.force.entity.Gara;
+import it.drwolf.force.entity.Soa;
+import it.drwolf.force.enums.ClassificaSoa;
 import it.drwolf.force.enums.PosizioneCNA;
 import it.drwolf.force.enums.StatoAzienda;
 
@@ -18,7 +22,9 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.framework.EntityHome;
+import org.jboss.seam.international.StatusMessage.Severity;
 import org.jboss.seam.security.Identity;
 
 @Name("aziendaHome")
@@ -30,10 +36,33 @@ public class AziendaHome extends EntityHome<Azienda> {
 	private static final long serialVersionUID = -1214123840587373460L;
 
 	@In
-	Identity identity;
+	private Identity identity;
 
 	@In
-	EntityManager entityManager;
+	private EntityManager entityManager;
+
+	private AziendaSoa aziendaSoa = null;
+
+	private Soa soa = null;
+
+	private ClassificaSoa classificaSoa = null;
+
+	public void addSoa() {
+		AziendaSoaId id = new AziendaSoaId(this.getInstance().getId(), this
+				.getSoa().getId());
+		AziendaSoa aziendaSoa = new AziendaSoa(id, this.getClassificaSoa()
+				.getNome(), this.getInstance(), this.getSoa());
+		this.entityManager.persist(aziendaSoa);
+		this.getInstance().getSoa().add(aziendaSoa);
+		this.entityManager.flush();
+		this.cleanAziendaSoa();
+	}
+
+	private void cleanAziendaSoa() {
+		this.aziendaSoa = null;
+		this.soa = null;
+		this.classificaSoa = null;
+	}
 
 	@Override
 	protected Azienda createInstance() {
@@ -41,8 +70,20 @@ public class AziendaHome extends EntityHome<Azienda> {
 		return azienda;
 	}
 
+	public void deleteAziendaSoa(AziendaSoa aziendaSoa) {
+
+	}
+
 	public Integer getAziendaId() {
 		return (Integer) this.getId();
+	}
+
+	public AziendaSoa getAziendaSoa() {
+		return this.aziendaSoa;
+	}
+
+	public ClassificaSoa getClassificaSoa() {
+		return this.classificaSoa;
 	}
 
 	public Azienda getDefinedInstance() {
@@ -53,6 +94,10 @@ public class AziendaHome extends EntityHome<Azienda> {
 		return Arrays.asList(PosizioneCNA.values());
 	}
 
+	public Soa getSoa() {
+		return this.soa;
+	}
+
 	public boolean haveCM() {
 		if (this.getInstance().getCategorieMerceologicheAsList().size() > 0) {
 			return true;
@@ -61,14 +106,26 @@ public class AziendaHome extends EntityHome<Azienda> {
 	}
 
 	public boolean haveSoa() {
-		if (this.getInstance().getSOAAsList().size() > 0) {
+		if (this.getInstance().getSoaAsList().size() > 0) {
 			return true;
 		}
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public String inserisciAzienda() {
 		try {
+			List<Object> l = this.entityManager
+					.createQuery(
+							"from Azienda a where a.emailReferente = :email")
+					.setParameter("email",
+							this.getInstance().getEmailReferente())
+					.getResultList();
+			if (l.size() > 0) {
+				FacesMessages.instance().add(Severity.ERROR,
+						"Email del referente già presente nel nostro database");
+				return "KO";
+			}
 			this.getInstance().setStato(StatoAzienda.NUOVA.toString());
 			// persisto l'entity azienda
 			this.persist();
@@ -102,6 +159,13 @@ public class AziendaHome extends EntityHome<Azienda> {
 		}
 	}
 
+	public void mergeSoa() {
+		this.aziendaSoa.setClassifica(this.getClassificaSoa().getNome());
+		this.aziendaSoa.setSoa(this.getSoa());
+		this.entityManager.merge(this.aziendaSoa);
+		this.cleanAziendaSoa();
+	}
+
 	private void sendEmail(String subject, String body, String to)
 			throws EmailException {
 		Email email = new SimpleEmail();
@@ -116,6 +180,20 @@ public class AziendaHome extends EntityHome<Azienda> {
 
 	public void setAziendaId(Integer id) {
 		this.setId(id);
+	}
+
+	public void setAziendaSoa(AziendaSoa aziendaSoa) {
+		this.aziendaSoa = aziendaSoa;
+		this.setSoa(aziendaSoa.getSoa());
+		this.setClassificaSoa(ClassificaSoa.valueOf(aziendaSoa.getClassifica()));
+	}
+
+	public void setClassificaSoa(ClassificaSoa classificaSoa) {
+		this.classificaSoa = classificaSoa;
+	}
+
+	public void setSoa(Soa soa) {
+		this.soa = soa;
 	}
 
 	public String updateCategorieMerceologiche() {
@@ -141,11 +219,11 @@ public class AziendaHome extends EntityHome<Azienda> {
 		return "updated";
 	}
 
-	public String updateSOA() {
+	public String updateSoa() {
 		this.update();
 		ArrayList<Gara> gare = (ArrayList<Gara>) this.entityManager
 				.createQuery(
-						"select distinct  g from Azienda a join a.SOA soa join soa.gare g  where g.stato = 'INSERITA' and a.id= :id")
+						"select distinct  g from Azienda a join a.soa s join s.soa.gare g  where g.stato = 'INSERITA' and a.id= :id")
 				.setParameter("id", this.getInstance().getId()).getResultList();
 		// per ogni gara devo controllare se è già presente nelle comunicaiozni.
 		// Se non lo è la inserisco
