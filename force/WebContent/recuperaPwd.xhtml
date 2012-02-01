@@ -17,9 +17,6 @@
             <s:div rendered="#{userUtil.statoRecuperoEmail.equals('OK')}">
                 <p>Invio password avvenuto con successo. Tra poco riceverei una email contenete le nuove credenziali</p>            
             </s:div>       
-            <s:div rendered="#{userUtil.statoRecuperoEmail.equals('NO_RESULT')}">
-                <p>Non è stato inidividuato nessun account con l'email inserita.</p>            
-            </s:div>       
             <s:div rendered="#{not userUtil.statoRecuperoEmail.equals('OK')}">
 
             <p>Per reimpostare la password, inserisci l'email con cui ti sei registrato a FORCE. Riceverai un email con le nuove credenziali.</p>

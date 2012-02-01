@@ -109,7 +109,7 @@ public class Azienda implements Serializable {
 		return this.cap;
 	}
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	public Set<CategoriaMerceologica> getCategorieMerceologiche() {
 		return this.categorieMerceologiche;
 	}

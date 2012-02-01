@@ -75,9 +75,6 @@ public class AdminUserSession implements Serializable {
 			args.put("lastName", azienda.getCognome());
 			args.put("email", azienda.getEmailReferente());
 			args.put("password", pwd);
-			// forse dovrei settare la password dato che di default � a
-			// "password"?
-			// args.put("password", "");
 			awsc.addPerson(args);
 
 			// Aggiungo l'utente al gruppo creato in precedenza
