@@ -1,6 +1,7 @@
 package it.drwolf.force.timer;
 
 import it.drwolf.force.entity.Azienda;
+import it.drwolf.force.entity.AziendaSoa;
 import it.drwolf.force.entity.CategoriaMerceologica;
 import it.drwolf.force.entity.CodiciCPV;
 import it.drwolf.force.entity.ComunicazioneAziendaGara;
@@ -339,15 +340,15 @@ public class Heartbeat {
 			}
 		}
 		if (gara.getSoaAsList().size() > 0) {
-			List<Azienda> resultList = entityManager
+			List<AziendaSoa> resultList = entityManager
 					.createQuery(
 							" select distinct  a from Gara g join g.soa s join s.aziende a where g.id = :g")
 					.setParameter("g", gara.getId()).getResultList();
-			for (Azienda azienda : resultList) {
+			for (AziendaSoa azienda : resultList) {
 				// per ogni azienda devo andare a inserire un riga nelle
 				// comunicazioni
 				ComunicazioneAziendaGaraId id = new ComunicazioneAziendaGaraId(
-						azienda.getId(), gara.getId());
+						azienda.getAzienda().getId(), gara.getId());
 				ComunicazioneAziendaGara cag = new ComunicazioneAziendaGara();
 				cag.setId(id);
 				cag.setEmail(false);

@@ -78,6 +78,48 @@ public class AlfrescoWebScriptClient {
 		return "";
 	}
 
+	public String addSignature(String target, String name) {
+		try {
+			String serviceLocation = "/service/addSignature";
+			String uri = this.repositoryUri + serviceLocation + "?target="
+					+ target + "&name=" + name;
+			return this.openGetRequest(uri);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public String changePassword(String username, String password) {
+		try {
+			HashMap<String, String> args = new HashMap<String, String>();
+			args.put("newpw", password);
+			String serviceLocation = "/service/api/person/changepassword/";
+			String uri = this.repositoryUri + serviceLocation + username;
+			JsonElement parsed = this.openJsonPostRequest(uri, args);
+			return "OK";
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public void embedContentToSignedDoc(String target, String content,
+			String name) {
+		try {
+			String serviceLocation = "/service/embedContent";
+			String uri = this.repositoryUri + serviceLocation + "?target="
+					+ target + "&content=" + content + "&name=" + name;
+			// System.out.println(uri);
+			this.openGetRequest(uri);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public Authority getGroupDetails(String shortName) {
 		Gson gson = new Gson();
 		try {
@@ -94,6 +136,25 @@ public class AlfrescoWebScriptClient {
 		}
 		return null;
 	}
+
+	// private JsonElement openJsonWebScript(String url)
+	// throws MalformedURLException, IOException,
+	// UnsupportedEncodingException {
+	// URL peopleServiceUrl = new URL(url);
+	// URLConnection conn = peopleServiceUrl.openConnection();
+	// String auth = "Basic "
+	// + Base64.encodeBase64String((username + ":" + password)
+	// .getBytes());
+	// conn.setRequestProperty("Authorization", auth);
+	// conn.connect();
+	//
+	// InputStream is = conn.getInputStream();
+	//
+	// JsonElement parsed = new JsonParser().parse(new JsonReader(
+	// new InputStreamReader(is, "UTF-8")));
+	//
+	// return parsed;
+	// }
 
 	public List<Authority> getGroupsList(String shortNameFilter, String zone) {
 		Gson gson = new Gson();
@@ -145,24 +206,28 @@ public class AlfrescoWebScriptClient {
 		return children;
 	}
 
-	// private JsonElement openJsonWebScript(String url)
-	// throws MalformedURLException, IOException,
-	// UnsupportedEncodingException {
-	// URL peopleServiceUrl = new URL(url);
-	// URLConnection conn = peopleServiceUrl.openConnection();
-	// String auth = "Basic "
-	// + Base64.encodeBase64String((username + ":" + password)
-	// .getBytes());
-	// conn.setRequestProperty("Authorization", auth);
-	// conn.connect();
-	//
-	// InputStream is = conn.getInputStream();
-	//
-	// JsonElement parsed = new JsonParser().parse(new JsonReader(
-	// new InputStreamReader(is, "UTF-8")));
-	//
-	// return parsed;
-	// }
+	public String openGetRequest(String uri) throws HttpException, IOException {
+		HttpClient client = new HttpClient();
+		client.getParams().setParameter("http.useragent", "WebScript Client");
+		client.getState().setCredentials(AuthScope.ANY,
+				new UsernamePasswordCredentials(this.username, this.password));
+		GetMethod method = new GetMethod(uri);
+		int statusCode = client.executeMethod(method);
+
+		InputStream responseStream = method.getResponseBodyAsStream();
+
+		StringBuilder stringBuilder = new StringBuilder();
+		String nl = System.getProperty("line.separator");
+		Scanner scanner = new Scanner(responseStream);
+		while (scanner.hasNextLine()) {
+			stringBuilder.append(scanner.nextLine() + nl);
+		}
+		String response = stringBuilder.toString();
+
+		// String response = method.getResponseBodyAsString();
+		// System.out.println("---> response: " + response);
+		return response.trim();
+	}
 
 	// new AuthScope("localhost", 9080) se si vogliono mettere i dati precisi
 	private JsonElement openJsonGetRequest(String uri) throws HttpException,
@@ -205,55 +270,5 @@ public class AlfrescoWebScriptClient {
 				new InputStreamReader(responseStream, "UTF-8")));
 
 		return parsed;
-	}
-
-	public String openGetRequest(String uri) throws HttpException, IOException {
-		HttpClient client = new HttpClient();
-		client.getParams().setParameter("http.useragent", "WebScript Client");
-		client.getState().setCredentials(AuthScope.ANY,
-				new UsernamePasswordCredentials(this.username, this.password));
-		GetMethod method = new GetMethod(uri);
-		int statusCode = client.executeMethod(method);
-
-		InputStream responseStream = method.getResponseBodyAsStream();
-
-		StringBuilder stringBuilder = new StringBuilder();
-		String nl = System.getProperty("line.separator");
-		Scanner scanner = new Scanner(responseStream);
-		while (scanner.hasNextLine()) {
-			stringBuilder.append(scanner.nextLine() + nl);
-		}
-		String response = stringBuilder.toString();
-
-		// String response = method.getResponseBodyAsString();
-		// System.out.println("---> response: " + response);
-		return response.trim();
-	}
-
-	public String addSignature(String target, String name) {
-		try {
-			String serviceLocation = "/service/addSignature";
-			String uri = this.repositoryUri + serviceLocation + "?target="
-					+ target + "&name=" + name;
-			return openGetRequest(uri);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public void embedContentToSignedDoc(String target, String content,
-			String name) {
-		try {
-			String serviceLocation = "/service/embedContent";
-			String uri = this.repositoryUri + serviceLocation + "?target="
-					+ target + "&content=" + content + "&name=" + name;
-			// System.out.println(uri);
-			openGetRequest(uri);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 }
