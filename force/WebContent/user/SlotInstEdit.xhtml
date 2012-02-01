@@ -171,8 +171,10 @@
 								rendered="#{dataInstance.dataDefinition.dataType == 'BOOLEAN'}"
 								required="#{dataInstance.dataDefinition.required}"
 								disabled="#{not dataInstance.dataDefinition.editable}">
-								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}"
-										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections, summaryPanel"/>
+								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}" 
+									onsubmit="#{rich:component('waitPanel')}.show();"
+									oncomplete="#{rich:component('waitPanel')}.hide();"
+									reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections, summaryPanel"/>
 							</h:selectBooleanCheckbox>
 							</a:region>
 							<rich:calendar id="subscriptionDate" mode="client"
@@ -190,7 +192,8 @@
 	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}" 
-										oncomplete="dirty=true;"
+										oncomplete="dirty=true; #{rich:component('waitPanel')}.hide();"
+										onsubmit="#{rich:component('waitPanel')}.show();"
 										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections, summaryPanel"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{dataInstance.integerValue}" required="#{dataInstance.dataDefinition.required}"             						
@@ -199,7 +202,8 @@
 	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
 												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}"
-										oncomplete="dirty=true"
+										oncomplete="dirty=true; #{rich:component('waitPanel')}.hide();"
+										onsubmit="#{rich:component('waitPanel')}.show();"
 										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections, summaryPanel"/>
 	             			</h:selectOneMenu>
 	             			<h:selectOneMenu value="#{dataInstance.dateValue}"  required="#{dataInstance.dataDefinition.required}"
@@ -209,7 +213,8 @@
 												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
 								<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}"
-										oncomplete="dirty=true"
+										oncomplete="dirty=true; #{rich:component('waitPanel')}.hide();"
+										onsubmit="#{rich:component('waitPanel')}.show();"
 										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections, summaryPanel"/>
 	             			</h:selectOneMenu>
 	             			<!--  --></a:region>
@@ -435,7 +440,7 @@
 									<a:region>
 										<a:commandButton value="Elimina"
 											action="#{slotInstEditBean.remove(coll.docDefCollection.id, item)}"
-											reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}, summaryPanel" 
+											reRender="infoPanel_#{coll.docDefCollection.id},primaryRegion_#{coll.docDefCollection.id}, summaryPanel"
 											onclick="dirty=true"/>
 										<a:commandButton value="Modifica"
 											action="#{slotInstEditBean.editItem(coll.docDefCollection.id, item)}" 
@@ -538,7 +543,7 @@
 				<h:commandButton id="delete"
 					value="Elimina" action="#{slotInstEditBean.removeSlot()}" immediate="true"
 					onclick="return confirm('Sicuro di voler eliminare la busta?'); dirty = false;"
-					rendered="#{slotInstHome.instance.id != null}"
+					rendered="#{slotInstHome.instance.id != null and slotDefHome.instance.type != 'PRIMARY'}"
 					styleClass="modal"/>
 				<a:jsFunction name="setDirty" >
 					<a:actionparam name="dirty" assignTo="#{slotInstEditBean.dirty}"/>

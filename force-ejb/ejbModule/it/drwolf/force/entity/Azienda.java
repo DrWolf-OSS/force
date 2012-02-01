@@ -61,6 +61,8 @@ public class Azienda implements Serializable {
 	private String posizioneCNA;
 	private String stato;
 
+	private String tipologiaAbbonamento;
+
 	// per Alfresco
 	private String alfrescoGroupId;
 
@@ -262,6 +264,10 @@ public class Azienda implements Serializable {
 		return this.telefono;
 	}
 
+	public String getTipologiaAbbonamento() {
+		return this.tipologiaAbbonamento;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 89;
@@ -408,5 +414,9 @@ public class Azienda implements Serializable {
 
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
+	}
+
+	public void setTipologiaAbbonamento(String tipologiaAbbonamento) {
+		this.tipologiaAbbonamento = tipologiaAbbonamento;
 	}
 }

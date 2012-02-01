@@ -25,7 +25,7 @@
             </s:decorate>
             <s:decorate id="linkField" template="/layout/display.xhtml">
                 <ui:define name="label">Link</ui:define>
-                <h:outputText value="#{garaHome.instance.link}" />
+                <a href="#{garaHome.instance.link}" target="_blank">#{garaHome.instance.link}</a>
             </s:decorate>
             <s:decorate id="dataInizioField" template="/layout/display.xhtml">
                 <ui:define name="label">Data inizio</ui:define>
@@ -56,12 +56,12 @@
                 </rich:dataTable>
             </s:decorate>
 
-            <s:decorate id="soaField" template="/layout/edit.xhtml" rendered="#{not empty garaHome.instance.SOAAsList}">
+            <s:decorate id="soaField" template="/layout/edit.xhtml" rendered="#{not empty garaHome.instance.soaAsList}">
                 <ui:define name="label">SOA</ui:define>
                 <rich:dataTable id="soaList"
                                var="soa"
                                 value="#{garaHome.instance.soaAsList}"
-                               rendered="#{not empty garaHome.instance.SOAAsList}">
+                               rendered="#{not empty garaHome.instance.soaAsList}">
                     <rich:column>
                         <h:outputText value="#{soa.codice}"></h:outputText>
                     </rich:column>
@@ -69,10 +69,7 @@
             </s:decorate>
 
 
-            <div style="clear:both">
-                <span class="required">*</span>
-                required fields
-            </div>
+            <div style="clear:both"/>
 
         </rich:panel>
 
@@ -93,9 +90,9 @@
             <s:button view="/admin/SlotDefWizardEdit.xhtml" 
             		id="createUser"
                     propagation="none"
-                    value="Associa Busta" 
+                    value="Crea Busta" 
                     action="#{slotDefGaraAssociationtBean.initSlotDefValues()}"
-                    rendered="#{garaHome.associatedSlotDef == null and not s:hasRole('ADMIN')}"
+                    rendered="#{garaHome.associatedSlotDef == null and not s:hasRole('ADMIN') and userSession.azienda.tipologiaAbbonamento != 'PREMIUM'}"
                     styleClass="modal">
                     <f:param name="slotDefId"/>
                    	<f:param name="model" value="#{false}"/>
@@ -107,7 +104,7 @@
             <s:button view="/admin/SlotDefView.xhtml"
                     propagation="none"
                     value="Modifica Busta" 
-                    rendered="#{garaHome.associatedSlotDef != null}">
+                    rendered="#{garaHome.associatedSlotDef != null and userSession.azienda.tipologiaAbbonamento != 'PREMIUM'}">
                     <f:param name="slotDefId" value="#{garaHome.associatedSlotDef.id}"/>
                    	<f:param name="model" value="#{true}"/>
             		<f:param name="mode" value="GENERAL"/>
