@@ -55,7 +55,7 @@ public class GaraList implements Serializable {
 	public void getListaGareGestire() {
 		this.listaGareGestite = this.entityManager
 				.createQuery(
-						"from Gara g where g.type = 'GESTITA' order by g.dataScadenza desc")
+						"select g from Gara g left join g.slotDefs sds where g.type = 'GESTITA' and (sds.ownerId not in ('ADMIN') or sds is null) order by g.dataScadenza desc")
 				.getResultList();
 	}
 

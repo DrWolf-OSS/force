@@ -54,11 +54,15 @@
                 <f:convertDateTime pattern="dd/MM/yyyy"/>
             </h:outputText>
         </rich:column>
-	    <rich:column>
-	        <f:facet name="header">Stato</f:facet>
-	        <h:outputText value="Da vedere" rendered="#{not cag.web}"></h:outputText>
-	        <h:outputText value="Vista" rendered="#{cag.web}"></h:outputText>
-	    </rich:column>
+    <rich:column style="width:55px">
+        <f:facet name="header">Stato</f:facet>
+        <h:graphicImage id="garaIcon" value="/img/newspaper.png" styleClass="fileIcon #{not cag.web ? 'opaque' : ''}"/>
+        <h:graphicImage id="mailIcon" value="/img/mail.png" styleClass="fileIcon #{not cag.email ? 'opaque' : ''}"/>
+        <h:graphicImage id="bustaIcon" value="/img/envelope-string.png" styleClass="fileIcon #{controlPanelBean.getAssociatedSlotDef(cag.gara)==null ? 'opaque' : ''}"/>
+        <rich:toolTip for="garaIcon" direction="bottom-left">Gara #{not cag.web ? 'da vedere' : 'vista'}</rich:toolTip>
+        <rich:toolTip for="mailIcon" direction="bottom-left">Mail #{not cag.email ? 'non inviata' : 'inviata'} dal sistema</rich:toolTip>
+        <rich:toolTip for="bustaIcon" direction="bottom-left">Busta #{controlPanelBean.getAssociatedSlotDef(cag.gara)==null ? 'non definita' : 'definita'}</rich:toolTip>
+    </rich:column>
          <rich:column styleClass="action">
             <f:facet name="header">Azioni</f:facet>
             <s:link view="/user/Gara.xhtml"

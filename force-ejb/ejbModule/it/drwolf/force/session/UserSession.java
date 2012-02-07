@@ -275,6 +275,7 @@ public class UserSession implements Serializable {
 		this.beni = beni;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setGaraVisisted(Integer gara_id) {
 		List<ComunicazioneAziendaGara> resultList = this.entityManager
 				.createQuery(

@@ -127,7 +127,7 @@
                 value="Richiedi Busta"
                 action="#{garaHome.sendBustaRequest(userSession.azienda)}" 
                 rendered="#{garaHome.associatedSlotInst == null and userSession.azienda.tipologiaAbbonamento == 'PREMIUM'}"
-                disabled="#{garaHome.isRequestSend(userSession.azienda)}"
+                disabled="#{garaHome.isRequestSend(userSession.azienda) or garaHome.associatedSlotDef != null}"
                 oncomplete="#{rich:component('bustaRequestResponse')}.show()">
             </a:commandButton>
 
