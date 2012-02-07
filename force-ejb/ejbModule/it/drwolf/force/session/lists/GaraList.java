@@ -46,22 +46,26 @@ public class GaraList implements Serializable {
 	public void getListaGareAttive() {
 		this.listaGareAttive = this.entityManager
 				.createQuery(
-						"select g from Gara g left join g.slotDefs sd where g.type = 'GESTITA' and sd.ownerId='ADMIN'")
+						"select g from Gara g left join g.slotDefs sd where g.type = 'GESTITA' and sd.ownerId='ADMIN'  order by g.dataScadenza desc")
 				.getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Factory("listaGareGestite")
 	public void getListaGareGestire() {
-		this.listaGareGestite = this.entityManager.createQuery(
-				"from Gara where type = 'GESTITA'").getResultList();
+		this.listaGareGestite = this.entityManager
+				.createQuery(
+						"from Gara g where g.type = 'GESTITA' order by g.dataScadenza desc")
+				.getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Factory("listaGareNuove")
 	public void getListaGareNuove() {
-		this.listaGareNuove = this.entityManager.createQuery(
-				"from Gara where type = 'NUOVA'").getResultList();
+		this.listaGareNuove = this.entityManager
+				.createQuery(
+						"from Gara g where g.type = 'NUOVA'  order by g.dataScadenza desc")
+				.getResultList();
 	}
 
 	public void setListaGareAttive(List<Gara> listaGareAttive) {

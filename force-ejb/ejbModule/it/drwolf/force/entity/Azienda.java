@@ -82,21 +82,12 @@ public class Azienda implements Serializable {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
+
+		try {
+			return ((Azienda) obj).getId().equals(this.getId());
+		} catch (Exception e) {
 			return false;
 		}
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
-		Azienda other = (Azienda) obj;
-		if (this.id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!this.id.equals(other.id)) {
-			return false;
-		}
-		return true;
 	}
 
 	public String getAlfrescoGroupId() {

@@ -53,6 +53,8 @@ public class AdminUserSession implements Serializable {
 			String groupName = azienda.getRagioneSociale().replaceAll("\\s",
 					"_");
 			groupName = groupName + "_" + azienda.getId();
+			groupName = AlfrescoWrapper.normalizeFolderName(groupName,
+					groupName.length(), "_");
 
 			AlfrescoWebScriptClient awsc = new AlfrescoWebScriptClient(
 					this.alfrescoInfo.getAdminUser(),

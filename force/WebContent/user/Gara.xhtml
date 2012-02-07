@@ -72,7 +72,16 @@
             <div style="clear:both"/>
 
         </rich:panel>
-
+<rich:modalPanel id="bustaRequestResponse" autosized="true" minWidth="500">
+	 <f:facet name="header">
+	   <h:outputText value="Richista Busta Amministrativa" />
+	</f:facet>    
+    <div style="font-size: 14px; margin: 0 auto;">
+	    <h:outputText  style="font-size: 14px;" value="La tua richiesta è stata inoltrata correttamente"></h:outputText>
+	    <br />
+    </div>
+    <s:button styleClass="clean-gray" id="chiudiPanel" onclick="#{rich:component('bustaRequestResponse')}.hide();return false;" value="Chiudi" />
+</rich:modalPanel>
         <div class="actionButtons">
             
             <s:button view="/admin/SlotDefTemplateList.xhtml"
@@ -113,6 +122,15 @@
             </s:button>
             
              
+            <a:commandButton id="slotRequest"
+                propagation="none"
+                value="Richiedi Busta"
+                action="#{garaHome.sendBustaRequest(userSession.azienda)}" 
+                rendered="#{garaHome.associatedSlotInst == null and userSession.azienda.tipologiaAbbonamento == 'PREMIUM'}"
+                disabled="#{garaHome.isRequestSend(userSession.azienda)}"
+                oncomplete="#{rich:component('bustaRequestResponse')}.show()">
+            </a:commandButton>
+
             <s:button view="/user/SlotInstEdit.xhtml"
                 id="slotEdit"
                 propagation="none"

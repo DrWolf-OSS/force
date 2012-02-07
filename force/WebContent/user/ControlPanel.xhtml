@@ -205,16 +205,22 @@
 <rich:spacer height="20px;"/>
 <rich:panel>
     <f:facet name="header"><s:span>
-    <s:link value="Vedi tutte" view="/user/GareList.xhtml" styleClass="topCommandLink">
-        <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
-        <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
-        <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
-    </s:link>
-    <h:outputText value="Gare del tuo Settore" /></s:span></f:facet>
+	    <s:link value="Vedi tutte" view="/user/GareList.xhtml" styleClass="topCommandLink">
+	        <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
+	        <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+	        <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
+	    </s:link>
+	    <h:outputText value="Gare del tuo Settore" />
+	    <h:graphicImage id="gareSettoreList" value="/img/question-white.png" />
+	    <rich:toolTip for="gareSettoreList" direction="bottom-left">Elenco delle gare che corrispondono alle Categorie Merceologiche inserite</rich:toolTip>
+	    </s:span>
+	    
+    </f:facet>
     <rich:dataTable value="#{controlPanelBean.selectedGare}" 
     		var="cag"
     		onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
-			onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+			onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+			rows="5">
     <rich:column>
         <f:facet name="header">Oggetto</f:facet>
         <h:outputText value="#{cag.gara.oggetto}"></h:outputText>
@@ -247,12 +253,15 @@
 <rich:spacer height="20px;"/>
 <rich:panel >
     <f:facet name="header"><s:span>
-    <s:link value="Vedi tutte" view="/user/CommesseEdit.xhtml" styleClass="topCommandLink">
-        <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
-        <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
-        <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
+    <s:link value="Vedi tutte" view="/user/WorkingGareList.xhtml" styleClass="topCommandLink">
+            <f:param name="slotInstId" value="#{slotInstHome.slotInstId}"/>
+            <f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
+            <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
     </s:link>
-    <h:outputText value="Gare a cui partecipi" /></s:span></f:facet>
+    <h:outputText value="Gare a cui partecipi" />
+    <h:graphicImage id="gareWorkingList" value="/img/question-white.png" />
+    <rich:toolTip for="gareWorkingList" direction="bottom-left">Elenco delle gare per le quali stai partecipando</rich:toolTip>
+    </s:span></f:facet>
     <rich:dataTable value="#{controlPanelBean.slotInst}" 
     			var="si"
     			onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
