@@ -185,12 +185,11 @@
 								onchanged="dirty=true"/>
 
 							<a:region>
-							
 							<h:selectOneMenu value="#{dataInstance.stringValue}" required="#{dataInstance.dataDefinition.required}"
 										rendered="#{dataInstance.dataDefinition.dataType == 'STRING' and dataInstance.dataDefinition.dictionaryValues != null}"
 										valueChangeListener="#{valueChangeListener.listener}">
 	                    		<s:selectItems value="#{dataInstance.dataDefinition.dictionaryValues}" 
-												var="value" label="#{value}" noSelectionLabel="-- seleziona un valore --"/>
+												var="value" label="#{value}" noSelectionLabel="#{dataInstance.stringValue==null ? 'seleziona un valore' : ''}"/>
 								<a:support event="onchange" action="#{slotInstEditBean.cleanConditionedElements(dataInstance)}" 
 										oncomplete="dirty=true; #{rich:component('waitPanel')}.hide();"
 										onsubmit="#{rich:component('waitPanel')}.show();"
@@ -217,7 +216,7 @@
 										onsubmit="#{rich:component('waitPanel')}.show();"
 										reRender="#{not empty dataInstance.propertyDef.conditionedPropertyDefs ? slotInstEditBean.buildIdsToRerender(dataInstance.propertyDef).concat(',') : ''} collections, summaryPanel"/>
 	             			</h:selectOneMenu>
-	             			<!--  --></a:region>
+	             			</a:region>
 	             		</s:fragment>
 	             		
 	             			
@@ -559,7 +558,7 @@
 								disabled="#{slotInstHome.instance.status != 'VALID'}"/>
 				
 				<s:button view="/user/SlotInstEdit.xhtml" value="Annulla Modifiche" style="float:right"
-					onclick="dirty=false" 
+					onclick="dirty=false;" 
 					propagation="none" includePageParams="true">
 				</s:button>
 			</s:div>

@@ -601,8 +601,8 @@
 
             <h:commandButton id="delete"
                           value="Elimina"
-                         action="#{slotDefHome.remove}"
-                      immediate="true"
+                         action="#{slotDefGaraAssociationtBean.deleteSlotDef()}"
+                         onclick="return confirm('Sicuro di voler eliminare la busta?')"
                        rendered="#{slotDefHome.managed}"
                        disabled="#{slotDefHome.referenced}"/>
                        
@@ -614,8 +614,10 @@
 				<f:param name="slotDefId" value="#{slotDefHome.instance.id}"/>
 	        </s:button>
 	        
-	        <s:button view="/admin/SlotDefWizardEdit.xhtml" value="Annulla Modifiche" 
-	        	style="float:right"	propagation="none" includePageParams="true"/>
+	        <s:button view="/admin/SlotDefWizardEdit.xhtml" 
+	        		value="Annulla Modifiche" 
+	        	style="float:right"	propagation="none" includePageParams="true"
+	        	disabled="#{slotDefHome.instance.id == null}"/>
 
         </div>
 
