@@ -21,14 +21,10 @@
    <param name="garaId" value="#{garaHome.garaId}"/>
    <param name="settoreId" value="#{settoreHome.settoreId}"/>
 
-   <navigation from-action="#{slotDefHome.remove}">
+   <navigation from-action="#{slotDefGaraAssociationtBean.deleteSlotDef()}">
       <rule if-outcome="removed">
-         <end-conversation/>
-         <redirect view-id="/admin/#{empty from ? 'SlotDefTemplateList.xhtml' : from}">
-         	<param name="model" value="#{slotDefParameters.model}"/>
-    		<param name="mode" value="#{slotDefParameters.mode}"/>
-    		<param name="wizard" value="#{slotDefParameters.wizard}"/>
-         </redirect>
+         <end-conversation before-redirect="true"/>
+         <redirect view-id="/admin/ActiveGareList.xhtml"/>
       </rule>
    </navigation>
    

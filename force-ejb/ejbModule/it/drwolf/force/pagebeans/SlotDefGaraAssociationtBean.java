@@ -125,6 +125,35 @@ public class SlotDefGaraAssociationtBean {
 		return rule;
 	}
 
+	@SuppressWarnings("unchecked")
+	public void cleanAssociations() {
+		if (this.slotDefHome.getInstance() != null
+				&& this.slotDefHome.getInstance().getId() != null) {
+			List<Gara> resultList = this.slotDefHome
+					.getEntityManager()
+					.createQuery(
+							"from Gara g where :slotDef in elements(g.slotDefs)")
+					.setParameter("slotDef", this.slotDefHome.getInstance())
+					.getResultList();
+			if (resultList != null && !resultList.isEmpty()) {
+				for (Gara g : resultList) {
+					g.getSlotDefs().remove(this.slotDefHome.getInstance());
+				}
+			}
+		}
+
+	}
+
+	public String deleteSlotDef() {
+		if (this.slotDefHome.getInstance() != null
+				&& this.slotDefHome.getInstance().getId() != null
+				&& !this.slotDefHome.getInstance().isReferenced()) {
+			this.cleanAssociations();
+			return this.slotDefHome.remove();
+		}
+		return "failed";
+	}
+
 	public void initSlotDefValues() {
 		Gara gara = this.garaHome.getInstance();
 		SlotDef slotDef = this.slotDefHome.getInstance();
