@@ -25,6 +25,7 @@
 	          <rich:componentControl for="panel" attachTo="chiudiPanel" operation="hide" event="onclick"/>
 	    </rich:modalPanel>
 	    
+	    
 	    <s:div styleClass="messageBox" rendered="#{not empty slotInstEditBean.slotMessages}">
 				<ui:repeat var="message" value="#{slotInstEditBean.slotMessages}">
 					<h:graphicImage value="/img/msgerror.png"  styleClass="fileIcon"
