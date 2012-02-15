@@ -180,6 +180,7 @@
 							</a:region>
 							<rich:calendar id="subscriptionDate" mode="client"
 								value="#{dataInstance.dateValue}" datePattern="dd/MM/yyyy"
+								enableManualInput="true"
 								rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
 								disabled="#{not dataInstance.dataDefinition.editable}" 
@@ -594,9 +595,9 @@
 			</a:form>
 		</rich:modalPanel>
 
-		<rich:modalPanel id="editPanel" autosized="true" minWidth="560" domElementAttachment="body">
+		<rich:modalPanel id="editPanel" autosized="true" minWidth="660" domElementAttachment="body">
 			<f:facet name="header">
-				<h:outputText value="Finestra di modifica" />
+				<h:outputText value="Valorizzazione proprietà" />
 			</f:facet>
 			
 			<a:form id="editPanelForm" onkeypress="dirty=true">
@@ -639,9 +640,10 @@
 							disabled="#{not dataInstance.dataDefinition.editable}" />
 						<rich:calendar id="subscriptionDate" mode="client"
 							value="#{dataInstance.dateValue}" datePattern="dd/MM/yyyy"
+							enableManualInput="true"
 							rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues == null}"
 							required="#{dataInstance.dataDefinition.required}"
-							disabled="#{not dataInstance.dataDefinition.editable}" 
+							disabled="#{not dataInstance.dataDefinition.editable}"
 							onchanged="dirty=true"/>
 						
 						<h:selectOneMenu value="#{dataInstance.stringValue}" required="#{dataInstance.dataDefinition.required}"

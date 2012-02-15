@@ -147,6 +147,9 @@ public class SlotInstEditBean {
 	private static final int LENGHT_LIMIT = 150;
 	private static final String SPACER = " ";
 
+	@In(create = true)
+	private SlotInstParameters slotInstParameters;
+
 	public void addActiveItemToDatas() {
 		if (!this.datas.get(this.activeCollectionId).contains(
 				this.activeFileContainer)) {
@@ -841,6 +844,7 @@ public class SlotInstEditBean {
 			}
 
 		} else {
+
 			List<PropertyInst> originalPropertyInsts = new ArrayList<PropertyInst>(
 					this.slotInstHome.getInstance().getPropertyInsts());
 			//
@@ -908,6 +912,22 @@ public class SlotInstEditBean {
 				this.slotInstHome.getInstance().setTransientStatus(
 						SlotInstStatus.EMPTY);
 			}
+
+			//
+			if (this.slotInstParameters.getOutcome() != null
+					&& this.slotInstParameters.getOutcome().equals(
+							SlotInstParameters.UPDATED)) {
+				this.addMainMessage(new VerifierMessage(
+						"Busta aggiornata con successo",
+						VerifierMessageType.VALID));
+			} else if (this.slotInstParameters.getOutcome() != null
+					&& this.slotInstParameters.getOutcome().equals(
+							SlotInstParameters.SAVED)) {
+				this.slotMessages
+						.add(new VerifierMessage("Busta creata con successo",
+								VerifierMessageType.VALID));
+			}
+			//
 		}
 
 	}
