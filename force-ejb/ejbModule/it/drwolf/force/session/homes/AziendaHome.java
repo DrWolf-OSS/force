@@ -126,6 +126,15 @@ public class AziendaHome extends EntityHome<Azienda> {
 						"Email del referente già presente nel nostro database");
 				return "KO";
 			}
+			l = this.entityManager
+					.createQuery("from Azienda a where a.partitaIva = :piva")
+					.setParameter("email", this.getInstance().getPartitaIva())
+					.getResultList();
+			if (l.size() > 0) {
+				FacesMessages.instance().add(Severity.ERROR,
+						"Partita IVA già presente nel nostro database");
+				return "KO";
+			}
 			this.getInstance().setStato(StatoAzienda.NUOVA.toString());
 			// persisto l'entity azienda
 			this.persist();

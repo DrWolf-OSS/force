@@ -101,6 +101,14 @@
                                required="true"
                                value="#{aziendaHome.instance.partitaIva}"/>
             </s:decorate>
+            <s:decorate id="codiceFiscaleField" template="layout/edit.xhtml">
+                <ui:define name="label">Codice Fiscale</ui:define>
+                <h:inputText id="codiceFiscale"
+                               maxlength="16"
+                               size="16"
+                               required="true"
+                               value="#{aziendaHome.instance.codiceFiscale}"/>
+            </s:decorate>
 
             <s:decorate id="emailField" template="layout/edit.xhtml">
                 <ui:define name="label">Posta Elettronica</ui:define>
