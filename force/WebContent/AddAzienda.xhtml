@@ -15,7 +15,7 @@
 
         <rich:panel>
             <f:facet name="header">Iscriviti al servizio FORCE</f:facet>
-
+            <h4>Dati Azienda</h4>
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">Nome dell'azienda</ui:define>
                 <h:inputTextarea id="ragioneSociale"
@@ -125,7 +125,8 @@
             </s:decorate>
  
             <div style="clear:both"></div>
-            <rich:separator></rich:separator>
+            <hr />
+            <h4>Dati Referente</h4>
             <s:decorate id="nomeField" template="layout/edit.xhtml">
                 <ui:define name="label">Nome</ui:define>
                 <h:inputText id="nome"
