@@ -36,13 +36,19 @@
 	<rich:panel>
 	   <f:facet name="header">Gestisci le Categorie Merceologiche </f:facet>
 	   <h:panelGrid columns="2" columnClasses="top, top" style="margin:0 auto;">
-	        <rich:pickList value="#{aziendaHome.instance.categorieMerceologicheAsList}" sourceListWidth="400" targetListWidth="400" listsHeight="400" rendered="#{aziendaHome.instance.bene}"> 
+<!-- 	        <rich:pickList value="#{aziendaHome.instance.categorieMerceologicheAsList}" sourceListWidth="400" targetListWidth="400" listsHeight="400" rendered="#{aziendaHome.instance.bene}"> 
                 <s:selectItems value="#{listaBeni}" var="cm" label="#{cm.categoria}" />
                 <s:convertEntity />
                 <a4j:support event="onlistchanged" reRender="result"/>
         </rich:pickList>
             <rich:pickList value="#{aziendaHome.instance.categorieMerceologicheAsList}" sourceListWidth="400" targetListWidth="400" listsHeight="400" rendered="#{aziendaHome.instance.servizio}"> 
                 <s:selectItems value="#{listaServizi}" var="cm" label="#{cm.categoria}" />
+                <s:convertEntity />
+                <a4j:support event="onlistchanged" reRender="result"/>
+        </rich:pickList>
+ -->        
+            <rich:pickList value="#{aziendaHome.instance.categorieMerceologicheAsList}" sourceListWidth="400" targetListWidth="400" listsHeight="400"> 
+                <s:selectItems value="#{listaCategorieMerceologiche}" var="cm" label="#{cm.categoria}" />
                 <s:convertEntity />
                 <a4j:support event="onlistchanged" reRender="result"/>
         </rich:pickList>

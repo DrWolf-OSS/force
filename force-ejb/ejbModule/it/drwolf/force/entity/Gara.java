@@ -2,6 +2,7 @@ package it.drwolf.force.entity;
 
 import it.drwolf.force.enums.TipoGara;
 import it.drwolf.force.exceptions.DuplicateCoupleGaraSlotDefOwner;
+import it.drwolf.force.session.UserSession;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
@@ -138,8 +139,22 @@ public class Gara implements Serializable {
 	public SlotDef getAssociatedSlotDef() {
 		AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
 				.getInstance("alfrescoUserIdentity");
-		Iterator<SlotDef> iterator = this.getSlotDefs().iterator();
 		String ownerId = alfrescoUserIdentity.getMyOwnerId();
+		if (!ownerId.equals("ADMIN")) {
+			// EntityManager entityManager = (EntityManager)
+			// org.jboss.seam.Component
+			// .getInstance("entityManager");
+			UserSession userSession = (UserSession) org.jboss.seam.Component
+					.getInstance("userSession");
+			String tipologiaAbbonamento = userSession.getAzienda()
+					.getTipologiaAbbonamento();
+			if (tipologiaAbbonamento != null
+					&& tipologiaAbbonamento.equals("PREMIUM")) {
+				ownerId = "ADMIN";
+			}
+		}
+		Iterator<SlotDef> iterator = this.getSlotDefs().iterator();
+
 		while (iterator.hasNext()) {
 			SlotDef slotDef = iterator.next();
 			if (slotDef.getOwnerId().equals(ownerId)) {

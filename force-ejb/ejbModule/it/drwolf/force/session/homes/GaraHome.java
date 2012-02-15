@@ -1,5 +1,7 @@
 package it.drwolf.force.session.homes;
 
+import it.drwolf.force.entity.Azienda;
+import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.force.entity.Gara;
 import it.drwolf.force.enums.TipoGara;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
@@ -91,6 +93,17 @@ public class GaraHome extends EntityHome<Gara> {
 		return (Integer) this.getId();
 	}
 
+	public boolean isRequestSend(Azienda azienda) {
+		if (azienda != null) {
+			for (ComunicazioneAziendaGara cag : this.getInstance().getAziende()) {
+				if (cag.getAzienda().equals(azienda)) {
+					return cag.isBustaRequest();
+				}
+			}
+		}
+		return false;
+	}
+
 	public boolean isWired() {
 		return true;
 	}
@@ -110,6 +123,25 @@ public class GaraHome extends EntityHome<Gara> {
 		this.getInstance().setType(TipoGara.SCARTATA.getNome());
 		this.persist();
 		return "OK";
+	}
+
+	// invia una richista all'amministratore di richiesta di creazione di una
+	// busta amministrativa
+	// il metodo da per scontato che l'azienda richiedente possa effettuara la
+	// richiesta (PREMIUM)
+	public void sendBustaRequest(Azienda azienda) {
+		if (azienda != null) {
+			for (ComunicazioneAziendaGara cag : this.getInstance().getAziende()) {
+				if (cag.getAzienda().equals(azienda)) {
+					cag.setBustaRequest(true);
+				}
+			}
+			// Manda un mail all'amministratore con la richiesta di creaiozne
+			// della
+			// busta.
+			// deve essere anche mantenuta traccia sul db?
+		}
+
 	}
 
 	public void setGaraId(Integer id) {

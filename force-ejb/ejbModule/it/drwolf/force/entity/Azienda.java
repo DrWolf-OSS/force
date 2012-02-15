@@ -61,6 +61,8 @@ public class Azienda implements Serializable {
 	private String posizioneCNA;
 	private String stato;
 
+	private String tipologiaAbbonamento;
+
 	// per Alfresco
 	private String alfrescoGroupId;
 
@@ -80,21 +82,12 @@ public class Azienda implements Serializable {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
+
+		try {
+			return ((Azienda) obj).getId().equals(this.getId());
+		} catch (Exception e) {
 			return false;
 		}
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
-		Azienda other = (Azienda) obj;
-		if (this.id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!this.id.equals(other.id)) {
-			return false;
-		}
-		return true;
 	}
 
 	public String getAlfrescoGroupId() {
@@ -107,7 +100,7 @@ public class Azienda implements Serializable {
 		return this.cap;
 	}
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	public Set<CategoriaMerceologica> getCategorieMerceologiche() {
 		return this.categorieMerceologiche;
 	}
@@ -262,6 +255,10 @@ public class Azienda implements Serializable {
 		return this.telefono;
 	}
 
+	public String getTipologiaAbbonamento() {
+		return this.tipologiaAbbonamento;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 89;
@@ -408,5 +405,9 @@ public class Azienda implements Serializable {
 
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
+	}
+
+	public void setTipologiaAbbonamento(String tipologiaAbbonamento) {
+		this.tipologiaAbbonamento = tipologiaAbbonamento;
 	}
 }

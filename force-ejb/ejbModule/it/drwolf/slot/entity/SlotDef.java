@@ -51,6 +51,8 @@ public class SlotDef {
 
 	private String ownerId;
 
+	private boolean pubblicato;
+
 	@OneToMany(mappedBy = "parentSlotDef", cascade = CascadeType.ALL)
 	public Set<DependentSlotDef> getDependentSlotDefs() {
 		return this.dependentSlotDefs;
@@ -149,6 +151,10 @@ public class SlotDef {
 		return this.type;
 	}
 
+	public boolean isPubblicato() {
+		return this.pubblicato;
+	}
+
 	@Transient
 	@SuppressWarnings("unchecked")
 	public boolean isReferenced() {
@@ -221,6 +227,10 @@ public class SlotDef {
 		return null;
 	}
 
+	public void setDependentSlotDefs(Set<DependentSlotDef> dependentSlotDefs) {
+		this.dependentSlotDefs = dependentSlotDefs;
+	}
+
 	// @Override
 	// public int hashCode() {
 	// final int prime = 31;
@@ -267,10 +277,6 @@ public class SlotDef {
 	// return false;
 	// return true;
 	// }
-
-	public void setDependentSlotDefs(Set<DependentSlotDef> dependentSlotDefs) {
-		this.dependentSlotDefs = dependentSlotDefs;
-	}
 
 	@Transient
 	public void setDependentSlotDefsAsList(
@@ -320,6 +326,10 @@ public class SlotDef {
 	@Transient
 	public void setPropertyDefsAsList(List<PropertyDef> propertyDefsAsList) {
 		this.propertyDefs = new HashSet<PropertyDef>(propertyDefsAsList);
+	}
+
+	public void setPubblicato(boolean pubblicato) {
+		this.pubblicato = pubblicato;
 	}
 
 	public void setRules(Set<Rule> rules) {

@@ -27,6 +27,8 @@ public class ComunicazioneAziendaGara implements Serializable {
 
 	private boolean web;
 
+	private boolean bustaRequest;
+
 	private Azienda azienda;
 
 	private Gara gara;
@@ -66,6 +68,11 @@ public class ComunicazioneAziendaGara implements Serializable {
 	}
 
 	@Column
+	public boolean isBustaRequest() {
+		return this.bustaRequest;
+	}
+
+	@Column
 	public boolean isEmail() {
 		return this.email;
 	}
@@ -77,6 +84,10 @@ public class ComunicazioneAziendaGara implements Serializable {
 
 	public void setAzienda(Azienda azienda) {
 		this.azienda = azienda;
+	}
+
+	public void setBustaRequest(boolean bustaRequest) {
+		this.bustaRequest = bustaRequest;
 	}
 
 	public void setEmail(boolean email) {

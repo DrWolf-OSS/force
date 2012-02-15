@@ -5,6 +5,7 @@ import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
+import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
 import it.drwolf.slot.pagebeans.SlotInstEditBean;
@@ -22,6 +23,8 @@ import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage.Severity;
 import org.jboss.seam.security.Identity;
 
 @Name("userSession")
@@ -60,6 +63,10 @@ public class UserSession implements Serializable {
 	private SlotInst primarySlotInst = null;
 
 	private Azienda azienda;
+
+	private String nuovaPwd;
+
+	private String reNuovaPwd;
 
 	// mi tengo anche l'id dell'azienda per essere sicuro di poter accedere a
 	// tutte gli attributi dell'azienda.
@@ -105,6 +112,10 @@ public class UserSession implements Serializable {
 		return this.groupFolder;
 	}
 
+	public String getNuovaPwd() {
+		return this.nuovaPwd;
+	}
+
 	public SlotDef getPrimarySlotDef() {
 		return this.primarySlotDef;
 	}
@@ -119,8 +130,6 @@ public class UserSession implements Serializable {
 		return this.primarySlotFolder;
 	}
 
-	// primary dell'azienda
-
 	public SlotInst getPrimarySlotInst() {
 		// if (this.primarySlotInst == null) {
 		// SlotInst slotInst = this.retriveSlotInst();
@@ -130,6 +139,10 @@ public class UserSession implements Serializable {
 		// }
 		// return this.primarySlotInst;
 		return this.retriveSlotInst();
+	}
+
+	public String getReNuovaPwd() {
+		return this.reNuovaPwd;
 	}
 
 	public void init() {
@@ -171,15 +184,11 @@ public class UserSession implements Serializable {
 		}
 	}
 
-	//
-	// @In(create = true)
-	// SlotDefHome slotDefHome;
-
-	//
-
 	public boolean isBeni() {
 		return this.beni;
 	}
+
+	// primary dell'azienda
 
 	public boolean isLlpp() {
 		return this.llpp;
@@ -187,6 +196,32 @@ public class UserSession implements Serializable {
 
 	public boolean isServizi() {
 		return this.servizi;
+	}
+
+	//
+	// @In(create = true)
+	// SlotDefHome slotDefHome;
+
+	//
+
+	public String reimpostaPassword() {
+		AlfrescoWebScriptClient awsc = new AlfrescoWebScriptClient(
+				this.alfrescoInfo.getAdminUser(),
+				this.alfrescoInfo.getAdminPwd(),
+				this.alfrescoInfo.getRepositoryUri());
+		String pwd = this.nuovaPwd;
+		String pwd2 = this.reNuovaPwd;
+		if (pwd.equals(pwd2)) {
+			String res = awsc.changePassword(this.azienda.getEmailReferente(),
+					pwd);
+			FacesMessages.instance().add(Severity.INFO,
+					"Cambio password avvenuto con successo");
+			return "OK";
+		} else {
+			FacesMessages.instance().add(Severity.ERROR,
+					"Password non coincidenti!");
+		}
+		return "KO";
 	}
 
 	private AlfrescoFolder retriveSlotFolder() {
@@ -240,6 +275,25 @@ public class UserSession implements Serializable {
 		this.beni = beni;
 	}
 
+	@SuppressWarnings("unchecked")
+	public void setGaraVisisted(Integer gara_id) {
+		List<ComunicazioneAziendaGara> resultList = this.entityManager
+				.createQuery(
+						"from ComunicazioneAziendaGara cag where cag.id.aziendaId = :a and cag.id.garaId= :g")
+				.setParameter("a", this.azienda.getId())
+				.setParameter("g", gara_id).setMaxResults(1).getResultList();
+		if (resultList.size() > 0) {
+			ComunicazioneAziendaGara cag = resultList.get(0);
+			cag.setWeb(true);
+			this.entityManager.merge(cag);
+			this.entityManager.flush();
+		}
+	}
+
+	public void setGroupFolder(AlfrescoFolder groupFolder) {
+		this.groupFolder = groupFolder;
+	}
+
 	// Lo SlotInst può essere null all'inizo della Session ed essere
 	// visualizzato in seguito. In realtà potrebbe anche essere modificata
 	// l'istanza collegata nel corso della session (non basta controllare se
@@ -261,26 +315,12 @@ public class UserSession implements Serializable {
 	// }
 	// }
 
-	public void setGaraVisisted(Integer gara_id) {
-		List<ComunicazioneAziendaGara> resultList = this.entityManager
-				.createQuery(
-						"from ComunicazioneAziendaGara cag where cag.id.aziendaId = :a and cag.id.garaId= :g")
-				.setParameter("a", this.azienda.getId())
-				.setParameter("g", gara_id).setMaxResults(1).getResultList();
-		if (resultList.size() > 0) {
-			ComunicazioneAziendaGara cag = resultList.get(0);
-			cag.setWeb(true);
-			this.entityManager.merge(cag);
-			this.entityManager.flush();
-		}
-	}
-
-	public void setGroupFolder(AlfrescoFolder groupFolder) {
-		this.groupFolder = groupFolder;
-	}
-
 	public void setLlpp(boolean llpp) {
 		this.llpp = llpp;
+	}
+
+	public void setNuovaPwd(String nuovaPwd) {
+		this.nuovaPwd = nuovaPwd;
 	}
 
 	public void setPrimarySlotDef(SlotDef primarySlotDef) {
@@ -293,6 +333,10 @@ public class UserSession implements Serializable {
 
 	public void setPrimarySlotInst(SlotInst primarySlotInst) {
 		this.primarySlotInst = primarySlotInst;
+	}
+
+	public void setReNuovaPwd(String reNuovaPwd) {
+		this.reNuovaPwd = reNuovaPwd;
 	}
 
 	public void setServizi(boolean servizi) {

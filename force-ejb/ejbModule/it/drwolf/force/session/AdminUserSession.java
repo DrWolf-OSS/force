@@ -1,6 +1,7 @@
 package it.drwolf.force.session;
 
 import it.drwolf.force.entity.Azienda;
+import it.drwolf.force.entity.Gara;
 import it.drwolf.force.enums.PosizioneCNA;
 import it.drwolf.force.enums.StatoAzienda;
 import it.drwolf.force.session.lists.AziendaList;
@@ -9,6 +10,7 @@ import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -53,6 +55,8 @@ public class AdminUserSession implements Serializable {
 			String groupName = azienda.getRagioneSociale().replaceAll("\\s",
 					"_");
 			groupName = groupName + "_" + azienda.getId();
+			groupName = AlfrescoWrapper.normalizeFolderName(groupName,
+					groupName.length(), "_");
 
 			AlfrescoWebScriptClient awsc = new AlfrescoWebScriptClient(
 					this.alfrescoInfo.getAdminUser(),
@@ -75,9 +79,6 @@ public class AdminUserSession implements Serializable {
 			args.put("lastName", azienda.getCognome());
 			args.put("email", azienda.getEmailReferente());
 			args.put("password", pwd);
-			// forse dovrei settare la password dato che di default � a
-			// "password"?
-			// args.put("password", "");
 			awsc.addPerson(args);
 
 			// Aggiungo l'utente al gruppo creato in precedenza
@@ -127,6 +128,15 @@ public class AdminUserSession implements Serializable {
 			e.printStackTrace();
 			return "KO";
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public ArrayList<Gara> getBusteRequest() {
+		ArrayList<Gara> requests = (ArrayList<Gara>) this.entityManager
+				.createQuery(
+						"select distinct(g) from ComunicazioneAziendaGara cag join cag.gara g left join g.slotDefs sd where cag.bustaRequest = true and (sd.ownerId !='ADMIN' or sd is null)")
+				.getResultList();
+		return requests;
 	}
 
 	public void init() {

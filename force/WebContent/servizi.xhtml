@@ -11,7 +11,7 @@
    <ui:define name="body">
     <h:form>
  
-       <div id="force_about" style="text-align: justify;font-size: 16px;">        
+       <div id="force_about" style="text-align: justify;font-size: 16px;line-height: 1.7">        
         <h3>SEZIONE SERVIZI GRATUITI</h3>
 
 La registrazione su FORCE permette di usufruire gratuitamente del servizio di:
@@ -29,20 +29,6 @@ ad altri bandi e gare</li>
 </ul></div>
 <br />
 <br />
-        <div style="text-align: justify;font-size: 16px;">
-        <h3>SEZIONE SERVIZI  A PAGAMENTO</h3>
-
-Accanto ai servizi base, forniti gratuitamente, FORCE offre anche:
-<ul>
-<li>Servizio di gestione della documentazione amministrativa (richiesta documenti, aggiornamento delle attestazioni in
-scadenza, predisposizione della documentazione da presentare alla stazione appaltante in caso di controlli, ecc.).</li>
-
-<li> Ricerca personalizzata di bandi e gare d’appalto</li>
-
-<li> Supporto on-line nella redazione e preparazione della documentazione amministrativa di gara e nelle attività post gara,
-inclusa la stipula del contratto in caso di aggiudicazione.</li>
-</ul>
-    </div>     
 	</h:form>
     </ui:define>
     <ui:define name="colonnaDx">
@@ -51,8 +37,9 @@ inclusa la stipula del contratto in caso di aggiudicazione.</li>
      
     <rich:dataList id="activeGareList"
                 var="_gara"
-              value="#{garaList.getGaraAttive(3)}"
-           rendered="#{not empty garaList.getGaraAttive(3)}"
+              value="#{listaGareGestite}"
+           rendered="#{not empty listaGareGestite}"
+           rows="3"
            style="list-style:none;">
            <h:outputText value="#{_gara.oggetto} (Scad. #{_gara.dataScadenza})" />
            <br />

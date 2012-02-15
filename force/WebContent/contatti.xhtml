@@ -1,0 +1,42 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    template="/layout/templateHome.xhtml">
+   <ui:define name="body">
+    <h:form>
+ 
+       <div id="force_about" style="text-align: justify;font-size: 16px;line-height: 1.7;width: 700px;">        
+        <h3>Contatti</h3>
+
+
+       </div>
+		<br />
+		<br />
+	</h:form>
+    </ui:define>
+    <ui:define name="colonnaDx">
+    <rich:panel>
+     <f:facet name="header">Gare in primo piano</f:facet>
+     
+    <rich:dataList id="activeGareList"
+                var="_gara"
+              value="#{listaGareGestite}"
+           rendered="#{not empty listaGareGestite}"
+           rows="3"
+           style="list-style:none;">
+           <h:outputText value="#{_gara.oggetto} (Scad. #{_gara.dataScadenza})" />
+           <br />
+           <s:link view="/AddAzienda.xhtml">
+            <h:outputText value="Dettagli" /> 
+           </s:link>
+           <hr style="color: gray;"/>
+     </rich:dataList>
+    </rich:panel>
+    </ui:define>
+</ui:composition>
