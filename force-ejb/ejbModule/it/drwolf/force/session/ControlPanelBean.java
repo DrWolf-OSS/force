@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
 import org.jboss.seam.ScopeType;
@@ -78,22 +77,21 @@ public class ControlPanelBean {
 
 	// questo metodo lo uso nel control panel per prendere le prime 5 gare
 	// segnalate
-	public List<ComunicazioneAziendaGara> getGare(Integer limit) {
-
-		ArrayList<ComunicazioneAziendaGara> lista = new ArrayList<ComunicazioneAziendaGara>();
-		Query query = this.entityManager
-				.createQuery(
-						"from ComunicazioneAziendaGara cag where cag.id.aziendaId = :a order by cag.gara.dataScadenza desc")
-				.setParameter("a", this.userSession.getAzienda().getId());
-		if (limit > 0) {
-			query = query.setMaxResults(limit);
-		}
-		ArrayList<ComunicazioneAziendaGara> elenco = (ArrayList<ComunicazioneAziendaGara>) query
-				.getResultList();
-		lista.addAll(elenco);
-
-		return lista;
-	}
+	/*
+	 * public List<ComunicazioneAziendaGara> getGare(Integer limit) {
+	 * 
+	 * ArrayList<ComunicazioneAziendaGara> lista = new
+	 * ArrayList<ComunicazioneAziendaGara>(); Query query = this.entityManager
+	 * .createQuery(
+	 * "from ComunicazioneAziendaGara cag where cag.id.aziendaId = :a order by cag.gara.dataScadenza desc"
+	 * ) .setParameter("a", this.userSession.getAzienda().getId()); if (limit >
+	 * 0) { query = query.setMaxResults(limit); }
+	 * ArrayList<ComunicazioneAziendaGara> elenco =
+	 * (ArrayList<ComunicazioneAziendaGara>) query .getResultList();
+	 * lista.addAll(elenco);
+	 * 
+	 * return lista; }
+	 */
 
 	public ArrayList<DocInstCollection> getInScadenza() {
 		return this.inScadenza;
@@ -105,19 +103,26 @@ public class ControlPanelBean {
 
 	// questo metodo lo uso nel control panel per prendere le prime 5 gare
 	// segnalate
+	@SuppressWarnings("unchecked")
 	public List<ComunicazioneAziendaGara> getSelectedGare() {
-
 		ArrayList<ComunicazioneAziendaGara> lista = new ArrayList<ComunicazioneAziendaGara>();
 		ArrayList<ComunicazioneAziendaGara> elenco = (ArrayList<ComunicazioneAziendaGara>) this.entityManager
 				.createQuery(
-						"from ComunicazioneAziendaGara cag where cag.id.aziendaId = :a order by cag.gara.dataScadenza desc")
+						"select cag from ComunicazioneAziendaGara cag "
+								+ "where cag.id.aziendaId = :a  "
+								+ "order by cag.gara.dataScadenza desc")
 				.setParameter("a", this.userSession.getAzienda().getId())
-				.setMaxResults(5).getResultList();
-		lista.addAll(elenco);
-
+				.getResultList();
+		for (ComunicazioneAziendaGara cag : elenco) {
+			if (this.getSlotInstAssociated(cag.getGara()) == null) {
+				lista.add(cag);
+			}
+		}
 		return lista;
 	}
 
+	//
+	@SuppressWarnings("unchecked")
 	public List<SlotInst> getSlotInst() {
 		ArrayList<SlotInst> elenco = (ArrayList<SlotInst>) this.entityManager
 				.createQuery(
@@ -127,6 +132,43 @@ public class ControlPanelBean {
 						this.alfrescoUserIdentity.getActiveGroup()
 								.getShortName()).getResultList();
 		return elenco;
+	}
+
+	@SuppressWarnings("unchecked")
+	public SlotInst getSlotInstAssociated(Gara gara) {
+		if (this.getAssociatedSlotDef(gara) != null) {
+			List<SlotInst> si = this.entityManager
+					.createQuery("from SlotInst s where s.slotDef.id = :sdId")
+					.setParameter("sdId",
+							this.getAssociatedSlotDef(gara).getId())
+					.getResultList();
+			if (si.size() > 0) {
+				return si.get(0);
+			} else {
+				return null;
+			}
+		}
+		return null;
+	}
+
+	// questo metodo lo uso nel control panel per prendere le prime 5 gare
+	// segnalate
+	@SuppressWarnings("unchecked")
+	public List<ComunicazioneAziendaGara> getWorkingGare() {
+		ArrayList<ComunicazioneAziendaGara> lista = new ArrayList<ComunicazioneAziendaGara>();
+		ArrayList<ComunicazioneAziendaGara> elenco = (ArrayList<ComunicazioneAziendaGara>) this.entityManager
+				.createQuery(
+						"select cag from ComunicazioneAziendaGara cag "
+								+ "where cag.id.aziendaId = :a "
+								+ "order by cag.gara.dataScadenza desc")
+				.setParameter("a", this.userSession.getAzienda().getId())
+				.getResultList();
+		for (ComunicazioneAziendaGara cag : elenco) {
+			if (this.getSlotInstAssociated(cag.getGara()) != null) {
+				lista.add(cag);
+			}
+		}
+		return lista;
 	}
 
 	@Create

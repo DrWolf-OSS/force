@@ -3,6 +3,7 @@ package it.drwolf.force.pagebeans;
 import it.drwolf.force.entity.Gara;
 import it.drwolf.force.exceptions.DuplicateCoupleGaraSlotDefOwner;
 import it.drwolf.force.session.homes.GaraHome;
+import it.drwolf.force.session.lists.GaraList;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.application.CustomModelController;
 import it.drwolf.slot.entity.DocDefCollection;
@@ -49,6 +50,9 @@ public class SlotDefGaraAssociationtBean {
 
 	@In(create = true)
 	private CustomModelController customModelController;
+
+	@In(create = true)
+	private GaraList garaList;
 
 	private final String EXPIRABLE_ASPECT = "P:slot:expirable";
 	private final String EXPIRATION_DATE_PROPERTY = "slot:expirationDate";
@@ -210,6 +214,8 @@ public class SlotDefGaraAssociationtBean {
 				gara.addSlotDef(slotDef);
 				String garaResult = this.garaHome.update();
 				if (garaResult.equals("updated")) {
+					this.garaList.setListaGareAttive(null);
+					this.garaList.setListaGareGestite(null);
 					return "associated";
 				}
 			}

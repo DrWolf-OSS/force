@@ -12,16 +12,16 @@
 
 <h:form id="gare" >
     <rich:panel>
-        <f:facet name="header">Elenco delle gare di tuo interesse</f:facet>
+        <f:facet name="header">Elenco delle gare a cui stai partecipando</f:facet>
     <div class="results" id="newGareList">
 
     <h:outputText value="La ricerca non ha prodotto nessun risultato."
-               rendered="#{empty controlPanelBean.selectedGare}"/>
+               rendered="#{empty controlPanelBean.workingGare}"/>
 
     <rich:dataTable id="activeGareList"
                 var="cag"
-              value="#{controlPanelBean.selectedGare}"
-           rendered="#{not empty controlPanelBean.selectedGare}"
+              value="#{controlPanelBean.workingGare}"
+           rendered="#{not empty controlPanelBean.workingGare}"
            onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
             onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
             rows="10"
@@ -54,14 +54,15 @@
                 <f:convertDateTime pattern="dd/MM/yyyy"/>
             </h:outputText>
         </rich:column>
-    <rich:column style="width:55px">
+    <rich:column styleClass="columnSlotInstStatus">
         <f:facet name="header">Stato</f:facet>
-        <h:graphicImage id="garaIcon" value="/img/newspaper.png" styleClass="fileIcon #{not cag.web ? 'opaque' : ''}"/>
-        <h:graphicImage id="mailIcon" value="/img/mail.png" styleClass="fileIcon #{not cag.email ? 'opaque' : ''}"/>
-        <h:graphicImage id="bustaIcon" value="/img/envelope-string.png" styleClass="fileIcon #{controlPanelBean.getAssociatedSlotDef(cag.gara)==null ? 'opaque' : ''}"/>
-        <rich:toolTip for="garaIcon" direction="bottom-left">Gara #{not cag.web ? 'da vedere' : 'vista'}</rich:toolTip>
-        <rich:toolTip for="mailIcon" direction="bottom-left">Mail #{not cag.email ? 'non inviata' : 'inviata'} dal sistema</rich:toolTip>
-        <rich:toolTip for="bustaIcon" direction="bottom-left">Busta #{controlPanelBean.getAssociatedSlotDef(cag.gara)==null ? 'non definita' : 'definita'}</rich:toolTip>
+        <h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
+                                rendered="#{controlPanelBean.getSlotInstAssociated(cag.gara).status == 'EMPTY'}" />
+                    <h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
+                                rendered="#{controlPanelBean.getSlotInstAssociated(cag.gara).status == 'VALID'}" />
+                    <h:graphicImage value="/img/envelope-red-exclamation.png"  styleClass="fileIcon"
+                                rendered="#{controlPanelBean.getSlotInstAssociated(cag.gara).status == 'INVALID'}" />
+        <h:outputText value="#{si.status.value()}"></h:outputText>
     </rich:column>
          <rich:column styleClass="action">
             <f:facet name="header">Azioni</f:facet>

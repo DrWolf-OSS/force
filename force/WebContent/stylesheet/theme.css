@@ -332,8 +332,12 @@ table.radio input[type=radio] {
 }
 
 #force_about{
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 30px;
+    margin-right: 30px;
+    text-align:justify;
+    font-size: 16px;
+    line-height: 1.7;
+    
 }
 
 .forceColor{
@@ -344,7 +348,7 @@ table.radio input[type=radio] {
 }
 
 .column {
-    width: 220px;	
+    width: 250px;	
 }
 
 .leftColumn{

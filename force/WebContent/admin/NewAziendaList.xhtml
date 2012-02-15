@@ -79,16 +79,18 @@
                       id="aziendaViewId">
                 <f:param name="aziendaId"
                         value="#{_azienda.id}"/>
+                <f:param name="aziendaFrom"
+                        value="NewAziendaList"/>
             </s:link>
             #{' '}
-            <s:link view="/admin/AziendaEdit.xhtml"
+            <!-- <s:link view="/admin/AziendaEdit.xhtml"
                    value="Modifica"
              propagation="none"
                       id="aziendaEdit"
                 rendered="#{empty from}">
                 <f:param name="aziendaId"
                         value="#{_azienda.id}"/>
-            </s:link>
+            </s:link> --> 
              #{' '}
             <h:commandButton value="Attiva"
                           styleClass="DeleteAction Action"

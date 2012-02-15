@@ -8,8 +8,8 @@
 	<application>
 		<view-handler>com.sun.facelets.FaceletViewHandler</view-handler>
 		<locale-config>
-			<default-locale>en</default-locale>
-			<supported-locale>bg</supported-locale>
+			<default-locale>it</default-locale>
+            <supported-locale>bg</supported-locale>
 			<supported-locale>de</supported-locale>
 			<supported-locale>en</supported-locale>
 			<supported-locale>fr</supported-locale>

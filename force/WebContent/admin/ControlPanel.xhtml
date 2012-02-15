@@ -14,18 +14,72 @@
    <h:form>
 
         <h1>Benvenuto nel Progetto FORCE (File yOuR raCE)!</h1>
-<h:form id="gareNuove" >
+    <h:form id="gareNuove">
+    <rich:panel>
+        <f:facet name="header">Richieste di creazione di buste amministrative</f:facet>
+        <h:outputText value="Non ci sono richieste per la creazione di buste amministrative"
+               rendered="#{empty adminUserSession.busteRequest}"/>
+        <rich:dataTable id="busetRequest"
+                        var="_gara"
+                        value="#{adminUserSession.busteRequest}"
+                        rows="5"
+                        onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
+                        onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                        rendered="#{not empty adminUserSession.busteRequest}"
+                        reRender="ds">
+        <rich:column sortBy="#{_gara.oggetto}" filterBy="#{_gara.oggetto}">
+            <f:facet name="header">
+                Oggetto
+            </f:facet>
+            <h:outputText value="#{_gara.oggetto}"/>
+        </rich:column>
+        <rich:column sortBy="#{_gara.fonte.nome}">
+            <f:facet name="header">
+                Fonte
+            </f:facet>
+            <h:outputText value="#{_gara.fonte.nome} (#{_gara.fonte.tipo})"/>
+        </rich:column>                
+         <rich:column sortBy="#{_gara.dataPubblicazione}">
+            <f:facet name="header">
+                Data Pubblicazione
+            </f:facet>
+            <h:outputText value="#{_gara.dataPubblicazione}">
+              <!--   <f:convertDateTime pattern="dd/MM/yyyy"/> -->
+            </h:outputText>
+        </rich:column>
+        <rich:column sortBy="#{_gara.dataScadenza}">
+            <f:facet name="header">
+                Data Scadenza
+            </f:facet>
+            <h:outputText value="#{_gara.dataScadenza}">
+                <!-- <f:convertDateTime pattern="dd/MM/yyyy"/> -->
+            </h:outputText>
+        </rich:column>
+        <rich:column styleClass="action">
+            <f:facet name="header">Azioni</f:facet>
+                <s:link id="garaDetails" view="/admin/GaraView.xhtml"
+                    styleClass="modal">
+                   <h:graphicImage value="/img/document-list.png" />
+                   <f:param name="garaId" value="#{_gara.id}"/>
+                   <rich:toolTip for="garaDetails" direction="bottom-left">Vedi il Dettaglio della Gara</rich:toolTip>
+            </s:link>
+            #{' '}
+        </rich:column>
+        
+        </rich:dataTable>
+    </rich:panel>
+    <rich:spacer height="10px"/>
     <rich:panel>
         <f:facet name="header">Elenco delle nuove gare non gestite</f:facet>
     <div class="results" id="newGareList">
 
-    <h:outputText value="La ricerca non ha prodotto nessun risultato."
+    <h:outputText value="Non ci sono gare non gestite"
                rendered="#{empty listaGareNuove}"/>
 
     <rich:dataTable id="newGareList"
                 var="_gara"
                 value="#{listaGareNuove}"
-                rows="10"
+                rows="5"
                 onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
                 onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
                 rendered="#{not empty listaGareNuove}"
