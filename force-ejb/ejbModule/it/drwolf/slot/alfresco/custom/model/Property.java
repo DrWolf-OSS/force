@@ -32,6 +32,9 @@ public class Property implements DataDefinition, Comparable<Property>,
 	private String type;
 
 	@Element(required = false)
+	private String description;
+
+	@Element(required = false)
 	private boolean mandatory;
 
 	@Element(required = false)
@@ -121,6 +124,10 @@ public class Property implements DataDefinition, Comparable<Property>,
 		} else {
 			return null;
 		}
+	}
+
+	public String getDescription() {
+		return this.description;
 	}
 
 	public List<String> getDictionaryValues() {

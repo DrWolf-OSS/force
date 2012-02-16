@@ -175,6 +175,7 @@ public class SlotDefCloner {
 			SlotDef clonedSlotDef) {
 		DocDefCollection clonedCollection = new DocDefCollection();
 		clonedCollection.setName(collection.getName());
+		clonedCollection.setDescription(collection.getDescription());
 		clonedCollection.setDocDef(collection.getDocDef());
 		clonedCollection.setMin(collection.getMin());
 		clonedCollection.setMax(collection.getMax());
@@ -218,6 +219,8 @@ public class SlotDefCloner {
 			EmbeddedProperty embeddedProperty) {
 		EmbeddedProperty clonedEmbeddedProperty = new EmbeddedProperty();
 		clonedEmbeddedProperty.setName(embeddedProperty.getName());
+		clonedEmbeddedProperty
+				.setDescription(embeddedProperty.getDescription());
 		clonedEmbeddedProperty.setDataType(embeddedProperty.getDataType());
 		clonedEmbeddedProperty.setMultiple(embeddedProperty.isMultiple());
 
@@ -292,6 +295,7 @@ public class SlotDefCloner {
 			SlotDef clonedSlotDef) {
 		PropertyDef clonedPropertyDef = new PropertyDef();
 		clonedPropertyDef.setName(propertyDef.getName());
+		clonedPropertyDef.setDescription(propertyDef.getDescription());
 		clonedPropertyDef.setDataType(propertyDef.getDataType());
 		clonedPropertyDef.setMultiple(propertyDef.isMultiple());
 		clonedPropertyDef.setRequired(propertyDef.isRequired());

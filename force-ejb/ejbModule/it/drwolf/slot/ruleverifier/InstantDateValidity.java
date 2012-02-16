@@ -25,11 +25,28 @@ public class InstantDateValidity implements IRuleVerifier {
 	private VerifierReport verifierReport = new VerifierReport();
 
 	public InstantDateValidity() {
-		params.add(new VerifierParameterDef(this.DATE_TO_VERIFY,
-				"Data da verificare", DataType.DATE, false, false, false));
-		params.add(new VerifierParameterDef(this.WARNING_THRESHOLD,
+		this.params.add(new VerifierParameterDef(this.DATE_TO_VERIFY,
+				"Data da verificare", DataType.DATE, false, false, false,
+				"Data da verificare rispetto a quella in corso"));
+		this.params.add(new VerifierParameterDef(this.WARNING_THRESHOLD,
 				"Giorni prima di notifica di avvertimento", DataType.INTEGER,
-				true, true, false));
+				true, true, false, "Giorni prima di notifica di avvertimento"));
+	}
+
+	public String getDefaultErrorMessage() {
+		return "Default instant date verification error message";
+	}
+
+	public String getDefaultWarningMessage() {
+		return "Default instant date verification warning message";
+	}
+
+	public String getDescription() {
+		return this.DESCRIPTION;
+	}
+
+	public List<VerifierParameterDef> getInParams() {
+		return this.params;
 	}
 
 	public VerifierReport verify(
@@ -59,8 +76,8 @@ public class InstantDateValidity implements IRuleVerifier {
 			}
 
 			if (dateToVerify.before(today)) {
-				verifierReport.setResult(VerifierResult.ERROR);
-				verifierReport.getFailedParams().add(parameterInst);
+				this.verifierReport.setResult(VerifierResult.ERROR);
+				this.verifierReport.getFailedParams().add(parameterInst);
 			} else if (threshold != null) {
 				Date addDays = DateUtils.addDays(dateToVerify, threshold);
 				if (addDays.after(today)) {
@@ -74,23 +91,7 @@ public class InstantDateValidity implements IRuleVerifier {
 
 		}
 
-		return verifierReport;
-	}
-
-	public List<VerifierParameterDef> getInParams() {
-		return params;
-	}
-
-	public String getDefaultErrorMessage() {
-		return "Default instant date verification error message";
-	}
-
-	public String getDefaultWarningMessage() {
-		return "Default instant date verification warning message";
-	}
-
-	public String getDescription() {
-		return DESCRIPTION;
+		return this.verifierReport;
 	}
 
 }

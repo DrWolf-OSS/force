@@ -749,6 +749,13 @@
 					<h:inputText value="#{slotDefEditBean.propertyDef.name}" required="true" styleClass="ptext"/>
 	            </s:decorate>
 	            
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Descrizione"/>
+					</ui:define>
+					<h:inputTextarea value="#{slotDefEditBean.propertyDef.description}" styleClass="ptext" />
+	            </s:decorate>
+	            
 	            <a:region>
 	            <s:decorate template="/layout/edit.xhtml">
 	                <ui:define name="label">
@@ -906,6 +913,13 @@
 					</ui:define>
 					<h:inputText value="#{slotDefEditBean.embeddedProperty.name}" required="true"/>
 	            </s:decorate>
+	            
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Descrizione"/>
+					</ui:define>
+					<h:inputTextarea value="#{slotDefEditBean.embeddedProperty.description}" styleClass="ptext" />
+	            </s:decorate>
 
 				<a:region>
 	            <s:decorate template="/layout/edit.xhtml">
@@ -1053,6 +1067,13 @@
 	                	<h:outputText value="Nome della Richiesta"/>
 					</ui:define>
 					<h:inputText value="#{slotDefEditBean.collection.name}" required="true" styleClass="ptext"/>
+	            </s:decorate>
+	            
+	            <s:decorate template="/layout/edit.xhtml">
+	                <ui:define name="label">
+	                	<h:outputText value="Descrizione"/>
+					</ui:define>
+					<h:inputTextarea value="#{slotDefEditBean.collection.description}" styleClass="ptext" />
 	            </s:decorate>
 	            
 	            <s:fragment rendered="false">

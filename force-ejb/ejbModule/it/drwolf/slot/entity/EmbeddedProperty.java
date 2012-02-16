@@ -61,6 +61,8 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 
 	private DefStatus status;
 
+	private String description;
+
 	@Transient
 	public void clean() {
 		this.setStringValue(null);
@@ -93,6 +95,10 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 	@Temporal(TemporalType.DATE)
 	public Date getDateValue() {
 		return this.dateValue;
+	}
+
+	public String getDescription() {
+		return this.description;
 	}
 
 	@Transient
@@ -212,6 +218,10 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 
 	public void setDateValue(Date dateValue) {
 		this.dateValue = dateValue;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void setDictionary(Dictionary dictionary) {

@@ -67,6 +67,8 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	private DefStatus status;
 
+	private String description;
+
 	public PropertyDef() {
 	}
 
@@ -154,6 +156,10 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 	@Column(name = "type")
 	public DataType getDataType() {
 		return this.dataType;
+	}
+
+	public String getDescription() {
+		return this.description;
 	}
 
 	@ManyToOne
@@ -264,6 +270,10 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	public void setDataType(DataType type) {
 		this.dataType = type;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void setDictionary(Dictionary dictionary) {
