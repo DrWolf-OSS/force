@@ -30,6 +30,11 @@ a:HOVER {
 	padding-right: 2px;
 }
 
+.fileIconRight{
+	vertical-align: text-bottom;
+	padding-left: 2px;
+}
+
 .primaryArrows{
 	margin: 5px;
 }

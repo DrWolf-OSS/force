@@ -45,6 +45,8 @@ public class DocDefCollection implements Deactivable, Definition, Conditionable 
 
 	private DefStatus status;
 
+	private String description;
+
 	@ManyToOne(cascade = CascadeType.PERSIST)
 	public PropertyDef getConditionalPropertyDef() {
 		return this.conditionalPropertyDef;
@@ -54,6 +56,10 @@ public class DocDefCollection implements Deactivable, Definition, Conditionable 
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	public PropertyInst getConditionalPropertyInst() {
 		return this.conditionalPropertyInst;
+	}
+
+	public String getDescription() {
+		return this.description;
 	}
 
 	@ManyToOne
@@ -114,6 +120,10 @@ public class DocDefCollection implements Deactivable, Definition, Conditionable 
 
 	public void setConditionalPropertyInst(PropertyInst conditionalPropertyInst) {
 		this.conditionalPropertyInst = conditionalPropertyInst;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void setDocDef(DocDef docDef) {

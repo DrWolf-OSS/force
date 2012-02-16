@@ -117,6 +117,11 @@
 					<s:decorate template="/layout/display.xhtml">
 						<ui:define name="label">
 							<h:outputText value="#{dataInstance.dataDefinition.label}" />
+							<h:graphicImage id="epi_#{dataInstance.id}"
+									value="/img/question-white.png"  styleClass="fileIconRight" 
+									rendered="#{dataInstance.dataDefinition.description !=null and !dataInstance.dataDefinition.description.equals('')}">
+								<rich:toolTip for="epi_#{dataInstance.id}">#{dataInstance.dataDefinition.description}</rich:toolTip>
+							</h:graphicImage>
 						</ui:define>
 						<s:fragment rendered="#{not dataInstance.multiple}">
 						<h:outputText value="#{dataInstance.stringValue}"
@@ -151,6 +156,10 @@
 										and slotInstEditBean.findPropertyInstByDefId(dataInstance.propertyDef.conditionalPropertyDef.id).value.equals(dataInstance.propertyDef.conditionalPropertyInst.value))}">
 							<ui:define name="label">
 								<h:outputText value="#{dataInstance.dataDefinition.label}" />
+								<h:graphicImage id="pi_#{dataInstance.propertyDef.id}" value="/img/question-white.png"  styleClass="fileIconRight"
+											rendered="#{dataInstance.dataDefinition.description !=null and !dataInstance.dataDefinition.description.equals('')}">
+									<rich:toolTip for="pi_#{dataInstance.propertyDef.id}">#{dataInstance.dataDefinition.description}</rich:toolTip>
+								</h:graphicImage>
 							</ui:define>
 							
 							<s:fragment rendered="#{not dataInstance.dataDefinition.multiple}">
@@ -251,6 +260,10 @@
 							<ui:define name="label">
 								<h:outputText value="#{coll.docDefCollection.name}" />
 								<s:span styleClass="required" rendered="#{coll.docDefCollection.min ge 1}">*</s:span>
+								<h:graphicImage id="ci_#{coll.docDefCollection.id}" value="/img/question-white.png"  styleClass="fileIconRight"
+											rendered="#{coll.docDefCollection.description !=null and !coll.docDefCollection.description.equals('')}">
+									<rich:toolTip for="ci_#{coll.docDefCollection.id}">#{coll.docDefCollection.description}</rich:toolTip>
+								</h:graphicImage>
 							</ui:define>
 									
 							<s:div id="primaryRegion_#{coll.docDefCollection.id}" 
@@ -620,6 +633,11 @@
 					<ui:param name="prefix" value="epf" />
 						<ui:define name="label">
 							<h:outputText value="#{dataInstance.dataDefinition.label}" />
+							<h:graphicImage id="epfi_#{dataInstance.property.name}"
+									value="/img/question-white.png"  styleClass="fileIconRight" 
+									rendered="#{dataInstance.dataDefinition.description !=null and !dataInstance.dataDefinition.description.equals('')}">
+								<rich:toolTip attached="true">#{dataInstance.dataDefinition.description}</rich:toolTip>
+							</h:graphicImage>
 						</ui:define>
 						
 						<s:fragment rendered="#{not dataInstance.dataDefinition.multiple}">

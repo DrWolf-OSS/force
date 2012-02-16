@@ -18,23 +18,13 @@ public class VerifierParameterDef implements DataDefinition {
 	private boolean optional;
 	private boolean ruleEmbedded;
 	private boolean multiple;
+	private String description;
 
 	private Dictionary dictionary;
 
 	public VerifierParameterDef(String name, String label, DataType type,
-			boolean optional, boolean ruleEmbedded, boolean multiple) {
-		super();
-		this.name = name;
-		this.label = label;
-		this.dataType = type;
-		this.optional = optional;
-		this.ruleEmbedded = ruleEmbedded;
-		this.multiple = multiple;
-	}
-
-	public VerifierParameterDef(String name, String label, DataType type,
 			boolean optional, boolean ruleEmbedded, boolean multiple,
-			Dictionary dictionary) {
+			Dictionary dictionary, String description) {
 		super();
 		this.name = name;
 		this.label = label;
@@ -43,10 +33,28 @@ public class VerifierParameterDef implements DataDefinition {
 		this.ruleEmbedded = ruleEmbedded;
 		this.multiple = multiple;
 		this.dictionary = dictionary;
+		this.description = description;
+	}
+
+	public VerifierParameterDef(String name, String label, DataType type,
+			boolean optional, boolean ruleEmbedded, boolean multiple,
+			String description) {
+		super();
+		this.name = name;
+		this.label = label;
+		this.dataType = type;
+		this.optional = optional;
+		this.ruleEmbedded = ruleEmbedded;
+		this.multiple = multiple;
+		this.description = description;
 	}
 
 	public DataType getDataType() {
 		return this.dataType;
+	}
+
+	public String getDescription() {
+		return this.description;
 	}
 
 	public Dictionary getDictionary() {
@@ -93,6 +101,10 @@ public class VerifierParameterDef implements DataDefinition {
 
 	public void setDataType(DataType type) {
 		this.dataType = type;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void setDictionary(Dictionary dictionary) {

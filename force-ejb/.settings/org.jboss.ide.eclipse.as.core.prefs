@@ -1,0 +1,3 @@
+#Mon Jun 06 13:37:55 CEST 2011
+eclipse.preferences.version=1
+org.jboss.ide.eclipse.as.core.singledeployable.deployableList=resources/openit-ds.xml\nresources/force-ds.xml\nejbModule/it/drwolf/slot/pagebeans/SlotInstEditBean.java\nejbModule/it/drwolf/slot/pagebeans/SlotInstEditBean.java\nresources/it.drwolf.patentanalyzer.web.patentcontentmodel-ds.xml\n

@@ -34,13 +34,16 @@ public class DateComparison implements IRuleVerifier {
 
 	public DateComparison() {
 		this.params.add(new VerifierParameterDef(DateComparison.EARLIER_DATE,
-				"Data Anteriore", DataType.DATE, false, false, false));
+				"Data Anteriore", DataType.DATE, false, false, false,
+				"E' la data che deve essere antecedente"));
 		this.params.add(new VerifierParameterDef(DateComparison.FOLLOWING_DATE,
-				"Data Posteriore", DataType.DATE, false, false, false));
-		this.params.add(new VerifierParameterDef(
-				DateComparison.WARNING_THRESHOLD,
-				"Giorni prima di notifica di avvertimento", DataType.INTEGER,
-				true, true, false));
+				"Data Posteriore", DataType.DATE, false, false, false,
+				"E' la data che deve essere posteriore"));
+		this.params
+				.add(new VerifierParameterDef(DateComparison.WARNING_THRESHOLD,
+						"Giorni prima di notifica di avvertimento",
+						DataType.INTEGER, true, true, false,
+						"Giorni di margine entro i quali viene mostrata una notifica di avvertimento"));
 	}
 
 	// Metodi di test per recuperare un Dictionary da associare
