@@ -170,44 +170,8 @@
               </property>
           </properties>
         </aspect>
-           <aspect name="slot:bilancio_1_1">
+           <aspect name="slot:bilancio">
             <title>Bilancio</title>
-            <properties>
-                <property name="slot:fatturatoBilancio_1_1">
-                    <title>Fatturato</title>
-                    <type>d:text</type>
-                    <mandatory>true</mandatory>
-                </property>
-                <property name="slot:annoBilancio_1_1">
-                    <title>Anno</title>
-                    <type>d:int</type>
-                    <mandatory>true</mandatory>
-                    <constraints>
-                       <constraint ref="slot:MinMaxAnnoBilancio"></constraint>
-                    </constraints>
-                </property>
-            </properties>
-        </aspect>
-           <aspect name="slot:bilancio_1.1">
-            <title>Bilancio (Obsoleto 1.1)</title>
-            <properties>
-                <property name="slot:fatturatoBilancio_1.1">
-                    <title>Fatturato</title>
-                    <type>d:text</type>
-                    <mandatory>true</mandatory>
-                </property>
-                <property name="slot:annoBilancio_1.1">
-                    <title>Anno</title>
-                    <type>d:int</type>
-                    <mandatory>true</mandatory>
-                    <constraints>
-                       <constraint ref="slot:MinMaxAnnoBilancio"></constraint>
-                    </constraints>
-                </property>
-            </properties>
-        </aspect>
-        <aspect name="slot:bilancio">
-            <title>Bilancio (Obsoleto)</title>
             <properties>
                 <property name="slot:fatturatoBilancio">
                     <title>Fatturato</title>
@@ -216,8 +180,11 @@
                 </property>
                 <property name="slot:annoBilancio">
                     <title>Anno</title>
-                    <type>d:date</type>
+                    <type>d:int</type>
                     <mandatory>true</mandatory>
+                    <constraints>
+                       <constraint ref="slot:MinMaxAnnoBilancio"></constraint>
+                    </constraints>
                 </property>
             </properties>
         </aspect>
@@ -239,7 +206,7 @@
             <title>Certificazioni</title>
             <properties>
                 <property name="slot:CertificazioneCodeVincolato">
-                    <title>Tipo di Certificazione (elenco)</title>
+                    <title>Tipo di Certificazione</title>
                     <type>d:text</type>
                     <mandatory>false</mandatory>
                     <constraints>
@@ -247,7 +214,7 @@
                     </constraints>
                 </property>
                 <property name="slot:CertificazioneCodiceLibero">
-                    <title>Tipo di Certificazione (libero)</title>
+                    <title>Tipo di Certificazione</title>
                     <type>d:text</type>
                     <mandatory>false</mandatory>
                 </property>
