@@ -26,34 +26,16 @@ import org.richfaces.model.UploadItem;
 
 public class FileContainer {
 	public final static String decodeFilename(String encoded) {
-		String name = encoded;
-		String extension = "";
-		int dotIndex = encoded.lastIndexOf(".");
-		if (dotIndex != -1) {
-			extension = encoded.substring(dotIndex);
-			name = encoded.substring(0, dotIndex);
+		int index = encoded.indexOf("_");
+		if (index != -1) {
+			String decoded = encoded.substring(index + 1);
+			return decoded;
 		}
-
-		int underscoreIndex = encoded.lastIndexOf("_");
-		String fileName = encoded;
-		if (underscoreIndex != -1) {
-			fileName = encoded.substring(0, underscoreIndex);
-		} else {
-			fileName = name;
-		}
-		return fileName.concat(extension);
+		return encoded;
 	}
 
 	public final static String encodeFilename(String origin) {
-		int dotIndex = origin.lastIndexOf(".");
-		String name = origin;
-		String extension = "";
-		if (dotIndex > 0) {
-			name = origin.substring(0, dotIndex);
-			extension = origin.substring(dotIndex);
-		}
-		String newName = name + "_" + System.currentTimeMillis() + extension;
-		return newName;
+		return System.currentTimeMillis() + "_" + origin;
 	}
 
 	public final static String retrieveContentFilename(
