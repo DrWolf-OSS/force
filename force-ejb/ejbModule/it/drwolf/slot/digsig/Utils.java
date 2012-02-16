@@ -14,12 +14,10 @@ public class Utils {
 	private static Pattern cf = Pattern
 			.compile("SERIALNUMBER\\s*=([\\w:\\w]+)");
 
-	public static String getCN(String dn) {
-		Matcher m = Utils.cn.matcher(dn);
-		if (m.find()) {
-			return m.group(m.groupCount());
-		}
-		return "No CN";
+	public static Calendar dateToCalendar(Date date) {
+		Calendar c = new GregorianCalendar();
+		c.setTime(date);
+		return c;
 	}
 
 	public static String getCF(String dn) {
@@ -28,6 +26,14 @@ public class Utils {
 			return m.group(m.groupCount());
 		}
 		return "No CF";
+	}
+
+	public static String getCN(String dn) {
+		Matcher m = Utils.cn.matcher(dn);
+		if (m.find()) {
+			return m.group(m.groupCount());
+		}
+		return "No CN";
 	}
 
 	public static String md5Encode(byte[] signature) {
@@ -49,31 +55,5 @@ public class Utils {
 		}
 		return "";
 	}
-
-	public static Calendar dateToCalendar(Date date) {
-		Calendar c = new GregorianCalendar();
-		c.setTime(date);
-		return c;
-	}
-
-	// public static String decodeDocumentFileName(String encoded) {
-	// // String encoded = getRealFileName();
-	// String name = encoded;
-	// String extension = "";
-	// int dotIndex = encoded.lastIndexOf(".");
-	// if (dotIndex != -1) {
-	// extension = encoded.substring(dotIndex);
-	// name = encoded.substring(0, dotIndex);
-	// }
-	//
-	// int underscoreIndex = encoded.lastIndexOf("_");
-	// String fileName = encoded;
-	// if (underscoreIndex != -1) {
-	// fileName = encoded.substring(0, underscoreIndex);
-	// } else {
-	// fileName = name;
-	// }
-	// return fileName.concat(extension);
-	// }
 
 }

@@ -4,6 +4,7 @@ import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
+import it.drwolf.slot.digsig.DigsigModel;
 import it.drwolf.slot.digsig.Signature;
 import it.drwolf.slot.enums.DataType;
 import it.drwolf.utils.mimetypes.Resolver;
@@ -11,6 +12,7 @@ import it.drwolf.utils.mimetypes.Resolver;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -24,34 +26,16 @@ import org.richfaces.model.UploadItem;
 
 public class FileContainer {
 	public final static String decodeFilename(String encoded) {
-		String name = encoded;
-		String extension = "";
-		int dotIndex = encoded.lastIndexOf(".");
-		if (dotIndex != -1) {
-			extension = encoded.substring(dotIndex);
-			name = encoded.substring(0, dotIndex);
+		int index = encoded.indexOf("_");
+		if (index != -1) {
+			String decoded = encoded.substring(index + 1);
+			return decoded;
 		}
-
-		int underscoreIndex = encoded.lastIndexOf("_");
-		String fileName = encoded;
-		if (underscoreIndex != -1) {
-			fileName = encoded.substring(0, underscoreIndex);
-		} else {
-			fileName = name;
-		}
-		return fileName.concat(extension);
+		return encoded;
 	}
 
 	public final static String encodeFilename(String origin) {
-		int dotIndex = origin.lastIndexOf(".");
-		String name = origin;
-		String extension = "";
-		if (dotIndex > 0) {
-			name = origin.substring(0, dotIndex);
-			extension = origin.substring(dotIndex);
-		}
-		String newName = name + "_" + System.currentTimeMillis() + extension;
-		return newName;
+		return System.currentTimeMillis() + "_" + origin;
 	}
 
 	public final static String retrieveContentFilename(
@@ -76,6 +60,10 @@ public class FileContainer {
 	private List<Signature> signatures;
 
 	private String mimetype;
+
+	private Boolean notYetValid;
+	private Boolean expired;
+	private Boolean globalValidity;
 
 	public FileContainer(AlfrescoDocument alfrescoDocument,
 			Set<Property> properties, boolean editable) {
@@ -173,6 +161,10 @@ public class FileContainer {
 		return this.documentProperties;
 	}
 
+	public Boolean getExpired() {
+		return this.expired;
+	}
+
 	public String getExtension() {
 		String fileName = this.getFileName();
 		int dotIndex = fileName.lastIndexOf(".");
@@ -186,6 +178,10 @@ public class FileContainer {
 			return this.uploadItem.getFileName();
 		}
 		return "";
+	}
+
+	public Boolean getGlobalValidity() {
+		return this.globalValidity;
 	}
 
 	public String getId() {
@@ -204,6 +200,10 @@ public class FileContainer {
 			return AlfrescoWrapper.id2ref(this.document.getId());
 		}
 		return "";
+	}
+
+	public Boolean getNotYetValid() {
+		return this.notYetValid;
 	}
 
 	public String getRealFileName() {
@@ -238,7 +238,9 @@ public class FileContainer {
 
 	private String retrieveContentMimetype() {
 		try {
-			if (this.document.hasAspect(Signature.ASPECT_SIGNED)) {
+			if (this.document.hasAspect(DigsigModel.ASPECT_SIGNED)
+					&& !this.document.getContentStream().getMimeType()
+							.contains("pdf")) {
 				AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
 						.getInstance("alfrescoUserIdentity");
 				ItemIterable<QueryResult> results = alfrescoUserIdentity
@@ -251,9 +253,10 @@ public class FileContainer {
 						QueryResult result = iterator.next();
 						String cmisName = result
 								.getPropertyValueById("cmis:name");
-						if (cmisName.equals(FileContainer
-								.retrieveContentFilename(this.document
-										.getName()))) {
+						int p7mIndex = this.document.getName().lastIndexOf(
+								".p7m");
+						if (cmisName.equals(this.document.getName().substring(
+								0, p7mIndex))) {
 							String contentNodeRef = result
 									.getPropertyValueById("cmis:objectId");
 							AlfrescoDocument content = (AlfrescoDocument) alfrescoUserIdentity
@@ -277,11 +280,14 @@ public class FileContainer {
 					.getInstance("alfrescoUserIdentity");
 			ItemIterable<QueryResult> results = alfrescoUserIdentity
 					.getSession().query(
-							"SELECT cmis:objectId," + Signature.VALIDITY + ","
-									+ Signature.EXPIRY + ","
-									+ Signature.AUTHORITY + ","
-									+ Signature.SIGN + "," + Signature.CF
-									+ " from " + Signature.SIGNATURE_TYPE
+							"SELECT cmis:objectId,"
+									+ DigsigModel.SIGNATURE_VALIDITY + ","
+									+ DigsigModel.SIGNATURE_NOT_AFTER + ","
+									+ DigsigModel.SIGNATURE_NOT_BEFORE + ","
+									+ DigsigModel.SIGNATURE_AUTHORITY + ","
+									+ DigsigModel.SIGNATURE_SIGN + ","
+									+ DigsigModel.SIGNATURE_CF + " from "
+									+ DigsigModel.TYPE_SIGNATURE
 									+ " WHERE IN_TREE('"
 									+ this.document.getId() + "')", true);
 			if (results.getTotalNumItems() != 0) {
@@ -291,19 +297,33 @@ public class FileContainer {
 					String nodeRef = result
 							.getPropertyValueById("cmis:objectId");
 					Boolean validity = result
-							.getPropertyValueById(Signature.VALIDITY);
+							.getPropertyValueById(DigsigModel.SIGNATURE_VALIDITY);
 					Calendar expiry = result
-							.getPropertyValueById(Signature.EXPIRY);
+							.getPropertyValueById(DigsigModel.SIGNATURE_NOT_AFTER);
+					Calendar notBefore = result
+							.getPropertyValueById(DigsigModel.SIGNATURE_NOT_BEFORE);
 					String authority = result
-							.getPropertyValueById(Signature.AUTHORITY);
-					String sign = result.getPropertyValueById(Signature.SIGN);
-					String cf = result.getPropertyValueById(Signature.CF);
+							.getPropertyValueById(DigsigModel.SIGNATURE_AUTHORITY);
+					String sign = result
+							.getPropertyValueById(DigsigModel.SIGNATURE_SIGN);
+					String cf = result
+							.getPropertyValueById(DigsigModel.SIGNATURE_CF);
 
 					Signature signature = new Signature(validity,
-							expiry.getTime(), authority, sign, cf, nodeRef);
+							expiry.getTime(), notBefore.getTime(), authority,
+							sign, cf, nodeRef);
 					this.signatures.add(signature);
 				}
 			}
+
+			this.expired = ((Calendar) this.document
+					.getPropertyValue(DigsigModel.SIGNED_SIGNATURE_EXPIRATION))
+					.getTime().before(new Date());
+			this.notYetValid = ((Calendar) this.document
+					.getPropertyValue(DigsigModel.SIGNED_SIGNATURE_BEGINNING))
+					.getTime().after(new Date());
+			this.globalValidity = this.document
+					.getPropertyValue(DigsigModel.SIGNED_GLOBAL_VALIDITY);
 		}
 	}
 
@@ -319,6 +339,18 @@ public class FileContainer {
 
 	public void setEditable(boolean editable) {
 		this.editable = editable;
+	}
+
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
+	}
+
+	public void setGlobalValidity(Boolean globalValidity) {
+		this.globalValidity = globalValidity;
+	}
+
+	public void setNotYetValid(Boolean notYetValid) {
+		this.notYetValid = notYetValid;
 	}
 
 	public void setUploadItem(UploadItem uploadItem) {

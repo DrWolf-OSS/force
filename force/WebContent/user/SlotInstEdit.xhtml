@@ -180,6 +180,7 @@
 							</a:region>
 							<rich:calendar id="subscriptionDate" mode="client"
 								value="#{dataInstance.dateValue}" datePattern="dd/MM/yyyy"
+								enableManualInput="true"
 								rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues == null}"
 								required="#{dataInstance.dataDefinition.required}"
 								disabled="#{not dataInstance.dataDefinition.editable}" 
@@ -366,25 +367,20 @@
 																	and not item.mimetype.contains('excel') and not item.mimetype.contains('opendocument.spreadsheet') and not item.mimetype.contains('image') 
 																	and not item.mimetype.contains('text') and not item.mimetype.contains('rtf') and not item.mimetype.contains('zip')}" 
 														styleClass="fileIcon"/>
-										<h:graphicImage value="/img/tick-small.png" rendered="#{item.document.hasAspect('P:dw:signed')}" style="margin-left:-6px; " />
 										<a href="/force/download/#{item.fileName}?ref=#{item.document.id}">
 										<h:outputText value="#{item.fileName}" />
 										</a>
 									</s:decorate>
-									<s:decorate template="/layout/display.xhtml">
+									<s:decorate template="/layout/display.xhtml" rendered="#{item.document.hasAspect('P:dw:signed')}">
 										<ui:define name="label">
-											<h:outputText value="Firmato digitalmente" />
+											<h:outputText value="Firma Digitale" />
 										</ui:define>
-										<h:outputText value="#{item.document.hasAspect('P:dw:signed') ? 'Sì' : 'No'}"/>
-										<rich:toolTip mode="client" rendered="#{item.document.hasAspect('P:dw:signed')}">
+										<h:graphicImage value="/img/cheque-red-exclamation.png" rendered="#{item.notYetValid or item.expired}" styleClass="fileIcon"/>
+										<h:graphicImage value="/img/cheque--exclamation.png" rendered="#{!item.globalValidity and not item.notYetValid and not item.expired}" styleClass="fileIcon"/>
+										<h:graphicImage value="/img/cheque-sign.png" rendered="#{item.globalValidity and not item.notYetValid and not item.expired}" styleClass="fileIcon"/>
+										<rich:toolTip mode="client">
 											<s:span>
 												<a:repeat var="sign" value="#{item.signatures}" rowKeyVar="key">										
-													<s:decorate template="/layout/display.xhtml">
-														<ui:define name="label">
-															<h:outputText value="Authority" />
-														</ui:define>
-														<h:outputText value="#{sign.authority}" />
-													</s:decorate>
 													<s:decorate template="/layout/display.xhtml">
 														<ui:define name="label">
 															<h:outputText value="Firma" />
@@ -399,11 +395,25 @@
 													</s:decorate>
 													<s:decorate template="/layout/display.xhtml">
 														<ui:define name="label">
-															<h:outputText value="Data di scadenza" />
+															<h:outputText value="Inizio Validità" />
 														</ui:define>
-														<h:outputText value="#{sign.expiry}" >
+														<h:outputText value="#{sign.notBefore}" >
 															<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
 														</h:outputText>
+													</s:decorate>
+													<s:decorate template="/layout/display.xhtml">
+														<ui:define name="label">
+															<h:outputText value="Fine Validità" />
+														</ui:define>
+														<h:outputText value="#{sign.notAfter}" >
+															<s:convertDateTime type="date" dateStyle="short" pattern="dd/MM/yyyy" />
+														</h:outputText>
+													</s:decorate>
+													<s:decorate template="/layout/display.xhtml">
+														<ui:define name="label">
+															<h:outputText value="Authority" />
+														</ui:define>
+														<h:outputText value="#{sign.authority}" />
 													</s:decorate>
 													<div style="clear: both" />
 													<rich:separator styleClass="tooltipSeparator" height="1" rendered="#{key ge 1}"/>
@@ -585,9 +595,9 @@
 			</a:form>
 		</rich:modalPanel>
 
-		<rich:modalPanel id="editPanel" autosized="true" minWidth="560" domElementAttachment="body">
+		<rich:modalPanel id="editPanel" autosized="true" minWidth="660" domElementAttachment="body">
 			<f:facet name="header">
-				<h:outputText value="Finestra di modifica" />
+				<h:outputText value="Valorizzazione proprietà" />
 			</f:facet>
 			
 			<a:form id="editPanelForm" onkeypress="dirty=true">
@@ -630,9 +640,10 @@
 							disabled="#{not dataInstance.dataDefinition.editable}" />
 						<rich:calendar id="subscriptionDate" mode="client"
 							value="#{dataInstance.dateValue}" datePattern="dd/MM/yyyy"
+							enableManualInput="true"
 							rendered="#{dataInstance.dataDefinition.dataType == 'DATE' and dataInstance.dataDefinition.dictionaryValues == null}"
 							required="#{dataInstance.dataDefinition.required}"
-							disabled="#{not dataInstance.dataDefinition.editable}" 
+							disabled="#{not dataInstance.dataDefinition.editable}"
 							onchanged="dirty=true"/>
 						
 						<h:selectOneMenu value="#{dataInstance.stringValue}" required="#{dataInstance.dataDefinition.required}"

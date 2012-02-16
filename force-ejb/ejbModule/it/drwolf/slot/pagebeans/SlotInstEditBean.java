@@ -2,7 +2,6 @@ package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
-import it.drwolf.slot.alfresco.SignatureVerifier;
 import it.drwolf.slot.alfresco.custom.model.Property;
 import it.drwolf.slot.alfresco.custom.support.DocumentPropertyInst;
 import it.drwolf.slot.application.CustomModelController;
@@ -107,9 +106,6 @@ public class SlotInstEditBean {
 	// private Preferences preferences;
 
 	@In(create = true)
-	SignatureVerifier signatureVerifier;
-
-	@In(create = true)
 	private RuleParametersResolver ruleParametersResolver;
 
 	private List<PropertyInst> propertyInsts;
@@ -150,6 +146,9 @@ public class SlotInstEditBean {
 
 	private static final int LENGHT_LIMIT = 150;
 	private static final String SPACER = " ";
+
+	@In(create = true)
+	private SlotInstParameters slotInstParameters;
 
 	public void addActiveItemToDatas() {
 		if (!this.datas.get(this.activeCollectionId).contains(
@@ -499,7 +498,7 @@ public class SlotInstEditBean {
 		// poi si aggiungono i valori delle relative properties
 		this.updateProperties(documentCopy, documentProperties);
 		// this.verifySignature(documentCopy);
-		this.signatureVerifier.verify(documentCopy);
+
 		nodeRef = objectId.getId();
 
 		return nodeRef;
@@ -845,6 +844,7 @@ public class SlotInstEditBean {
 			}
 
 		} else {
+
 			List<PropertyInst> originalPropertyInsts = new ArrayList<PropertyInst>(
 					this.slotInstHome.getInstance().getPropertyInsts());
 			//
@@ -912,6 +912,22 @@ public class SlotInstEditBean {
 				this.slotInstHome.getInstance().setTransientStatus(
 						SlotInstStatus.EMPTY);
 			}
+
+			//
+			if (this.slotInstParameters.getOutcome() != null
+					&& this.slotInstParameters.getOutcome().equals(
+							SlotInstParameters.UPDATED)) {
+				this.addMainMessage(new VerifierMessage(
+						"Busta aggiornata con successo",
+						VerifierMessageType.VALID));
+			} else if (this.slotInstParameters.getOutcome() != null
+					&& this.slotInstParameters.getOutcome().equals(
+							SlotInstParameters.SAVED)) {
+				this.slotMessages
+						.add(new VerifierMessage("Busta creata con successo",
+								VerifierMessageType.VALID));
+			}
+			//
 		}
 
 	}
@@ -1290,7 +1306,7 @@ public class SlotInstEditBean {
 		this.updateProperties(document, fileContainer.getDocumentProperties());
 
 		// this.verifySignature(document);
-		this.signatureVerifier.verify(document);
+
 		fileContainer.setDocument(document);
 
 		return document;
