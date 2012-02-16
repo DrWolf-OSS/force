@@ -1,5 +1,6 @@
 package it.drwolf.slot.session;
 
+import it.drwolf.slot.entity.DependentSlotDef;
 import it.drwolf.slot.entity.DocDefCollection;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.Rule;
@@ -136,6 +137,15 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 		this.slotDefCloner.cloneModel();
 
 		this.setInstance(this.slotDefCloner.getCloned());
+	}
+
+	public void switchPublishedStatus() {
+		boolean pubblicato = this.instance.isPubblicato();
+		this.instance.setPubblicato(!pubblicato);
+		for (DependentSlotDef dependentSlotDef : this.instance
+				.getDependentSlotDefs()) {
+			dependentSlotDef.setPubblicato(!pubblicato);
+		}
 	}
 
 	@Override

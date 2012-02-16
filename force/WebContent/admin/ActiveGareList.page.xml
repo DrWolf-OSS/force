@@ -5,5 +5,7 @@
       login-required="true">
 
    <begin-conversation join="true"/>
+   
+   <restrict>#{s:hasRole('ADMIN')}</restrict>
 
 </page>

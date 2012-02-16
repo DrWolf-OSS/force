@@ -324,18 +324,26 @@
 			</s:decorate>
 			
 			
-			<s:decorate template="/layout/display.xhtml">
+			<s:decorate template="/layout/display.xhtml" id="buttons">
 				<ui:define name="label">
 	                <h:outputText value="" />
 				</ui:define>
+				<a:commandButton value="#{slotDefHome.instance.pubblicato ? 'Revoca la pubblicazione' : 'Pubblica'}" 
+						action="#{slotDefEditBean.switchPublish()}" 
+						rendered="#{not slotDefHome.instance.template and identity.hasRole('ADMIN')}"
+						reRender="buttons"/>
 				<s:button value="Modifica Informazioni" view="/admin/SlotDefWizardEdit.xhtml" propagation="none"
-							action="#{slotDefEditBean.checkReference()}">
+							action="#{slotDefEditBean.checkReference()}" disabled="#{slotDefHome.instance.pubblicato and identity.hasRole('ADMIN')}">
 					<f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>
 					<f:param name="mode" value="#{slotDefParameters.mode}"/>
 		          	<f:param name="model" value="#{slotDefParameters.model}"/>
 		          	<f:param name="wizard" value="#{true}"/>
 		          	<f:param name="garaId" value="#{garaHome.garaId}"/>
 				</s:button>
+				<h:graphicImage id="publishButton" value="/img/question-white.png"  styleClass="fileIconRight" 
+								rendered="#{identity.hasRole('ADMIN')}" >
+						<rich:toolTip for="publishButton">Per modificare la busta è necessario prima revocare la pubblicazione</rich:toolTip>
+				</h:graphicImage>
 			</s:decorate>
 			
             <div style="clear:both">

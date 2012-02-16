@@ -12,6 +12,16 @@
 
 	<ui:define name="body">
 	
+		<rich:modalPanel id="pubblicatoPanel" width="750" height="400" 
+			showWhenRendered="#{slotInstHome.instance.slotDef.ownerId == 'ADMIN' and not slotInstHome.instance.slotDef.pubblicato}">
+	        <f:facet name="header">
+	            <h:panelGroup>
+	                <h:outputText value="BUSTA ATTUALMENTE IN MANUTENZIONE"></h:outputText>
+	            </h:panelGroup>
+	        </f:facet>
+	        <h:outputText value="BUSTA ATTUALMENTE IN MANUTENZIONE"></h:outputText>
+	    </rich:modalPanel>
+	
 	    <rich:modalPanel id="panel" width="350" height="100" showWhenRendered="#{not slotInstHome.idDefined and slotDefHome.instance.type.name() == 'PRIMARY'}">
 	        <f:facet name="header">
 	            <h:panelGroup>

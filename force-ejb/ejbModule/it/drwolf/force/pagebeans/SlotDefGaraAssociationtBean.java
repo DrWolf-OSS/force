@@ -31,6 +31,7 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage.Severity;
+import org.jboss.seam.security.Identity;
 
 @Name("slotDefGaraAssociationtBean")
 @Scope(ScopeType.CONVERSATION)
@@ -53,6 +54,9 @@ public class SlotDefGaraAssociationtBean {
 
 	@In(create = true)
 	private GaraList garaList;
+
+	@In
+	private Identity identity;
 
 	private final String EXPIRABLE_ASPECT = "P:slot:expirable";
 	private final String EXPIRATION_DATE_PROPERTY = "slot:expirationDate";
@@ -180,6 +184,10 @@ public class SlotDefGaraAssociationtBean {
 				embeddedLink.setDataType(DataType.LINK);
 				embeddedLink.setStringValue(gara.getLink());
 				slotDef.getEmbeddedProperties().add(embeddedLink);
+			}
+
+			if (!this.identity.hasRole("ADMIN")) {
+				this.slotDefHome.switchPublishedStatus();
 			}
 		}
 	}

@@ -24,7 +24,7 @@
    <navigation from-action="#{slotDefGaraAssociationtBean.deleteSlotDef()}">
       <rule if-outcome="removed">
          <end-conversation before-redirect="true"/>
-         <redirect view-id="/admin/ActiveGareList.xhtml"/>
+         <redirect view-id="#{s:hasRole('ADMIN') ? '/admin/ActiveGareList.xhtml' : '/home.xhtml'}"/>
       </rule>
    </navigation>
    

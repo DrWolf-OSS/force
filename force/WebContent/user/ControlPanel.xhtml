@@ -271,6 +271,10 @@
         <h:outputText value="#{si.slotDef.name}"></h:outputText>
     </rich:column>
     <rich:column styleClass="columnSlotInstStatus">
+        <f:facet name="header">Busta definita da</f:facet>
+        <h:outputText value="#{si.slotDef.ownerId=='ADMIN' ? 'ADMIN' : 'Utente' }"></h:outputText>
+    </rich:column>
+    <rich:column styleClass="columnSlotInstStatus">
         <f:facet name="header">Stato</f:facet>
         <h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
 								rendered="#{si.status == 'EMPTY'}" />

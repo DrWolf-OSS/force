@@ -51,7 +51,7 @@ public class SlotDef {
 
 	private String ownerId;
 
-	private boolean pubblicato;
+	private boolean pubblicato = Boolean.FALSE;
 
 	@OneToMany(mappedBy = "parentSlotDef", cascade = CascadeType.ALL)
 	public Set<DependentSlotDef> getDependentSlotDefs() {

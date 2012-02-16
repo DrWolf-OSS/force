@@ -13,5 +13,16 @@
    <param name="from" value="#{slotDefParameters.from}"/>
    
    <param name="garaId" value="#{garaHome.garaId}"/> 
+   
+<!--    <navigation from-action="#{slotDefEditBean.switchPublish()}"> -->
+<!--          <end-conversation before-redirect="true" /> -->
+<!--          <redirect> -->
+<!--          	<param name="model" value="#{slotDefParameters.model}"/> -->
+<!--     		<param name="mode" value="#{slotDefParameters.mode}"/> -->
+<!--     		<param name="wizard" value="#{slotDefParameters.wizard}"/> -->
+<!--     		<param name="garaId" value="#{garaHome.garaId}"/> -->
+<!--     		<param name="settoreId" value="#{settoreHome.settoreId}"/> -->
+<!--          </redirect> -->
+<!--    </navigation> -->
 
 </page>

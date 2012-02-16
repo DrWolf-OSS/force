@@ -899,6 +899,11 @@ public class SlotDefEditBean {
 		this.propertyDef = propertyDef;
 	}
 
+	public void switchPublish() {
+		this.slotDefHome.switchPublishedStatus();
+		this.slotDefHome.update();
+	}
+
 	public String update() {
 		String validate = this.validate();
 
