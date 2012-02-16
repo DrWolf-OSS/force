@@ -18,6 +18,7 @@ import it.drwolf.force.utils.AvcpFeedParser;
 import it.drwolf.force.utils.StartFeedParser;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -181,6 +182,10 @@ public class Heartbeat {
 									Date dataFine = avcpFeed.getDataFine();
 									if (dataInizio != null) {
 										gara.setDataScadenza(dataFine);
+									}
+									BigDecimal importo = avcpFeed.getImporto();
+									if (importo != null) {
+										gara.setImporto(importo);
 									}
 									if (avcpFeed.haveSoa()) {
 										System.out.println("trovate le soa : "
@@ -430,6 +435,11 @@ public class Heartbeat {
 								if (dataInizio != null) {
 									gara.setDataScadenza(dataFine);
 								}
+								BigDecimal importo = startFeed.getImporto();
+								if (importo != null) {
+									gara.setImporto(importo);
+								}
+
 								if (startFeed.isAperta()) {
 									gara.setTipoProcedura(TipoProceduraGara.APERTA
 											.getNome());

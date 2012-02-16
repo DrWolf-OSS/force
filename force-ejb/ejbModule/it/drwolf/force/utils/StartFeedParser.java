@@ -2,6 +2,7 @@ package it.drwolf.force.utils;
 
 import it.drwolf.force.interfaces.GaraFeedParserIF;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,6 +62,20 @@ public class StartFeedParser implements GaraFeedParserIF {
 				e.printStackTrace();
 			}
 
+		}
+		return null;
+	}
+
+	public BigDecimal getImporto() {
+		for (String key : this.feedElements.keySet()) {
+			if (key.contains("importo") || key.contains("Importo")) {
+				try {
+					String[] t = this.feedElements.get(key).split(" ");
+					return new BigDecimal(t[0]);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return null;
 	}
