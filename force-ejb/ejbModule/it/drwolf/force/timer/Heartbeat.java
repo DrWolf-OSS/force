@@ -38,7 +38,7 @@ import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.annotations.async.Asynchronous;
 import org.jboss.seam.annotations.async.Expiration;
 import org.jboss.seam.annotations.async.FinalExpiration;
-import org.jboss.seam.annotations.async.IntervalDuration;
+import org.jboss.seam.annotations.async.IntervalCron;
 import org.jboss.seam.async.QuartzTriggerHandle;
 import org.jboss.seam.transaction.UserTransaction;
 
@@ -67,7 +67,7 @@ public class Heartbeat {
 	@Asynchronous
 	@Transactional
 	public QuartzTriggerHandle avcpFetcher(@Expiration Date date,
-			@IntervalDuration Long intervall, @FinalExpiration Date end) {
+			@IntervalCron String cron, @FinalExpiration Date end) {
 		System.out
 				.println("################parte il fetcher feed avcp###############");
 		QuartzTriggerHandle handle = new QuartzTriggerHandle(
@@ -339,7 +339,7 @@ public class Heartbeat {
 	@Asynchronous
 	@Transactional
 	public QuartzTriggerHandle comunicaGare(@Expiration Date date,
-			@IntervalDuration Long intervall, @FinalExpiration Date end) {
+			@IntervalCron String cron, @FinalExpiration Date end) {
 		System.out
 				.println("################parte il servizio di comunicaiozne delle Gare###############");
 		QuartzTriggerHandle handle = new QuartzTriggerHandle(
@@ -417,7 +417,7 @@ public class Heartbeat {
 	@Asynchronous
 	@Transactional
 	public QuartzTriggerHandle startFetcher(@Expiration Date date,
-			@IntervalDuration Long intervall, @FinalExpiration Date end) {
+			@IntervalCron String cron, @FinalExpiration Date end) {
 
 		System.out
 				.println("################parte il fetcher feed start###############");

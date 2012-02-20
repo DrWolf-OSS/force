@@ -21,6 +21,12 @@ public class Starter {
 	@In
 	Heartbeat heartbeat;
 
+	public static final String TIMER_CRON_EVERY_DAY_AT_2_AM = "00 00 02 * * ?";
+
+	public static final String TIMER_CRON_EVERY_DAY_AT_3_AM = "00 00 03 * * ?";
+
+	public static final String TIMER_CRON_EVERY_DAY_AT_4_AM = "00 00 04 * * ?";
+
 	@Observer("org.jboss.seam.postInitialization")
 	@Asynchronous
 	@Transactional
@@ -64,14 +70,14 @@ public class Starter {
 		endDate.set(2100, 1, 1);
 		Calendar now = Calendar.getInstance();
 
-		// this.heartbeat.startFetcher(now.getTime(),
-		// new Long(24 * 60 * 60 * 1000), endDate.getTime());
-		// now.add(Calendar.MINUTE, 10);
-		// this.heartbeat.avcpFetcher(now.getTime(),
-		// new Long(24 * 60 * 60 * 1000), endDate.getTime());
-		// now.add(Calendar.MINUTE, 1);
-		// this.heartbeat.comunicaGare(now.getTime(), new Long(60 * 60 * 1000),
-		// endDate.getTime());
+		this.heartbeat.startFetcher(now.getTime(),
+				Starter.TIMER_CRON_EVERY_DAY_AT_2_AM, endDate.getTime());
+		now.add(Calendar.MINUTE, 10);
+		this.heartbeat.avcpFetcher(now.getTime(),
+				Starter.TIMER_CRON_EVERY_DAY_AT_3_AM, endDate.getTime());
+		now.add(Calendar.MINUTE, 10);
+		this.heartbeat.comunicaGare(now.getTime(),
+				Starter.TIMER_CRON_EVERY_DAY_AT_4_AM, endDate.getTime());
 
 	}
 }
