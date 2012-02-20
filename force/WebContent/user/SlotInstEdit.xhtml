@@ -576,6 +576,12 @@
 					onclick="setDirty(dirty); dirty = false;"
 					action="#{slotInstEditBean.validate()}"
 					styleClass="modal"/>
+				
+				<s:button id="done"
+				             value="Fatto"
+				             rendered="#{slotInstHome.id != null}" 
+				             propagation="end"
+				             view="/home.xhtml"/>
 					
 				<h:commandButton onclick="setDirty(dirty); dirty = false;" value="Scarica documenti"
 								action="#{slotInstEditBean.downloadDocumentsZip()}"  

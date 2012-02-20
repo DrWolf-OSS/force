@@ -3,7 +3,6 @@ package it.drwolf.force.timer;
 import it.drwolf.force.entity.Azienda;
 import it.drwolf.force.entity.AziendaSoa;
 import it.drwolf.force.entity.CategoriaMerceologica;
-import it.drwolf.force.entity.CodiciCPV;
 import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.force.entity.ComunicazioneAziendaGaraId;
 import it.drwolf.force.entity.EntePubblico;
@@ -218,6 +217,7 @@ public class Heartbeat {
 										for (String element : avcpFeed
 												.getCategorie()) {
 											try {
+												ArrayList<CategoriaMerceologica> categorieMerceologiche = new ArrayList<CategoriaMerceologica>();
 												// in questo caso mi stanno
 												// arrivando codici CPV devo
 												// andare
@@ -225,26 +225,77 @@ public class Heartbeat {
 												// in categorie merceologiche
 												// utilizzando l'apposita
 												// tabella
-												CodiciCPV codice = (CodiciCPV) entityManager
+												element = element.replaceAll(
+														"0", "_");
+												categorieMerceologiche = (ArrayList<CategoriaMerceologica>) entityManager
 														.createQuery(
-																"from CodiciCPV where code = :code")
-														.setParameter("code",
+																"from CategoriaMerceologica cm where cm.codiceCPV like :cpv")
+														.setParameter("cpv",
 																element)
-														.getSingleResult();
-												if (codice
-														.getCategorieMerceologiche()
-														.size() > 0) {
-													for (CategoriaMerceologica cm : codice
-															.getCategorieMerceologiche()) {
-														listaCM.add(cm);
+														.getResultList();
+												boolean flag = true;
+												while ((categorieMerceologiche
+														.size() == 0) && flag) {
+													// non ho trovato niente
+													// devo allargare
+
+													int index = element
+															.indexOf("_", 3);
+													if (index != -1) {
+														String newElement = element
+																.substring(
+																		0,
+																		index - 1)
+																+ "%";
+														categorieMerceologiche = (ArrayList<CategoriaMerceologica>) entityManager
+																.createQuery(
+																		"from CategoriaMerceologica cm where cm.codiceCPV like :cpv")
+																.setParameter(
+																		"cpv",
+																		newElement)
+																.getResultList();
+														if (categorieMerceologiche
+																.size() == 0) {
+															// non ho trovato
+															// ancora niente mi
+															// sposto a sinistra
+															element = element
+																	.substring(
+																			0,
+																			index - 1)
+																	+ "_";
+
+														}
+
+													} else {
+														flag = false;
 													}
 												}
-												gara.setCategorieMerceologiche(listaCM);
-												gara.setType(TipoGara.GESTITA
-														.toString());
-												System.out
-														.println(codice
-																.getCategorieMerceologiche());
+												if (categorieMerceologiche
+														.size() > 0) {
+													for (CategoriaMerceologica cm : categorieMerceologiche) {
+														listaCM.add(cm);
+													}
+													gara.setCategorieMerceologiche(listaCM);
+													gara.setType(TipoGara.GESTITA
+															.toString());
+
+												}
+												/*
+												 * CodiciCPV codice =
+												 * (CodiciCPV) entityManager
+												 * .createQuery(
+												 * "from CodiciCPV where code = :code"
+												 * ) .setParameter("code",
+												 * element) .getSingleResult();
+												 * if (codice
+												 * .getCategorieMerceologiche()
+												 * .size() > 0) { for
+												 * (CategoriaMerceologica cm :
+												 * codice
+												 * .getCategorieMerceologiche())
+												 * { listaCM.add(cm); } }
+												 */
 											} catch (NoResultException e) {
 												System.out
 														.println("CPV non riconosciuto");

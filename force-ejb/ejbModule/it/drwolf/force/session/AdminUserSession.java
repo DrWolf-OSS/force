@@ -105,14 +105,14 @@ public class AdminUserSession implements Serializable {
 			String body = new String();
 			body = "Gentile " + azienda.getNome() + " " + azienda.getCognome()
 					+ "\n";
-			body += "ecco le credenziali per accedere al servizio ai servizi forniti dalla piattaforma FORCE:";
+			body += "ecco le credenziali per accedere ai servizi forniti dalla piattaforma FORCE:\n";
 			body += "Username : " + azienda.getEmailReferente() + "\n";
 			body += "Password : " + pwd + "\n";
 			body += "Per completare la registrazione e rendere il servizio funzionante sono necessari ancora alcuni passi.\n";
 			body += "Una volta effettuato il primo login al seguente indirizzo:\n";
 			body += "http://forcecna.it\n\n";
 			if (azienda.isEdile()) {
-				body += "Dovrete indicare le attestazioni SOA di cui l’azienda è in possesso o, in alternativa, indicare le attestazioni SOA che corrispondono all’attività svolta. In tal modo verrà creato un filtro che le permetterà di ricevere informazioni solo su gare e bandi di effettivo interesse.\n";
+				body += "Dovrete indicare le attestazioni SOA di cui l'azienda è in possesso o, in alternativa, indicare le attestazioni SOA che corrispondono all’attività svolta. In tal modo verrà creato un filtro che le permetterà di ricevere informazioni solo su gare e bandi di effettivo interesse.\n";
 			} else {
 				body += "Dovrete Inserire le Categorie Merceologiche per le quali è interessato a ricevere  informazioni su gare e bandi.\n";
 			}
