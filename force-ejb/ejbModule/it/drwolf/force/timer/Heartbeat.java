@@ -357,24 +357,39 @@ public class Heartbeat {
 
 			}
 		}
-		// per prima cosa devo prelevare l'elenco delle gare inserite e non
-		// comunicate
-		ArrayList<Gara> gare = (ArrayList<Gara>) entityManager.createQuery(
-				"from Gara where type = 'GESTITA' and stato = 'INSERITA'")
-				.getResultList();
-		for (Gara gara : gare) {
-			// pre ogni gara devo prendere l'elenco delle aziende a cui devo
-			// comunicarla
-			List<ComunicazioneAziendaGara> resultList = entityManager
+		// prelevo la lista delle aziende attive. Devo inviare una mail per
+		// ognuna (a patto che abbia nuove gare)
+		List<Azienda> aziede = entityManager.createQuery(
+				"from Azienda a where a.stato= 'ATTIVA'").getResultList();
+		for (Azienda azienda : aziede) {
+			// per ogni azienda vado a prelevare dalla tabella Comunicazione le
+			// gare ancora non segnalate
+			// cioè quelle con email a false
+			List<ComunicazioneAziendaGara> cags = entityManager
 					.createQuery(
-							" from ComunicazioneAziendaGara  where garaId = :gid and email = false")
-					.setParameter("gid", gara.getId()).getResultList();
-			// a questo punto devo predenre le singole aziende e mandargli una
-			// mail
-			for (ComunicazioneAziendaGara comunicazioneAziendaGara : resultList) {
+							"from ComunicazioneAziendaGara cag where cag.azienda = :azienda and cag.gara.type = 'GESTITA' and cag.gara.stato = 'INSERITA' and email = false")
+					.setParameter("azienda", azienda).getResultList();
+			for (ComunicazioneAziendaGara cag : cags) {
+
 			}
 		}
-		return handle;
+
+		/*
+		 * // per prima cosa devo prelevare l'elenco delle gare inserite e non
+		 * // comunicate ArrayList<Gara> gare = (ArrayList<Gara>)
+		 * entityManager.createQuery(
+		 * "from Gara where type = 'GESTITA' and stato = 'INSERITA'")
+		 * .getResultList(); for (Gara gara : gare) { // per ogni gara devo
+		 * prendere l'elenco delle aziende a cui devo // comunicarla
+		 * List<ComunicazioneAziendaGara> resultList = entityManager
+		 * .createQuery(
+		 * " from ComunicazioneAziendaGara  where garaId = :gid and email = false group by azienda"
+		 * ) .setParameter("gid", gara.getId()).getResultList(); // a questo
+		 * punto devo predenre le singole aziende e mandargli una // mail for
+		 * (ComunicazioneAziendaGara comunicazioneAziendaGara : resultList) {
+		 * 
+		 * } }
+		 */return handle;
 	}
 
 	private void setComunicaizioneAziende(EntityManager entityManager, Gara gara) {
