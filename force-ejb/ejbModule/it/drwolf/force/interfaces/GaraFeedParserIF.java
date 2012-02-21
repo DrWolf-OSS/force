@@ -1,5 +1,6 @@
 package it.drwolf.force.interfaces;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +13,8 @@ public interface GaraFeedParserIF {
 	public Date getDataFine();
 
 	public Date getDataInizio();
+
+	public BigDecimal getImporto();
 
 	public List<String> getSoa();
 

@@ -15,7 +15,7 @@
 
         <rich:panel>
             <f:facet name="header">Iscriviti al servizio FORCE</f:facet>
-
+            <h4>Dati Azienda</h4>
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">Nome dell'azienda</ui:define>
                 <h:inputTextarea id="ragioneSociale"
@@ -87,7 +87,11 @@
                                maxlength="5"
                                size="5"
                                required="true"
-                              value="#{aziendaHome.instance.cap}"/>
+                              value="#{aziendaHome.instance.cap}">
+                             <rich:jQuery selector="#cap" query="mask('99999', {placeholder:' '})"
+  timing="onload"/>
+                
+                </h:inputText>
             </s:decorate>
             
             <div style="clear:both"></div>
@@ -99,7 +103,18 @@
                                maxlength="11"
                                size="11"
                                required="true"
-                               value="#{aziendaHome.instance.partitaIva}"/>
+                               value="#{aziendaHome.instance.partitaIva}">
+                               <rich:jQuery selector="#partitaIva" query="mask('99999999999', {placeholder:' '})"
+  timing="onload"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="codiceFiscaleField" template="layout/edit.xhtml">
+                <ui:define name="label">Codice Fiscale</ui:define>
+                <h:inputText id="codiceFiscale"
+                               maxlength="16"
+                               size="16"
+                               required="true"
+                               value="#{aziendaHome.instance.codiceFiscale}"/>
             </s:decorate>
 
             <s:decorate id="emailField" template="layout/edit.xhtml">
@@ -117,7 +132,8 @@
             </s:decorate>
  
             <div style="clear:both"></div>
-            <rich:separator></rich:separator>
+            <hr />
+            <h4>Dati Referente</h4>
             <s:decorate id="nomeField" template="layout/edit.xhtml">
                 <ui:define name="label">Nome</ui:define>
                 <h:inputText id="nome"
@@ -154,7 +170,7 @@
  
              <div style="clear:both">
                 <span class="required">*</span>
-                required fields
+                 campi obbligatori
             </div>
             
         </rich:panel>

@@ -3,7 +3,6 @@ package it.drwolf.force.timer;
 import it.drwolf.force.entity.Azienda;
 import it.drwolf.force.entity.AziendaSoa;
 import it.drwolf.force.entity.CategoriaMerceologica;
-import it.drwolf.force.entity.CodiciCPV;
 import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.force.entity.ComunicazioneAziendaGaraId;
 import it.drwolf.force.entity.EntePubblico;
@@ -18,6 +17,7 @@ import it.drwolf.force.utils.AvcpFeedParser;
 import it.drwolf.force.utils.StartFeedParser;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import org.jboss.seam.annotations.Transactional;
 import org.jboss.seam.annotations.async.Asynchronous;
 import org.jboss.seam.annotations.async.Expiration;
 import org.jboss.seam.annotations.async.FinalExpiration;
-import org.jboss.seam.annotations.async.IntervalDuration;
+import org.jboss.seam.annotations.async.IntervalCron;
 import org.jboss.seam.async.QuartzTriggerHandle;
 import org.jboss.seam.transaction.UserTransaction;
 
@@ -67,7 +67,7 @@ public class Heartbeat {
 	@Asynchronous
 	@Transactional
 	public QuartzTriggerHandle avcpFetcher(@Expiration Date date,
-			@IntervalDuration Long intervall, @FinalExpiration Date end) {
+			@IntervalCron String cron, @FinalExpiration Date end) {
 		System.out
 				.println("################parte il fetcher feed avcp###############");
 		QuartzTriggerHandle handle = new QuartzTriggerHandle(
@@ -182,6 +182,10 @@ public class Heartbeat {
 									if (dataInizio != null) {
 										gara.setDataScadenza(dataFine);
 									}
+									BigDecimal importo = avcpFeed.getImporto();
+									if (importo != null) {
+										gara.setImporto(importo);
+									}
 									if (avcpFeed.haveSoa()) {
 										System.out.println("trovate le soa : "
 												+ avcpFeed.getSoa());
@@ -213,6 +217,7 @@ public class Heartbeat {
 										for (String element : avcpFeed
 												.getCategorie()) {
 											try {
+												ArrayList<CategoriaMerceologica> categorieMerceologiche = new ArrayList<CategoriaMerceologica>();
 												// in questo caso mi stanno
 												// arrivando codici CPV devo
 												// andare
@@ -220,26 +225,77 @@ public class Heartbeat {
 												// in categorie merceologiche
 												// utilizzando l'apposita
 												// tabella
-												CodiciCPV codice = (CodiciCPV) entityManager
+												element = element.replaceAll(
+														"0", "_");
+												categorieMerceologiche = (ArrayList<CategoriaMerceologica>) entityManager
 														.createQuery(
-																"from CodiciCPV where code = :code")
-														.setParameter("code",
+																"from CategoriaMerceologica cm where cm.codiceCPV like :cpv")
+														.setParameter("cpv",
 																element)
-														.getSingleResult();
-												if (codice
-														.getCategorieMerceologiche()
-														.size() > 0) {
-													for (CategoriaMerceologica cm : codice
-															.getCategorieMerceologiche()) {
-														listaCM.add(cm);
+														.getResultList();
+												boolean flag = true;
+												while ((categorieMerceologiche
+														.size() == 0) && flag) {
+													// non ho trovato niente
+													// devo allargare
+
+													int index = element
+															.indexOf("_", 3);
+													if (index != -1) {
+														String newElement = element
+																.substring(
+																		0,
+																		index - 1)
+																+ "%";
+														categorieMerceologiche = (ArrayList<CategoriaMerceologica>) entityManager
+																.createQuery(
+																		"from CategoriaMerceologica cm where cm.codiceCPV like :cpv")
+																.setParameter(
+																		"cpv",
+																		newElement)
+																.getResultList();
+														if (categorieMerceologiche
+																.size() == 0) {
+															// non ho trovato
+															// ancora niente mi
+															// sposto a sinistra
+															element = element
+																	.substring(
+																			0,
+																			index - 1)
+																	+ "_";
+
+														}
+
+													} else {
+														flag = false;
 													}
 												}
-												gara.setCategorieMerceologiche(listaCM);
-												gara.setType(TipoGara.GESTITA
-														.toString());
-												System.out
-														.println(codice
-																.getCategorieMerceologiche());
+												if (categorieMerceologiche
+														.size() > 0) {
+													for (CategoriaMerceologica cm : categorieMerceologiche) {
+														listaCM.add(cm);
+													}
+													gara.setCategorieMerceologiche(listaCM);
+													gara.setType(TipoGara.GESTITA
+															.toString());
+
+												}
+												/*
+												 * CodiciCPV codice =
+												 * (CodiciCPV) entityManager
+												 * .createQuery(
+												 * "from CodiciCPV where code = :code"
+												 * ) .setParameter("code",
+												 * element) .getSingleResult();
+												 * if (codice
+												 * .getCategorieMerceologiche()
+												 * .size() > 0) { for
+												 * (CategoriaMerceologica cm :
+												 * codice
+												 * .getCategorieMerceologiche())
+												 * { listaCM.add(cm); } }
+												 */
 											} catch (NoResultException e) {
 												System.out
 														.println("CPV non riconosciuto");
@@ -283,7 +339,7 @@ public class Heartbeat {
 	@Asynchronous
 	@Transactional
 	public QuartzTriggerHandle comunicaGare(@Expiration Date date,
-			@IntervalDuration Long intervall, @FinalExpiration Date end) {
+			@IntervalCron String cron, @FinalExpiration Date end) {
 		System.out
 				.println("################parte il servizio di comunicaiozne delle Gare###############");
 		QuartzTriggerHandle handle = new QuartzTriggerHandle(
@@ -361,7 +417,7 @@ public class Heartbeat {
 	@Asynchronous
 	@Transactional
 	public QuartzTriggerHandle startFetcher(@Expiration Date date,
-			@IntervalDuration Long intervall, @FinalExpiration Date end) {
+			@IntervalCron String cron, @FinalExpiration Date end) {
 
 		System.out
 				.println("################parte il fetcher feed start###############");
@@ -430,6 +486,11 @@ public class Heartbeat {
 								if (dataInizio != null) {
 									gara.setDataScadenza(dataFine);
 								}
+								BigDecimal importo = startFeed.getImporto();
+								if (importo != null) {
+									gara.setImporto(importo);
+								}
+
 								if (startFeed.isAperta()) {
 									gara.setTipoProcedura(TipoProceduraGara.APERTA
 											.getNome());

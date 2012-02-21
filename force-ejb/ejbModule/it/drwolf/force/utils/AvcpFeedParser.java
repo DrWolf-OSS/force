@@ -3,12 +3,15 @@ package it.drwolf.force.utils;
 import it.drwolf.force.interfaces.GaraFeedParserIF;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +27,8 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 	private HashMap<String, String> feedElements = new HashMap<String, String>();
 	private ArrayList<String> soa = new ArrayList<String>();
 	private ArrayList<String> cpv = new ArrayList<String>();
+
+	private BigDecimal importo;
 
 	private static final Map<String, String> codificaSOA = new HashMap<String, String>();
 	static {
@@ -93,6 +98,11 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 		}
 	}
 
+	private String extractImporto(String importo) {
+		return importo.replaceAll("€", "").replaceAll(" ", "")
+				.replaceAll(",", "");
+	}
+
 	private void extractSoa(String stringaSOA) {
 		Pattern pSOA = Pattern.compile("(O[GS]\\d)");
 		Matcher mSOA = pSOA.matcher(stringaSOA);
@@ -138,6 +148,10 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 			}
 		}
 		return null;
+	}
+
+	public BigDecimal getImporto() {
+		return this.importo;
 	}
 
 	public String getOggetto() {
@@ -186,6 +200,7 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 			}
 		}
 		HtmlTable lotti = page.getHtmlElementById("listaLotti");
+		BigDecimal importoTotale = new BigDecimal(0);
 		for (HtmlTableRow row : lotti.getRows()) {
 			if (row.getCells().size() > 1) {
 				List<HtmlElement> a = row.getCell(0).getHtmlElementsByTagName(
@@ -206,6 +221,19 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 								if (r.getCell(0).asText().equals("CPV")) {
 									this.extractCPV(r.getCell(1).asText());
 								}
+								if (r.getCell(0).asText()
+										.contains("Importo a base")) {
+									String importoStr = this.extractImporto(r
+											.getCell(1).asText());
+									if (importoStr != null) {
+										NumberFormat fmt_IT = NumberFormat
+												.getNumberInstance(Locale.ITALIAN);
+										BigDecimal i = new BigDecimal(
+												importoStr);
+										importoTotale = importoTotale.add(i);
+
+									}
+								}
 							} else {
 								this.feedElements.put(r.getCell(0).asText()
 										.trim(), r.getCell(1).asText().trim());
@@ -219,6 +247,7 @@ public class AvcpFeedParser implements GaraFeedParserIF {
 				}
 			}
 		}
+		this.importo = importoTotale;
 		System.out.println(this.feedElements.toString().replaceAll(",", "\n"));
 
 	}

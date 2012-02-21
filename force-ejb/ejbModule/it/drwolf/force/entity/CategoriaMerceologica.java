@@ -30,6 +30,8 @@ public class CategoriaMerceologica implements Serializable {
 
 	private Set<Gara> gare;
 
+	private String codiceCPV;
+
 	private Set<CodiciCPV> codiciCPV;
 
 	@Override
@@ -62,6 +64,11 @@ public class CategoriaMerceologica implements Serializable {
 	@Column
 	public String getCategoria() {
 		return this.categoria;
+	}
+
+	@Column
+	public String getCodiceCPV() {
+		return this.codiceCPV;
 	}
 
 	@ManyToMany(mappedBy = "categorieMerceologiche")
@@ -99,6 +106,10 @@ public class CategoriaMerceologica implements Serializable {
 
 	public void setCategoria(String categoria) {
 		this.categoria = categoria;
+	}
+
+	public void setCodiceCPV(String codiceCPV) {
+		this.codiceCPV = codiceCPV;
 	}
 
 	public void setCodiciCPV(Set<CodiciCPV> codiciCPV) {
