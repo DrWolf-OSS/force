@@ -45,23 +45,6 @@ public class Initialiser {
 	// entityManager.persist(dictionary);
 	// }
 
-	private void createLavoroDisabileDictionary(EntityManager entityManager) {
-		List res = entityManager
-				.createQuery("from Dictionary d where d.name = :name")
-				.setParameter("name", "Dizionario sui Lavoratori Disabili")
-				.getResultList();
-
-		if (res.size() == 0) {
-			Dictionary dictionary = new Dictionary();
-			dictionary.setName("Dizionario sui Lavoratori Disabili");
-			dictionary.setDataType(DataType.STRING);
-			dictionary.getValues().add("Si");
-			dictionary.getValues().add("Sotto 15 dipendenti");
-			dictionary.getValues().add("No");
-			entityManager.persist(dictionary);
-		}
-	}
-
 	private void createTipoPartecipazioneDictonary(EntityManager entityManager) {
 		List res = entityManager
 				.createQuery("from Dictionary d where d.name = :name")
@@ -100,7 +83,6 @@ public class Initialiser {
 		}
 		this.checkParams(entityManager);
 
-		this.createLavoroDisabileDictionary(entityManager);
 		this.createTipoPartecipazioneDictonary(entityManager);
 		System.out.println("---> Checked");
 	}

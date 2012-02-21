@@ -16,20 +16,11 @@ public class Preference implements Serializable {
 
 	private static Preference ALFRESCO_LOCATION = new Preference(
 			PreferenceKey.ALFRESCO_LOCATION.name(),
-			"http://localhost:9080/alfresco");
+			"http://localhost:8080/alfresco");
 	private static Preference ALFRESCO_ADMIN_USER = new Preference(
 			PreferenceKey.ALFRESCO_ADMIN_USER.name(), "admin");
 	private static Preference ALFRESCO_ADMIN_PWD = new Preference(
 			PreferenceKey.ALFRESCO_ADMIN_PWD.name(), "uamepumdp");
-	private static Preference ALFRESCO_USERS_HOME = new Preference(
-			PreferenceKey.ALFRESCO_USERS_HOME.name(),
-			"workspace://SpacesStore/065b9204-329b-42bb-b16d-e76811274d25");
-	private static Preference CUSTOM_MODEL_JAR_PATH = new Preference(
-			PreferenceKey.CUSTOM_MODEL_JAR_PATH.name(),
-			"/home/drwolf/alfresco-3.4.d/tomcat/webapps/alfresco/WEB-INF/lib/it.drwolf.slot.alfresco.custom.jar");
-	private static Preference CUSTOM_MODEL_XML_PATH_IN_JAR = new Preference(
-			PreferenceKey.CUSTOM_MODEL_XML_PATH_IN_JAR.name(),
-			"it/drwolf/slot/alfresco/content/slotModel.xml");
 	private static Preference CUSTOM_MODEL_XML_PATH = new Preference(
 			PreferenceKey.CUSTOM_MODEL_XML_PATH.name(),
 			"/Dizionario dei dati/Modelli");
@@ -41,18 +32,17 @@ public class Preference implements Serializable {
 			PreferenceKey.FORCE_ADMIN.name(), "CNA");
 	private static Preference FORCE_USER_GROUP = new Preference(
 			PreferenceKey.FORCE_USER_GROUP.name(), "aziende");
-	private static Preference CERTS_LIST_REF = new Preference(
-			PreferenceKey.CERTS_LIST_REF.name(),
-			"sostituire con LISTACER.zip.p7m nodeRef");
+	private static Preference FORCE_EMAIL_HOSTNAME = new Preference(
+			PreferenceKey.FORCE_EMAIL_HOSTNAME.name(), "localhost");
+	private static Preference FORCE_EMAIL_FROM = new Preference(
+			PreferenceKey.FORCE_EMAIL_FROM.name(), "info@forcecna.it");
 
 	public static Preference[] defaults = new Preference[] {
 			Preference.ALFRESCO_LOCATION, Preference.ALFRESCO_ADMIN_USER,
-			Preference.ALFRESCO_ADMIN_PWD, Preference.ALFRESCO_USERS_HOME,
-			Preference.CUSTOM_MODEL_JAR_PATH,
-			Preference.CUSTOM_MODEL_XML_PATH_IN_JAR,
-			Preference.CUSTOM_MODEL_XML_PATH, Preference.CUSTOM_MODEL_XML_NAME,
-			Preference.FORCE_GROUPS_PATH, Preference.FORCE_ADMIN,
-			Preference.FORCE_USER_GROUP, Preference.CERTS_LIST_REF };
+			Preference.ALFRESCO_ADMIN_PWD, Preference.CUSTOM_MODEL_XML_PATH,
+			Preference.CUSTOM_MODEL_XML_NAME, Preference.FORCE_GROUPS_PATH,
+			Preference.FORCE_ADMIN, Preference.FORCE_USER_GROUP,
+			Preference.FORCE_EMAIL_HOSTNAME, Preference.FORCE_EMAIL_FROM };
 
 	private Integer id;
 	private String keyValue;

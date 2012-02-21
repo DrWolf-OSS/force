@@ -3,6 +3,8 @@ package it.drwolf.force.utils;
 import it.drwolf.force.entity.Azienda;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
+import it.drwolf.slot.prefs.PreferenceKey;
+import it.drwolf.slot.prefs.Preferences;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -37,6 +39,9 @@ public class UserUtil implements Serializable {
 
 	@In(create = true)
 	AlfrescoInfo alfrescoInfo;
+
+	@In(create = true)
+	private Preferences preferences;
 
 	private String email = null;
 
@@ -101,9 +106,11 @@ public class UserUtil implements Serializable {
 	public String sendEmail(String subject, String body, String to)
 			throws EmailException {
 		Email email = new SimpleEmail();
-		email.setHostName("zimbra.drwolf.it");
+		email.setHostName(this.preferences
+				.getValue(PreferenceKey.FORCE_EMAIL_HOSTNAME.name()));
 		email.setSmtpPort(25);
-		email.setFrom("info@forcecna.it");
+		email.setFrom(this.preferences.getValue(PreferenceKey.FORCE_EMAIL_FROM
+				.name()));
 		email.setSubject(subject);
 		email.addTo(to);
 		email.setMsg(body);

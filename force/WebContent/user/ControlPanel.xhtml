@@ -28,6 +28,10 @@
             <h:outputText value="#{userSession.azienda.partitaIva}"/>
      </s:decorate>
      <s:decorate template="/layout/display.xhtml">
+            <ui:define name="label">Codice Fiscale</ui:define>
+            <h:outputText value="#{userSession.azienda.codiceFiscale}"/>
+     </s:decorate>
+     <s:decorate template="/layout/display.xhtml">
             <ui:define name="label">Forma giuridica</ui:define>
             <h:outputText value="#{userSession.azienda.formaGiuridica.nome}"/>
      </s:decorate>
@@ -50,10 +54,6 @@
      <s:decorate id="referente" template="/layout/display.xhtml">
             <ui:define name="label">Referente</ui:define>
             <h:outputText value="#{userSession.azienda.referente}"/>
-     </s:decorate>
-     <s:decorate template="/layout/display.xhtml">
-            <ui:define name="label">CF Referente</ui:define>
-            <h:outputText value="#{userSession.azienda.codiceFiscale}"/>
      </s:decorate>
      <s:decorate id="emailref" template="/layout/display.xhtml">
             <ui:define name="label">e-mail Referente</ui:define>
