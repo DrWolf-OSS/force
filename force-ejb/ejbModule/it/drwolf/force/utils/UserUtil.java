@@ -21,6 +21,7 @@ import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.async.Asynchronous;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage.Severity;
 
@@ -78,8 +79,15 @@ public class UserUtil implements Serializable {
 						+ "la nuova sua nuova password per accedere al servizio FORCE è :\n\n"
 						+ pwd + "\n";
 				try {
-					this.sendEmail("Nuova  password servizio FORCE", newPwdMsg,
-							azienda.getEmailReferente());
+					this.sendEmail(
+							"Nuova  password servizio FORCE",
+							newPwdMsg,
+							azienda.getEmailReferente(),
+							this.preferences
+									.getValue(PreferenceKey.FORCE_EMAIL_HOSTNAME
+											.name()), this.preferences
+									.getValue(PreferenceKey.FORCE_EMAIL_FROM
+											.name()));
 				} catch (EmailException e) {
 					e.printStackTrace();
 					return "KO";
@@ -103,14 +111,13 @@ public class UserUtil implements Serializable {
 		return "NO_RESULT";
 	}
 
-	public String sendEmail(String subject, String body, String to)
-			throws EmailException {
+	@Asynchronous
+	public String sendEmail(String subject, String body, String to,
+			String hostname, String from) throws EmailException {
 		Email email = new SimpleEmail();
-		email.setHostName(this.preferences
-				.getValue(PreferenceKey.FORCE_EMAIL_HOSTNAME.name()));
+		email.setHostName(hostname);
 		email.setSmtpPort(25);
-		email.setFrom(this.preferences.getValue(PreferenceKey.FORCE_EMAIL_FROM
-				.name()));
+		email.setFrom(from);
 		email.setSubject(subject);
 		email.addTo(to);
 		email.setMsg(body);

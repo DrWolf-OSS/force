@@ -10,6 +10,7 @@ import it.drwolf.force.entity.Soa;
 import it.drwolf.force.enums.ClassificaSoa;
 import it.drwolf.force.enums.PosizioneCNA;
 import it.drwolf.force.enums.StatoAzienda;
+import it.drwolf.force.utils.UserUtil;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
@@ -19,9 +20,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.SimpleEmail;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.faces.FacesMessages;
@@ -39,6 +38,9 @@ public class AziendaHome extends EntityHome<Azienda> {
 
 	@In
 	private Identity identity;
+
+	@In
+	private UserUtil userUtil;
 
 	@In
 	private EntityManager entityManager;
@@ -77,7 +79,9 @@ public class AziendaHome extends EntityHome<Azienda> {
 	}
 
 	public void deleteAziendaSoa(AziendaSoa aziendaSoa) {
-
+		this.entityManager.remove(aziendaSoa);
+		this.getInstance().getSoa().remove(aziendaSoa);
+		this.entityManager.flush();
 	}
 
 	public Integer getAziendaId() {
@@ -134,7 +138,7 @@ public class AziendaHome extends EntityHome<Azienda> {
 			}
 			l = this.entityManager
 					.createQuery("from Azienda a where a.partitaIva = :piva")
-					.setParameter("email", this.getInstance().getPartitaIva())
+					.setParameter("piva", this.getInstance().getPartitaIva())
 					.getResultList();
 			if (l.size() > 0) {
 				FacesMessages.instance().add(Severity.ERROR,
@@ -148,8 +152,17 @@ public class AziendaHome extends EntityHome<Azienda> {
 				String body = "La ringraziamo per essersi registrato al servizio FORCE.\n";
 				body += "Non appena completata la verifica dei dati inseriti riceverà le credenziali per accedere ai servizi forniti dalla piattaforma FORCE\n.";
 				// una volta persistito mando una mail al referente
-				this.sendEmail("Benvenuto in Force", body, this.getInstance()
-						.getEmailReferente());
+				this.userUtil
+						.sendEmail(
+								"Benvenuto in Force",
+								body,
+								this.getInstance().getEmailReferente(),
+								this.preferences
+										.getValue(PreferenceKey.FORCE_EMAIL_HOSTNAME
+												.name()),
+								this.preferences
+										.getValue(PreferenceKey.FORCE_EMAIL_FROM
+												.name()));
 			} catch (EmailException e) {
 				// TODO: handle exception
 			}
@@ -179,20 +192,6 @@ public class AziendaHome extends EntityHome<Azienda> {
 		this.aziendaSoa.setSoa(this.getSoa());
 		this.entityManager.merge(this.aziendaSoa);
 		this.cleanAziendaSoa();
-	}
-
-	private void sendEmail(String subject, String body, String to)
-			throws EmailException {
-		Email email = new SimpleEmail();
-		email.setHostName(this.preferences
-				.getValue(PreferenceKey.FORCE_EMAIL_HOSTNAME.name()));
-		email.setSmtpPort(25);
-		email.setFrom(this.preferences.getValue(PreferenceKey.FORCE_EMAIL_FROM
-				.name()));
-		email.setSubject(subject);
-		email.addTo(to);
-		email.setMsg(body);
-		email.send();
 	}
 
 	public void setAziendaId(Integer id) {

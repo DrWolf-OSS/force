@@ -5,6 +5,7 @@ import it.drwolf.force.entity.Gara;
 import it.drwolf.force.enums.PosizioneCNA;
 import it.drwolf.force.enums.StatoAzienda;
 import it.drwolf.force.session.lists.AziendaList;
+import it.drwolf.force.utils.UserUtil;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
@@ -19,9 +20,6 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 
 import org.alfresco.cmis.client.AlfrescoFolder;
-import org.apache.commons.mail.Email;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.SimpleEmail;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
@@ -49,6 +47,9 @@ public class AdminUserSession implements Serializable {
 
 	@In(create = true)
 	private Preferences preferences;
+
+	@In
+	private UserUtil userUtil;
 
 	@In
 	EntityManager entityManager;
@@ -103,9 +104,13 @@ public class AdminUserSession implements Serializable {
 
 			}
 			// alla fine dovrei mandare una mail con gli accessi al referente
+			System.out
+					.println("###############Finita la parte di alfresco###############");
 			azienda.setStato(StatoAzienda.ATTIVA.getNome());
 			azienda.setAlfrescoGroupId(groupName);
 			this.entityManager.persist(azienda);
+			System.out
+					.println("###############Preparo la mail ###############");
 			// mando la mail con i dati
 			String body = new String();
 			body = "Gentile " + azienda.getNome() + " " + azienda.getCognome()
@@ -117,12 +122,22 @@ public class AdminUserSession implements Serializable {
 			body += "Una volta effettuato il primo login al seguente indirizzo:\n";
 			body += "http://forcecna.it\n\n";
 			if (azienda.isEdile()) {
-				body += "Dovrete indicare le attestazioni SOA di cui l'azienda è in possesso o, in alternativa, indicare le attestazioni SOA che corrispondono all’attività svolta. In tal modo verrà creato un filtro che le permetterà di ricevere informazioni solo su gare e bandi di effettivo interesse.\n";
+				body += "Dovrete indicare le attestazioni SOA di cui l'azienda è in possesso o, in alternativa, indicare le attestazioni SOA che corrispondono all’attività svolta. In tal modo verrà creato un filtro che le permetterà di ricevere informazioni solo su gare e bandi di effettivo interesse.\n\n";
 			} else {
-				body += "Dovrete Inserire le Categorie Merceologiche per le quali è interessato a ricevere  informazioni su gare e bandi.\n";
+				body += "Dovrete Inserire le Categorie Merceologiche per le quali è interessato a ricevere  informazioni su gare e bandi.\n\n";
 			}
-			this.sendEmail("Conferma iscrizione FORCE", body,
-					azienda.getEmailReferente());
+			body += "Per avere maggiori informazioni sulla procedura di registrazione e configurazione dell\'account FORCE vi inviatiamo a prendere visione della guida, scaricabile al seguente indirizzo:\n";
+			body += "http://www.forcecna.it/force/Manuale.pdf";
+			body += "\n\n";
+			body += "Lo Staff di FORCE\n";
+			System.out.println("###############Invio la mail ###############");
+			this.userUtil.sendEmail("Conferma iscrizione FORCE", body, azienda
+					.getEmailReferente(), this.preferences
+					.getValue(PreferenceKey.FORCE_EMAIL_HOSTNAME.name()),
+					this.preferences.getValue(PreferenceKey.FORCE_EMAIL_FROM
+							.name()));
+			System.out
+					.println("###############Inviato segnale mail ###############");
 			// terimata la creazione devo mettere a null la lista delle aziende
 			// e attive e delle nuove per rigenerare la Factory
 			this.aziendaList.setAziendeAttive(null);
@@ -149,17 +164,4 @@ public class AdminUserSession implements Serializable {
 		// poi vediamo
 	}
 
-	private void sendEmail(String subject, String body, String to)
-			throws EmailException {
-		Email email = new SimpleEmail();
-		email.setHostName(this.preferences
-				.getValue(PreferenceKey.FORCE_EMAIL_HOSTNAME.name()));
-		email.setSmtpPort(25);
-		email.setFrom(this.preferences.getValue(PreferenceKey.FORCE_EMAIL_FROM
-				.name()));
-		email.setSubject(subject);
-		email.addTo(to);
-		email.setMsg(body);
-		email.send();
-	}
 }
