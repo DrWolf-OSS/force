@@ -127,14 +127,15 @@
                 value="Richiedi Busta"
                 action="#{garaHome.sendBustaRequest(userSession.azienda)}" 
                 rendered="#{garaHome.associatedSlotInst == null and userSession.azienda.tipologiaAbbonamento == 'PREMIUM'}"
-                disabled="#{garaHome.isRequestSend(userSession.azienda) or garaHome.associatedSlotDef != null}"
+                disabled="#{garaHome.isRequestSend(userSession.azienda) or (garaHome.associatedSlotDef != null and garaHome.associatedSlotDef.pubblicato)}"
                 oncomplete="#{rich:component('bustaRequestResponse')}.show()">
             </a:commandButton>
 
             <s:button view="/user/SlotInstEdit.xhtml"
                 id="slotEdit"
                 propagation="none"
-                value="Partecipa" disabled="#{garaHome.associatedSlotDef == null}"
+                value="Partecipa" 
+                disabled="#{garaHome.associatedSlotDef == null or (garaHome.associatedSlotDef != null and not garaHome.associatedSlotDef.pubblicato)}"
                 rendered="#{garaHome.associatedSlotInst == null}">
                 <f:param name="slotDefId" value="#{garaHome.associatedSlotDef.id}"/>
                 <f:param name="garaId" value="#{garaHome.garaId}"/>

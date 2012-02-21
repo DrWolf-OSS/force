@@ -523,7 +523,7 @@
 							oncomplete="#{rich:component('embeddedPropPanel')}.show()" 
 							rendered="#{slotDefParameters.mode != 'PRIMARY'}"
 							reRender="embeddedPropPanel"/>
-                <h:graphicImage id="addInfoGara" value="/img/question-white.png" />
+                <h:graphicImage id="addInfoGara" value="/img/question-white.png" styleClass="fileIconRight" style="margin-right: 20px"/>
                 <rich:toolTip for="addInfoGara" direction="bottom-left">Aggiungi una informazione relativa alla gara. Per esempio la data di scadenza.</rich:toolTip>
 							
 				<a:commandButton value="Aggiungi informazione sull'azienda"
@@ -531,7 +531,7 @@
 							oncomplete="#{rich:component('propTypePanel')}.show()" 	
 							reRender="pf,propPanel"
 							rendered="#{s:hasRole('ADMIN')}"/>
-                <h:graphicImage id="addInfoAzienda" value="/img/question-white.png" rendered="#{s:hasRole('ADMIN')}" />
+                <h:graphicImage id="addInfoAzienda" value="/img/question-white.png" styleClass="fileIconRight" style="margin-right: 20px" rendered="#{s:hasRole('ADMIN')}" />
                 <rich:toolTip for="addInfoAzienda" direction="bottom-left">Aggiungi una informazione relativa all'azienda.</rich:toolTip>
 							
 				<a:commandButton value="Aggiungi richiesta" 
@@ -545,20 +545,19 @@
 							oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('collPanel')}.show();"
 							reRender="collPanel,propPanel"
 							rendered="#{not s:hasRole('ADMIN') and not slotDefHome.instance.template}"/>
-                <h:graphicImage id="addRichiesta" value="/img/question-white.png" />
+                <h:graphicImage id="addRichiesta" value="/img/question-white.png" styleClass="fileIconRight" style="margin-right: 20px"/>
                 <rich:toolTip for="addRichiesta" direction="bottom-left">Aggiungi un documento richiesto dal disciplinare</rich:toolTip>
 							
 				<a:commandButton value="Aggiungi sottobusta"
 							rendered="#{slotDefHome.instance.type == 'GENERAL' and s:hasRole('ADMIN')}" 						 
 							oncomplete="#{rich:component('dependentSlotDefPanel')}.show()" 
-							reRender="dependentSlotDefPanel"/>
-				
+							reRender="dependentSlotDefPanel"/>				
 				<a:commandButton value="Aggiungi sottobusta"
 							action="#{slotDefEditBean.newSimplifiedDependentSlotDef()}"
 							rendered="#{slotDefHome.instance.type == 'GENERAL' and not s:hasRole('ADMIN')}" 						 
 							oncomplete="#{rich:component('dependentSlotDefPanel')}.show()" 
 							reRender="dependentSlotDefPanel"/>					
-                <h:graphicImage id="addSottoBusta" value="/img/question-white.png" />
+                <h:graphicImage id="addSottoBusta" value="/img/question-white.png" styleClass="fileIconRight" style="margin-right: 20px"/>
                 <rich:toolTip for="addSottoBusta" direction="bottom-left">Inserisci una busta amministrativa collegata neln caso in cui intendi partecipare in Consorzio, ATI/RTI</rich:toolTip>
 			</s:decorate>
 			

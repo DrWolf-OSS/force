@@ -901,7 +901,7 @@ public class SlotDefEditBean {
 
 	public void switchPublish() {
 		this.slotDefHome.switchPublishedStatus();
-		this.slotDefHome.update();
+		// this.slotDefHome.update();
 	}
 
 	public String update() {

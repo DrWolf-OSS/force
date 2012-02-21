@@ -211,7 +211,7 @@
 	        <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
 	    </s:link>
 	    <h:outputText value="Gare del tuo Settore" />
-	    <h:graphicImage id="gareSettoreList" value="/img/question-white.png" />
+	    <h:graphicImage id="gareSettoreList" value="/img/question-white.png" styleClass="fileIconRight"/>
 	    <rich:toolTip for="gareSettoreList" direction="bottom-left">Elenco delle gare che corrispondono alle Categorie Merceologiche inserite</rich:toolTip>
 	    </s:span>
 	    
@@ -233,10 +233,10 @@
         <f:facet name="header">Stato</f:facet>
         <h:graphicImage id="garaIcon" value="/img/newspaper.png" styleClass="fileIcon #{not cag.web ? 'opaque' : ''}"/>
         <h:graphicImage id="mailIcon" value="/img/mail.png" styleClass="fileIcon #{not cag.email ? 'opaque' : ''}"/>
-        <h:graphicImage id="bustaIcon" value="/img/envelope-string.png" styleClass="fileIcon #{controlPanelBean.getAssociatedSlotDef(cag.gara)==null ? 'opaque' : ''}"/>
+        <h:graphicImage id="bustaIcon" value="/img/envelope-string.png" styleClass="fileIcon #{(controlPanelBean.getAssociatedSlotDef(cag.gara)==null or not controlPanelBean.getAssociatedSlotDef(cag.gara).pubblicato) ? 'opaque' : ''}"/>
         <rich:toolTip for="garaIcon" direction="bottom-left">Gara #{not cag.web ? 'da vedere' : 'vista'}</rich:toolTip>
         <rich:toolTip for="mailIcon" direction="bottom-left">Mail #{not cag.email ? 'non inviata' : 'inviata'} dal sistema</rich:toolTip>
-        <rich:toolTip for="bustaIcon" direction="bottom-left">Busta #{controlPanelBean.getAssociatedSlotDef(cag.gara)==null ? 'non definita' : 'definita'}</rich:toolTip>
+        <rich:toolTip for="bustaIcon" direction="bottom-left">Busta #{(controlPanelBean.getAssociatedSlotDef(cag.gara)!=null and controlPanelBean.getAssociatedSlotDef(cag.gara).pubblicato) ? 'definita' : 'non definita'}</rich:toolTip>
     </rich:column>
     <rich:column>
         <f:facet name="header">Azioni</f:facet>
@@ -259,7 +259,7 @@
             <f:param name="aziendaId" value="#{userSession.azienda.id}"/>
     </s:link>
     <h:outputText value="Gare a cui partecipi" />
-    <h:graphicImage id="gareWorkingList" value="/img/question-white.png" />
+    <h:graphicImage id="gareWorkingList" value="/img/question-white.png" styleClass="fileIconRight"/>
     <rich:toolTip for="gareWorkingList" direction="bottom-left">Elenco delle gare per le quali stai partecipando</rich:toolTip>
     </s:span></f:facet>
     <rich:dataTable value="#{controlPanelBean.slotInst}" 

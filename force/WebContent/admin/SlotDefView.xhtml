@@ -331,7 +331,9 @@
 				<a:commandButton value="#{slotDefHome.instance.pubblicato ? 'Revoca la pubblicazione' : 'Pubblica'}" 
 						action="#{slotDefEditBean.switchPublish()}" 
 						rendered="#{not slotDefHome.instance.template and identity.hasRole('ADMIN')}"
-						reRender="buttons"/>
+						reRender="buttons"
+						onclick="#{rich:component('waitPanel')}.show();"
+						oncomplete="#{rich:component('waitPanel')}.hide();"/>
 				<s:button value="Modifica Informazioni" view="/admin/SlotDefWizardEdit.xhtml" propagation="none"
 							action="#{slotDefEditBean.checkReference()}" disabled="#{slotDefHome.instance.pubblicato and identity.hasRole('ADMIN')}">
 					<f:param name="slotDefId" value="#{slotDefHome.slotDefId}"/>

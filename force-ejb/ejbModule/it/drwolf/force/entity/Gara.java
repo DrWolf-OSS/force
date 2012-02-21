@@ -133,8 +133,6 @@ public class Gara implements Serializable {
 		return resultList;
 	}
 
-	// Questo metodo dovrà essere modificato per tener conto del fatto che gli
-	// utenti "paganti" avranno a disposizione gli SlotDef definiti dal sistema
 	@Transient
 	public SlotDef getAssociatedSlotDef() {
 		AlfrescoUserIdentity alfrescoUserIdentity = (AlfrescoUserIdentity) org.jboss.seam.Component
