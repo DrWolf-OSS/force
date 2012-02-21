@@ -150,6 +150,8 @@ public class SlotInstEditBean {
 	@In(create = true)
 	private SlotInstParameters slotInstParameters;
 
+	private VerifierMessage popupMessage;
+
 	public void addActiveItemToDatas() {
 		if (!this.datas.get(this.activeCollectionId).contains(
 				this.activeFileContainer)) {
@@ -166,10 +168,9 @@ public class SlotInstEditBean {
 						this.activeFileContainer);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				FacesMessages
-						.instance()
-						.add(Severity.ERROR,
-								"Errore interno del sistema di salvataggio dei documenti!");
+				this.popupMessage = new VerifierMessage(
+						"Errore interno del sistema di salvataggio dei documenti!",
+						VerifierMessageType.ERROR);
 				e.printStackTrace();
 			}
 		}
@@ -793,6 +794,10 @@ public class SlotInstEditBean {
 		return null;
 	}
 
+	public VerifierMessage getPopupMessage() {
+		return this.popupMessage;
+	}
+
 	public HashMap<Long, List<FileContainer>> getPrimaryDocs() {
 		return this.primaryDocs;
 	}
@@ -999,6 +1004,10 @@ public class SlotInstEditBean {
 		this.verifiable = true;
 		this.failAllowed = false;
 		// warning = false;
+	}
+
+	public void resetPopupMessage() {
+		this.popupMessage = null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1249,6 +1258,10 @@ public class SlotInstEditBean {
 	public void setFilesMessages(
 			HashMap<String, ArrayList<VerifierMessage>> filesMessages) {
 		this.filesMessages = filesMessages;
+	}
+
+	public void setPopupMessage(VerifierMessage popupMessage) {
+		this.popupMessage = popupMessage;
 	}
 
 	public void setPrimaryDocs(HashMap<Long, List<FileContainer>> primaryDocs) {

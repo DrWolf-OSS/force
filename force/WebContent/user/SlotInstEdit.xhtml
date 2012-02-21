@@ -12,6 +12,26 @@
 
 	<ui:define name="body">
 	
+		<rich:modalPanel id="popupMessagePanel" width="400" height="100" 
+			showWhenRendered="#{slotInstEditBean.popupMessage != null}">
+	        <f:facet name="header">
+	            <h:panelGroup>
+	                <h:outputText value="ATTENZIONE"></h:outputText>
+	            </h:panelGroup>
+	        </f:facet>
+			<a:form>
+			<h:graphicImage value="/img/msgerror.png"  styleClass="fileIcon"
+						rendered="#{slotInstEditBean.popupMessage.type == 'ERROR'}" />
+			<h:graphicImage value="/img/msgwarn.png"  styleClass="fileIcon"
+				rendered="#{slotInstEditBean.popupMessage.type == 'WARNING'}" />
+			<h:graphicImage value="/img/tick.png"  styleClass="fileIcon"
+				rendered="#{slotInstEditBean.popupMessage.type == 'VALID'}" />
+	        <h:outputText value="#{slotInstEditBean.popupMessage.text}"></h:outputText>
+	        <div style="clear: both"/>
+	        <a:commandButton value="OK" action="#{slotInstEditBean.resetPopupMessage()}" reRender="popupMessagePanel" oncomplete="#{rich:component('popupMessagePanel')}.hide()"/>
+	        </a:form>
+	    </rich:modalPanel>
+	
 		<rich:modalPanel id="pubblicatoPanel" width="750" height="400" 
 			showWhenRendered="#{slotInstHome.instance.slotDef.ownerId == 'ADMIN' and not slotInstHome.instance.slotDef.pubblicato}">
 	        <f:facet name="header">
@@ -20,6 +40,8 @@
 	            </h:panelGroup>
 	        </f:facet>
 	        <h:outputText value="BUSTA ATTUALMENTE IN MANUTENZIONE"></h:outputText>
+	        <div style="clear: both"/>
+	        <s:button value="OK" view="/home.xhtml"/>
 	    </rich:modalPanel>
 	
 	    <rich:modalPanel id="panel" width="350" height="100" showWhenRendered="#{not slotInstHome.idDefined and slotDefHome.instance.type.name() == 'PRIMARY'}">
@@ -713,7 +735,7 @@
 				<a:jsFunction name="cleanActiveElements" action="#{slotInstEditBean.cleanActiveElements()}"/>
 				<a:commandButton value="Conferma"
 					action="#{slotInstEditBean.addActiveItemToDatas}"
-					reRender="editPanelForm, infoPanel_#{slotInstEditBean.activeCollectionId}, primaryRegion_#{slotInstEditBean.activeCollectionId}, summaryPanel" 
+					reRender="editPanelForm, infoPanel_#{slotInstEditBean.activeCollectionId}, primaryRegion_#{slotInstEditBean.activeCollectionId}, summaryPanel,popupMessagePanel" 
 					oncomplete="if(!epfinvalid){#{rich:component('editPanel')}.hide(); cleanActiveElements();}#{rich:component('waitPanel')}.hide();"
 					onclick="#{rich:component('waitPanel')}.show();"/>
 				<a:region>
