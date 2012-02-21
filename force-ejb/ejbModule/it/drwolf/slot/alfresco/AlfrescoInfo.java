@@ -18,20 +18,19 @@ public class AlfrescoInfo {
 	public AlfrescoInfo() {
 	}
 
-	public String getRepositoryUri() {
-		return preferences.getValue(PreferenceKey.ALFRESCO_LOCATION.name());
+	public String getAdminPwd() {
+		return this.preferences.getValue(PreferenceKey.ALFRESCO_ADMIN_PWD
+				.name());
 	}
 
 	public String getAdminUser() {
-		return preferences.getValue(PreferenceKey.ALFRESCO_ADMIN_USER.name());
+		return this.preferences.getValue(PreferenceKey.ALFRESCO_ADMIN_USER
+				.name());
 	}
 
-	public String getAdminPwd() {
-		return preferences.getValue(PreferenceKey.ALFRESCO_ADMIN_PWD.name());
-	}
-
-	public String getUsersHomeRef() {
-		return preferences.getValue(PreferenceKey.ALFRESCO_USERS_HOME.name());
+	public String getRepositoryUri() {
+		return this.preferences
+				.getValue(PreferenceKey.ALFRESCO_LOCATION.name());
 	}
 
 }

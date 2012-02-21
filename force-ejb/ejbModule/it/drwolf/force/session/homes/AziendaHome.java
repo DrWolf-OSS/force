@@ -10,6 +10,8 @@ import it.drwolf.force.entity.Soa;
 import it.drwolf.force.enums.ClassificaSoa;
 import it.drwolf.force.enums.PosizioneCNA;
 import it.drwolf.force.enums.StatoAzienda;
+import it.drwolf.slot.prefs.PreferenceKey;
+import it.drwolf.slot.prefs.Preferences;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +43,9 @@ public class AziendaHome extends EntityHome<Azienda> {
 	@In
 	private EntityManager entityManager;
 
+	@In(create = true)
+	private Preferences preferences;
+
 	private AziendaSoa aziendaSoa = null;
 
 	private Soa soa = null;
@@ -56,9 +61,10 @@ public class AziendaHome extends EntityHome<Azienda> {
 		this.getInstance().getSoa().add(aziendaSoa);
 		this.entityManager.flush();
 		this.cleanAziendaSoa();
+		this.updateSoa();
 	}
 
-	private void cleanAziendaSoa() {
+	public void cleanAziendaSoa() {
 		this.aziendaSoa = null;
 		this.soa = null;
 		this.classificaSoa = null;
@@ -178,9 +184,11 @@ public class AziendaHome extends EntityHome<Azienda> {
 	private void sendEmail(String subject, String body, String to)
 			throws EmailException {
 		Email email = new SimpleEmail();
-		email.setHostName("zimbra.drwolf.it");
+		email.setHostName(this.preferences
+				.getValue(PreferenceKey.FORCE_EMAIL_HOSTNAME.name()));
 		email.setSmtpPort(25);
-		email.setFrom("info@forcecna.it");
+		email.setFrom(this.preferences.getValue(PreferenceKey.FORCE_EMAIL_FROM
+				.name()));
 		email.setSubject(subject);
 		email.addTo(to);
 		email.setMsg(body);

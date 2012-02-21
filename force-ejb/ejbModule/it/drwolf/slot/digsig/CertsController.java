@@ -1,13 +1,11 @@
 package it.drwolf.slot.digsig;
 
 import it.drwolf.slot.entitymanager.PreferenceManager;
-import it.drwolf.slot.prefs.PreferenceKey;
 
 import java.util.List;
 
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
@@ -26,21 +24,12 @@ public class CertsController {
 	@In(create = true)
 	private PreferenceManager preferenceManager;
 
-	@Create
-	public void loadCerts() {
-		certs = new Certs();
-		alfrescoNodeCertsProvider.setNodeRef(preferenceManager.getPreference(
-				PreferenceKey.CERTS_LIST_REF.name()).getStringValue());
-		certs.setCertsProvider(alfrescoNodeCertsProvider);
-		certificates = certs.getCertificates();
+	public List<X509CertificateObject> getCertificates() {
+		return this.certificates;
 	}
 
 	public Certs getCerts() {
-		return certs;
-	}
-
-	public List<X509CertificateObject> getCertificates() {
-		return certificates;
+		return this.certs;
 	}
 
 }

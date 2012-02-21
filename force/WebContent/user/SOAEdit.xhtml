@@ -112,6 +112,7 @@
 	</rich:panel>
 	<div class="actionButtons">
    <a4j:commandButton value="Aggiungi SOA"
+                        action="#{aziendaHome.cleanAziendaSoa()}"
                       oncomplete="#{rich:component('addSOA')}.show();"
                       reRender="soaDataTable" />
 
