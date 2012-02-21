@@ -50,16 +50,6 @@ public class PropertyInst implements DataInstance {
 	public PropertyInst() {
 	}
 
-	public PropertyInst(PropertyDef propertyDef, SlotInst slotInst) {
-		this(propertyDef);
-		this.slotInst = slotInst;
-		if (propertyDef.isMultiple()) {
-			this.setMultiplicity(DataInstanceMultiplicity.MULTIPLE);
-		} else {
-			this.setMultiplicity(DataInstanceMultiplicity.SINGLE);
-		}
-	}
-
 	public PropertyInst(PropertyDef propertyDef) {
 		super();
 		this.propertyDef = propertyDef;
@@ -68,136 +58,24 @@ public class PropertyInst implements DataInstance {
 		} else {
 			this.setMultiplicity(DataInstanceMultiplicity.SINGLE);
 		}
+
+		if (propertyDef.getDataType().equals(DataType.BOOLEAN)) {
+			this.booleanValue = Boolean.FALSE;
+		}
 	}
 
-	@Id
-	@GeneratedValue
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	@ManyToOne
-	public PropertyDef getPropertyDef() {
-		return propertyDef;
-	}
-
-	public void setPropertyDef(PropertyDef propertytDef) {
-		this.propertyDef = propertytDef;
-	}
-
-	@ManyToOne
-	public SlotInst getSlotInst() {
-		return slotInst;
-	}
-
-	public void setSlotInst(SlotInst slotInst) {
+	public PropertyInst(PropertyDef propertyDef, SlotInst slotInst) {
+		this(propertyDef);
 		this.slotInst = slotInst;
-	}
-
-	@Transient
-	public DataDefinition getDataDefinition() {
-		return this.propertyDef;
-	}
-
-	@Enumerated(EnumType.STRING)
-	public DataInstanceMultiplicity getMultiplicity() {
-		return multiplicity;
-	}
-
-	public void setMultiplicity(DataInstanceMultiplicity multiplicity) {
-		this.multiplicity = multiplicity;
-	}
-
-	//
-
-	public String getStringValue() {
-		return stringValue;
-	}
-
-	public void setStringValue(String stringValue) {
-		this.stringValue = stringValue;
-	}
-
-	public Integer getIntegerValue() {
-		return integerValue;
-	}
-
-	public void setIntegerValue(Integer integerValue) {
-		this.integerValue = integerValue;
-	}
-
-	public Boolean getBooleanValue() {
-		return booleanValue;
-	}
-
-	public void setBooleanValue(Boolean booleanValue) {
-		this.booleanValue = booleanValue;
-	}
-
-	@Temporal(TemporalType.DATE)
-	public Date getDateValue() {
-		return dateValue;
-	}
-
-	public void setDateValue(Date dateValue) {
-		this.dateValue = dateValue;
-	}
-
-	@Transient
-	public String getLinkValue() {
-		if (this.getStringValue().startsWith("http://")) {
-			return stringValue;
+		if (propertyDef.isMultiple()) {
+			this.setMultiplicity(DataInstanceMultiplicity.MULTIPLE);
 		} else {
-			return "http://".concat(stringValue);
+			this.setMultiplicity(DataInstanceMultiplicity.SINGLE);
 		}
-	}
 
-	//
-
-	@CollectionOfElements
-	public Set<String> getValues() {
-		return values;
-	}
-
-	public void setValues(Set<String> values) {
-		this.values = values;
-	}
-
-	@Transient
-	public List<String> getValuesAsList() {
-		return new ArrayList<String>(this.values);
-	}
-
-	@Transient
-	public void setValuesAsList(List<String> valuesAsList) {
-		this.values = new HashSet<String>(valuesAsList);
-	}
-
-	//
-
-	@Transient
-	public Object getValue() {
-		if (!this.getPropertyDef().isMultiple()) {
-			if (this.getPropertyDef().getDataType().equals(DataType.STRING))
-				return this.getStringValue();
-			else if (this.getPropertyDef().getDataType()
-					.equals(DataType.INTEGER))
-				return this.getIntegerValue();
-			else if (this.getPropertyDef().getDataType().equals(DataType.DATE))
-				return this.getDateValue();
-			else if (this.getPropertyDef().getDataType()
-					.equals(DataType.BOOLEAN))
-				return this.getBooleanValue();
-			else if (this.getPropertyDef().getDataType().equals(DataType.LINK))
-				return this.getStringValue();
-		} else {
-			return this.getValues();
+		if (propertyDef.getDataType().equals(DataType.BOOLEAN)) {
+			this.booleanValue = Boolean.FALSE;
 		}
-		return null;
 	}
 
 	@Transient
@@ -207,6 +85,139 @@ public class PropertyInst implements DataInstance {
 		this.setDateValue(null);
 		this.setBooleanValue(null);
 		this.getValues().clear();
+	}
+
+	public Boolean getBooleanValue() {
+		return this.booleanValue;
+	}
+
+	@Transient
+	public DataDefinition getDataDefinition() {
+		return this.propertyDef;
+	}
+
+	@Temporal(TemporalType.DATE)
+	public Date getDateValue() {
+		return this.dateValue;
+	}
+
+	@Id
+	@GeneratedValue
+	public Long getId() {
+		return this.id;
+	}
+
+	public Integer getIntegerValue() {
+		return this.integerValue;
+	}
+
+	@Transient
+	public String getLinkValue() {
+		if (this.getStringValue().startsWith("http://")) {
+			return this.stringValue;
+		} else {
+			return "http://".concat(this.stringValue);
+		}
+	}
+
+	@Enumerated(EnumType.STRING)
+	public DataInstanceMultiplicity getMultiplicity() {
+		return this.multiplicity;
+	}
+
+	@ManyToOne
+	public PropertyDef getPropertyDef() {
+		return this.propertyDef;
+	}
+
+	//
+
+	@ManyToOne
+	public SlotInst getSlotInst() {
+		return this.slotInst;
+	}
+
+	public String getStringValue() {
+		return this.stringValue;
+	}
+
+	@Transient
+	public Object getValue() {
+		if (!this.getPropertyDef().isMultiple()) {
+			if (this.getPropertyDef().getDataType().equals(DataType.STRING)) {
+				return this.getStringValue();
+			} else if (this.getPropertyDef().getDataType()
+					.equals(DataType.INTEGER)) {
+				return this.getIntegerValue();
+			} else if (this.getPropertyDef().getDataType()
+					.equals(DataType.DATE)) {
+				return this.getDateValue();
+			} else if (this.getPropertyDef().getDataType()
+					.equals(DataType.BOOLEAN)) {
+				return this.getBooleanValue();
+			} else if (this.getPropertyDef().getDataType()
+					.equals(DataType.LINK)) {
+				return this.getStringValue();
+			}
+		} else {
+			return this.getValues();
+		}
+		return null;
+	}
+
+	@CollectionOfElements
+	public Set<String> getValues() {
+		return this.values;
+	}
+
+	@Transient
+	public List<String> getValuesAsList() {
+		return new ArrayList<String>(this.values);
+	}
+
+	public void setBooleanValue(Boolean booleanValue) {
+		this.booleanValue = booleanValue;
+	}
+
+	public void setDateValue(Date dateValue) {
+		this.dateValue = dateValue;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setIntegerValue(Integer integerValue) {
+		this.integerValue = integerValue;
+	}
+
+	//
+
+	public void setMultiplicity(DataInstanceMultiplicity multiplicity) {
+		this.multiplicity = multiplicity;
+	}
+
+	public void setPropertyDef(PropertyDef propertytDef) {
+		this.propertyDef = propertytDef;
+	}
+
+	public void setSlotInst(SlotInst slotInst) {
+		this.slotInst = slotInst;
+	}
+
+	public void setStringValue(String stringValue) {
+		this.stringValue = stringValue;
+	}
+
+	//
+
+	public void setValues(Set<String> values) {
+		this.values = values;
+	}
+
+	@Transient
+	public void setValuesAsList(List<String> valuesAsList) {
+		this.values = new HashSet<String>(valuesAsList);
 	}
 
 }
