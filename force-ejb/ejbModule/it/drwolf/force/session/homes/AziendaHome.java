@@ -150,7 +150,7 @@ public class AziendaHome extends EntityHome<Azienda> {
 			this.persist();
 			try {
 				String body = "La ringraziamo per essersi registrato al servizio FORCE.\n";
-				body += "Non appena completata la verifica dei dati inseriti riceverà le credenziali per accedere ai servizi forniti dalla piattaforma FORCE\n.";
+				body += "Non appena completata la verifica dei dati inseriti riceverà le credenziali per accedere ai servizi forniti dalla piattaforma FORCE.\n";
 				// una volta persistito mando una mail al referente
 				this.userUtil
 						.sendEmail(

@@ -113,6 +113,7 @@ public class UserUtil implements Serializable {
 	public String sendEmail(String subject, String body, String to,
 			String hostname, String from) throws EmailException {
 		Email email = new SimpleEmail();
+		email.setCharset("UTF-8");
 		email.setHostName(hostname);
 		email.setSmtpPort(25);
 		email.setFrom(from);
