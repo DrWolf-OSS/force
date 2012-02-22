@@ -9,6 +9,7 @@ import it.drwolf.force.entity.EntePubblico;
 import it.drwolf.force.entity.Fonte;
 import it.drwolf.force.entity.Gara;
 import it.drwolf.force.entity.Soa;
+import it.drwolf.force.enums.StatoAzienda;
 import it.drwolf.force.enums.StatoGara;
 import it.drwolf.force.enums.TipoGara;
 import it.drwolf.force.enums.TipoProceduraGara;
@@ -336,6 +337,7 @@ public class Heartbeat {
 		return handle;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Asynchronous
 	@Transactional
 	public QuartzTriggerHandle comunicaGare(@Expiration Date date,
@@ -359,8 +361,9 @@ public class Heartbeat {
 		}
 		// prelevo la lista delle aziende attive. Devo inviare una mail per
 		// ognuna (a patto che abbia nuove gare)
-		List<Azienda> aziede = entityManager.createQuery(
-				"from Azienda a where a.stato= 'ATTIVA'").getResultList();
+		List<Azienda> aziede = entityManager
+				.createQuery("from Azienda a where a.stato=:stato")
+				.setParameter("stato", StatoAzienda.ATTIVA).getResultList();
 		for (Azienda azienda : aziede) {
 			// per ogni azienda vado a prelevare dalla tabella Comunicazione le
 			// gare ancora non segnalate

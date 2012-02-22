@@ -15,17 +15,16 @@
 
         <rich:panel>
             <f:facet name="header">#{aziendaHome.managed ? 'Modifica' : 'Aggiungi'} Azienda</f:facet>
-
-
-
-            <s:decorate id="alfrescoGroupIdField" template="/layout/edit.xhtml">
-                <ui:define name="label">Alfresco group id</ui:define>
-                <h:inputTextarea id="alfrescoGroupId"
-                               cols="80"
-                               rows="3"
-                              value="#{aziendaHome.instance.alfrescoGroupId}"/>
+            
+            <s:decorate id="alfrescoGroupField" template="/layout/display.xhtml">
+                <ui:define name="label">Alfresco Group Id</ui:define>
+                <h:outputText  id="alfrescoGroup" value="#{aziendaHome.instance.alfrescoGroupId}"/>
             </s:decorate>
-
+            
+            <s:decorate id="emailReferenteField" template="/layout/display.xhtml">
+                <ui:define name="label">Email referente</ui:define>
+                <h:outputText  id="emailReferente" value="#{aziendaHome.instance.emailReferente}"/>
+            </s:decorate>
 
             <s:decorate id="capField" template="/layout/edit.xhtml">
                 <ui:define name="label">Cap</ui:define>
@@ -82,16 +81,6 @@
                                cols="80"
                                rows="3"
                               value="#{aziendaHome.instance.emailCertificata}"/>
-            </s:decorate>
-
-
-            <s:decorate id="emailReferenteField" template="/layout/edit.xhtml">
-                <ui:define name="label">Email referente</ui:define>
-                <h:inputTextarea id="emailReferente"
-                               cols="80"
-                               rows="3"
-                           required="true"
-                              value="#{aziendaHome.instance.emailReferente}"/>
             </s:decorate>
 
 
@@ -155,17 +144,6 @@
             </s:decorate>
 
 
-
-            <s:decorate id="statoField" template="/layout/edit.xhtml">
-                <ui:define name="label">Stato</ui:define>
-                <h:inputTextarea id="stato"
-                               cols="80"
-                               rows="3"
-                           required="true"
-                              value="#{aziendaHome.instance.stato}"/>
-            </s:decorate>
-
-
             <s:decorate id="telefonoField" template="/layout/edit.xhtml">
                 <ui:define name="label">Telefono</ui:define>
                 <h:inputTextarea id="telefono"
@@ -173,7 +151,25 @@
                                rows="3"
                               value="#{aziendaHome.instance.telefono}"/>
             </s:decorate>
-
+            
+            <s:decorate id="statoField" template="/layout/edit.xhtml">
+                <ui:define name="label">Stato Azienda</ui:define>
+                <h:selectOneMenu id="statoType" value="#{aziendaHome.instance.stato}" >
+                   	<s:selectItems value="#{statoAziendaList}" 
+					var="statoAzienda" label="#{statoAzienda.value()}"/>
+					<s:convertEnum/>
+             	</h:selectOneMenu>
+            </s:decorate>
+            
+            <s:decorate id="tipologiaAbbonamentoField" template="/layout/edit.xhtml">
+                <ui:define name="label">Tipologia Abbonamento</ui:define>
+                <h:selectOneMenu id="abbonamentoType" value="#{aziendaHome.instance.tipologiaAbbonamento}" >
+                   	<s:selectItems value="#{tipologiaAbbonamentoList}" 
+					var="tipologiaAbbonamento" label="#{tipologiaAbbonamento.value()}"/>
+					<s:convertEnum/>
+             	</h:selectOneMenu>
+            </s:decorate>
+            
             <div style="clear:both">
                 <span class="required">*</span>
                 required fields
@@ -198,7 +194,8 @@
                           value="Elmina"
                          action="#{aziendaHome.remove}"
                       immediate="true"
-                       rendered="#{aziendaHome.managed}"/>
+                       rendered="#{aziendaHome.managed}"
+                       disabled="true"/>
 
             <s:button id="cancelEdit"
                    value="Annulla"

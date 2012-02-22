@@ -103,7 +103,7 @@ public class AdminUserSession implements Serializable {
 
 			}
 			// alla fine dovrei mandare una mail con gli accessi al referente
-			azienda.setStato(StatoAzienda.ATTIVA.getNome());
+			azienda.setStato(StatoAzienda.ATTIVA);
 			azienda.setAlfrescoGroupId(groupName);
 			this.entityManager.persist(azienda);
 			// mando la mail con i dati

@@ -141,7 +141,7 @@ public class AziendaHome extends EntityHome<Azienda> {
 						"Partita IVA già presente nel nostro database");
 				return "KO";
 			}
-			this.getInstance().setStato(StatoAzienda.NUOVA.toString());
+			this.getInstance().setStato(StatoAzienda.NUOVA);
 			// persisto l'entity azienda
 			this.persist();
 			try {

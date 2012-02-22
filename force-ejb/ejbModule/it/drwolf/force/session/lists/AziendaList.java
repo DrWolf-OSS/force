@@ -1,6 +1,7 @@
 package it.drwolf.force.session.lists;
 
 import it.drwolf.force.entity.Azienda;
+import it.drwolf.force.enums.StatoAzienda;
 
 import java.io.Serializable;
 import java.util.List;
@@ -37,15 +38,18 @@ public class AziendaList implements Serializable {
 	@SuppressWarnings("unchecked")
 	@Factory("aziendeAttive")
 	public void getListaAziendeAttive() {
-		this.aziendeAttive = this.entityManager.createQuery(
-				"from Azienda where stato = 'ATTIVA'").getResultList();
+		this.aziendeAttive = this.entityManager
+				.createQuery("from Azienda where stato = :stato")
+				.setParameter("stato", StatoAzienda.ATTIVA).getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Factory("aziendeNuove")
 	public void getListaAziendeNuove() {
-		this.aziendeNuove = this.entityManager.createQuery(
-				"from Azienda where stato = 'NUOVA'").getResultList();
+		this.aziendeNuove = this.entityManager
+				.createQuery("from Azienda where stato = :stato")
+				.setParameter("stato", StatoAzienda.NUOVA).getResultList();
+		;
 	}
 
 	public void setAziendeAttive(List<Azienda> aziendeAttive) {

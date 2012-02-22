@@ -1,6 +1,7 @@
 package it.drwolf.force.entity;
 
 import it.drwolf.force.enums.TipoGara;
+import it.drwolf.force.enums.TipologiaAbbonamento;
 import it.drwolf.force.exceptions.DuplicateCoupleGaraSlotDefOwner;
 import it.drwolf.force.session.UserSession;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
@@ -144,10 +145,11 @@ public class Gara implements Serializable {
 			// .getInstance("entityManager");
 			UserSession userSession = (UserSession) org.jboss.seam.Component
 					.getInstance("userSession");
-			String tipologiaAbbonamento = userSession.getAzienda()
-					.getTipologiaAbbonamento();
+			TipologiaAbbonamento tipologiaAbbonamento = userSession
+					.getAzienda().getTipologiaAbbonamento();
 			if (tipologiaAbbonamento != null
-					&& tipologiaAbbonamento.equals("PREMIUM")) {
+					&& tipologiaAbbonamento
+							.equals(TipologiaAbbonamento.PREMIUM)) {
 				ownerId = "ADMIN";
 			}
 		}
