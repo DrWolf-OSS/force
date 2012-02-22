@@ -15,4 +15,7 @@
 	       </redirect>
 	    </rule>
     </navigation>
+    <navigation from-action="#{aziendaHome.deleteAziendaSoa(aziendaSoa)}">
+        <redirect></redirect>
+    </navigation>
 </page>

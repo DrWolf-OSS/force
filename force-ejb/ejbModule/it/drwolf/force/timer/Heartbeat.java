@@ -32,6 +32,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 
+import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
 import org.jboss.seam.Component;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.Name;
@@ -372,8 +375,27 @@ public class Heartbeat {
 					.createQuery(
 							"from ComunicazioneAziendaGara cag where cag.azienda = :azienda and cag.gara.type = 'GESTITA' and cag.gara.stato = 'INSERITA' and email = false")
 					.setParameter("azienda", azienda).getResultList();
-			for (ComunicazioneAziendaGara cag : cags) {
+			if (cags.size() > 0) {
+				String body = "Gentile " + azienda.getNome() + " "
+						+ azienda.getCognome() + "\n";
+				body += "sono state individuate le seguenti gare  :\n";
 
+				for (ComunicazioneAziendaGara cag : cags) {
+					body += cag.getGara().getOggetto() + "\n";
+					body += "######################################################\n";
+					cag.setEmail(true);
+					entityManager.merge(cag);
+					entityManager.flush();
+				}
+				body += "Per vedere il dettaglio effettua il login su FORCE:\n";
+				body += "http://http://www.forcecna.it/force/login.seam\n\n";
+				try {
+					this.sendEmail("Nuove Gare", body,
+							azienda.getEmailReferente());
+				} catch (EmailException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -393,6 +415,18 @@ public class Heartbeat {
 		 * 
 		 * } }
 		 */return handle;
+	}
+
+	private String sendEmail(String subject, String body, String to)
+			throws EmailException {
+		Email email = new SimpleEmail();
+		email.setHostName("zimbra.drwolf.it");
+		email.setSmtpPort(25);
+		email.setFrom("info@forcecna.it");
+		email.setSubject(subject);
+		email.addTo(to);
+		email.setMsg(body);
+		return email.send();
 	}
 
 	private void setComunicaizioneAziende(EntityManager entityManager, Gara gara) {
@@ -632,4 +666,5 @@ public class Heartbeat {
 		}
 		return false;
 	}
+
 }

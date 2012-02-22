@@ -78,8 +78,15 @@ public class UserUtil implements Serializable {
 						+ "la nuova sua nuova password per accedere al servizio FORCE è :\n\n"
 						+ pwd + "\n";
 				try {
-					this.sendEmail("Nuova  password servizio FORCE", newPwdMsg,
-							azienda.getEmailReferente());
+					this.sendEmail(
+							"Nuova  password servizio FORCE",
+							newPwdMsg,
+							azienda.getEmailReferente(),
+							this.preferences
+									.getValue(PreferenceKey.FORCE_EMAIL_HOSTNAME
+											.name()), this.preferences
+									.getValue(PreferenceKey.FORCE_EMAIL_FROM
+											.name()));
 				} catch (EmailException e) {
 					e.printStackTrace();
 					return "KO";
@@ -103,14 +110,13 @@ public class UserUtil implements Serializable {
 		return "NO_RESULT";
 	}
 
-	public String sendEmail(String subject, String body, String to)
-			throws EmailException {
+	public String sendEmail(String subject, String body, String to,
+			String hostname, String from) throws EmailException {
 		Email email = new SimpleEmail();
-		email.setHostName(this.preferences
-				.getValue(PreferenceKey.FORCE_EMAIL_HOSTNAME.name()));
+		email.setCharset("UTF-8");
+		email.setHostName(hostname);
 		email.setSmtpPort(25);
-		email.setFrom(this.preferences.getValue(PreferenceKey.FORCE_EMAIL_FROM
-				.name()));
+		email.setFrom(from);
 		email.setSubject(subject);
 		email.addTo(to);
 		email.setMsg(body);
