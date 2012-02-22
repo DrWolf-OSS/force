@@ -21,7 +21,6 @@ import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.async.Asynchronous;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage.Severity;
 
@@ -111,7 +110,6 @@ public class UserUtil implements Serializable {
 		return "NO_RESULT";
 	}
 
-	@Asynchronous
 	public String sendEmail(String subject, String body, String to,
 			String hostname, String from) throws EmailException {
 		Email email = new SimpleEmail();
