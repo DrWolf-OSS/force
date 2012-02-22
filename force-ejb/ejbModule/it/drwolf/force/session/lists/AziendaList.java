@@ -34,11 +34,52 @@ public class AziendaList implements Serializable {
 	@Out(required = false)
 	private List<Azienda> aziendeNuove = null;
 
+	@SuppressWarnings("unused")
+	@Out(required = false)
+	private List<Azienda> aziendePremium = null;
+
+	@SuppressWarnings("unused")
+	@Out(required = false)
+	private List<Azienda> aziendeBase = null;
+
+	@SuppressWarnings("unused")
+	@Out(required = false)
+	private List<Azienda> aziendeCallCenter = null;
+
+	@SuppressWarnings("unchecked")
+	@Factory("aziendeBase")
+	public void getAziendeBase() {
+		this.aziendeBase = this.entityManager
+				.createQuery(
+						"from Azienda where stato = 'ATTIVA' and tipologiaAbbonamento='BASE'")
+				.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Factory("aziendeCallCenter")
+	public void getAziendeCallCenter() {
+		this.aziendeCallCenter = this.entityManager
+				.createQuery(
+						"from Azienda where stato = 'ATTIVA' and tipologiaAbbonamento='CALL_CENTER'")
+				.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Factory("aziendePremium")
+	public void getAziendePremium() {
+		this.aziendePremium = this.entityManager
+				.createQuery(
+						"from Azienda where stato = 'ATTIVA' and tipologiaAbbonamento='PREMIUM'")
+				.getResultList();
+	}
+
 	@SuppressWarnings("unchecked")
 	@Factory("aziendeAttive")
 	public void getListaAziendeAttive() {
-		this.aziendeAttive = this.entityManager.createQuery(
-				"from Azienda where stato = 'ATTIVA'").getResultList();
+		this.aziendeAttive = this.entityManager
+				.createQuery(
+						"from Azienda where stato = 'ATTIVA' and tipologiaAbbonamento is null")
+				.getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -52,7 +93,19 @@ public class AziendaList implements Serializable {
 		this.aziendeAttive = aziendeAttive;
 	}
 
+	public void setAziendeBase(List<Azienda> aziendeBase) {
+		this.aziendeBase = aziendeBase;
+	}
+
+	public void setAziendeCallCenter(List<Azienda> aziendeCallCenter) {
+		this.aziendeCallCenter = aziendeCallCenter;
+	}
+
 	public void setAziendeNuove(List<Azienda> aziendeNuove) {
 		this.aziendeNuove = aziendeNuove;
+	}
+
+	public void setAziendePremium(List<Azienda> aziendePremium) {
+		this.aziendePremium = aziendePremium;
 	}
 }

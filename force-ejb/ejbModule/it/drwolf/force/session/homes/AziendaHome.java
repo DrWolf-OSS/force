@@ -163,8 +163,7 @@ public class AziendaHome extends EntityHome<Azienda> {
 								this.preferences
 										.getValue(PreferenceKey.FORCE_EMAIL_FROM
 												.name()));
-			} catch (EmailException e) {
-				// TODO: handle exception
+			} catch (EmailException e) { // TODO: handle exception
 			}
 
 		} catch (Exception e) {
