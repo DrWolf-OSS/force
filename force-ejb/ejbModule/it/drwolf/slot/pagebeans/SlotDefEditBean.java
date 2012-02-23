@@ -180,6 +180,8 @@ public class SlotDefEditBean {
 	public void addEmbeddedProperty() {
 		if (!this.slotDefHome.getInstance().getEmbeddedPropertiesAsList()
 				.contains(this.embeddedProperty)) {
+			this.embeddedProperty.setPosition(this.slotDefHome.getInstance()
+					.getEmbeddedProperties().size());
 			this.slotDefHome.getInstance().getEmbeddedProperties()
 					.add(this.embeddedProperty);
 		}

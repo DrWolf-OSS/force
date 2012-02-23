@@ -1,6 +1,7 @@
 package it.drwolf.slot.pagebeans;
 
 import it.drwolf.slot.entity.DocDefCollection;
+import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.session.SlotDefHome;
 
@@ -56,6 +57,43 @@ public class PositionSorterBean {
 
 	public void moveDocDefCollectionUp(DocDefCollection sortable) {
 		this.moveDocDefCollection(sortable, PositionSorterBean.UP);
+	}
+
+	private void moveEmbeddedProperty(EmbeddedProperty embeddedProperty,
+			String direction) {
+		Integer oldPosition = embeddedProperty.getPosition();
+		if (direction.equals(PositionSorterBean.UP)
+				&& oldPosition.intValue() > 0) {
+			embeddedProperty.setPosition(oldPosition - 1);
+		} else if (direction.equals(PositionSorterBean.DOWN)
+				&& oldPosition < this.slotDefHome.getInstance()
+						.getPropertyDefs().size() - 1) {
+			embeddedProperty.setPosition(oldPosition + 1);
+		} else {
+			return;
+		}
+
+		if (embeddedProperty instanceof EmbeddedProperty) {
+			Iterator<EmbeddedProperty> iterator = this.slotDefHome
+					.getInstance().getEmbeddedProperties().iterator();
+			while (iterator.hasNext()) {
+				EmbeddedProperty ep = iterator.next();
+				if (ep.getPosition().intValue() == (embeddedProperty
+						.getPosition().intValue())
+						&& !ep.equals(embeddedProperty)) {
+					ep.setPosition(oldPosition);
+					return;
+				}
+			}
+		}
+	}
+
+	public void moveEmbeddedPropertyDown(EmbeddedProperty sortable) {
+		this.moveEmbeddedProperty(sortable, PositionSorterBean.DOWN);
+	}
+
+	public void moveEmbeddedPropertyUp(EmbeddedProperty sortable) {
+		this.moveEmbeddedProperty(sortable, PositionSorterBean.UP);
 	}
 
 	private void movePropertyDef(PropertyDef propertyDef, String direction) {

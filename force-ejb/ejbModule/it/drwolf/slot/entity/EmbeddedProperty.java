@@ -5,6 +5,7 @@ import it.drwolf.slot.enums.DefStatus;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.DataInstance;
 import it.drwolf.slot.interfaces.Deactivable;
+import it.drwolf.slot.interfaces.PositionSortable;
 import it.drwolf.slot.validators.Validator;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 public class EmbeddedProperty implements DataDefinition, DataInstance,
-		Deactivable {
+		Deactivable, PositionSortable {
 
 	private Long id;
 
@@ -62,6 +63,8 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 	private DefStatus status;
 
 	private String description;
+
+	private Integer position;
 
 	@Transient
 	public void clean() {
@@ -141,6 +144,10 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 
 	public String getName() {
 		return this.name;
+	}
+
+	public Integer getPosition() {
+		return this.position;
 	}
 
 	@Transient
@@ -242,6 +249,10 @@ public class EmbeddedProperty implements DataDefinition, DataInstance,
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setPosition(Integer position) {
+		this.position = position;
 	}
 
 	public void setStatus(DefStatus status) {

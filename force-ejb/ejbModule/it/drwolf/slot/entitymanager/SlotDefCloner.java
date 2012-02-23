@@ -224,7 +224,7 @@ public class SlotDefCloner {
 				.setDescription(embeddedProperty.getDescription());
 		clonedEmbeddedProperty.setDataType(embeddedProperty.getDataType());
 		clonedEmbeddedProperty.setMultiple(embeddedProperty.isMultiple());
-
+		clonedEmbeddedProperty.setPosition(embeddedProperty.getPosition());
 		clonedEmbeddedProperty.setDictionary(embeddedProperty.getDictionary());
 		clonedEmbeddedProperty.setValues(new HashSet<String>());
 		return clonedEmbeddedProperty;

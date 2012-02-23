@@ -187,7 +187,8 @@
 						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" 
 						style="width:1024px" 
 						onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
-						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+						rowKeyVar="row">
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
@@ -252,6 +253,22 @@
             						rendered="#{slotDefHome.referenced and eprop.id!=null}"/>
             			<rich:toolTip for="invalidate" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}">
             			L'informazione è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
+					</rich:column>
+					<rich:column styleClass="action #{!eprop.active ? 'invalidRow' : ''}" style="width:50px">
+						<f:facet name="header">Ordine</f:facet>
+						<a:commandLink action="#{positionSorterBean.moveEmbeddedPropertyUp(eprop)}"
+									onclick="#{rich:component('waitPanel')}.show()"
+									oncomplete="#{rich:component('waitPanel')}.hide()"
+									reRender="epropTable" disabled="#{row == 0}">
+							<h:graphicImage value="/img/arrow-090.png" styleClass="#{row == 0 ? 'opaque' : ''}"/>
+						</a:commandLink>
+						#{' '}
+						<a:commandLink action="#{positionSorterBean.moveEmbeddedPropertyDown(eprop)}"
+									onclick="#{rich:component('waitPanel')}.show()"
+									oncomplete="#{rich:component('waitPanel')}.hide()" 
+									reRender="epropTable" disabled="#{row == slotDefHome.instance.propertyDefs.size()-1}">
+							<h:graphicImage value="/img/arrow-270.png" styleClass="#{row == slotDefHome.instance.embeddedProperties.size()-1 ? 'opaque' : ''}"/>
+						</a:commandLink>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -358,7 +375,7 @@
             			L'informazione è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
             						
 					</rich:column>
-					<rich:column styleClass="action #{!prop.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="action #{!prop.active ? 'invalidRow' : ''}" style="width:50px">
 						<f:facet name="header">Ordine</f:facet>
 						<a:commandLink action="#{positionSorterBean.movePropertyDefUp(prop)}"
 									onclick="#{rich:component('waitPanel')}.show()"
@@ -450,11 +467,21 @@
             				<rich:toolTip for="invalidate" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}">
             				La richiesta è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
 					</rich:column>
-					<rich:column styleClass="action #{!coll.active ? 'invalidRow' : ''}">
+					<rich:column styleClass="action #{!coll.active ? 'invalidRow' : ''}" style="width:50px">
 						<f:facet name="header">Ordine</f:facet>
-						<a:commandLink value="UP" action="#{positionSorterBean.moveDocDefCollectionUp(coll)}" reRender="collTable" disabled="#{row == 0}"/>
+						<a:commandLink action="#{positionSorterBean.moveDocDefCollectionUp(coll)}"
+									onclick="#{rich:component('waitPanel')}.show()"
+									oncomplete="#{rich:component('waitPanel')}.hide()"
+									reRender="collTable" disabled="#{row == 0}">
+							<h:graphicImage value="/img/arrow-090.png" styleClass="#{row == 0 ? 'opaque' : ''}"/>
+						</a:commandLink>
 						#{' '}
-						<a:commandLink value="DOWN" action="#{positionSorterBean.moveDocDefCollectionDown(coll)}" reRender="collTable" disabled="#{row == slotDefHome.instance.docDefCollections.size()-1}"/>
+						<a:commandLink action="#{positionSorterBean.moveDocDefCollectionDown(coll)}"
+									onclick="#{rich:component('waitPanel')}.show()"
+									oncomplete="#{rich:component('waitPanel')}.hide()" 
+									reRender="collTable" disabled="#{row == slotDefHome.instance.docDefCollections.size()-1}">
+							<h:graphicImage value="/img/arrow-270.png" styleClass="#{row == slotDefHome.instance.docDefCollections.size()-1 ? 'opaque' : ''}"/>
+						</a:commandLink>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>

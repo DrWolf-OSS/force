@@ -1,6 +1,7 @@
 package it.drwolf.slot.entity.listeners;
 
 import it.drwolf.slot.entity.DocDefCollection;
+import it.drwolf.slot.entity.EmbeddedProperty;
 import it.drwolf.slot.entity.PropertyDef;
 import it.drwolf.slot.entity.SlotDef;
 
@@ -28,6 +29,13 @@ public class SlotDefListener {
 			}
 		}
 
-	}
+		List<EmbeddedProperty> epList = slotDef.getEmbeddedPropertiesAsList();
+		for (EmbeddedProperty embeddedProperty : epList) {
+			if (embeddedProperty.getPosition() == null) {
+				int index = epList.indexOf(embeddedProperty);
+				embeddedProperty.setPosition(index);
+			}
+		}
 
+	}
 }

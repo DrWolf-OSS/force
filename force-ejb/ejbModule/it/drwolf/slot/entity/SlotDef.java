@@ -83,7 +83,7 @@ public class SlotDef {
 		return list;
 	}
 
-	@OrderBy("name")
+	@OrderBy("position")
 	@OneToMany(cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@JoinColumn(name = "slotDef_id")
@@ -93,7 +93,10 @@ public class SlotDef {
 
 	@Transient
 	public List<EmbeddedProperty> getEmbeddedPropertiesAsList() {
-		return new ArrayList<EmbeddedProperty>(this.embeddedProperties);
+		ArrayList<EmbeddedProperty> list = new ArrayList<EmbeddedProperty>(
+				this.embeddedProperties);
+		Collections.sort(list, new PositionSortableComparator());
+		return list;
 	}
 
 	@Id
