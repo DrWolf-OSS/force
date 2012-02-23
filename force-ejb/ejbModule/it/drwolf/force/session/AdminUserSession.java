@@ -159,6 +159,15 @@ public class AdminUserSession implements Serializable {
 		return requests;
 	}
 
+	@SuppressWarnings("unchecked")
+	public ArrayList<Azienda> getBusteRequestByGara(Gara g) {
+		ArrayList<Azienda> requests = (ArrayList<Azienda>) this.entityManager
+				.createQuery(
+						"select cag.azienda from ComunicazioneAziendaGara cag where cag.bustaRequest = true and cag.gara = :gara")
+				.setParameter("gara", g).getResultList();
+		return requests;
+	}
+
 	public void init() {
 		// per non faccio niente
 		// poi vediamo
