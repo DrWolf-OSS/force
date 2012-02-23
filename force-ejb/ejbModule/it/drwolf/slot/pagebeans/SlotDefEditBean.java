@@ -137,6 +137,8 @@ public class SlotDefEditBean {
 	public void addCollection() {
 		if (!this.slotDefHome.getInstance().getDocDefCollectionsAsList()
 				.contains(this.collection)) {
+			this.collection.setPosition(this.slotDefHome.getInstance()
+					.getDocDefCollections().size());
 			this.collection.setSlotDef(this.slotDefHome.getInstance());
 			this.slotDefHome.getInstance().getDocDefCollections()
 					.add(this.collection);
@@ -186,8 +188,8 @@ public class SlotDefEditBean {
 	public void addProperty() {
 		SlotDef instance = this.slotDefHome.getInstance();
 		if (!instance.getPropertyDefsAsList().contains(this.propertyDef)) {
-			instance.getPropertyDefs().add(this.propertyDef);
 			this.propertyDef.setPosition(instance.getPropertyDefs().size());
+			instance.getPropertyDefs().add(this.propertyDef);
 		}
 		// if (this.converterPropertyMap.get(this.propertyDef.getUuid()) ==
 		// null) {
@@ -559,34 +561,75 @@ public class SlotDefEditBean {
 		}
 	}
 
-	private void movePropertyDef(PropertyDef propertyDef, String direction) {
-		Integer oldPosition = propertyDef.getPosition();
-		if (direction.equals("UP")) {
-			propertyDef.setPosition(oldPosition - 1);
-		} else if (direction.equals("DOWN")) {
-			propertyDef.setPosition(oldPosition + 1);
-		} else {
-			return;
-		}
-		Iterator<PropertyDef> iterator = this.slotDefHome.getInstance()
-				.getPropertyDefs().iterator();
-		while (iterator.hasNext()) {
-			PropertyDef pd = iterator.next();
-			if (pd.getPosition().intValue() == (propertyDef.getPosition()
-					.intValue()) && !pd.equals(propertyDef)) {
-				pd.setPosition(oldPosition);
-				return;
-			}
-		}
-	}
-
-	public void movePropertyDefDown(PropertyDef propertyDef) {
-		this.movePropertyDef(propertyDef, "DOWN");
-	}
-
-	public void movePropertyDefUp(PropertyDef propertyDef) {
-		this.movePropertyDef(propertyDef, "UP");
-	}
+	// private void moveDocDefCollection(DocDefCollection docDefCollection,
+	// String direction) {
+	// Integer oldPosition = docDefCollection.getPosition();
+	// if (direction.equals("UP") && oldPosition.intValue() > 0) {
+	// docDefCollection.setPosition(oldPosition - 1);
+	// } else if (direction.equals("DOWN")
+	// && oldPosition.intValue() < this.slotDefHome.getInstance()
+	// .getDocDefCollections().size() - 1) {
+	// docDefCollection.setPosition(oldPosition + 1);
+	// } else {
+	// return;
+	// }
+	//
+	// if (docDefCollection instanceof DocDefCollection) {
+	// Iterator<DocDefCollection> iterator = this.slotDefHome
+	// .getInstance().getDocDefCollections().iterator();
+	// while (iterator.hasNext()) {
+	// DocDefCollection ddc = iterator.next();
+	// if (ddc.getPosition().intValue() == (docDefCollection
+	// .getPosition().intValue())
+	// && !ddc.equals(docDefCollection)) {
+	// ddc.setPosition(oldPosition);
+	// return;
+	// }
+	// }
+	// }
+	// }
+	//
+	// public void moveDocDefCollectionDown(DocDefCollection sortable) {
+	// this.moveDocDefCollection(sortable, "DOWN");
+	// }
+	//
+	// public void moveDocDefCollectionUp(DocDefCollection sortable) {
+	// this.moveDocDefCollection(sortable, "UP");
+	// }
+	//
+	// private void movePropertyDef(PropertyDef propertyDef, String direction) {
+	// Integer oldPosition = propertyDef.getPosition();
+	// if (direction.equals("UP") && oldPosition.intValue() > 0) {
+	// propertyDef.setPosition(oldPosition - 1);
+	// } else if (direction.equals("DOWN")
+	// && oldPosition < this.slotDefHome.getInstance()
+	// .getPropertyDefs().size() - 1) {
+	// propertyDef.setPosition(oldPosition + 1);
+	// } else {
+	// return;
+	// }
+	//
+	// if (propertyDef instanceof PropertyDef) {
+	// Iterator<PropertyDef> iterator = this.slotDefHome.getInstance()
+	// .getPropertyDefs().iterator();
+	// while (iterator.hasNext()) {
+	// PropertyDef pd = iterator.next();
+	// if (pd.getPosition().intValue() == (propertyDef.getPosition()
+	// .intValue()) && !pd.equals(propertyDef)) {
+	// pd.setPosition(oldPosition);
+	// return;
+	// }
+	// }
+	// }
+	// }
+	//
+	// public void movePropertyDefDown(PropertyDef sortable) {
+	// this.movePropertyDef(sortable, "DOWN");
+	// }
+	//
+	// public void movePropertyDefUp(PropertyDef sortable) {
+	// this.movePropertyDef(sortable, "UP");
+	// }
 
 	public void newCollection() {
 		this.collection = new DocDefCollection();
@@ -935,7 +978,7 @@ public class SlotDefEditBean {
 
 	public void switchPublish() {
 		this.slotDefHome.switchPublishedStatus();
-		// this.slotDefHome.update();
+		this.slotDefHome.update();
 	}
 
 	public String update() {

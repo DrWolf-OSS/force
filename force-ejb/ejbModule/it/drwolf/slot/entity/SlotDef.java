@@ -1,6 +1,6 @@
 package it.drwolf.slot.entity;
 
-import it.drwolf.slot.comparators.PropertyDefPositionComparator;
+import it.drwolf.slot.comparators.PositionSortableComparator;
 import it.drwolf.slot.entity.listeners.SlotDefListener;
 import it.drwolf.slot.enums.SlotDefSatus;
 import it.drwolf.slot.enums.SlotDefType;
@@ -70,14 +70,17 @@ public class SlotDef {
 
 	@OneToMany(mappedBy = "slotDef", cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	@OrderBy("name")
+	@OrderBy("position")
 	public Set<DocDefCollection> getDocDefCollections() {
 		return this.docDefCollections;
 	}
 
 	@Transient
 	public List<DocDefCollection> getDocDefCollectionsAsList() {
-		return new ArrayList<DocDefCollection>(this.docDefCollections);
+		ArrayList<DocDefCollection> list = new ArrayList<DocDefCollection>(
+				this.docDefCollections);
+		Collections.sort(list, new PositionSortableComparator());
+		return list;
 	}
 
 	@OrderBy("name")
@@ -119,7 +122,7 @@ public class SlotDef {
 	public List<PropertyDef> getPropertyDefsAsList() {
 		ArrayList<PropertyDef> list = new ArrayList<PropertyDef>(
 				this.propertyDefs);
-		Collections.sort(list, new PropertyDefPositionComparator());
+		Collections.sort(list, new PositionSortableComparator());
 		return list;
 	}
 

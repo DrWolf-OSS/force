@@ -179,6 +179,7 @@ public class SlotDefCloner {
 		clonedCollection.setDocDef(collection.getDocDef());
 		clonedCollection.setMin(collection.getMin());
 		clonedCollection.setMax(collection.getMax());
+		clonedCollection.setPosition(collection.getPosition());
 
 		//
 		clonedCollection.setQuantifier(collection.getQuantifier());

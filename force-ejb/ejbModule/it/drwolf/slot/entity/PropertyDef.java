@@ -5,6 +5,7 @@ import it.drwolf.slot.enums.DefStatus;
 import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.Deactivable;
+import it.drwolf.slot.interfaces.PositionSortable;
 import it.drwolf.slot.validators.Validator;
 
 import java.util.ArrayList;
@@ -31,7 +32,8 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Cascade;
 
 @Entity
-public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
+public class PropertyDef implements DataDefinition, Deactivable, Conditionable,
+		PositionSortable {
 
 	private Long id;
 
