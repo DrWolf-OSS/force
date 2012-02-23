@@ -104,9 +104,10 @@ public class AdminUserSession implements Serializable {
 
 			}
 			// alla fine dovrei mandare una mail con gli accessi al referente
+			azienda.setStato(StatoAzienda.ATTIVA);
 			System.out
 					.println("###############Finita la parte di alfresco###############");
-			azienda.setStato(StatoAzienda.ATTIVA.getNome());
+
 			azienda.setAlfrescoGroupId(groupName);
 			this.entityManager.persist(azienda);
 			System.out

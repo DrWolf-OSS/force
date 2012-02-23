@@ -12,11 +12,11 @@
 
 	<ui:define name="body">
 	
-		<rich:modalPanel id="popupMessagePanel" width="400" height="100" 
+		<rich:modalPanel id="popupMessagePanel" autosized="true" minWidth="400" 
 			showWhenRendered="#{slotInstEditBean.popupMessage != null}">
 	        <f:facet name="header">
 	            <h:panelGroup>
-	                <h:outputText value="ATTENZIONE"></h:outputText>
+	                <h:outputText value="#{slotInstEditBean.popupMessage.type == 'VALID' ? 'INFORMAZIONE' : 'ATTENZIONE'}"></h:outputText>
 	            </h:panelGroup>
 	        </f:facet>
 			<a:form>

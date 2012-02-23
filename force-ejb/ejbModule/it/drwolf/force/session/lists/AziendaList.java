@@ -1,6 +1,7 @@
 package it.drwolf.force.session.lists;
 
 import it.drwolf.force.entity.Azienda;
+import it.drwolf.force.enums.StatoAzienda;
 
 import java.io.Serializable;
 import java.util.List;
@@ -51,8 +52,8 @@ public class AziendaList implements Serializable {
 	public void getAziendeBase() {
 		this.aziendeBase = this.entityManager
 				.createQuery(
-						"from Azienda where stato = 'ATTIVA' and tipologiaAbbonamento='BASE'")
-				.getResultList();
+						"from Azienda where stato = :stato and tipologiaAbbonamento='BASE'")
+				.setParameter("stato", StatoAzienda.ATTIVA).getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -60,8 +61,8 @@ public class AziendaList implements Serializable {
 	public void getAziendeCallCenter() {
 		this.aziendeCallCenter = this.entityManager
 				.createQuery(
-						"from Azienda where stato = 'ATTIVA' and tipologiaAbbonamento='CALL_CENTER'")
-				.getResultList();
+						"from Azienda where stato = :stato and tipologiaAbbonamento='CALL_CENTER'")
+				.setParameter("stato", StatoAzienda.ATTIVA).getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -69,8 +70,8 @@ public class AziendaList implements Serializable {
 	public void getAziendePremium() {
 		this.aziendePremium = this.entityManager
 				.createQuery(
-						"from Azienda where stato = 'ATTIVA' and tipologiaAbbonamento='PREMIUM'")
-				.getResultList();
+						"from Azienda where stato = :stato and tipologiaAbbonamento='PREMIUM'")
+				.setParameter("stato", StatoAzienda.ATTIVA).getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -78,15 +79,17 @@ public class AziendaList implements Serializable {
 	public void getListaAziendeAttive() {
 		this.aziendeAttive = this.entityManager
 				.createQuery(
-						"from Azienda where stato = 'ATTIVA' and tipologiaAbbonamento is null")
-				.getResultList();
+						"from Azienda where stato = :stato and tipologiaAbbonamento is null")
+				.setParameter("stato", StatoAzienda.ATTIVA).getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Factory("aziendeNuove")
 	public void getListaAziendeNuove() {
-		this.aziendeNuove = this.entityManager.createQuery(
-				"from Azienda where stato = 'NUOVA'").getResultList();
+		this.aziendeNuove = this.entityManager
+				.createQuery("from Azienda where stato = :stato")
+				.setParameter("stato", StatoAzienda.NUOVA).getResultList();
+		;
 	}
 
 	public void setAziendeAttive(List<Azienda> aziendeAttive) {

@@ -110,6 +110,12 @@
         <s:button view="/admin/#{empty aziendaFrom ? 'AziendaList' : aziendaFrom}.xhtml"
                     id="done"
                  value="Fatto"/>
+                 
+        <s:button view="/admin/AziendaEdit.xhtml"
+                    id="edit"
+                 value="Modifica">
+        	<f:param name="aziendaId" value="#{aziendaHome.aziendaId}"/>
+        </s:button>
 
     </div>
 

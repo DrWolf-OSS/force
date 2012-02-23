@@ -179,6 +179,7 @@ public class SlotDefCloner {
 		clonedCollection.setDocDef(collection.getDocDef());
 		clonedCollection.setMin(collection.getMin());
 		clonedCollection.setMax(collection.getMax());
+		clonedCollection.setPosition(collection.getPosition());
 
 		//
 		clonedCollection.setQuantifier(collection.getQuantifier());
@@ -223,7 +224,7 @@ public class SlotDefCloner {
 				.setDescription(embeddedProperty.getDescription());
 		clonedEmbeddedProperty.setDataType(embeddedProperty.getDataType());
 		clonedEmbeddedProperty.setMultiple(embeddedProperty.isMultiple());
-
+		clonedEmbeddedProperty.setPosition(embeddedProperty.getPosition());
 		clonedEmbeddedProperty.setDictionary(embeddedProperty.getDictionary());
 		clonedEmbeddedProperty.setValues(new HashSet<String>());
 		return clonedEmbeddedProperty;
@@ -300,6 +301,7 @@ public class SlotDefCloner {
 		clonedPropertyDef.setMultiple(propertyDef.isMultiple());
 		clonedPropertyDef.setRequired(propertyDef.isRequired());
 		clonedPropertyDef.setDictionary(propertyDef.getDictionary());
+		clonedPropertyDef.setPosition(propertyDef.getPosition());
 		return clonedPropertyDef;
 	}
 

@@ -1,9 +1,12 @@
 package it.drwolf.slot.entity;
 
+import it.drwolf.slot.comparators.PositionSortableComparator;
+import it.drwolf.slot.entity.listeners.SlotDefListener;
 import it.drwolf.slot.enums.SlotDefSatus;
 import it.drwolf.slot.enums.SlotDefType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +14,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EntityManager;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -26,6 +30,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Cascade;
 
 @Entity
+@EntityListeners(value = SlotDefListener.class)
 @Inheritance(strategy = InheritanceType.JOINED)
 public class SlotDef {
 
@@ -65,17 +70,20 @@ public class SlotDef {
 
 	@OneToMany(mappedBy = "slotDef", cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	@OrderBy("name")
+	@OrderBy("position")
 	public Set<DocDefCollection> getDocDefCollections() {
 		return this.docDefCollections;
 	}
 
 	@Transient
 	public List<DocDefCollection> getDocDefCollectionsAsList() {
-		return new ArrayList<DocDefCollection>(this.docDefCollections);
+		ArrayList<DocDefCollection> list = new ArrayList<DocDefCollection>(
+				this.docDefCollections);
+		Collections.sort(list, new PositionSortableComparator());
+		return list;
 	}
 
-	@OrderBy("name")
+	@OrderBy("position")
 	@OneToMany(cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@JoinColumn(name = "slotDef_id")
@@ -85,7 +93,10 @@ public class SlotDef {
 
 	@Transient
 	public List<EmbeddedProperty> getEmbeddedPropertiesAsList() {
-		return new ArrayList<EmbeddedProperty>(this.embeddedProperties);
+		ArrayList<EmbeddedProperty> list = new ArrayList<EmbeddedProperty>(
+				this.embeddedProperties);
+		Collections.sort(list, new PositionSortableComparator());
+		return list;
 	}
 
 	@Id
@@ -102,7 +113,7 @@ public class SlotDef {
 		return this.ownerId;
 	}
 
-	@OrderBy("name")
+	@OrderBy("position")
 	@OneToMany(cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@JoinColumn(name = "slotDef_id")
@@ -112,7 +123,10 @@ public class SlotDef {
 
 	@Transient
 	public List<PropertyDef> getPropertyDefsAsList() {
-		return new ArrayList<PropertyDef>(this.propertyDefs);
+		ArrayList<PropertyDef> list = new ArrayList<PropertyDef>(
+				this.propertyDefs);
+		Collections.sort(list, new PositionSortableComparator());
+		return list;
 	}
 
 	@Transient

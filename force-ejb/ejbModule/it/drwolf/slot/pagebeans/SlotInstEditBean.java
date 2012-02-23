@@ -167,9 +167,8 @@ public class SlotInstEditBean {
 				this.datas.get(this.activeCollectionId).add(
 						this.activeFileContainer);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				this.popupMessage = new VerifierMessage(
-						"Errore interno del sistema di salvataggio dei documenti!",
+						"Errore interno nel sistema di salvataggio dei documenti!",
 						VerifierMessageType.ERROR);
 				e.printStackTrace();
 			}

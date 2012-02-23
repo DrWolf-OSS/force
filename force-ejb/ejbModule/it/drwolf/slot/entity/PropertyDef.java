@@ -5,6 +5,7 @@ import it.drwolf.slot.enums.DefStatus;
 import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.DataDefinition;
 import it.drwolf.slot.interfaces.Deactivable;
+import it.drwolf.slot.interfaces.PositionSortable;
 import it.drwolf.slot.validators.Validator;
 
 import java.util.ArrayList;
@@ -31,7 +32,8 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Cascade;
 
 @Entity
-public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
+public class PropertyDef implements DataDefinition, Deactivable, Conditionable,
+		PositionSortable {
 
 	private Long id;
 
@@ -68,6 +70,8 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 	private DefStatus status;
 
 	private String description;
+
+	private Integer position;
 
 	public PropertyDef() {
 	}
@@ -191,6 +195,10 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 		return this.name;
 	}
 
+	public Integer getPosition() {
+		return this.position;
+	}
+
 	@OneToMany(mappedBy = "numberOfInstances")
 	public Set<DependentSlotDef> getSlotDefsIsNumberOfInstancesOf() {
 		return this.slotDefsIsNumberOfInstancesOf;
@@ -290,6 +298,10 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setPosition(Integer position) {
+		this.position = position;
 	}
 
 	public void setRequired(boolean required) {

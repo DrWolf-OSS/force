@@ -187,7 +187,8 @@
 						rendered="#{not empty slotDefHome.instance.embeddedPropertiesAsList}" 
 						style="width:1024px" 
 						onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
-						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+						rowKeyVar="row">
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!eprop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
@@ -253,6 +254,22 @@
             			<rich:toolTip for="invalidate" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(eprop)}">
             			L'informazione è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
 					</rich:column>
+					<rich:column styleClass="action #{!eprop.active ? 'invalidRow' : ''}" style="width:50px">
+						<f:facet name="header">Ordine</f:facet>
+						<a:commandLink action="#{positionSorterBean.moveEmbeddedPropertyUp(eprop)}"
+									onclick="#{rich:component('waitPanel')}.show()"
+									oncomplete="#{rich:component('waitPanel')}.hide()"
+									reRender="epropTable" disabled="#{row == 0}">
+							<h:graphicImage value="/img/arrow-090.png" styleClass="#{row == 0 ? 'opaque' : ''}"/>
+						</a:commandLink>
+						#{' '}
+						<a:commandLink action="#{positionSorterBean.moveEmbeddedPropertyDown(eprop)}"
+									onclick="#{rich:component('waitPanel')}.show()"
+									oncomplete="#{rich:component('waitPanel')}.hide()" 
+									reRender="epropTable" disabled="#{row == slotDefHome.instance.propertyDefs.size()-1}">
+							<h:graphicImage value="/img/arrow-270.png" styleClass="#{row == slotDefHome.instance.embeddedProperties.size()-1 ? 'opaque' : ''}"/>
+						</a:commandLink>
+					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
             
@@ -267,7 +284,8 @@
 				<rich:dataTable value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
 						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" 
 						onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
-						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+						rowKeyVar="row">
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
@@ -357,6 +375,22 @@
             			L'informazione è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
             						
 					</rich:column>
+					<rich:column styleClass="action #{!prop.active ? 'invalidRow' : ''}" style="width:50px">
+						<f:facet name="header">Ordine</f:facet>
+						<a:commandLink action="#{positionSorterBean.movePropertyDefUp(prop)}"
+									onclick="#{rich:component('waitPanel')}.show()"
+									oncomplete="#{rich:component('waitPanel')}.hide()"
+									reRender="propTable" disabled="#{row == 0}">
+							<h:graphicImage value="/img/arrow-090.png" styleClass="#{row == 0 ? 'opaque' : ''}"/>
+						</a:commandLink>
+						#{' '}
+						<a:commandLink action="#{positionSorterBean.movePropertyDefDown(prop)}"
+									onclick="#{rich:component('waitPanel')}.show()"
+									oncomplete="#{rich:component('waitPanel')}.hide()" 
+									reRender="propTable" disabled="#{row == slotDefHome.instance.propertyDefs.size()-1}">
+							<h:graphicImage value="/img/arrow-270.png" styleClass="#{row == slotDefHome.instance.propertyDefs.size()-1 ? 'opaque' : ''}"/>
+						</a:commandLink>
+					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
 			
@@ -372,7 +406,8 @@
 						rendered="#{not empty slotDefHome.instance.docDefCollectionsAsList}" 
 						style="width:1024px"
 						onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
-						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+						rowKeyVar="row">
 					<rich:column style="width:200px; font-weight:bold;" stylesimplifiedDependentSlotDefPanelClass="#{!coll.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
@@ -431,6 +466,22 @@
             						rendered="#{slotDefHome.referenced and coll.id!=null}"/>
             				<rich:toolTip for="invalidate" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(coll)}">
             				La richiesta è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
+					</rich:column>
+					<rich:column styleClass="action #{!coll.active ? 'invalidRow' : ''}" style="width:50px">
+						<f:facet name="header">Ordine</f:facet>
+						<a:commandLink action="#{positionSorterBean.moveDocDefCollectionUp(coll)}"
+									onclick="#{rich:component('waitPanel')}.show()"
+									oncomplete="#{rich:component('waitPanel')}.hide()"
+									reRender="collTable" disabled="#{row == 0}">
+							<h:graphicImage value="/img/arrow-090.png" styleClass="#{row == 0 ? 'opaque' : ''}"/>
+						</a:commandLink>
+						#{' '}
+						<a:commandLink action="#{positionSorterBean.moveDocDefCollectionDown(coll)}"
+									onclick="#{rich:component('waitPanel')}.show()"
+									oncomplete="#{rich:component('waitPanel')}.hide()" 
+									reRender="collTable" disabled="#{row == slotDefHome.instance.docDefCollections.size()-1}">
+							<h:graphicImage value="/img/arrow-270.png" styleClass="#{row == slotDefHome.instance.docDefCollections.size()-1 ? 'opaque' : ''}"/>
+						</a:commandLink>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -523,7 +574,7 @@
 							oncomplete="#{rich:component('embeddedPropPanel')}.show()" 
 							rendered="#{slotDefParameters.mode != 'PRIMARY'}"
 							reRender="embeddedPropPanel"/>
-                <h:graphicImage id="addInfoGara" value="/img/question-white.png" styleClass="fileIconRight" style="margin-right: 20px"/>
+                <h:graphicImage id="addInfoGara" value="/img/question-white.png" styleClass="fileIconRight" style="margin-right: 20px" rendered="#{slotDefParameters.mode != 'PRIMARY'}"/>
                 <rich:toolTip for="addInfoGara" direction="bottom-left">Aggiungi una informazione relativa alla gara. Per esempio la data di scadenza.</rich:toolTip>
 							
 				<a:commandButton value="Aggiungi informazione sull'azienda"
@@ -545,7 +596,10 @@
 							oncomplete="#{rich:component('collTypePanel')}.hide(); #{rich:component('collPanel')}.show();"
 							reRender="collPanel,propPanel"
 							rendered="#{not s:hasRole('ADMIN') and not slotDefHome.instance.template}"/>
-                <h:graphicImage id="addRichiesta" value="/img/question-white.png" styleClass="fileIconRight" style="margin-right: 20px"/>
+                <h:graphicImage id="addRichiesta" 
+                			value="/img/question-white.png" 
+                			styleClass="fileIconRight" 
+                			style="margin-right: 20px"/>
                 <rich:toolTip for="addRichiesta" direction="bottom-left">Aggiungi un documento richiesto dal disciplinare</rich:toolTip>
 							
 				<a:commandButton value="Aggiungi sottobusta"

@@ -1,5 +1,8 @@
 package it.drwolf.force.entity;
 
+import it.drwolf.force.enums.StatoAzienda;
+import it.drwolf.force.enums.TipologiaAbbonamento;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,6 +11,8 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -59,9 +64,11 @@ public class Azienda implements Serializable {
 	private FormaGiuridica formaGiuridica;
 	private Settore settore;
 	private String posizioneCNA;
-	private String stato;
+	// private String stato;
+	private StatoAzienda stato;
 
-	private String tipologiaAbbonamento;
+	// private String tipologiaAbbonamento;
+	private TipologiaAbbonamento tipologiaAbbonamento;
 
 	// per Alfresco
 	private String alfrescoGroupId;
@@ -244,18 +251,29 @@ public class Azienda implements Serializable {
 
 	}
 
-	@Column(nullable = false)
+	// @Column(nullable = false)
+	// @NotNull
+	// public String getStato() {
+	// return this.stato;
+	// }
+
+	@Enumerated(EnumType.STRING)
 	@NotNull
-	public String getStato() {
+	public StatoAzienda getStato() {
 		return this.stato;
 	}
+
+	// public String getTipologiaAbbonamento() {
+	// return this.tipologiaAbbonamento;
+	// }
 
 	@Column(nullable = true)
 	public String getTelefono() {
 		return this.telefono;
 	}
 
-	public String getTipologiaAbbonamento() {
+	@Enumerated(EnumType.STRING)
+	public TipologiaAbbonamento getTipologiaAbbonamento() {
 		return this.tipologiaAbbonamento;
 	}
 
@@ -394,20 +412,29 @@ public class Azienda implements Serializable {
 		this.soa = categoriaOpereGenerali;
 	}
 
+	// public void setStato(String stato) {
+	// this.stato = stato;
+	// }
+
 	@Transient
 	public void setSoaAsList(List<AziendaSoa> lista) {
 		this.setSoa(new HashSet<AziendaSoa>(lista));
 	}
 
-	public void setStato(String stato) {
-		this.stato = stato;
+	public void setStato(StatoAzienda statoAzienda) {
+		this.stato = statoAzienda;
 	}
 
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
 
-	public void setTipologiaAbbonamento(String tipologiaAbbonamento) {
+	public void setTipologiaAbbonamento(
+			TipologiaAbbonamento tipologiaAbbonamento) {
 		this.tipologiaAbbonamento = tipologiaAbbonamento;
 	}
+
+	// public void setTipologiaAbbonamento(String tipologiaAbbonamento) {
+	// this.tipologiaAbbonamento = tipologiaAbbonamento;
+	// }
 }

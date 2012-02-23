@@ -6,6 +6,7 @@ import it.drwolf.slot.enums.DefStatus;
 import it.drwolf.slot.interfaces.Conditionable;
 import it.drwolf.slot.interfaces.Deactivable;
 import it.drwolf.slot.interfaces.Definition;
+import it.drwolf.slot.interfaces.PositionSortable;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -21,7 +22,8 @@ import org.hibernate.validator.NotNull;
 
 @Entity
 @EntityListeners(value = DocDefCollectionListener.class)
-public class DocDefCollection implements Deactivable, Definition, Conditionable {
+public class DocDefCollection implements Deactivable, Definition,
+		Conditionable, PositionSortable {
 
 	private Long id;
 
@@ -46,6 +48,8 @@ public class DocDefCollection implements Deactivable, Definition, Conditionable 
 	private DefStatus status;
 
 	private String description;
+
+	private Integer position;
 
 	@ManyToOne(cascade = CascadeType.PERSIST)
 	public PropertyDef getConditionalPropertyDef() {
@@ -89,6 +93,10 @@ public class DocDefCollection implements Deactivable, Definition, Conditionable 
 
 	public String getName() {
 		return this.name;
+	}
+
+	public Integer getPosition() {
+		return this.position;
 	}
 
 	@Transient
@@ -144,6 +152,10 @@ public class DocDefCollection implements Deactivable, Definition, Conditionable 
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setPosition(Integer position) {
+		this.position = position;
 	}
 
 	public void setQuantifier(CollectionQuantifier quantifier) {
