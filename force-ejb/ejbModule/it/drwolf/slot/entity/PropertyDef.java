@@ -69,6 +69,8 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	private String description;
 
+	private Integer position;
+
 	public PropertyDef() {
 	}
 
@@ -191,6 +193,10 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 		return this.name;
 	}
 
+	public Integer getPosition() {
+		return this.position;
+	}
+
 	@OneToMany(mappedBy = "numberOfInstances")
 	public Set<DependentSlotDef> getSlotDefsIsNumberOfInstancesOf() {
 		return this.slotDefsIsNumberOfInstancesOf;
@@ -290,6 +296,10 @@ public class PropertyDef implements DataDefinition, Deactivable, Conditionable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setPosition(Integer position) {
+		this.position = position;
 	}
 
 	public void setRequired(boolean required) {

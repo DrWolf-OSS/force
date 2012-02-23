@@ -187,6 +187,7 @@ public class SlotDefEditBean {
 		SlotDef instance = this.slotDefHome.getInstance();
 		if (!instance.getPropertyDefsAsList().contains(this.propertyDef)) {
 			instance.getPropertyDefs().add(this.propertyDef);
+			this.propertyDef.setPosition(instance.getPropertyDefs().size());
 		}
 		// if (this.converterPropertyMap.get(this.propertyDef.getUuid()) ==
 		// null) {
@@ -384,6 +385,10 @@ public class SlotDefEditBean {
 		return this.embeddedProperty;
 	}
 
+	private Integer getFirstPropertyDefPosition() {
+		return null;
+	}
+
 	public ArrayList<VerifierMessage> getMessages() {
 		return this.messages;
 	}
@@ -552,6 +557,35 @@ public class SlotDefEditBean {
 			this.slotInstHome.setInstance(slotInst);
 			this.slotInstHome.update();
 		}
+	}
+
+	private void movePropertyDef(PropertyDef propertyDef, String direction) {
+		Integer oldPosition = propertyDef.getPosition();
+		if (direction.equals("UP")) {
+			propertyDef.setPosition(oldPosition - 1);
+		} else if (direction.equals("DOWN")) {
+			propertyDef.setPosition(oldPosition + 1);
+		} else {
+			return;
+		}
+		Iterator<PropertyDef> iterator = this.slotDefHome.getInstance()
+				.getPropertyDefs().iterator();
+		while (iterator.hasNext()) {
+			PropertyDef pd = iterator.next();
+			if (pd.getPosition().intValue() == (propertyDef.getPosition()
+					.intValue()) && !pd.equals(propertyDef)) {
+				pd.setPosition(oldPosition);
+				return;
+			}
+		}
+	}
+
+	public void movePropertyDefDown(PropertyDef propertyDef) {
+		this.movePropertyDef(propertyDef, "DOWN");
+	}
+
+	public void movePropertyDefUp(PropertyDef propertyDef) {
+		this.movePropertyDef(propertyDef, "UP");
 	}
 
 	public void newCollection() {

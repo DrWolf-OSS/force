@@ -1,9 +1,12 @@
 package it.drwolf.slot.entity;
 
+import it.drwolf.slot.comparators.PropertyDefPositionComparator;
+import it.drwolf.slot.entity.listeners.SlotDefListener;
 import it.drwolf.slot.enums.SlotDefSatus;
 import it.drwolf.slot.enums.SlotDefType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +14,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EntityManager;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -26,6 +30,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Cascade;
 
 @Entity
+@EntityListeners(value = SlotDefListener.class)
 @Inheritance(strategy = InheritanceType.JOINED)
 public class SlotDef {
 
@@ -102,7 +107,7 @@ public class SlotDef {
 		return this.ownerId;
 	}
 
-	@OrderBy("name")
+	@OrderBy("position")
 	@OneToMany(cascade = CascadeType.ALL)
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 	@JoinColumn(name = "slotDef_id")
@@ -112,7 +117,10 @@ public class SlotDef {
 
 	@Transient
 	public List<PropertyDef> getPropertyDefsAsList() {
-		return new ArrayList<PropertyDef>(this.propertyDefs);
+		ArrayList<PropertyDef> list = new ArrayList<PropertyDef>(
+				this.propertyDefs);
+		Collections.sort(list, new PropertyDefPositionComparator());
+		return list;
 	}
 
 	@Transient

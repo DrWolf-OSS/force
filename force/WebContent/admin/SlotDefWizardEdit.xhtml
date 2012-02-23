@@ -267,7 +267,8 @@
 				<rich:dataTable value="#{slotDefHome.instance.propertyDefsAsList}" var="prop" 
 						rendered="#{not empty slotDefHome.instance.propertyDefsAsList}" 
 						onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
-						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+						rowKeyVar="row">
 					<rich:column style="width:200px; font-weight:bold;" styleClass="#{!prop.active ? 'invalidRow' : ''}">
 						<f:facet name="header">Nome</f:facet>
 						<h:graphicImage value="/img/cross.png"  styleClass="fileIcon"
@@ -356,6 +357,12 @@
             			<rich:toolTip for="invalidate" attached="true" rendered="#{not empty slotDefEditBean.retrieveReferencedRules(prop)}">
             			L'informazione è coinvolta in una regola e non può essere rimossa. Eliminare prima la regola che la referenzia</rich:toolTip>
             						
+					</rich:column>
+					<rich:column styleClass="action #{!prop.active ? 'invalidRow' : ''}">
+						<f:facet name="header">Ordine</f:facet>
+						<a:commandLink value="UP" action="#{slotDefEditBean.movePropertyDefUp(prop)}" reRender="propTable" disabled="#{row == 0}"/>
+						#{' '}
+						<a:commandLink value="DOWN" action="#{slotDefEditBean.movePropertyDefDown(prop)}" reRender="propTable" disabled="#{row == slotDefHome.instance.propertyDefs.size()-1}"/>
 					</rich:column>
 				</rich:dataTable>
 			</s:decorate>
@@ -560,8 +567,7 @@
 							rendered="#{slotDefHome.instance.type == 'GENERAL' and not s:hasRole('ADMIN')}" 						 
 							oncomplete="#{rich:component('dependentSlotDefPanel')}.show()" 
 							reRender="dependentSlotDefPanel"/>					
-                <h:graphicImage id="addSottoBusta" value="/img/question-white.png" styleClass="fileIconRight" style="margin-right: 20px"
-                			rendered="#{slotDefHome.instance.type == 'GENERAL' and not s:hasRole('ADMIN')}"/>
+                <h:graphicImage id="addSottoBusta" value="/img/question-white.png" styleClass="fileIconRight" style="margin-right: 20px"/>
                 <rich:toolTip for="addSottoBusta" direction="bottom-left">Inserisci una busta amministrativa collegata neln caso in cui intendi partecipare in Consorzio, ATI/RTI</rich:toolTip>
 			</s:decorate>
 			

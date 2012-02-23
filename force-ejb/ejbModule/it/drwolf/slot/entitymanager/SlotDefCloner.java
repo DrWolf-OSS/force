@@ -300,6 +300,7 @@ public class SlotDefCloner {
 		clonedPropertyDef.setMultiple(propertyDef.isMultiple());
 		clonedPropertyDef.setRequired(propertyDef.isRequired());
 		clonedPropertyDef.setDictionary(propertyDef.getDictionary());
+		clonedPropertyDef.setPosition(propertyDef.getPosition());
 		return clonedPropertyDef;
 	}
 

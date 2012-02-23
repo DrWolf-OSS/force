@@ -343,7 +343,7 @@
 		          	<f:param name="garaId" value="#{garaHome.garaId}"/>
 				</s:button>
 				<h:graphicImage id="publishButton" value="/img/question-white.png"  styleClass="fileIconRight" 
-								rendered="#{identity.hasRole('ADMIN')}" >
+								rendered="#{not slotDefHome.instance.template and identity.hasRole('ADMIN')}" >
 						<rich:toolTip for="publishButton">Per modificare la busta è necessario prima revocare la pubblicazione</rich:toolTip>
 				</h:graphicImage>
 			</s:decorate>
