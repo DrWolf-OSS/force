@@ -389,13 +389,11 @@ public class Heartbeat {
 				}
 				body += "Per vedere il dettaglio effettua il login su FORCE:\n";
 				body += "http://http://www.forcecna.it/force/login.seam\n\n";
-				try {
-					this.sendEmail("Nuove Gare", body,
-							azienda.getEmailReferente());
-				} catch (EmailException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				/*
+				 * try { this.sendEmail("Nuove Gare", body,
+				 * azienda.getEmailReferente()); } catch (EmailException e) { //
+				 * TODO Auto-generated catch block e.printStackTrace(); }
+				 */
 			}
 		}
 
