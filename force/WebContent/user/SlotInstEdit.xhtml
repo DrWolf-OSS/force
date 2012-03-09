@@ -391,7 +391,7 @@
 										</ui:repeat>
 									</s:div>
 
-									<s:decorate template="/layout/display.xhtml">
+									<s:decorate template="/layout/displayAlfrescoProperty.xhtml">
 										<rich:toolTip direction="top-left">
 									 		<img src="/force/tn?id=#{item.document.id}&amp;name=imgpreview"/>
 										</rich:toolTip>
@@ -416,7 +416,7 @@
 										<h:outputText value="#{item.fileName}" />
 										</a>
 									</s:decorate>
-									<s:decorate template="/layout/display.xhtml" rendered="#{item.document.hasAspect('P:dw:signed')}">
+									<s:decorate template="/layout/displayAlfrescoProperty.xhtml" rendered="#{item.document.hasAspect('P:dw:signed')}">
 										<ui:define name="label">
 											<h:outputText value="Firma Digitale" />
 										</ui:define>
@@ -461,14 +461,14 @@
 														<h:outputText value="#{sign.authority}" />
 													</s:decorate>
 													<div style="clear: both" />
-													<rich:separator styleClass="tooltipSeparator" height="1" rendered="#{key ge 1}"/>
+													<rich:separator styleClass="tooltipSeparator" height="1" rendered="#{key ge 0 and key lt item.signatures.size()-1}"/>
 												</a:repeat>
 											</s:span>
 										</rich:toolTip>
 									</s:decorate>
 
 									<a:repeat var="dataInstance" value="#{item.documentProperties}">
-										<s:decorate template="/layout/display.xhtml">
+										<s:decorate template="/layout/displayAlfrescoProperty.xhtml">
 											<ui:define name="label">
 												<h:outputText value="#{dataInstance.dataDefinition.label}" />
 											</ui:define>
@@ -652,7 +652,6 @@
 			</f:facet>
 			
 			<a:form id="editPanelForm" onkeypress="dirty=true">
-
 					<script type="text/javascript">
 					var epfinvalid = false;
 					</script>

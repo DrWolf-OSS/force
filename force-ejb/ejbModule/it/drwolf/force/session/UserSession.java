@@ -8,7 +8,6 @@ import it.drwolf.slot.alfresco.AlfrescoWrapper;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.entity.SlotDef;
 import it.drwolf.slot.entity.SlotInst;
-import it.drwolf.slot.pagebeans.SlotInstEditBean;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
@@ -51,9 +50,6 @@ public class UserSession implements Serializable {
 
 	@In(create = true)
 	private AlfrescoWrapper alfrescoWrapper;
-
-	@In(create = true)
-	SlotInstEditBean slotInstEditBean;
 
 	@In(create = true)
 	private Preferences preferences;

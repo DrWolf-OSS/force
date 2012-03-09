@@ -14,7 +14,6 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 
-import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.framework.EntityHome;
 
@@ -25,8 +24,8 @@ public class SlotDefHome extends EntityHome<SlotDef> {
 
 	private SlotDef model;
 
-	@In(create = true)
-	private SlotInstHome slotInstHome;
+	// @In(create = true)
+	// private SlotInstHome slotInstHome;
 
 	// @In(create = true)
 	private SlotDefCloner slotDefCloner = new SlotDefCloner();

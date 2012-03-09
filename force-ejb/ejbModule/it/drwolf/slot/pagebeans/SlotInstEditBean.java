@@ -81,7 +81,6 @@ import org.richfaces.model.UploadItem;
 
 @Name("slotInstEditBean")
 @Scope(ScopeType.CONVERSATION)
-@Transactional
 public class SlotInstEditBean {
 
 	@In(create = true)

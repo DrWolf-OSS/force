@@ -125,7 +125,7 @@ a:HOVER {
 }
 
 .infoPanel{
-	width: 450px; 
+	width: 500px; 
 }
 
 .summaryGrid{
@@ -181,6 +181,23 @@ a:HOVER {
 	opacity: .3;
 	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
 	filter: alpha(opacity=30);
+}
+
+/* customType = a */
+.aname {
+	vertical-align: top;
+	font-weight: bold;
+	width: 145px;
+	float: left;
+	padding: 5px;
+	margin-top: 3px;
+	clear: left;
+}
+
+.avalue {
+	float: left;
+	padding: 5px;
+	width: 255px;
 }
 
 /*
