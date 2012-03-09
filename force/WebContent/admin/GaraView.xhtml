@@ -71,77 +71,129 @@
 
             <div style="clear:both"/>
             <rich:spacer height="40"/>
-			
-			<rich:dataTable id="garaSlotInsts" value="#{allAssociatedSlotInstsAsObjects}" 
-						var="field" 
-						rendered="#{not empty allAssociatedSlotInstsAsObjects}"
-						onRowMouseOver="this.style.backgroundColor='#F2F2F2'"
-						onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
-				<f:facet name="header">
-					<h:outputText value="Buste amministrative relative alla gara" />
-            	</f:facet>
-				<rich:column>
+			<rich:tabPanel switchType="client">
+			    <rich:tab label="Richieste">
+			    <h:outputText value="Non ci sono richieste per questa gara" rendered="#{empty adminUserSession.getBusteRequestByGara(garaHome.instance)}"/>
+			    <rich:dataTable id="garaRichiesteBusta" value="#{adminUserSession.getBusteRequestByGara(garaHome.instance)}" 
+                            var="_azienda" 
+                            rendered="#{not empty adminUserSession.getBusteRequestByGara(garaHome.instance)}"
+                            onRowMouseOver="this.style.backgroundColor='#F2F2F2'"
+                            onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+                    <f:facet name="header">
+                        <h:outputText value="Aziende che hanno richiesto la busta amministrativa" />
+                    </f:facet>
+                    <rich:column sortBy="#{_azienda.ragioneSociale}">
+                        <f:facet name="header">
+                            Ragione Sociale
+                        </f:facet>
+                    <h:outputText value="#{_azienda.ragioneSociale}"/>
+                    </rich:column>
+                    <rich:column sortBy="#{_azienda.nome}">
+			            <f:facet name="header">
+			            Nome
+			            </f:facet>
+			            <h:outputText value="#{_azienda.nome}"/>
+			        </rich:column>
+			        <rich:column sortBy="#{_azienda.cognome}">
+			            <f:facet name="header">
+			            Cognome
+			            </f:facet>
+			            <h:outputText value="#{_azienda.cognome}"/>
+			        </rich:column>
+			        <rich:column sortBy="#{_azienda.emailReferente}">
+			            <f:facet name="header">
+			            Email Referente
+			            </f:facet>
+			            <h:outputText value="#{_azienda.emailReferente}"/>
+			        </rich:column>
+                    
+				   <rich:column styleClass="action">
+				            <f:facet name="header">Azioni</f:facet>
+				            <s:link view="/admin/#Azienda.xhtml"
+				                   value="Vedi'"
+				                      id="aziendaViewId">
+				                <f:param name="aziendaId"
+				                        value="#{_azienda.id}"/>
+				            </s:link>
+				            #{' '}
+			        </rich:column>
+                     </rich:dataTable>
+			    </rich:tab>
+			    <rich:tab label="Partecipanti"> 
+			    <h:outputText value="Non ci sono aziende che stanno partecipando a questa gara" rendered="#{empty allAssociatedSlotInstsAsObjects}"/>
+				<rich:dataTable id="garaSlotInsts" value="#{allAssociatedSlotInstsAsObjects}" 
+							var="field" 
+							rendered="#{not empty allAssociatedSlotInstsAsObjects}"
+							onRowMouseOver="this.style.backgroundColor='#F2F2F2'"
+							onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
 					<f:facet name="header">
-						<h:outputText value="Id" />
-            		</f:facet>
-					<h:outputText value="#{field[0]}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">
-						<h:outputText value="Partecipante" />
-            		</f:facet>
-            		<s:link value="#{field[2]}" propagation="none"
-            			view="/admin/Azienda.xhtml">
-            			<f:param name="aziendaId" value="#{field[7]}"/>
-            		</s:link>
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">
-						<h:outputText value="Referente" />
-            		</f:facet>
-					<h:outputText value="#{field[6]}" />
-				</rich:column>
-				<rich:column styleClass="columnSlotInstStatus">
-					<f:facet name="header">
-						<h:outputText value="Stato" />
-            		</f:facet>
-            		<h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
-								rendered="#{field[5] == 'EMPTY'}" />
-					<h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
-								rendered="#{field[5] == 'VALID'}" />
-					<h:graphicImage value="/img/envelope-red-exclamation.png"  styleClass="fileIcon"
-								rendered="#{field[5] == 'INVALID'}" />
-					<h:outputText value="#{field[5].value()}" />
-				</rich:column>
-				<rich:column>
-					<f:facet name="header">
-						<h:outputText value="Busta definita da" />
-            		</f:facet>
-					<h:outputText value="#{field[1] == field[4] ? field[2] : field[4]}" />
-				</rich:column>
-				
-				<rich:column styleClass="action">
-            		<f:facet name="header">Azioni</f:facet>
-            		<s:link view="/admin/SlotDefView.xhtml"
-            			styleClass="modal"
-		                   value="Visualizza Definizione"
-		             propagation="none">
-		                <f:param name="garaId" value="#{_gara.id}"/>
-		                <f:param name="slotDefId" value="#{field[3]}"/>
-		            </s:link>
-		            #{' | '}
-            		<s:link view="/user/SlotInstEdit.xhtml"
-            			styleClass="modal"
-		                   value="Modifica Contenuto"
-		             propagation="none">
-		                <f:param name="garaId" value="#{_gara.id}"/>
-		                <f:param name="slotInstId" value="#{field[0]}"/>
-		                <f:param name="slotDefId" value="#{field[3]}"/>
-		            </s:link>
-        		</rich:column>
-			</rich:dataTable>
-			<rich:datascroller for="garaSlotInsts" renderIfSinglePage="false" rendered="#{not empty allAssociatedSlotInstsAsObjects}"/>
+						<h:outputText value="Buste amministrative relative alla gara" />
+	            	</f:facet>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Id" />
+	            		</f:facet>
+						<h:outputText value="#{field[0]}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Partecipante" />
+	            		</f:facet>
+	            		<s:link value="#{field[2]}" propagation="none"
+	            			view="/admin/Azienda.xhtml">
+	            			<f:param name="aziendaId" value="#{field[7]}"/>
+	            		</s:link>
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Referente" />
+	            		</f:facet>
+						<h:outputText value="#{field[6]}" />
+					</rich:column>
+					<rich:column styleClass="columnSlotInstStatus">
+						<f:facet name="header">
+							<h:outputText value="Stato" />
+	            		</f:facet>
+	            		<h:graphicImage value="/img/envelope-empty.png"  styleClass="fileIcon"
+									rendered="#{field[5] == 'EMPTY'}" />
+						<h:graphicImage value="/img/envelope-tick.png"  styleClass="fileIcon"
+									rendered="#{field[5] == 'VALID'}" />
+						<h:graphicImage value="/img/envelope-red-exclamation.png"  styleClass="fileIcon"
+									rendered="#{field[5] == 'INVALID'}" />
+						<h:outputText value="#{field[5].value()}" />
+					</rich:column>
+					<rich:column>
+						<f:facet name="header">
+							<h:outputText value="Busta definita da" />
+	            		</f:facet>
+						<h:outputText value="#{field[1] == field[4] ? field[2] : field[4]}" />
+					</rich:column>
+					
+					<rich:column styleClass="action">
+	            		<f:facet name="header">Azioni</f:facet>
+	            		<s:link view="/admin/SlotDefView.xhtml"
+	            			styleClass="modal"
+			                   value="Visualizza Definizione"
+			             propagation="none">
+			                <f:param name="garaId" value="#{_gara.id}"/>
+			                <f:param name="slotDefId" value="#{field[3]}"/>
+			            </s:link>
+			            #{' | '}
+	            		<s:link view="/user/SlotInstEdit.xhtml"
+	            			styleClass="modal"
+			                   value="Modifica Contenuto"
+			             propagation="none">
+			                <f:param name="garaId" value="#{_gara.id}"/>
+			                <f:param name="slotInstId" value="#{field[0]}"/>
+			                <f:param name="slotDefId" value="#{field[3]}"/>
+			            </s:link>
+	        		</rich:column>
+	                <rich:datascroller for="garaSlotInsts" renderIfSinglePage="false" rendered="#{not empty allAssociatedSlotInstsAsObjects}"/>
+				</rich:dataTable>
+				</rich:tab>
+		</rich:tabPanel>
         </rich:panel>
+
          <s:div rendered="#{garaHome.instance.active}">
              <s:button view="/admin/SlotDefTemplateList.xhtml"
                     id="create"

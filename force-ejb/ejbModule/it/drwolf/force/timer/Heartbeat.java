@@ -373,7 +373,7 @@ public class Heartbeat {
 			// cioè quelle con email a false
 			List<ComunicazioneAziendaGara> cags = entityManager
 					.createQuery(
-							"from ComunicazioneAziendaGara cag where cag.azienda = :azienda and cag.gara.type = 'GESTITA' and cag.gara.stato = 'INSERITA' and email = false")
+							"from ComunicazioneAziendaGara cag where cag.azienda = :azienda and cag.gara.type = 'GESTITA' and cag.gara.stato = 'INSERITA' and email = false and web = false")
 					.setParameter("azienda", azienda).getResultList();
 			if (cags.size() > 0) {
 				String body = "Gentile " + azienda.getNome() + " "
@@ -389,13 +389,11 @@ public class Heartbeat {
 				}
 				body += "Per vedere il dettaglio effettua il login su FORCE:\n";
 				body += "http://http://www.forcecna.it/force/login.seam\n\n";
-				try {
-					this.sendEmail("Nuove Gare", body,
-							azienda.getEmailReferente());
-				} catch (EmailException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				/*
+				 * try { this.sendEmail("Nuove Gare", body,
+				 * azienda.getEmailReferente()); } catch (EmailException e) { //
+				 * TODO Auto-generated catch block e.printStackTrace(); }
+				 */
 			}
 		}
 

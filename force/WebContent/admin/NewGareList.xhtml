@@ -12,71 +12,49 @@
 
     <h:form id="gareNuove" >
     <rich:panel>
-        <f:facet name="header">Elenco delle nuove gare inserite</f:facet>
+        <f:facet name="header">Elenco delle nuove gare non gestite</f:facet>
     <div class="results" id="newGareList">
 
-    <h:outputText value="La ricerca non ha prodotto nessun risultato."
-               rendered="#{empty garaList.garaNuove}"/>
+    <h:outputText value="Non ci sono gare non gestite."
+               rendered="#{empty listaGareNuove}"/>
 
     <rich:dataTable id="newGareList"
                 var="_gara"
-              value="#{garaList.garaNuove}"
-               rows="10"
-           rendered="#{not empty garaList.garaNuove}">
-        <h:column>
+                value="#{listaGareNuove}"
+                rows="5"
+                onRowMouseOver="this.style.backgroundColor='#F1F1F1'"
+                onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'"
+                rendered="#{not empty listaGareNuove}"
+                reRender="ds">
+       <rich:column sortBy="#{_gara.oggetto}" filterBy="#{_gara.oggetto}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Oggetto"/>
-                    <ui:param name="propertyPath" value="gara.oggetto"/>
-                </ui:include>
+                Oggetto
             </f:facet>
             <h:outputText value="#{_gara.oggetto}"/>
-        </h:column>
-        <h:column>
+        </rich:column>
+
+        <rich:column sortBy="#{_gara.fonte.nome}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Provenienza"/>
-                    <ui:param name="propertyPath" value="gara.fonte.nome"/>
-                </ui:include>
+                Fonte
             </f:facet>
             <h:outputText value="#{_gara.fonte.nome} (#{_gara.fonte.tipo})"/>
-        </h:column>
-           <h:column>
+        </rich:column>
+        <rich:column sortBy="#{_gara.dataPubblicazione}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Procedura"/>
-                    <ui:param name="propertyPath" value="gara.tipoProcedura"/>
-                </ui:include>
-            </f:facet>
-            <h:outputText value="#{_gara.tipoProcedura}"/>
-        </h:column>
-        <h:column>
-            <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Data Inizio"/>
-                    <ui:param name="propertyPath" value="gara.dataPubblicazione"/>
-                </ui:include>
+                Data Pubblicazione
             </f:facet>
             <h:outputText value="#{_gara.dataPubblicazione}">
-                <f:convertDateTime pattern="dd/MM/yyyy"/>
+              <!--   <f:convertDateTime pattern="dd/MM/yyyy"/> -->
             </h:outputText>
-        </h:column>
-        <h:column>
+        </rich:column>
+        <rich:column sortBy="#{_gara.dataScadenza}">
             <f:facet name="header">
-                <ui:include src="/layout/sort.xhtml">
-                    <ui:param name="entityList" value="#{garaList}"/>
-                    <ui:param name="propertyLabel" value="Data Fine"/>
-                    <ui:param name="propertyPath" value="gara.dataScadenza"/>
-                </ui:include>
+                Data Scadenza
             </f:facet>
             <h:outputText value="#{_gara.dataScadenza}">
-                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                <!-- <f:convertDateTime pattern="dd/MM/yyyy"/> -->
             </h:outputText>
-        </h:column>
+        </rich:column>
         <rich:column styleClass="action">
             <f:facet name="header">Azioni</f:facet>
             <h:outputLink value="#{_gara.link}" target="_blank">Vedi</h:outputLink>
@@ -92,8 +70,10 @@
              #{' '}
              
         </rich:column>
+         <f:facet name="footer">
+             <rich:datascroller id="ds" renderIfSinglePage="false"></rich:datascroller>
+        </f:facet>
     </rich:dataTable>
-    <rich:datascroller for="newGareList" />    
 
     </div>
     </rich:panel>

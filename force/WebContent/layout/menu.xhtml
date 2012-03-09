@@ -69,28 +69,51 @@
         <f:facet name="label">Gestione Aziende</f:facet>
         <rich:menuItem>
             <s:link view="/admin/NewAziendaList.xhtml"
-                value="Aziende da Attivare"
+                value="Da Attivare"
                 id="NewCompId"
                 includePageParams="false"
                 propagation="none"/>
         </rich:menuItem>
         <rich:menuItem>
             <s:link view="/admin/AziendaList.xhtml"
-                value="Aziende Attive"
+                value="Attive"
                 id="ActiveCompId"
                 includePageParams="false"
                 propagation="none"/>
         </rich:menuItem>
+         <rich:menuGroup value="Pagamento">
+            <rich:menuItem>
+            <s:link view="/admin/CallCenterAziendaList.xhtml"
+                value="Call Center"
+                id="CallCenerCompId"
+                includePageParams="false"
+                propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem>
+            <s:link view="/admin/BaseAziendaList.xhtml"
+                value="Base"
+                id="BaseCompId"
+                includePageParams="false"
+                propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem>
+            <s:link view="/admin/PremiumAziendaList.xhtml"
+                value="All Inclusive"
+                id="PremiumCompId"
+                includePageParams="false"
+                propagation="none"/>
+            </rich:menuItem>
+        </rich:menuGroup>
         <rich:menuItem>
             <s:link view="/admin/SuspendAziendaList.xhtml"
-                value="Aziende Sospese"
+                value="Sospese"
                 id="SuspCompId"
                 includePageParams="false"
                 propagation="none"/>
         </rich:menuItem>
         <rich:menuItem>
             <s:link view="/admin/RevokedAziendaList.xhtml"
-                value="Aziende Revocate"
+                value="Revocate"
                 id="RevCompId"
                 includePageParams="false"
                 propagation="none"/>
