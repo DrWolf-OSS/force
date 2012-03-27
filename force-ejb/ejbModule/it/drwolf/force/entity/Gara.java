@@ -50,6 +50,8 @@ public class Gara implements Serializable {
 
 	private String link;
 
+	private String avcpCode;
+
 	private Date dataPubblicazione;
 
 	private Date dataScadenza;
@@ -77,11 +79,11 @@ public class Gara implements Serializable {
 
 	private Fonte fonte;
 
-	// private SlotDef slotDef;
-
 	private Set<SlotDef> slotDefs = new HashSet<SlotDef>();
 
 	private Set<CategoriaMerceologica> categorieMerceologiche = new HashSet<CategoriaMerceologica>();
+
+	// private SlotDef slotDef;
 
 	private Set<Soa> soa = new HashSet<Soa>();
 
@@ -164,6 +166,11 @@ public class Gara implements Serializable {
 		return null;
 	}
 
+	@Column(nullable = true)
+	public String getAvcpCode() {
+		return this.avcpCode;
+	}
+
 	@OneToMany(mappedBy = "gara", fetch = FetchType.EAGER)
 	public Set<ComunicazioneAziendaGara> getAziende() {
 		return this.aziende;
@@ -228,16 +235,16 @@ public class Gara implements Serializable {
 		return this.requisitoEconomico;
 	}
 
+	@Column
+	public BigDecimal getRequisitoTecnico() {
+		return this.requisitoTecnico;
+	}
+
 	// @ManyToOne
 	// @JoinColumn(name = "SlotDef")
 	// public SlotDef getSlotDef() {
 	// return this.slotDef;
 	// }
-
-	@Column
-	public BigDecimal getRequisitoTecnico() {
-		return this.requisitoTecnico;
-	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "Settore", nullable = true)
@@ -282,8 +289,6 @@ public class Gara implements Serializable {
 		return this.type;
 	}
 
-	// deve essere inserito anche un riferimento al settore?
-
 	@Transient
 	public boolean isActive() {
 		if (this.getType().equals(TipoGara.GESTITA.getNome())) {
@@ -291,6 +296,8 @@ public class Gara implements Serializable {
 		}
 		return false;
 	}
+
+	// deve essere inserito anche un riferimento al settore?
 
 	@Transient
 	public boolean isNew() {
@@ -310,6 +317,10 @@ public class Gara implements Serializable {
 			}
 		}
 		return null;
+	}
+
+	public void setAvcpCode(String avcpCode) {
+		this.avcpCode = avcpCode;
 	}
 
 	// deve essere inserito anche un riferimento al settore?

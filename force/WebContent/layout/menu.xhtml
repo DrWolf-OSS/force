@@ -218,6 +218,33 @@
             </s:link>
         </rich:menuItem>
     </rich:dropDownMenu>
+    <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none" rendered="#{identity.loggedIn and identity.hasRole('ADMIN')}">
+        <f:facet name="label">Comunicazioni</f:facet>
+            <rich:menuItem>
+                <s:link view="/admin/ComunicazioniList.xhtml"
+	                value="Elenco comunicazioni"
+	                id="ComunicaizoniList"
+	                includePageParams="false"
+	                propagation="none">
+                </s:link>   
+            </rich:menuItem>
+            <rich:menuItem>        
+                <s:link view="/admin/ComunicazioneEdit.xhtml"
+                    value="Nuova Comunicazione"
+                    id="ComunicaizoniEdit"
+                    includePageParams="false"
+                    propagation="none">
+                </s:link>   
+                 </rich:menuItem>
+            <rich:menuItem>            
+                <s:link view="/admin/SendComunicazioniList.xhtml"
+                    value="Elenco comunicazioni inviate"
+                    id="SendComunicaizoniList"
+                    includePageParams="false"
+                    propagation="none">
+                </s:link>            
+            </rich:menuItem>
+    </rich:dropDownMenu>
     <!-- @newMenuItem@ -->
     <rich:toolBarGroup location="right" styleClass="linkMenuBar">
         <rich:dropDownMenu showDelay="250" hideDelay="0" submitMode="none"  rendered="#{identity.loggedIn}">

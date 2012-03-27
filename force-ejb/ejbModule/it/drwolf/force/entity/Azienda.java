@@ -61,15 +61,19 @@ public class Azienda implements Serializable {
 
 	private String fax;
 	private String cellulare;
+
+	// Per Privacy
+	private boolean privacy;
+
 	private FormaGiuridica formaGiuridica;
+
 	private Settore settore;
+
 	private String posizioneCNA;
 	// private String stato;
 	private StatoAzienda stato;
-
 	// private String tipologiaAbbonamento;
 	private TipologiaAbbonamento tipologiaAbbonamento;
-
 	// per Alfresco
 	private String alfrescoGroupId;
 
@@ -251,6 +255,17 @@ public class Azienda implements Serializable {
 
 	}
 
+	@Enumerated(EnumType.STRING)
+	@NotNull
+	public StatoAzienda getStato() {
+		return this.stato;
+	}
+
+	@Column(nullable = true)
+	public String getTelefono() {
+		return this.telefono;
+	}
+
 	// @Column(nullable = false)
 	// @NotNull
 	// public String getStato() {
@@ -258,24 +273,13 @@ public class Azienda implements Serializable {
 	// }
 
 	@Enumerated(EnumType.STRING)
-	@NotNull
-	public StatoAzienda getStato() {
-		return this.stato;
+	public TipologiaAbbonamento getTipologiaAbbonamento() {
+		return this.tipologiaAbbonamento;
 	}
 
 	// public String getTipologiaAbbonamento() {
 	// return this.tipologiaAbbonamento;
 	// }
-
-	@Column(nullable = true)
-	public String getTelefono() {
-		return this.telefono;
-	}
-
-	@Enumerated(EnumType.STRING)
-	public TipologiaAbbonamento getTipologiaAbbonamento() {
-		return this.tipologiaAbbonamento;
-	}
 
 	@Override
 	public int hashCode() {
@@ -299,6 +303,11 @@ public class Azienda implements Serializable {
 			return true;
 		}
 		return false;
+	}
+
+	@Column
+	public boolean isPrivacy() {
+		return this.privacy;
 	}
 
 	@Transient
@@ -394,6 +403,10 @@ public class Azienda implements Serializable {
 
 	public void setPosizioneCNA(String posizioneCNA) {
 		this.posizioneCNA = posizioneCNA;
+	}
+
+	public void setPrivacy(boolean privacy) {
+		this.privacy = privacy;
 	}
 
 	public void setProvincia(String provincia) {

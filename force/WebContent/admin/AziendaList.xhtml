@@ -51,11 +51,11 @@
             <h:outputText value="#{_azienda.emailReferente}"/>
         </rich:column>
 
-        <rich:column sortBy="#{_azienda.formaGiuridica.nome}"  filterBy="#{_azienda.formaGiuridica.nome}">
+        <rich:column sortBy="#{_azienda.comune}"  filterBy="#{_azienda.comune}">
             <f:facet name="header">
-            Forma Giuridica
+            Comune
             </f:facet>
-            <h:outputText value="#{_azienda.formaGiuridica.nome}"/>
+            <h:outputText value="#{_azienda.comune}"/>
         </rich:column>
         <rich:column sortBy="#{_azienda.indirizzo}" filterBy="#{_azienda.indirizzo}">
             <f:facet name="header">
