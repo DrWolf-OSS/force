@@ -1,8 +1,10 @@
 package it.drwolf.force.session.lists;
 
 import it.drwolf.force.entity.Comunicato;
+import it.drwolf.force.enums.StatoComunicato;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -37,15 +39,21 @@ public class ComunicazioneList implements Serializable {
 	@SuppressWarnings("unchecked")
 	@Factory("comunicatiNonSpediti")
 	public void getComunicatiNonSpediti() {
-		this.comunicatiNonSpediti = this.entityManager.createQuery(
-				"from Comunicato c where c.inviata = false").getResultList();
+		this.comunicatiNonSpediti = this.entityManager
+				.createQuery("from Comunicato c where c.stato IN (:s)")
+				.setParameter(
+						"s",
+						Arrays.asList(new StatoComunicato[] {
+								StatoComunicato.IN_ELABORAZIONE,
+								StatoComunicato.PRONTA })).getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Factory("comunicatiSpediti")
 	public void getComunicatiSpediti() {
-		this.comunicatiSpediti = this.entityManager.createQuery(
-				"from Comunicato c where c.inviata = true").getResultList();
+		this.comunicatiSpediti = this.entityManager
+				.createQuery("from Comunicato c where c.stato = :s")
+				.setParameter("s", StatoComunicato.SPEDITA).getResultList();
 	}
 
 	public void setComunicatiNonSpediti(List<Comunicato> comunicatiNonSpediti) {

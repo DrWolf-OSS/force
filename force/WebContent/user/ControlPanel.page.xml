@@ -12,6 +12,10 @@
     <action execute="#{userSession.checkStatus()}"/>
 
    <navigation from-action="#{userSession.checkStatus()}">
+     <rule if-outcome="NO_PRIVACY">
+        <redirect view-id="/privacy.xhtml">
+       </redirect>
+    </rule>
      <rule if-outcome="GO_TO_SOA">
         <redirect view-id="/user/SOAEdit.xhtml">
 	       <param name="slotInstId" value="#{slotInstHome.slotInstId}"/>

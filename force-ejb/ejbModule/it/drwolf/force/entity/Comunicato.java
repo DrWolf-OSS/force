@@ -1,13 +1,23 @@
 package it.drwolf.force.entity;
 
+import it.drwolf.force.enums.StatoComunicato;
+
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import org.hibernate.validator.NotNull;
 
 @Entity
 @Table(name = "Comunicato")
@@ -30,11 +40,41 @@ public class Comunicato implements Serializable {
 
 	private boolean toServizi = false;
 
-	private boolean inviata = false;
+	private StatoComunicato stato;
+
+	private Date dataCreazione;
+
+	private Date dataSpedizione;
+
+	private Date dataUltimaModifica;
 
 	@Column
 	public String getBody() {
 		return this.body;
+	}
+
+	@Transient
+	public String getBodySnippet() {
+		if (this.getBody().length() > 19) {
+			return this.getBody().substring(0, 20) + "...";
+		}
+		return this.getBody();
+	}
+
+	@Column
+	public Date getDataCreazione() {
+		return this.dataCreazione;
+	}
+
+	@Column
+	public Date getDataSpedizione() {
+		return this.dataSpedizione;
+	}
+
+	@Column
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date getDataUltimaModifica() {
+		return this.dataUltimaModifica;
 	}
 
 	@Id
@@ -48,8 +88,10 @@ public class Comunicato implements Serializable {
 		return this.oggetto;
 	}
 
-	public boolean isInviata() {
-		return this.inviata;
+	@Enumerated(EnumType.STRING)
+	@NotNull
+	public StatoComunicato getStato() {
+		return this.stato;
 	}
 
 	@Column
@@ -71,16 +113,28 @@ public class Comunicato implements Serializable {
 		this.body = body;
 	}
 
+	public void setDataCreazione(Date dataCreazione) {
+		this.dataCreazione = dataCreazione;
+	}
+
+	public void setDataSpedizione(Date dataSpedizione) {
+		this.dataSpedizione = dataSpedizione;
+	}
+
+	public void setDataUltimaModifica(Date dataUltimaModifica) {
+		this.dataUltimaModifica = dataUltimaModifica;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public void setInviata(boolean inviata) {
-		this.inviata = inviata;
-	}
-
 	public void setOggetto(String oggetto) {
 		this.oggetto = oggetto;
+	}
+
+	public void setStato(StatoComunicato stato) {
+		this.stato = stato;
 	}
 
 	public void setToBeni(boolean toBeni) {

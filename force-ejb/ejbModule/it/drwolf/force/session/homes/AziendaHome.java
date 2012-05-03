@@ -146,7 +146,9 @@ public class AziendaHome extends EntityHome<Azienda> {
 				return "KO";
 			}
 			this.getInstance().setStato(StatoAzienda.NUOVA);
+			this.getInstance().setPrivacy(true);
 			// persisto l'entity azienda
+
 			this.persist();
 			try {
 				String body = "La ringraziamo per essersi registrato al servizio FORCE.\n";

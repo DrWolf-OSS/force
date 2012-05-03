@@ -1,4 +1,4 @@
-<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
     xmlns:s="http://jboss.com/products/seam/taglib"
@@ -34,6 +34,14 @@
                 </h:selectOneMenu>
             </s:decorate>
             -->
+            <s:decorate id="linkField" template="/layout/edit.xhtml">
+                <ui:define name="label">Link Fonte</ui:define>
+                <h:outputLink value="#{garaHome.instance.link}"><h:outputText value="#{garaHome.instance.link}" /> </h:outputLink>
+            </s:decorate>
+            <s:decorate id="avcpLinkField" template="/layout/edit.xhtml" rendered="#{garaHome.fromAVCP}">
+                <ui:define name="label">Link AVCP</ui:define>
+                <h:outputLink target="_blank" value="#{garaHome.instance.fonte.url.concat(garaHome.instance.avcpLink)}"><h:outputText value="#{garaHome.instance.avcpLink}" /> </h:outputLink>
+            </s:decorate>
 
             <s:decorate id="catmerField" template="/layout/edit.xhtml">
                 <ui:define name="label">Categorie Merceologiche</ui:define>

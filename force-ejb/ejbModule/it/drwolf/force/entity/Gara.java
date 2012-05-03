@@ -50,7 +50,7 @@ public class Gara implements Serializable {
 
 	private String link;
 
-	private String avcpCode;
+	private String avcpLink;
 
 	private Date dataPubblicazione;
 
@@ -167,8 +167,8 @@ public class Gara implements Serializable {
 	}
 
 	@Column(nullable = true)
-	public String getAvcpCode() {
-		return this.avcpCode;
+	public String getAvcpLink() {
+		return this.avcpLink;
 	}
 
 	@OneToMany(mappedBy = "gara", fetch = FetchType.EAGER)
@@ -319,8 +319,8 @@ public class Gara implements Serializable {
 		return null;
 	}
 
-	public void setAvcpCode(String avcpCode) {
-		this.avcpCode = avcpCode;
+	public void setAvcpLink(String avcpCode) {
+		this.avcpLink = avcpCode;
 	}
 
 	// deve essere inserito anche un riferimento al settore?

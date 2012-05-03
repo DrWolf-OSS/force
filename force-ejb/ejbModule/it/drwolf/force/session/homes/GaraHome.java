@@ -3,6 +3,7 @@ package it.drwolf.force.session.homes;
 import it.drwolf.force.entity.Azienda;
 import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.force.entity.Gara;
+import it.drwolf.force.enums.TipoFonte;
 import it.drwolf.force.enums.TipoGara;
 import it.drwolf.slot.alfresco.AlfrescoUserIdentity;
 import it.drwolf.slot.entity.SlotDef;
@@ -91,6 +92,15 @@ public class GaraHome extends EntityHome<Gara> {
 
 	public Integer getGaraId() {
 		return (Integer) this.getId();
+	}
+
+	public boolean isFromAVCP() {
+		if (this.getInstance().getFonte().getTipo()
+				.equals(TipoFonte.AVCP.name())) {
+			return true;
+		}
+		return false;
+
 	}
 
 	public boolean isRequestSend(Azienda azienda) {

@@ -1,0 +1,78 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:a="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:a4j="http://richfaces.org/a4j"
+    template="/layout/template.xhtml">
+
+<ui:define name="body">
+
+    <h:form id="comunicato" styleClass="edit">
+
+        <rich:panel>
+            <f:facet name="header">#{comunicatoHome.managed ? 'Modifica' : 'Nuova'} Comunicazione</f:facet>
+
+
+
+            <s:decorate id="oggettoField" template="/layout/display.xhtml">
+                <ui:define name="label">Oggetto</ui:define>
+                <h:inputText required="true" value="#{comunicatoHome.instance.oggetto}" />
+            </s:decorate>
+
+            <s:decorate id="bodyField" template="/layout/edit.xhtml">
+                <ui:define name="label">Testo</ui:define>
+                <rich:editor required="true" id="bodyEditor" width="400" height="300" value="#{comunicatoHome.instance.body}">
+                </rich:editor>
+            </s:decorate>
+            <s:decorate id="settoriField" template="/layout/edit.xhtml">
+                <ui:define name="label">Settori</ui:define>
+                <h:selectBooleanCheckbox value="#{comunicatoHome.instance.toLavori}" />Lavori&nbsp;
+                <h:selectBooleanCheckbox value="#{comunicatoHome.instance.toBeni}" />Beni&nbsp;
+                <h:selectBooleanCheckbox value="#{comunicatoHome.instance.toServizi}" />Servizi&nbsp;
+            </s:decorate>
+            <s:decorate id="invioField" template="/layout/edit.xhtml">
+                <ui:define name="label">Invio di Prova</ui:define>
+                <h:inputText value="#{comunicatoHome.emailTest}" />
+                <h:commandButton action="#{comunicatoHome.sendTest()}" value="Test" />
+            </s:decorate>
+
+            <div style="clear:both">
+                <span class="required">*</span>
+                campi obbligatori
+            </div>
+
+        </rich:panel>
+
+  <div class="actionButtons">
+
+            <h:commandButton id="salva"
+                          value="Salva"
+                         disabled="#{comunicatoHome.inSpedizione() or comunicatoHome.spedita()}"
+                          rendered="#{!comunicatoHome.managed}"
+                         action="#{comunicatoHome.persist()}"/>
+            <h:commandButton id="modifica"
+                          value="Modifica"
+                         disabled="#{comunicatoHome.inSpedizione() or comunicatoHome.spedita()}"
+                          rendered="#{comunicatoHome.managed}"
+                         action="#{comunicatoHome.update()}"/>
+
+            <h:commandButton id="invia"
+                          value="Invia"
+                         action="#{comunicatoHome.toBeSend()}"
+                         disabled="#{comunicatoHome.inSpedizione() or comunicatoHome.spedita()}"
+                        onclick="if (!confirm('Sei sicuro di voler inviare la comunicaiozne alle aziende?')) return false"
+                       rendered="#{comunicatoHome.managed}"/>
+                       
+            
+ 
+        </div>    
+</h:form>
+
+</ui:define>
+
+</ui:composition>

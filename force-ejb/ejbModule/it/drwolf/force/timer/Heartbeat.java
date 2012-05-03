@@ -178,6 +178,7 @@ public class Heartbeat {
 											ente.getLinkSezioneGare(),
 											TipoGara.NUOVA.getNome(), fonte);
 									gara.setStato(StatoGara.INSERITA.toString());
+									gara.setAvcpLink(dg.getHrefAttribute());
 									Date dataInizio = avcpFeed.getDataInizio();
 									if (dataInizio != null) {
 										gara.setDataPubblicazione(dataInizio);
@@ -336,6 +337,71 @@ public class Heartbeat {
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
+		}
+		return handle;
+	}
+
+	public QuartzTriggerHandle checkComunicazioneGare(@Expiration Date date,
+			@IntervalCron String cron, @FinalExpiration Date end) {
+		System.out
+				.println("################parte il controllo delle comuncazioni###############");
+		QuartzTriggerHandle handle = new QuartzTriggerHandle(
+				"Fetcher di controllo");
+		EntityManager entityManager = null;
+
+		while (entityManager == null) {
+			try {
+				entityManager = (EntityManager) Component
+						.getInstance("entityManager");
+				System.out.println("---> Sleep!");
+				Thread.sleep(2000);
+			} catch (Exception e) {
+
+			}
+		}
+		List<Azienda> aziende = entityManager
+				.createQuery("from Azienda a where a.stato=:stato")
+				.setParameter("stato", StatoAzienda.ATTIVA).getResultList();
+
+		for (Azienda azienda : aziende) {
+			ArrayList<Gara> gare = (ArrayList<Gara>) entityManager
+					.createQuery(
+							"select distinct  g from Azienda a join a.soa s join s.soa.gare g  where g.stato = 'INSERITA' and a.id= :id")
+					.setParameter("id", azienda.getId()).getResultList();
+			// Se non lo è la inserisco
+			for (Gara gara : gare) {
+				ComunicazioneAziendaGaraId id = new ComunicazioneAziendaGaraId(
+						azienda.getId(), gara.getId());
+				ComunicazioneAziendaGara cag = entityManager.find(
+						ComunicazioneAziendaGara.class, id);
+				if (cag == null) {
+					cag = new ComunicazioneAziendaGara(id, false, false,
+							azienda, gara);
+					this.storeOnDatabase(cag, entityManager);
+				}
+
+			}
+		}
+		for (Azienda azienda : aziende) {
+			ArrayList<Gara> gare = (ArrayList<Gara>) entityManager
+					.createQuery(
+							"select distinct  g from Azienda a join a.categorieMerceologiche cm join cm.gare g where g.stato = 'INSERITA' and a.id= :id")
+					.setParameter("id", azienda.getId()).getResultList();
+			// per ogni gara devo controllare se è già presente nelle
+			// comunicaiozni.
+			// Se non lo è la inserisco
+			for (Gara gara : gare) {
+				ComunicazioneAziendaGaraId id = new ComunicazioneAziendaGaraId(
+						azienda.getId(), gara.getId());
+				ComunicazioneAziendaGara cag = entityManager.find(
+						ComunicazioneAziendaGara.class, id);
+				if (cag == null) {
+					cag = new ComunicazioneAziendaGara(id, false, false,
+							azienda, gara);
+					this.storeOnDatabase(cag, entityManager);
+				}
+
+			}
 		}
 		return handle;
 	}

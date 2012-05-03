@@ -82,7 +82,9 @@ public class UserSession implements Serializable {
 	private boolean servizi = false;
 
 	public String checkStatus() {
-		if (this.isLlpp() && (this.azienda.getSoa().size() == 0)
+		if (!this.azienda.isPrivacy()) {
+			return "NO_PRIVACY";
+		} else if (this.isLlpp() && (this.azienda.getSoa().size() == 0)
 				&& (this.azienda.getCategorieMerceologiche().size() == 0)) {
 			return "GO_TO_SOA";
 		} else if (!this.isLlpp()
@@ -184,21 +186,15 @@ public class UserSession implements Serializable {
 		return this.beni;
 	}
 
-	// primary dell'azienda
-
 	public boolean isLlpp() {
 		return this.llpp;
 	}
 
+	// primary dell'azienda
+
 	public boolean isServizi() {
 		return this.servizi;
 	}
-
-	//
-	// @In(create = true)
-	// SlotDefHome slotDefHome;
-
-	//
 
 	public String reimpostaPassword() {
 		AlfrescoWebScriptClient awsc = new AlfrescoWebScriptClient(
@@ -219,6 +215,12 @@ public class UserSession implements Serializable {
 		}
 		return "KO";
 	}
+
+	//
+	// @In(create = true)
+	// SlotDefHome slotDefHome;
+
+	//
 
 	private AlfrescoFolder retriveSlotFolder() {
 		if (this.getPrimarySlotInst() != null) {
@@ -290,6 +292,10 @@ public class UserSession implements Serializable {
 		this.groupFolder = groupFolder;
 	}
 
+	public void setLlpp(boolean llpp) {
+		this.llpp = llpp;
+	}
+
 	// Lo SlotInst può essere null all'inizo della Session ed essere
 	// visualizzato in seguito. In realtà potrebbe anche essere modificata
 	// l'istanza collegata nel corso della session (non basta controllare se
@@ -310,10 +316,6 @@ public class UserSession implements Serializable {
 	// // Non è ancora stato creato uno slotInst
 	// }
 	// }
-
-	public void setLlpp(boolean llpp) {
-		this.llpp = llpp;
-	}
 
 	public void setNuovaPwd(String nuovaPwd) {
 		this.nuovaPwd = nuovaPwd;
@@ -337,5 +339,11 @@ public class UserSession implements Serializable {
 
 	public void setServizi(boolean servizi) {
 		this.servizi = servizi;
+	}
+
+	public String updatePrivacy() {
+		this.getAzienda().setPrivacy(true);
+		this.entityManager.merge(this.getAzienda());
+		return "updated";
 	}
 }

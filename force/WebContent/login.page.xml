@@ -7,13 +7,17 @@
    <begin-conversation join="true"/>
    
    <navigation from-action="#{identity.login}">
+        <rule if="#{identity.hasRole('AZIENDE') and not userSession.azienda.privacy}">
+            <end-conversation before-redirect="true"/>
+            <redirect view-id="/privacy.xhtml" />
+      </rule>
    		<rule if="#{identity.hasRole('AZIENDE')}">
-       	<end-conversation before-redirect="true"/>
-        <redirect view-id="/user/ControlPanel.xhtml">
-        	<param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
-            <param name="slotInstId" value="#{userSession.primarySlotInst.id}"/>
-            <param name="aziendaId" value="#{userSession.azienda.id}" />
-        </redirect>
+	       	<end-conversation before-redirect="true"/>
+	        <redirect view-id="/user/ControlPanel.xhtml">
+	        	<param name="slotDefId" value="#{userSession.primarySlotDef.id}"/>
+	            <param name="slotInstId" value="#{userSession.primarySlotInst.id}"/>
+	            <param name="aziendaId" value="#{userSession.azienda.id}" />
+	        </redirect>
       </rule>
       <rule if="#{identity.loggedIn}">
       	<end-conversation before-redirect="true"/>

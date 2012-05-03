@@ -1,0 +1,85 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:s="http://jboss.com/products/seam/taglib"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:rich="http://richfaces.org/rich"
+    template="/layout/template.xhtml">
+
+<ui:define name="body">
+
+    <rich:panel>
+        <f:facet name="header">Elenco delle comunicazioni ancora da inviare</f:facet>
+    <div class="results" id="comList">
+     <h:outputText value="Non sono presenti comunicati da spedire."
+               rendered="#{empty comunicatiNonSpediti}"/>
+    <h:form>
+    <rich:dataTable id="comunicazioneList"
+                var="_com"
+              value="#{comunicatiNonSpediti}"
+           rendered="#{not empty comunicatiNonSpediti}"
+           rows="15"
+           reRender="ds">
+        <rich:column sortBy="#{_com.id}">
+            <f:facet name="header">
+            Id
+            </f:facet>
+            <h:outputText value="#{_com.id}"/>
+        </rich:column>
+        <rich:column sortBy="#{_com.oggetto}" filterBy="#{_com.oggetto}">
+            <f:facet name="header">
+            Oggetto
+            </f:facet>
+            <h:outputText value="#{_com.oggetto}"/>
+        </rich:column>
+        <rich:column filterBy="#{_com.body}">
+            <f:facet name="header">
+            Body
+            </f:facet>
+            <h:outputText escape="false" id="bodySnippet" value="#{_com.bodySnippet}"/>
+            <rich:toolTip for="bodySnippet" direction="bottom-left"><h:outputText escape="false" value="#{_com.body}" /> </rich:toolTip>
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">Stato</f:facet>
+            <h:outputText value="#{_com.stato.value()}" />
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+            Destinatari
+            </f:facet>
+            <h:outputText rendered="#{_com.toBeni}" value="Beni"/><br />
+            <h:outputText rendered="#{_com.toServizi}" value="Servizi"/><br />
+            <h:outputText rendered="#{_com.toLavori}" value="Lavori"/><br />
+        </rich:column>
+        <rich:column styleClass="action">
+            <f:facet name="header">Azioni</f:facet>
+            <s:link view="/admin/ComunicazioneEdit.xhtml"
+                   value="Modifica"
+                      id="aziendaViewId">
+                <f:param name="comunicatoId"
+                        value="#{_com.id}"/>
+            </s:link>
+            #{' '}
+            <!-- <s:link view="/admin/AziendaEdit.xhtml"
+                   value="Modifica"
+             propagation="none"
+                      id="aziendaEdit"
+                rendered="#{empty from}">
+                <f:param name="aziendaId"
+                        value="#{_azienda.id}"/>
+            </s:link> -->
+        </rich:column>
+        <f:facet name="footer">
+             <rich:datascroller id="ds" renderIfSinglePage="false"></rich:datascroller>
+        </f:facet>
+    </rich:dataTable>
+    </h:form>
+
+    </div>
+    </rich:panel>
+
+</ui:define>
+
+</ui:composition>
