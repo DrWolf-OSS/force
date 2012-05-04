@@ -341,6 +341,8 @@ public class Heartbeat {
 		return handle;
 	}
 
+	@Asynchronous
+	@Transactional
 	public QuartzTriggerHandle checkComunicazioneGare(@Expiration Date date,
 			@IntervalCron String cron, @FinalExpiration Date end) {
 		System.out

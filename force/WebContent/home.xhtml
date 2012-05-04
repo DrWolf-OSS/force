@@ -35,7 +35,7 @@ Realizzato con il contributo della Regione Toscana, il supporto di Anci Toscana 
            rendered="#{not empty listaGareGestite}"
            rows="3"
            style="list-style:none;">
-           <h:outputText value="#{_gara.oggetto} (Scad. #{_gara.dataScadenza})" />
+           <h:outputText value="#{_gara.oggetto}" /><br />(Scad. <h:outputText value="#{_gara.dataScadenza}" ><f:convertDateTime pattern="dd.MM.yyyy" dateStyle="short" type="date"/></h:outputText>)
            <br />
            <s:link view="/AddAzienda.xhtml">
             <h:outputText value="Dettagli" /> 
