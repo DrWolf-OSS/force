@@ -489,7 +489,7 @@ public class Heartbeat {
 	private void sendEmail(String subject, String body) {
 		Email email = new SimpleEmail();
 		email.setCharset("UTF-8");
-		email.setHostName("zimbra.drwolf.it");
+		email.setHostName("localhost");
 		email.setSmtpPort(25);
 		try {
 			email.setFrom("cron@forcecna.it");
