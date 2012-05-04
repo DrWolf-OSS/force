@@ -74,6 +74,7 @@ public class Heartbeat {
 			@IntervalCron String cron, @FinalExpiration Date end) {
 		System.out
 				.println("################parte il fetcher feed avcp###############");
+		this.sendEmail("Parte Cron AVCP Fetcher", "Cron partito");
 		QuartzTriggerHandle handle = new QuartzTriggerHandle(
 				"Fetcher dei fedd del sistema AVCP");
 
@@ -350,6 +351,7 @@ public class Heartbeat {
 		QuartzTriggerHandle handle = new QuartzTriggerHandle(
 				"Fetcher di controllo");
 		EntityManager entityManager = null;
+		this.sendEmail("Parte Cron Check", "Cron partito");
 
 		while (entityManager == null) {
 			try {
@@ -417,6 +419,7 @@ public class Heartbeat {
 				.println("################parte il servizio di comunicaiozne delle Gare###############");
 		QuartzTriggerHandle handle = new QuartzTriggerHandle(
 				"Comunicatore gare");
+		this.sendEmail("Parte Cron di comunicazione", "Cron partito");
 
 		EntityManager entityManager = null;
 
@@ -483,16 +486,21 @@ public class Heartbeat {
 		 */return handle;
 	}
 
-	private String sendEmail(String subject, String body, String to)
-			throws EmailException {
+	private void sendEmail(String subject, String body) {
 		Email email = new SimpleEmail();
+		email.setCharset("UTF-8");
 		email.setHostName("zimbra.drwolf.it");
 		email.setSmtpPort(25);
-		email.setFrom("info@forcecna.it");
-		email.setSubject(subject);
-		email.addTo(to);
-		email.setMsg(body);
-		return email.send();
+		try {
+			email.setFrom("cron@forcecna.it");
+			email.setSubject(subject);
+			email.addTo("stefanoraffini@drwolf.it");
+			email.setMsg(body);
+			email.send();
+		} catch (EmailException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void setComunicaizioneAziende(EntityManager entityManager, Gara gara) {
@@ -541,6 +549,7 @@ public class Heartbeat {
 				.println("################parte il fetcher feed start###############");
 		QuartzTriggerHandle handle = new QuartzTriggerHandle(
 				"Fetcher dei fedd del sistema START");
+		this.sendEmail("Parte Cron START Fetcher", "Cron partito");
 
 		EntityManager entityManager = null;
 
