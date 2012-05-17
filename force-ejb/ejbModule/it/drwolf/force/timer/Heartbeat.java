@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import javax.persistence.NonUniqueResultException;
 
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.SimpleEmail;
 import org.jboss.seam.Component;
 import org.jboss.seam.annotations.AutoCreate;
@@ -70,6 +72,7 @@ public class Heartbeat {
 
 	@Asynchronous
 	@Transactional
+	@SuppressWarnings("unchecked")
 	public QuartzTriggerHandle avcpFetcher(@Expiration Date date,
 			@IntervalCron String cron, @FinalExpiration Date end) {
 		System.out
@@ -163,7 +166,7 @@ public class Heartbeat {
 						for (String title : dettagliGare.keySet()) {
 							String oggettoLike = title.toLowerCase()
 									.replaceAll("\\W+", "%");
-							List results = entityManager
+							List<Gara> results = entityManager
 									.createQuery(
 											"from Gara where lower(oggetto) like lower(:oggetto)")
 									.setParameter("oggetto", oggettoLike)
@@ -344,6 +347,7 @@ public class Heartbeat {
 
 	@Asynchronous
 	@Transactional
+	@SuppressWarnings("unchecked")
 	public QuartzTriggerHandle checkComunicazioneGare(@Expiration Date date,
 			@IntervalCron String cron, @FinalExpiration Date end) {
 		System.out
@@ -442,48 +446,44 @@ public class Heartbeat {
 			// per ogni azienda vado a prelevare dalla tabella Comunicazione le
 			// gare ancora non segnalate
 			// cioè quelle con email a false
+
+			Calendar now = Calendar.getInstance();
 			List<ComunicazioneAziendaGara> cags = entityManager
 					.createQuery(
-							"from ComunicazioneAziendaGara cag where cag.azienda = :azienda and cag.gara.type = 'GESTITA' and cag.gara.stato = 'INSERITA' and email = false and web = false")
-					.setParameter("azienda", azienda).getResultList();
+							"from ComunicazioneAziendaGara cag where cag.azienda = :azienda and cag.gara.type = 'GESTITA' and cag.gara.stato = 'INSERITA' and email = false and web = false and cag.gara.dataScadenza < :scad")
+					.setParameter("azienda", azienda)
+					.setParameter("scad", now.getTime()).getResultList();
 			if (cags.size() > 0) {
-				String body = "Gentile " + azienda.getNome() + " "
-						+ azienda.getCognome() + "\n";
-				body += "sono state individuate le seguenti gare  :\n";
+				String body = "<p>Gentile " + azienda.getNome() + " "
+						+ azienda.getCognome() + "</p>";
+				body += "<p>sono state individuate le seguenti gare  :</p>";
 
+				body += "<table>";
 				for (ComunicazioneAziendaGara cag : cags) {
-					body += cag.getGara().getOggetto() + "\n";
-					body += "######################################################\n";
+					body += "<tr><td>";
+					body += "<a href='";
+					body += "http://forcecna.it/force/user/Gara.seam?garaId="
+							+ cag.getGara().getId() + "'>";
+					body += cag.getGara().getOggetto() + "</a>";
+					body += "</td></tr>";
 					cag.setEmail(true);
-					entityManager.merge(cag);
-					entityManager.flush();
+					this.storeOnDatabase(cag, entityManager);
 				}
-				body += "Per vedere il dettaglio effettua il login su FORCE:\n";
-				body += "http://http://www.forcecna.it/force/login.seam\n\n";
-				/*
-				 * try { this.sendEmail("Nuove Gare", body,
-				 * azienda.getEmailReferente()); } catch (EmailException e) { //
-				 * TODO Auto-generated catch block e.printStackTrace(); }
-				 */
+				body += "</table>";
+				body += "<p>Per vedere il dettaglio segui il link di ogni gara ed accedi al servizio Force.</p>";
+				try {
+					String email = azienda.getEmailReferente();
+					email = "stefanoraffini@drwolf.it";
+					this.sendHtmlEmail("Segnalazione di nuove gare", email,
+							body);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
 			}
 		}
 
-		/*
-		 * // per prima cosa devo prelevare l'elenco delle gare inserite e non
-		 * // comunicate ArrayList<Gara> gare = (ArrayList<Gara>)
-		 * entityManager.createQuery(
-		 * "from Gara where type = 'GESTITA' and stato = 'INSERITA'")
-		 * .getResultList(); for (Gara gara : gare) { // per ogni gara devo
-		 * prendere l'elenco delle aziende a cui devo // comunicarla
-		 * List<ComunicazioneAziendaGara> resultList = entityManager
-		 * .createQuery(
-		 * " from ComunicazioneAziendaGara  where garaId = :gid and email = false group by azienda"
-		 * ) .setParameter("gid", gara.getId()).getResultList(); // a questo
-		 * punto devo predenre le singole aziende e mandargli una // mail for
-		 * (ComunicazioneAziendaGara comunicazioneAziendaGara : resultList) {
-		 * 
-		 * } }
-		 */return handle;
+		return handle;
 	}
 
 	private void sendEmail(String subject, String body) {
@@ -503,6 +503,26 @@ public class Heartbeat {
 		}
 	}
 
+	private String sendHtmlEmail(String oggetto, String to, String body) {
+		try {
+			HtmlEmail email = new HtmlEmail();
+			email.setCharset("UTF-8");
+
+			email.setHostName("localhost");
+			email.setSmtpPort(25);
+			email.setFrom("info@forcecna.it");
+			email.setSubject(oggetto);
+			email.addTo(to);
+			email.setMsg(body);
+			email.send();
+			return "OK";
+		} catch (EmailException e) {
+			// TODO Auto-generated catch block
+			return "KO";
+		}
+	}
+
+	@SuppressWarnings("unchecked")
 	private void setComunicaizioneAziende(EntityManager entityManager, Gara gara) {
 		if (gara.getCategorieMerceologicheAsList().size() > 0) {
 			List<Azienda> resultList = entityManager
@@ -542,6 +562,7 @@ public class Heartbeat {
 
 	@Asynchronous
 	@Transactional
+	@SuppressWarnings("unchecked")
 	public QuartzTriggerHandle startFetcher(@Expiration Date date,
 			@IntervalCron String cron, @FinalExpiration Date end) {
 
@@ -582,11 +603,11 @@ public class Heartbeat {
 			WebClient wc = new WebClient();
 			try {
 				feed = new SyndFeedInput().build(new XmlReader(url));
-				Iterator i = feed.getEntries().iterator();
+				Iterator<SyndEntry> i = feed.getEntries().iterator();
 				StartFeedParser startFeed = new StartFeedParser();
 				while (i.hasNext()) {
-					SyndEntry post = (SyndEntry) i.next();
-					List results = entityManager
+					SyndEntry post = i.next();
+					List<Gara> results = entityManager
 							.createQuery("from Gara where oggetto = :oggetto")
 							.setParameter("oggetto", post.getTitle())
 							.getResultList();
