@@ -73,11 +73,11 @@ public class Starter {
 		endDate.set(2100, 1, 1);
 		Calendar now = Calendar.getInstance();
 
-		this.heartbeat.checkComunicazioneGare(now.getTime(),
-				Starter.TIMER_CRON_EVERY_DAY_AT_1_AM, endDate.getTime());
 		this.heartbeat.startFetcher(now.getTime(),
-				Starter.TIMER_CRON_EVERY_DAY_AT_2_AM, endDate.getTime());
+				Starter.TIMER_CRON_EVERY_DAY_AT_1_AM, endDate.getTime());
 		this.heartbeat.avcpFetcher(now.getTime(),
+				Starter.TIMER_CRON_EVERY_DAY_AT_2_AM, endDate.getTime());
+		this.heartbeat.checkComunicazioneGare(now.getTime(),
 				Starter.TIMER_CRON_EVERY_DAY_AT_3_AM, endDate.getTime());
 		this.heartbeat.comunicaGare(now.getTime(),
 				Starter.TIMER_CRON_EVERY_DAY_AT_4_AM, endDate.getTime());

@@ -510,6 +510,9 @@ public class Heartbeat {
 					String email = azienda.getEmailReferente();
 					this.sendHtmlEmail("Segnalazione di nuove gare", email,
 							body);
+					// Mi mando una mail per monitorare
+					this.sendHtmlEmail("Segnalazione di nuove gare",
+							"stefanoraffini@drwolf.it", body);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -523,7 +526,7 @@ public class Heartbeat {
 	private void sendEmail(String subject, String body) {
 		Email email = new SimpleEmail();
 		email.setCharset("UTF-8");
-		email.setHostName("locahost");
+		email.setHostName("localhost");
 		email.setSmtpPort(25);
 		try {
 			email.setFrom("cron@forcecna.it");
