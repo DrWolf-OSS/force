@@ -40,8 +40,9 @@ public class CategoriaMerceologichaList {
 	@SuppressWarnings("unchecked")
 	@Factory("listaBeni")
 	public void getListaBeni() {
-		this.listaBeni = this.entityManager.createQuery(
-				"from CategoriaMerceologica cm where cm.type = 'BENE'")
+		this.listaBeni = this.entityManager
+				.createQuery(
+						"from CategoriaMerceologica cm where cm.type = 'BENE' order by  categoria")
 				.getResultList();
 	}
 
@@ -49,14 +50,16 @@ public class CategoriaMerceologichaList {
 	@Factory("listaCategorieMerceologiche")
 	public void getListaCategorieMerceologiche() {
 		this.listaCategorieMerceologiche = this.entityManager.createQuery(
-				"from CategoriaMerceologica").getResultList();
+				"from CategoriaMerceologica order by type, categoria")
+				.getResultList();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Factory("listaServizi")
 	public void getListaServizi() {
-		this.listaServizi = this.entityManager.createQuery(
-				"from CategoriaMerceologica cm where cm.type = 'SERVIZIO'")
+		this.listaServizi = this.entityManager
+				.createQuery(
+						"from CategoriaMerceologica cm where cm.type = 'SERVIZIO' order by  categoria")
 				.getResultList();
 	}
 

@@ -45,7 +45,7 @@
 
             <s:decorate id="catmerField" template="/layout/edit.xhtml">
                 <ui:define name="label">Categorie Merceologiche</ui:define>
-	                <rich:pickList value="#{garaHome.instance.categorieMerceologicheAsList}" sourceListWidth="150" targetListWidth="150" listsHeight="200"> 
+	                <rich:pickList value="#{garaHome.instance.categorieMerceologicheAsList}" sourceListWidth="300" targetListWidth="300" listsHeight="200"> 
 	                    <s:selectItems value="#{listaCategorieMerceologiche}" var="cm" label="#{cm.categoria}"/>
 	                    <s:convertEntity />
 	                    <a4j:support event="onlistchanged" reRender="result"/>
@@ -54,7 +54,7 @@
 
             <s:decorate id="soaField" template="/layout/edit.xhtml">
                 <ui:define name="label">SOA</ui:define>
-                    <rich:pickList value="#{garaHome.instance.soaAsList}" sourceListWidth="150" targetListWidth="150" listsHeight="200"> 
+                    <rich:pickList value="#{garaHome.instance.soaAsList}" sourceListWidth="300" targetListWidth="300" listsHeight="200"> 
                         <s:selectItems value="#{soaList.resultList}" var="cm" label="#{cm.codice}"/>
                         <s:convertEntity />
                         <a4j:support event="onlistchanged" reRender="result"/>
