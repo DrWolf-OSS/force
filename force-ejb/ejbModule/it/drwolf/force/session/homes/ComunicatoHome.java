@@ -50,7 +50,8 @@ public class ComunicatoHome extends EntityHome<Comunicato> {
 	}
 
 	public boolean inSpedizione() {
-		if (this.getInstance().getStato().equals(StatoComunicato.PRONTA)) {
+		if (this.getInstance().getStato() != null
+				&& this.getInstance().getStato().equals(StatoComunicato.PRONTA)) {
 			return true;
 		}
 		return false;
@@ -99,7 +100,9 @@ public class ComunicatoHome extends EntityHome<Comunicato> {
 	}
 
 	public boolean spedita() {
-		if (this.getInstance().getStato().equals(StatoComunicato.SPEDITA)) {
+		if (this.getInstance().getStato() != null
+				&& this.getInstance().getStato()
+						.equals(StatoComunicato.SPEDITA)) {
 			return true;
 		}
 		return false;

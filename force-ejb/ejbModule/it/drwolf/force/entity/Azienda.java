@@ -5,6 +5,7 @@ import it.drwolf.force.enums.TipologiaAbbonamento;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,6 +63,10 @@ public class Azienda implements Serializable {
 	private String fax;
 	private String cellulare;
 
+	private Date dataInserimento;
+
+	private Date dataAttivazione;
+
 	// Per Privacy
 	private boolean privacy;
 
@@ -70,19 +75,19 @@ public class Azienda implements Serializable {
 	private Settore settore;
 
 	private String posizioneCNA;
+
 	// private String stato;
 	private StatoAzienda stato;
+
 	// private String tipologiaAbbonamento;
 	private TipologiaAbbonamento tipologiaAbbonamento;
+
 	// per Alfresco
 	private String alfrescoGroupId;
 
 	private Set<CategoriaMerceologica> categorieMerceologiche = new HashSet<CategoriaMerceologica>();
-
 	private Set<AziendaSoa> soa = new HashSet<AziendaSoa>();
-
 	private Set<Commessa> commesse;
-
 	private Set<ComunicazioneAziendaGara> gare = new HashSet<ComunicazioneAziendaGara>();
 
 	public Azienda() {
@@ -148,6 +153,16 @@ public class Azienda implements Serializable {
 	@NotNull
 	public String getComune() {
 		return this.comune;
+	}
+
+	@Column
+	public Date getDataAttivazione() {
+		return this.dataAttivazione;
+	}
+
+	@Column
+	public Date getDataInserimento() {
+		return this.dataInserimento;
 	}
 
 	@Column(nullable = false)
@@ -266,20 +281,10 @@ public class Azienda implements Serializable {
 		return this.telefono;
 	}
 
-	// @Column(nullable = false)
-	// @NotNull
-	// public String getStato() {
-	// return this.stato;
-	// }
-
 	@Enumerated(EnumType.STRING)
 	public TipologiaAbbonamento getTipologiaAbbonamento() {
 		return this.tipologiaAbbonamento;
 	}
-
-	// public String getTipologiaAbbonamento() {
-	// return this.tipologiaAbbonamento;
-	// }
 
 	@Override
 	public int hashCode() {
@@ -289,6 +294,12 @@ public class Azienda implements Serializable {
 		return result;
 	}
 
+	// @Column(nullable = false)
+	// @NotNull
+	// public String getStato() {
+	// return this.stato;
+	// }
+
 	@Transient
 	public boolean isBene() {
 		if (this.getSettore().getNome().equals("Beni")) {
@@ -296,6 +307,10 @@ public class Azienda implements Serializable {
 		}
 		return false;
 	}
+
+	// public String getTipologiaAbbonamento() {
+	// return this.tipologiaAbbonamento;
+	// }
 
 	@Transient
 	public boolean isEdile() {
@@ -355,6 +370,14 @@ public class Azienda implements Serializable {
 
 	public void setComune(String comune) {
 		this.comune = comune;
+	}
+
+	public void setDataAttivazione(Date dataAttivazione) {
+		this.dataAttivazione = dataAttivazione;
+	}
+
+	public void setDataInserimento(Date dataInserimento) {
+		this.dataInserimento = dataInserimento;
 	}
 
 	public void setEmail(String email) {

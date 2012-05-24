@@ -6,8 +6,10 @@ import it.drwolf.force.entity.AziendaSoaId;
 import it.drwolf.force.entity.ComunicazioneAziendaGara;
 import it.drwolf.force.entity.ComunicazioneAziendaGaraId;
 import it.drwolf.force.entity.Gara;
+import it.drwolf.force.entity.Log;
 import it.drwolf.force.entity.Soa;
 import it.drwolf.force.enums.ClassificaSoa;
+import it.drwolf.force.enums.LogType;
 import it.drwolf.force.enums.PosizioneCNA;
 import it.drwolf.force.enums.StatoAzienda;
 import it.drwolf.force.utils.UserUtil;
@@ -16,6 +18,7 @@ import it.drwolf.slot.prefs.Preferences;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -145,9 +148,14 @@ public class AziendaHome extends EntityHome<Azienda> {
 						"Partita IVA già presente nel nostro database");
 				return "KO";
 			}
+			this.getInstance().setDataInserimento(new Date());
 			this.getInstance().setStato(StatoAzienda.NUOVA);
 			this.getInstance().setPrivacy(true);
 			// persisto l'entity azienda
+			Log logEntity = new Log();
+			logEntity.setClasse(this.getClass().getSimpleName());
+			logEntity.setMethod("inserisciAzienda");
+			logEntity.setAzienda(this.getInstance());
 
 			this.persist();
 			try {
@@ -165,12 +173,28 @@ public class AziendaHome extends EntityHome<Azienda> {
 								this.preferences
 										.getValue(PreferenceKey.FORCE_EMAIL_FROM
 												.name()));
-			} catch (EmailException e) { // TODO: handle exception
+				logEntity.setType(LogType.INFO);
+				logEntity.setMessages("Inserita nuova azienda "
+						+ this.getInstance().getRagioneSociale());
+				logEntity.setDate(new Date());
+				this.entityManager.persist(logEntity);
+			} catch (EmailException e) {
+				logEntity.setType(LogType.ERROR);
+				logEntity
+						.setMessages("Errore nell'inivio della mail di conferma");
+				logEntity.setStackTrace(e.getMessage());
 			}
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log logEntity = new Log();
+			logEntity.setClasse(this.getClass().getSimpleName());
+			logEntity.setMethod("inserisciAzienda");
+			logEntity.setType(LogType.ERROR);
+			logEntity.setAzienda(this.getInstance());
+			logEntity.setMessages("Errore nell'inserimento dell'azienda "
+					+ this.getInstance().getRagioneSociale());
+			logEntity.setStackTrace(e.getMessage());
+			this.entityManager.persist(logEntity);
 			return "KO";
 		}
 

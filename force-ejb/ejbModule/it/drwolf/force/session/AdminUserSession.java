@@ -14,6 +14,7 @@ import it.drwolf.slot.prefs.Preferences;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -105,6 +106,7 @@ public class AdminUserSession implements Serializable {
 			}
 			// alla fine dovrei mandare una mail con gli accessi al referente
 			azienda.setStato(StatoAzienda.ATTIVA);
+			azienda.setDataAttivazione(new Date());
 			System.out
 					.println("###############Finita la parte di alfresco###############");
 
