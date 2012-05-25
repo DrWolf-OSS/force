@@ -1,12 +1,15 @@
 package it.drwolf.force.utils;
 
 import it.drwolf.force.entity.Azienda;
+import it.drwolf.force.entity.Log;
+import it.drwolf.force.enums.LogType;
 import it.drwolf.slot.alfresco.AlfrescoInfo;
 import it.drwolf.slot.alfresco.webscripts.AlfrescoWebScriptClient;
 import it.drwolf.slot.prefs.PreferenceKey;
 import it.drwolf.slot.prefs.Preferences;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
@@ -44,7 +47,6 @@ public class UserUtil implements Serializable {
 	private Preferences preferences;
 
 	private String email = null;
-
 	private String statoRecuperoEmail = null;
 
 	public String getEmail() {
@@ -53,6 +55,19 @@ public class UserUtil implements Serializable {
 
 	public String getStatoRecuperoEmail() {
 		return this.statoRecuperoEmail;
+	}
+
+	public void logMe(Azienda azienda, String classe, String messages,
+			String method, String stackTrace, LogType type) {
+		Log log = new Log();
+		log.setAzienda(azienda);
+		log.setClasse(classe);
+		log.setMessages(messages);
+		log.setDate(new Date());
+		log.setMethod(method);
+		log.setStackTrace(method);
+		log.setType(type);
+		this.entityManager.persist(log);
 	}
 
 	public String recuperaPassword() {

@@ -498,7 +498,7 @@ public class Heartbeat {
 					body += "<tr><td>";
 					body += "<a href='";
 					body += "http://forcecna.it/force/user/Gara.seam?garaId="
-							+ cag.getGara().getId() + "'>";
+							+ cag.getGara().getId() + "&from=email'>";
 					body += cag.getGara().getOggetto() + "</a>";
 					body += "</td></tr>";
 					cag.setEmail(true);
