@@ -197,6 +197,7 @@ public class Heartbeat {
 										gara.setStato(StatoGara.INSERITA
 												.toString());
 										gara.setAvcpLink(dg.getHrefAttribute());
+										gara.setDataInseriemento(new Date());
 										Date dataInizio = avcpFeed
 												.getDataInizio();
 										if (dataInizio != null) {
@@ -665,6 +666,7 @@ public class Heartbeat {
 											post.getLink(),
 											TipoGara.NUOVA.getNome(), fonte);
 									gara.setStato(StatoGara.INSERITA.toString());
+									gara.setDataInseriemento(new Date());
 									Date dataInizio = startFeed.getDataInizio();
 									if (dataInizio != null) {
 										gara.setDataPubblicazione(dataInizio);

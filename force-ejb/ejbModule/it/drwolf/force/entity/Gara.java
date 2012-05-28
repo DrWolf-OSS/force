@@ -56,6 +56,8 @@ public class Gara implements Serializable {
 
 	private Date dataScadenza;
 
+	private Date dataInseriemento;
+
 	private BigDecimal importo;
 
 	private BigDecimal requisitoTecnico;
@@ -83,11 +85,11 @@ public class Gara implements Serializable {
 
 	private Set<CategoriaMerceologica> categorieMerceologiche = new HashSet<CategoriaMerceologica>();
 
-	// private SlotDef slotDef;
-
 	private Set<Soa> soa = new HashSet<Soa>();
 
 	private Set<ComunicazioneAziendaGara> aziende = new HashSet<ComunicazioneAziendaGara>();
+
+	// private SlotDef slotDef;
 
 	private Settore settore;
 
@@ -194,6 +196,11 @@ public class Gara implements Serializable {
 	}
 
 	@Column
+	public Date getDataInseriemento() {
+		return this.dataInseriemento;
+	}
+
+	@Column
 	public Date getDataPubblicazione() {
 		return this.dataPubblicazione;
 	}
@@ -240,17 +247,17 @@ public class Gara implements Serializable {
 		return this.requisitoTecnico;
 	}
 
-	// @ManyToOne
-	// @JoinColumn(name = "SlotDef")
-	// public SlotDef getSlotDef() {
-	// return this.slotDef;
-	// }
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "Settore", nullable = true)
 	public Settore getSettore() {
 		return this.settore;
 	}
+
+	// @ManyToOne
+	// @JoinColumn(name = "SlotDef")
+	// public SlotDef getSlotDef() {
+	// return this.slotDef;
+	// }
 
 	@ManyToMany
 	public Set<SlotDef> getSlotDefs() {
@@ -297,8 +304,6 @@ public class Gara implements Serializable {
 		return false;
 	}
 
-	// deve essere inserito anche un riferimento al settore?
-
 	@Transient
 	public boolean isNew() {
 		if (this.getType().equals(TipoGara.NUOVA.getNome())) {
@@ -306,6 +311,8 @@ public class Gara implements Serializable {
 		}
 		return false;
 	}
+
+	// deve essere inserito anche un riferimento al settore?
 
 	@Transient
 	public SlotDef retrieveSlotDefByOwner(String ownerId) {
@@ -323,11 +330,11 @@ public class Gara implements Serializable {
 		this.avcpLink = avcpCode;
 	}
 
-	// deve essere inserito anche un riferimento al settore?
-
 	public void setAziende(Set<ComunicazioneAziendaGara> aziende) {
 		this.aziende = aziende;
 	}
+
+	// deve essere inserito anche un riferimento al settore?
 
 	public void setCategorieMerceologiche(
 			Set<CategoriaMerceologica> categorieMerceologiche) {
@@ -342,6 +349,10 @@ public class Gara implements Serializable {
 
 	public void setCig(String cig) {
 		this.cig = cig;
+	}
+
+	public void setDataInseriemento(Date dataInseriemento) {
+		this.dataInseriemento = dataInseriemento;
 	}
 
 	public void setDataPubblicazione(Date dataPubblicazione) {
