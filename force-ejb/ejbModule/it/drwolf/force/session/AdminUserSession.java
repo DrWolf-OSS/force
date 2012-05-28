@@ -2,6 +2,7 @@ package it.drwolf.force.session;
 
 import it.drwolf.force.entity.Azienda;
 import it.drwolf.force.entity.Gara;
+import it.drwolf.force.enums.LogType;
 import it.drwolf.force.enums.PosizioneCNA;
 import it.drwolf.force.enums.StatoAzienda;
 import it.drwolf.force.session.lists.AziendaList;
@@ -107,13 +108,8 @@ public class AdminUserSession implements Serializable {
 			// alla fine dovrei mandare una mail con gli accessi al referente
 			azienda.setStato(StatoAzienda.ATTIVA);
 			azienda.setDataAttivazione(new Date());
-			System.out
-					.println("###############Finita la parte di alfresco###############");
-
 			azienda.setAlfrescoGroupId(groupName);
 			this.entityManager.persist(azienda);
-			System.out
-					.println("###############Preparo la mail ###############");
 			// mando la mail con i dati
 			String body = new String();
 			body = "Gentile " + azienda.getNome() + " " + azienda.getCognome()
@@ -133,14 +129,14 @@ public class AdminUserSession implements Serializable {
 			body += "http://www.forcecna.it/force/Manuale.pdf";
 			body += "\n\n";
 			body += "Lo Staff di FORCE\n";
-			System.out.println("###############Invio la mail ###############");
 			this.userUtil.sendEmail("Conferma iscrizione FORCE", body, azienda
 					.getEmailReferente(), this.preferences
 					.getValue(PreferenceKey.FORCE_EMAIL_HOSTNAME.name()),
 					this.preferences.getValue(PreferenceKey.FORCE_EMAIL_FROM
 							.name()));
-			System.out
-					.println("###############Inviato segnale mail ###############");
+			this.userUtil.logMe(azienda, this.getClass().getSimpleName(),
+					"Azienda attivata con successo", "attivaAzienda", null,
+					LogType.INFO);
 			// terimata la creazione devo mettere a null la lista delle aziende
 			// e attive e delle nuove per rigenerare la Factory
 			this.aziendaList.setAziendeAttive(null);
@@ -148,7 +144,9 @@ public class AdminUserSession implements Serializable {
 			return "ok";
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			this.userUtil.logMe(azienda, this.getClass().getSimpleName(),
+					"Errore nell'attivazione dell'azienda", "inserisciAzienda",
+					e.getMessage(), LogType.ERROR);
 			return "KO";
 		}
 	}
