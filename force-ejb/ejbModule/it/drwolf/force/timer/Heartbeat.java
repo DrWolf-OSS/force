@@ -8,7 +8,9 @@ import it.drwolf.force.entity.ComunicazioneAziendaGaraId;
 import it.drwolf.force.entity.EntePubblico;
 import it.drwolf.force.entity.Fonte;
 import it.drwolf.force.entity.Gara;
+import it.drwolf.force.entity.Log;
 import it.drwolf.force.entity.Soa;
+import it.drwolf.force.enums.LogType;
 import it.drwolf.force.enums.StatoAzienda;
 import it.drwolf.force.enums.StatoGara;
 import it.drwolf.force.enums.TipoGara;
@@ -348,6 +350,17 @@ public class Heartbeat {
 												entityManager)) {
 											this.setComunicaizioneAziende(
 													entityManager, gara);
+											String msg = "Inserita nuova gara : "
+													+ gara.getOggetto()
+													+ ". Fonte :"
+													+ ente.getEnte();
+											this.logMe(
+													entityManager,
+													null,
+													this.getClass()
+															.getCanonicalName(),
+													msg, "avcpFetcher", null,
+													LogType.INFO);
 										}
 									}
 
@@ -486,7 +499,7 @@ public class Heartbeat {
 			Calendar now = Calendar.getInstance();
 			List<ComunicazioneAziendaGara> cags = entityManager
 					.createQuery(
-							"from ComunicazioneAziendaGara cag where cag.azienda = :azienda and cag.gara.type = 'GESTITA' and cag.gara.stato = 'INSERITA' and email = false and web = false and cag.gara.dataScadenza < :scad")
+							"from ComunicazioneAziendaGara cag where cag.azienda = :azienda and cag.gara.type = 'GESTITA' and cag.gara.stato = 'INSERITA' and email = false and web = false and cag.gara.dataScadenza > :scad")
 					.setParameter("azienda", azienda)
 					.setParameter("scad", now.getTime()).getResultList();
 			if (cags.size() > 0) {
@@ -508,20 +521,43 @@ public class Heartbeat {
 				body += "</table>";
 				body += "<p>Per vedere il dettaglio segui il link di ogni gara ed accedi al servizio Force.</p>";
 				try {
-					String email = azienda.getEmailReferente();
-					this.sendHtmlEmail("Segnalazione di nuove gare", email,
-							body);
+					this.sendHtmlEmail("Segnalazione di nuove gare",
+							azienda.getEmailReferente(), body);
 					// Mi mando una mail per monitorare
 					this.sendHtmlEmail("Segnalazione di nuove gare",
 							"stefanoraffini@drwolf.it", body);
+					String msg = "Inviata email a "
+							+ azienda.getEmailReferente();
+					this.logMe(entityManager, azienda, this.getClass()
+							.getCanonicalName(), msg, "avcpFetcher", null,
+							LogType.INFO);
+
 				} catch (Exception e) {
-					e.printStackTrace();
+					String msg = "Errore nell'invio dela email a "
+							+ azienda.getEmailReferente();
+					this.logMe(entityManager, azienda, this.getClass()
+							.getCanonicalName(), msg, "avcpFetcher", e
+							.getMessage(), LogType.ERROR);
 				}
 
 			}
 		}
 
 		return handle;
+	}
+
+	private void logMe(EntityManager entityManager, Azienda azienda,
+			String classe, String messages, String method, String stackTrace,
+			LogType type) {
+		Log log = new Log();
+		log.setClasse(classe);
+		log.setAzienda(azienda);
+		log.setMessages(messages);
+		log.setDate(new Date());
+		log.setMethod(method);
+		log.setStackTrace(method);
+		log.setType(type);
+		this.storeOnDatabase(log, entityManager);
 	}
 
 	private void sendEmail(String subject, String body) {
@@ -758,12 +794,27 @@ public class Heartbeat {
 											entityManager)) {
 										this.setComunicaizioneAziende(
 												entityManager, gara);
+										String msg = "Inserita nuova gara : "
+												+ gara.getOggetto()
+												+ ". Fonte :" + fonte.getNome();
+										this.logMe(entityManager, null, this
+												.getClass().getCanonicalName(),
+												msg, "startFetcher", null,
+												LogType.INFO);
+
 									}
 
 								}
 							} catch (Exception e) {
-								// TODO: handle exception
-								e.printStackTrace();
+								String msg = "Errore durante l'inserimento della gara : "
+										+ post.getTitle()
+										+ ". Fonte :"
+										+ fonte.getNome();
+								;
+								this.logMe(entityManager, null, this.getClass()
+										.getCanonicalName(), msg,
+										"startFetcher", e.getMessage(),
+										LogType.ERROR);
 							}
 						}
 					}
