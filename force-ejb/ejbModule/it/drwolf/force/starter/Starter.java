@@ -21,7 +21,7 @@ public class Starter {
 	@In
 	Heartbeat heartbeat;
 
-	public static final String TIMER_CRON_TEST = "00 32 * * * ?";
+	public static final String TIMER_CRON_TEST = "00 50 * * * ?";
 	public static final String TIMER_CRON_EVERY_DAY_AT_1_AM = "00 00 01 * * ?";
 
 	public static final String TIMER_CRON_EVERY_DAY_AT_2_AM = "00 00 02 * * ?";
@@ -73,8 +73,8 @@ public class Starter {
 		endDate.set(2100, 1, 1);
 		Calendar now = Calendar.getInstance();
 
-		this.heartbeat.startFetcher(now.getTime(), Starter.TIMER_CRON_TEST,
-				endDate.getTime());
+		this.heartbeat.startFetcher(now.getTime(),
+				Starter.TIMER_CRON_EVERY_DAY_AT_1_AM, endDate.getTime());
 		this.heartbeat.avcpFetcher(now.getTime(),
 				Starter.TIMER_CRON_EVERY_DAY_AT_2_AM, endDate.getTime());
 		this.heartbeat.checkComunicazioneGare(now.getTime(),

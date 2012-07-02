@@ -513,7 +513,28 @@ public class Heartbeat {
 					body += "<a href='";
 					body += "http://forcecna.it/force/user/Gara.seam?garaId="
 							+ cag.getGara().getId() + "&from=email'>";
-					body += cag.getGara().getOggetto() + "</a>";
+					body += cag.getGara().getOggetto();
+					if (cag.getGara().getFonte().getTipo().equals("START")) {
+						body += " (" + cag.getGara().getFonte().getNome() + ")";
+					} else if (cag.getGara().getFonte().getTipo()
+							.equals("AVCP")) {
+						EntePubblico ep = null;
+						try {
+							ep = (EntePubblico) entityManager
+									.createQuery(
+											"from EntePubblico where linkSezioneGare = :link")
+									.setParameter("link",
+											cag.getGara().getLink())
+									.getSingleResult();
+
+						} catch (Exception e) {
+							// TODO: handle exception
+						}
+						if (ep != null) {
+							body += " (" + ep.getEnte() + ")";
+						}
+					}
+					body += "</a>";
 					body += "</td></tr>";
 					cag.setEmail(true);
 					this.storeOnDatabase(cag, entityManager);

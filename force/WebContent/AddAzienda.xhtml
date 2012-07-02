@@ -16,6 +16,10 @@
         <rich:panel>
             <f:facet name="header">Iscriviti al servizio FORCE</f:facet>
             <h4>Dati Azienda</h4>
+            <s:div style="float: right;width:130px;text-align: center;font-weight: bolder;margin: 10px;">
+               <a href="Manuale.pdf"><h:graphicImage value="img/pdf-icon-128.png" />
+               Scarica la guida alla registrazione</a>
+            </s:div>
             <s:decorate id="nameField" template="layout/edit.xhtml">
                 <ui:define name="label">Nome dell'azienda</ui:define>
                 <h:inputTextarea id="ragioneSociale"
@@ -246,13 +250,13 @@
         
           <div class="actionButtons">
 
-            <h:commandButton id="save"
+            <h:commandButton styleClass="clean-gray" style="width70px;" id="save"
                           value="Accetto ed eseguo l'iscrizione"
                          action="#{aziendaHome.inserisciAzienda()}"
                        disabled="#{!aziendaHome.wired}"
                        rendered="#{!aziendaHome.managed}"/>
 
-            <s:button id="cancelAdd"
+            <s:button styleClass="clean-gray" id="cancelAdd"
                    value="Non accetto"
              propagation="end"
                     view="/home.xhtml"
